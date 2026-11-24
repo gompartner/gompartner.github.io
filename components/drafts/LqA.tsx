@@ -45,8 +45,7 @@ export function LqA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.wine }}>THIS MONTH</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">가격대별 추천</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">가격대별 추천</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {PICKS.map(([p, use, d]) => (
               <li key={p} className="grid gap-1 border-b py-6 md:grid-cols-[0.8fr_0.6fr_2fr_auto] md:items-center md:gap-8" style={{ borderColor: C.line }}>

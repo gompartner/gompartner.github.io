@@ -9,10 +9,10 @@ const IMG = "/images/drafts/pat";
 const C = { ink: "#0f1a2a", sub: "#5a6576", line: "#e2e7ee", soft: "#f2f5f9", blue: "#14407a", teal: "#0f8a8a" };
 
 const AREAS = [
-  { e: "PATENT", t: "특허, 실용신안", d: "전자, 기계, 소프트웨어, 바이오" },
+  { e: "PATENT", t: "특허와 실용신안", d: "전자, 기계, 소프트웨어, 바이오" },
   { e: "DESIGN", t: "디자인", d: "제품 외관, 화면 디자인(GUI)" },
   { e: "TRADEMARK", t: "상표", d: "브랜드명, 로고, 해외 출원" },
-  { e: "DISPUTE", t: "심판, 소송", d: "무효심판, 권리범위확인, 침해 경고 대응" },
+  { e: "DISPUTE", t: "심판과 소송", d: "무효심판, 권리범위확인, 침해 경고 대응" },
 ];
 
 export function PatA() {
@@ -48,9 +48,9 @@ export function PatA() {
             </p>
             <dl className="mt-10 grid max-w-[480px] grid-cols-3 border-t pt-6" style={{ borderColor: C.line }}>
               {[
-                ["전기전자", "반도체, 통신"],
-                ["기계", "장비, 부품"],
-                ["SW", "플랫폼, AI"],
+                ["전기전자", "반도체와 통신"],
+                ["기계", "장비와 부품"],
+                ["SW", "플랫폼과 AI"],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-[19px] font-bold" style={{ color: C.blue }}>{k}</dt>
@@ -71,8 +71,7 @@ export function PatA() {
           <ul className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: C.line }}>
             {AREAS.map((a) => (
               <li key={a.t} className="flex flex-col bg-white p-7 md:p-8">
-                <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.teal }}>{a.e}</p>
-                <h3 className="mt-3 text-[22px] font-bold tracking-[-0.03em]">{a.t}</h3>
+                <h3 className="text-[22px] font-bold tracking-[-0.03em]">{a.t}</h3>
                 <p className="mt-1 flex-1 text-[15px]" style={{ color: C.sub }}>{a.d}</p>
                 <ArrowRight className="mt-8" size={20} aria-hidden />
               </li>
@@ -95,7 +94,7 @@ export function PatA() {
               ["기술 미팅", "1주", "발명 내용 청취, 선행기술 조사"],
               ["명세서 작성", "2 ~ 4주", "청구항 설계, 도면 작성, 발명자 검토"],
               ["출원", "당일", "출원번호 발급, 특허 출원 중 표시 가능"],
-              ["심사, 의견 대응", "10 ~ 14개월", "의견제출통지서 대응, 보정"],
+              ["심사와 의견 대응", "10 ~ 14개월", "의견제출통지서 대응, 보정"],
               ["등록", "등록 결정 후", "등록료 납부, 특허증 발급"],
             ].map(([k, p, v], i) => (
               <li key={k} className="grid grid-cols-[40px_1fr] gap-2 border-b py-5 sm:grid-cols-[48px_1fr_auto]" style={{ borderColor: C.line }}>

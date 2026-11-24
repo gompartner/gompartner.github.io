@@ -9,9 +9,9 @@ const IMG = "/images/drafts/km";
 const C = { ink: "#1a1d18", sub: "#626a5e", line: "#e6eae2", soft: "#f3f6f0", green: "#4e6b3a", greenSoft: "#eaf0e3" };
 
 const SYM = [
-  ["허리, 목 통증", "침, 약침, 추나요법"],
+  ["허리와 목 통증", "침, 약침, 추나요법"],
   ["소화 불량, 위장", "체질 한약, 뜸"],
-  ["불면, 만성 피로", "상담 후 한약 처방"],
+  ["불면과 만성 피로", "상담 후 한약 처방"],
   ["다이어트", "체성분 검사 후 한약"],
   ["수험생 집중", "방학 기간 한약"],
   ["산후 조리", "출산 2주 뒤부터"],
@@ -120,7 +120,7 @@ export function KmB() {
               ["월 ~ 금", "10:00 ~ 20:00"],
               ["토요일", "09:00 ~ 14:00"],
               ["점심시간", "13:00 ~ 14:00"],
-              ["휴진", "일요일, 공휴일"],
+              ["휴진", "일요일과 공휴일"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 border-b border-white/20 pb-2.5">
                 <dt className="text-white/75">{k}</dt>

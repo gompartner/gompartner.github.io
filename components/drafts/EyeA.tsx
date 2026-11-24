@@ -46,13 +46,11 @@ export function EyeA() {
 
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.aqua }}>CENTER</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">진료 센터</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">진료 센터</h2>
           <ul className="mt-14 grid gap-px md:grid-cols-3" style={{ background: C.line }}>
             {CENTERS.map((c) => (
               <li key={c.t} className="flex flex-col bg-white p-8 md:p-10">
-                <p className="text-[12px] font-bold tracking-[0.24em]" style={{ color: C.aqua }}>{c.e}</p>
-                <h3 className="mt-3 text-[26px] font-bold tracking-[-0.03em]" style={{ color: C.teal }}>{c.t}</h3>
+                <h3 className="text-[26px] font-bold tracking-[-0.03em]" style={{ color: C.teal }}>{c.t}</h3>
                 <p className="mt-2 flex-1" style={{ color: C.sub }}>{c.d}</p>
                 <p className="mt-8 border-t pt-4 text-[15px] font-semibold" style={{ borderColor: C.line }}>{c.m}</p>
                 <ArrowRight className="mt-6" size={20} aria-hidden />
@@ -73,11 +71,10 @@ export function EyeA() {
             </div>
           </div>
           <div className="self-center">
-            <p className="text-[13px] font-bold tracking-[0.26em] text-white/55">PROCESS</p>
-            <h2 className="mt-4 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">수술 전 정밀검사 순서</h2>
+            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">수술 전 정밀검사 순서</h2>
             <ol className="mt-8 grid gap-4">
               {[
-                ["시력, 굴절", "나안 시력, 교정 시력, 안압"],
+                ["시력과 굴절", "나안 시력, 교정 시력, 안압"],
                 ["각막", "각막 두께, 지형도, 내피세포 수"],
                 ["망막", "산동 후 안저 촬영, 빛간섭단층촬영"],
                 ["상담", "결과지로 수술 방법과 렌즈 종류 결정"],
@@ -99,8 +96,7 @@ export function EyeA() {
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1320px] gap-12 md:grid-cols-2 md:gap-16">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.aqua }}>HOURS</p>
-            <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[44px]">진료 안내</h2>
+            <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[44px]">진료 안내</h2>
             <p className="mt-6 text-[34px] font-bold tabular-nums" style={{ color: C.teal }}>051-000-0000</p>
             <p className="mt-2" style={{ color: C.sub }}>부산광역시 부산진구 서면 일대, 건물 5층 전체. 지정 주차장 2시간 무료.</p>
           </div>
@@ -110,7 +106,7 @@ export function EyeA() {
               ["토요일", "08:30 ~ 13:00"],
               ["점심시간", "13:00 ~ 14:00"],
               ["수술", "화, 목 오전 (예약제)"],
-              ["휴진", "일요일, 공휴일"],
+              ["휴진", "일요일과 공휴일"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 border-b py-4" style={{ borderColor: C.line }}>
                 <dt style={{ color: C.sub }}>{k}</dt>

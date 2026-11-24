@@ -19,7 +19,7 @@ const REQS: Req[] = [
   { id: "bake", name: "메뉴 추가", before: "빵 나오는 시간 4줄", after: "17:00 치아바타, 올리브 포카치아" },
 ];
 const STEPS = ["접수", "변경 대상 백업", "반영", "결과 보고"];
-const NOW = ["접수", "변경 대상 백업", "반영", "모바일 화면 확인, 결과 보고"];
+const NOW = ["접수", "변경 대상 백업", "반영", "모바일 화면 확인과 결과 보고"];
 
 const CSS = `
 [data-mt-on]{outline:4px solid #256ef4!important;outline-offset:8px;border-radius:8px;transition:outline-color .3s}
@@ -80,7 +80,7 @@ function change(fr: HTMLIFrameElement | null, r: Req) {
     const li = el.lastElementChild.cloneNode(true) as HTMLElement;
     const sp = li.querySelectorAll("span");
     if (sp[0]) sp[0].textContent = "17:00";
-    if (sp[1]) sp[1].textContent = "치아바타, 올리브 포카치아";
+    if (sp[1]) sp[1].textContent = "치아바타와 올리브 포카치아";
     (el.lastElementChild as HTMLElement).style.borderBottomWidth = "1px";
     li.classList.add("mt-row");
     el.appendChild(li);

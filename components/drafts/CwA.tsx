@@ -78,7 +78,7 @@ export function CwA() {
               <Wifi size={28} style={{ color: C.green }} aria-hidden /> 포함 사항
             </h2>
             <ul className="mt-7 flex flex-wrap gap-2">
-              {["24시간 출입", "기가 와이파이", "복합기", "커피, 차", "개인 사물함", "택배 수령", "폰부스 4개", "샤워실"].map((m) => (
+              {["24시간 출입", "기가 와이파이", "복합기", "커피와 차", "개인 사물함", "택배 수령", "폰부스 4개", "샤워실"].map((m) => (
                 <li key={m} className="rounded-full border bg-white px-4 py-1.5 font-semibold" style={{ borderColor: C.line }}>{m}</li>
               ))}
             </ul>

@@ -95,7 +95,7 @@ export function EstateA() {
                 ["등기부 확인", "소유자, 근저당, 압류를 계약 당일 다시 뗍니다."],
                 ["시세 비교", "같은 단지, 같은 평형의 최근 실거래가를 함께 봅니다."],
                 ["특약 정리", "수리, 입주일, 잔금 조건을 문장으로 남깁니다."],
-                ["잔금, 입주", "잔금일 등기 이전과 관리비 정산까지 챙깁니다."],
+                ["잔금과 입주", "잔금일 등기 이전과 관리비 정산까지 챙깁니다."],
               ].map(([t, d], i) => (
                 <li key={t} className="flex gap-5 border-b py-5" style={{ borderColor: C.line }}>
                   <span className="text-[14px] font-bold tabular-nums" style={{ color: C.sub }}>0{i + 1}</span>

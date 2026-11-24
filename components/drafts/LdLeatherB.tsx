@@ -48,9 +48,9 @@ export function LdLeatherB() {
           <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ["가죽 고르기", "탄, 브라운, 올리브, 버건디"],
-              ["재단, 구멍 내기", "본을 대고 자른 뒤 목타로"],
+              ["재단과 구멍 내기", "본을 대고 자른 뒤 목타로"],
               ["새들 스티치", "바늘 두 개로 한 땀씩"],
-              ["마감, 각인", "옆면을 다듬고 이니셜 도장"],
+              ["마감과 각인", "옆면을 다듬고 이니셜 도장"],
             ].map(([t, d], i) => (
               <li key={t} className="rounded-[20px] bg-white p-6">
                 <p className="text-[14px] font-bold tabular-nums" style={{ color: C.brown }}>0{i + 1}</p>

@@ -14,7 +14,7 @@ const BELTS = [
   ["초록띠", "#2f9e44", "태극 2 ~ 3장"],
   ["파란띠", "#1c6fd1", "태극 4 ~ 5장"],
   ["빨간띠", "#d92b2b", "태극 6 ~ 8장"],
-  ["품띠, 검은띠", "#111111", "고려, 국기원 승품, 승단 심사"],
+  ["품띠와 검은띠", "#111111", "고려, 국기원 승품, 승단 심사"],
 ];
 
 export function TkB() {
@@ -40,8 +40,7 @@ export function TkB() {
         <Image src={`${IMG}/b-hero.jpg`} alt="긴 그림자가 드리운 노란 체육관 바닥과 주황 선" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/40" aria-hidden />
         <div className="relative mx-auto w-full max-w-[1320px] px-5 pb-16 md:px-10 md:pb-24">
-          <p className="text-[14px] font-bold tracking-[0.22em]" style={{ color: C.red }}>POOMSAE &amp; KYORUGI</p>
-          <h1 className="mt-5 text-[40px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[76px]">
+          <h1 className="text-[40px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[76px]">
             검은띠까지,
             <br />
             단계마다 심사합니다
@@ -59,7 +58,7 @@ export function TkB() {
               <li key={t} className="flex items-center gap-5 bg-white p-6 md:p-8">
                 <span className="h-4 w-14 shrink-0 rounded-sm border" style={{ background: color, borderColor: "#d0d0d0" }} aria-hidden />
                 <div>
-                  <p className="text-[13px] font-bold tabular-nums" style={{ color: C.sub }}>STEP {i + 1}</p>
+                  <p className="text-[13px] font-bold tabular-nums" style={{ color: C.sub }}>{i + 1}단계</p>
                   <h3 className="text-[21px] font-bold tracking-[-0.03em]">{t}</h3>
                   <p className="text-[15px]" style={{ color: C.sub }}>{d}</p>
                 </div>
@@ -89,8 +88,7 @@ export function TkB() {
           </div>
           <div className="flex flex-col justify-between gap-8 bg-black p-8 text-white md:p-10">
             <div>
-              <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.red }}>KYORUGI TEAM</p>
-              <h2 className="mt-4 text-[26px] font-bold tracking-[-0.04em] md:text-[32px]">겨루기 시합반</h2>
+              <h2 className="text-[26px] font-bold tracking-[-0.04em] md:text-[32px]">겨루기 시합반</h2>
               <ul className="mt-5 grid gap-2.5 text-white/75">
                 <li>초등 3학년 이상, 파란띠부터</li>
                 <li>화, 목 19:00 ~ 20:30, 토요일 오전</li>

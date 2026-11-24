@@ -73,7 +73,7 @@ export function PenB() {
           <div>
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">안에 있는 것</h2>
             <ul className="mt-7 flex flex-wrap gap-2">
-              {["인덕션, 전자레인지", "냄비, 칼, 식기", "드립 커피 도구", "블루투스 스피커", "화로대와 장작", "수건, 세면도구", "빔프로젝터", "보드게임"].map((m) => (
+              {["인덕션과 전자레인지", "냄비, 칼, 식기", "드립 커피 도구", "블루투스 스피커", "화로대와 장작", "수건과 세면도구", "빔프로젝터", "보드게임"].map((m) => (
                 <li key={m} className="rounded-full border px-4 py-1.5 font-semibold" style={{ borderColor: C.line }}>{m}</li>
               ))}
             </ul>

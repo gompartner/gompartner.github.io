@@ -101,7 +101,7 @@ export const groups: { slug: string; label: string; title: string; description: 
     title: "키오스크 화면 제작",
     description: "병원 접수, 학원 출결처럼 현장에서 직접 누르는 키오스크 화면 포트폴리오입니다.",
     keywords: ["키오스크 제작", "접수 키오스크", "출결 키오스크", "키오스크 프로그램"],
-    needs: ["큰 글씨, 음성 안내", "대기번호 출력", "QR, 번호 입력", "관리자 화면"],
+    needs: ["큰 글씨와 음성 안내", "대기번호 출력", "QR, 번호 입력", "관리자 화면"],
     match: (p) => p.category === "키오스크",
   },
   {

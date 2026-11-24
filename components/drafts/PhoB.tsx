@@ -91,10 +91,10 @@ export function PhoB() {
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">촬영 당일 순서</h2>
             <ol className="mt-8 grid gap-5">
               {[
-                ["의상, 소품 고르기", "도착 후 20분"],
+                ["의상과 소품 고르기", "도착 후 20분"],
                 ["촬영", "종류별 40 ~ 90분, 중간 쉬는 시간"],
                 ["원본 보기, 컷 고르기", "모니터로 함께 선택"],
-                ["보정본, 액자 받기", "2주 뒤 문자 안내, 택배 가능"],
+                ["보정본과 액자 받기", "2주 뒤 문자 안내, 택배 가능"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: C.brown }}>{i + 1}</span>

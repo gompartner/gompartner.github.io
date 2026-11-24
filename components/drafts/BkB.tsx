@@ -110,7 +110,7 @@ export function BkB() {
           </div>
           <div className="flex flex-col justify-between gap-8 bg-black p-8 text-white md:p-10">
             <div>
-              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">단체, 선물 세트</h2>
+              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">단체와 선물 세트</h2>
               <p className="mt-3 text-white/70">15인 이상 단체석과 빵 선물 상자는 이틀 전까지 전화로 받습니다. 김포 한강신도시, 운양역에서 차로 7분.</p>
             </div>
             <p className="text-[28px] font-bold tabular-nums" style={{ color: C.gold }}>031-000-0000</p>

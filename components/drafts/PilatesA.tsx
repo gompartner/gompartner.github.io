@@ -33,8 +33,7 @@ export function PilatesA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="리포머 기구가 줄지어 놓인 베이지 톤 필라테스 스튜디오" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-black/45" aria-hidden />
         <div className="relative mx-auto w-full max-w-[1320px] px-5 text-center md:px-10">
-          <p className="text-[14px] font-bold tracking-[0.36em] text-white/75">STRONG &amp; GRACEFUL</p>
-          <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[68px]">
+          <h1 className="text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[68px]">
             바른 자세는
             <br />
             몸이 기억합니다
@@ -45,12 +44,11 @@ export function PilatesA() {
 
       <section className="px-5 py-24 md:px-10 md:py-36">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.28em]" style={{ color: C.sub }}>CLASS</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">수업 안내</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">수업 안내</h2>
           <ul className="mt-14 border-t" style={{ borderColor: C.ink }}>
             {CLASSES.map((c) => (
               <li key={c.k} className="grid gap-3 border-b py-8 md:grid-cols-[80px_1fr_1.4fr_160px] md:items-center md:gap-8 md:py-10" style={{ borderColor: C.line }}>
-                <span className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.sub }}>{c.k} CLASS</span>
+                <span className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.sub }}>{c.k}반</span>
                 <div>
                   <h3 className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">{c.t}</h3>
                   <p className="text-[14px] tracking-[0.12em]" style={{ color: C.sub }}>{c.en}</p>
@@ -69,7 +67,6 @@ export function PilatesA() {
             <Image src={`${IMG}/a-room.jpg`} alt="창이 넓은 밝은 방에 놓인 캐딜락과 리포머" fill sizes="(min-width: 768px) 55vw, 100vw" className="object-cover grayscale-[30%]" />
           </div>
           <div className="flex flex-col justify-center gap-6 p-8 md:p-12" style={{ background: C.soft }}>
-            <p className="text-[13px] font-bold tracking-[0.28em]" style={{ color: C.sub }}>STUDIO</p>
             <h2 className="text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[36px]">
               기구 한 대에
               <br />

@@ -35,7 +35,6 @@ export function FoA() {
 
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.orange }}>FOOD OEM</p>
           <div className="mt-4 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[72px]">
               레시피만 가져오시면
@@ -77,8 +76,8 @@ export function FoA() {
             <ol className="mt-7 grid gap-4">
               {[
                 ["원료 입고, 검사", "원산지, 이물, 미생물 검사"],
-                ["배합, 가열", "레시피대로 계량, 살균 온도 기록"],
-                ["충전, 밀봉", "파우치, 병, 스틱 자동 충전"],
+                ["배합과 가열", "레시피대로 계량, 살균 온도 기록"],
+                ["충전과 밀봉", "파우치, 병, 스틱 자동 충전"],
                 ["금속 검출, 포장", "전수 검사 뒤 박스 포장"],
                 ["출하", "로트별 시험성적서 첨부"],
               ].map(([k, v], i) => (

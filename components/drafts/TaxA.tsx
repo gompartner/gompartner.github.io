@@ -10,8 +10,8 @@ const C = { navy: "#0b1f3a", navy2: "#12294a", ink: "#0f1720", sub: "#5b6576", l
 const TEL = "02-000-0000";
 
 const SERVICES = [
-  { en: "BOOKKEEPING", t: "법인, 개인 기장", d: "매월 장부 작성과 부가세, 원천세 신고를 정해진 날짜에 처리하고 결과를 리포트로 보내 드립니다." },
-  { en: "TAX FILING", t: "법인세, 종합소득세 신고", d: "공제와 감면 항목을 빠짐없이 검토해 신고 전 예상 세액과 근거를 먼저 설명드립니다." },
+  { en: "BOOKKEEPING", t: "법인과 개인 기장", d: "매월 장부 작성과 부가세, 원천세 신고를 정해진 날짜에 처리하고 결과를 리포트로 보내 드립니다." },
+  { en: "TAX FILING", t: "법인세와 종합소득세 신고", d: "공제와 감면 항목을 빠짐없이 검토해 신고 전 예상 세액과 근거를 먼저 설명드립니다." },
   { en: "ADVISORY", t: "세무 자문, 조사 대응", d: "가업승계, 법인 전환, 세무조사 사전 점검과 소명 자료 작성을 맡습니다." },
   { en: "PAYROLL", t: "급여, 4대보험 아웃소싱", d: "급여 계산, 명세서 발송, 4대보험 취득과 상실 신고를 대신 처리합니다." },
 ];
@@ -40,8 +40,7 @@ export function TaxA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="아래에서 올려다본 유리 외벽 고층 빌딩" fill priority sizes="100vw" className="object-cover opacity-60" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(11,31,58,0.95) 0%, rgba(11,31,58,0.7) 50%, rgba(11,31,58,0.25) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1240px] px-5 pt-20 md:px-8">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.mint }}>SINCE 2004, CORPORATE TAX PARTNER</p>
-          <h1 className="mt-5 max-w-[820px] text-[36px] font-bold leading-[1.25] tracking-[-0.035em] md:text-[62px]">
+          <h1 className="max-w-[820px] text-[36px] font-bold leading-[1.25] tracking-[-0.035em] md:text-[62px]">
             숫자가 보이면
             <br />
             경영 판단이 빨라집니다
@@ -80,14 +79,12 @@ export function TaxA() {
 
       <section className="px-5 py-24 md:px-8 md:py-32">
         <div className="mx-auto max-w-[1240px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.accent }}>SERVICES</p>
-          <h2 className="mt-4 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[46px]">업무 안내</h2>
+          <h2 className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[46px]">업무 안내</h2>
           <ul className="mt-14 grid gap-5 md:grid-cols-2">
             {SERVICES.map((s) => (
               <li key={s.en} className="group flex flex-col justify-between rounded-[6px] border p-8 transition-colors md:p-10" style={{ borderColor: C.line }}>
                 <div>
-                  <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.sub }}>{s.en}</p>
-                  <h3 className="mt-3 text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">{s.t}</h3>
+                  <h3 className="text-[24px] font-bold tracking-[-0.03em] md:text-[28px]">{s.t}</h3>
                   <p className="mt-4 max-w-[460px]" style={{ color: C.sub }}>{s.d}</p>
                 </div>
                 <p className="mt-10 inline-flex items-center gap-1.5 text-[15px] font-bold" style={{ color: C.accent }}>
@@ -106,8 +103,7 @@ export function TaxA() {
             <Image src={`${IMG}/a-doc.jpg`} alt="대리석 책상 위에 놓인 재무 보고서" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="px-7 py-14 text-white md:px-14 md:py-16">
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.mint }}>MONTHLY REPORT</p>
-            <h2 className="mt-4 text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[38px]">
+            <h2 className="text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[38px]">
               매달 10일,
               <br />
               한 장짜리 경영 리포트
@@ -130,17 +126,16 @@ export function TaxA() {
 
       <section className="px-5 py-24 md:px-8 md:py-28" style={{ background: C.soft }}>
         <div className="mx-auto max-w-[1240px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.accent }}>PROCESS</p>
-          <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">기장 이관은 이렇게 진행됩니다</h2>
+          <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">기장 이관은 이렇게 진행됩니다</h2>
           <ol className="mt-14 grid gap-4 md:grid-cols-4">
             {[
               ["무료 진단", "지난 신고서와 장부를 보고 개선할 점을 먼저 말씀드립니다."],
-              ["계약, 자료 이관", "기존 세무사무소에서 받을 자료 목록을 저희가 정리합니다."],
+              ["계약과 자료 이관", "기존 세무사무소에서 받을 자료 목록을 저희가 정리합니다."],
               ["첫 결산", "이관 첫 달에 지난 장부의 오류를 함께 바로잡습니다."],
               ["월간 리포트", "다음 달부터 매달 10일 리포트를 받아 보십니다."],
             ].map(([t, d], i) => (
               <li key={t} className="rounded-[6px] bg-white p-7">
-                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.accent }}>STEP {i + 1}</p>
+                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.accent }}>{i + 1}단계</p>
                 <h3 className="mt-3 text-[20px] font-bold">{t}</h3>
                 <p className="mt-2 text-[15px]" style={{ color: C.sub }}>{d}</p>
               </li>

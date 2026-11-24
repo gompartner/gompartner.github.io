@@ -56,7 +56,7 @@ export function CeA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28" style={{ background: C.soft }}>
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">국내, 해외 인증</h2>
+          <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">국내와 해외 인증</h2>
           <ul className="mt-10 bg-white">
             <li className="hidden grid-cols-[1.2fr_0.5fr_1.8fr_0.6fr] gap-4 border-b px-6 py-4 text-[14px] font-semibold md:grid" style={{ borderColor: C.line, color: C.sub }}>
               <span>인증</span>
@@ -91,10 +91,10 @@ export function CeA() {
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">인증 진행 순서</h2>
             <ol className="mt-7 grid gap-4">
               {[
-                ["상담, 견적", "제품 사양서로 필요한 인증 확인"],
+                ["상담과 견적", "제품 사양서로 필요한 인증 확인"],
                 ["시료 접수", "시료 2대, 회로도, 부품 목록"],
                 ["시험", "전자파 챔버, 안전 시험실"],
-                ["성적서, 인증서", "시험성적서 발행, 인증기관 접수 대행"],
+                ["성적서와 인증서", "시험성적서 발행, 인증기관 접수 대행"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center text-[15px] font-bold text-white" style={{ background: C.teal }}>{i + 1}</span>

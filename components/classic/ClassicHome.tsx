@@ -15,22 +15,22 @@ const h2c = "text-[26px] font-[800] tracking-[-0.05em] md:text-[38px]";
 
 const make = [
   { href: "/homepage", name: "홈페이지 제작", body: "병원, 매장, 전문직, 기업, 학원", price: manwon(plans[0].price), from: true },
-  { href: "/landing-page", name: "랜딩페이지 제작", body: "광고 상담, 예약 신청 접수", price: manwon(landingPlans[0].price), from: true },
+  { href: "/landing-page", name: "랜딩페이지 제작", body: "광고 상담과 예약 신청 접수", price: manwon(landingPlans[0].price), from: true },
   { href: "/program", name: "업무 프로그램 제작", body: "엑셀 반복 업무를 웹 프로그램으로", price: "견적 문의", from: false },
   { href: "/app", name: "앱 제작", body: "예약, 주문, 적립, 현장 보고", price: manwon(appPlans[0].price), from: true },
   { href: "/kiosk", name: "키오스크 화면 제작", body: "접수, 출결, 안내", price: manwon(kioskPlans[0].price), from: true },
-  { href: "/3d", name: "3D 웹 제작", body: "제품 옵션 견적, 공간 3D", price: "180만 원", from: true },
+  { href: "/3d", name: "3D 웹 제작", body: "제품 옵션 견적과 공간 3D", price: "180만 원", from: true },
 ];
 
 const care = [
   { href: "/maintenance/fix", name: "유지보수", body: "수정 요청 건별 처리" },
-  { href: "/maintenance/monthly", name: "유지관리", body: "정기 점검, 월간 보고" },
-  { href: "/maintenance/perf", name: "성능 개선", body: "속도 진단, 쿼리 튜닝" },
-  { href: "/maintenance/ai-site", name: "고도화", body: "MVP, 시제품 완제품화" },
+  { href: "/maintenance/monthly", name: "유지관리", body: "정기 점검과 월간 보고" },
+  { href: "/maintenance/perf", name: "성능 개선", body: "속도 진단과 쿼리 튜닝" },
+  { href: "/maintenance/ai-site", name: "고도화", body: "MVP와 시제품 완제품화" },
 ];
 
 const portfolio = [
-  { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약, 회원권 앱", alt: "필라테스 예약, 회원권 앱 화면" },
+  { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약과 회원권 앱", alt: "필라테스 예약과 회원권 앱 화면" },
   { href: "/sample/kiosk-clinic", img: "/images/demos/kiosk-clinic.jpg", kind: "키오스크", name: "병원 접수 키오스크", alt: "병원 접수 키오스크 화면" },
   { href: "/sample/bakery-cafe", img: "/images/demos/bakery-cafe.jpg", kind: "홈페이지", name: "베이커리 홈페이지", alt: "베이커리 홈페이지 화면" },
   { href: "/sample/landing-water-rental", img: "/images/demos/landing-water-rental.jpg", kind: "랜딩페이지", name: "정수기 렌탈 상담 신청", alt: "정수기 렌탈 상담 랜딩페이지 화면" },

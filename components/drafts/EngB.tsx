@@ -57,7 +57,7 @@ export function EngB() {
           <ol className="mt-10 grid gap-4 md:grid-cols-3">
             {STAGES.map(([t, a, d], i) => (
               <li key={t} className="flex flex-col rounded-[24px] bg-white p-7 md:p-8">
-                <span className="text-[14px] font-bold tabular-nums" style={{ color: C.green }}>STEP {i + 1}</span>
+                <span className="text-[14px] font-bold tabular-nums" style={{ color: C.green }}>{i + 1}단계</span>
                 <h3 className="mt-2 text-[25px] font-bold tracking-[-0.03em]">{t}</h3>
                 <span className="mt-2 self-start rounded-full px-3 py-0.5 text-[14px] font-bold" style={{ background: C.greenSoft, color: C.green }}>{a}</span>
                 <p className="mt-4 text-[15px]" style={{ color: C.sub }}>{d}</p>

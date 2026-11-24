@@ -34,8 +34,7 @@ export function FwA() {
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto grid max-w-[1320px] gap-10 md:grid-cols-[1fr_1.4fr] md:items-end">
           <div className="pb-2">
-            <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.walnut }}>CUSTOM FURNITURE</p>
-            <h1 className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[64px]">
+            <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[64px]">
               집 치수에 맞춰
               <br />
               한 점씩 짭니다
@@ -75,9 +74,9 @@ export function FwA() {
               {[
                 ["상담", "놓을 자리 사진과 치수, 쓰는 사람 수"],
                 ["도면", "평면도, 측면도, 수종 견본 확인"],
-                ["재단, 집성", "결을 맞춰 상판을 붙입니다"],
-                ["가공, 마감", "짜맞춤, 샌딩, 오일 3회"],
-                ["배송, 설치", "직접 싣고 가서 수평을 맞춥니다"],
+                ["재단과 집성", "결을 맞춰 상판을 붙입니다"],
+                ["가공과 마감", "짜맞춤, 샌딩, 오일 3회"],
+                ["배송과 설치", "직접 싣고 가서 수평을 맞춥니다"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center text-[15px] font-bold text-white" style={{ background: C.walnut }}>{i + 1}</span>

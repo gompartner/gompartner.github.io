@@ -78,7 +78,7 @@ export function VisaA() {
             <h2 className="mt-3 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">고용 변동 신고, 15일 안</h2>
             <dl className="mt-7 border-t" style={{ borderColor: C.ink }}>
               {[
-                ["퇴사, 해고", "사유 발생을 안 날부터 15일 안"],
+                ["퇴사와 해고", "사유 발생을 안 날부터 15일 안"],
                 ["근무처 변경", "변경 전 허가 또는 15일 안 신고"],
                 ["외국인 등록", "입국한 날부터 90일 안"],
                 ["체류기간 연장", "만료 전에 신청"],
@@ -103,10 +103,10 @@ export function VisaA() {
                 ["요건 검토", "직종 코드, 학력, 경력, 급여 기준"],
                 ["회사 서류", "사업자, 납세, 고용보험 가입 현황"],
                 ["사증 발급 인정 또는 자격 변경", "해외 채용은 인정서, 국내 유학생은 변경"],
-                ["접수, 보완", "방문 접수, 보완 요청 대응"],
+                ["접수와 보완", "방문 접수, 보완 요청 대응"],
               ].map(([k, v], i) => (
                 <li key={k} className="bg-white p-6 md:p-7">
-                  <p className="text-[14px] font-bold tabular-nums" style={{ color: C.red }}>STEP {i + 1}</p>
+                  <p className="text-[14px] font-bold tabular-nums" style={{ color: C.red }}>{i + 1}단계</p>
                   <p className="mt-2 text-[19px] font-bold">{k}</p>
                   <p className="text-[15px]" style={{ color: C.sub }}>{v}</p>
                 </li>

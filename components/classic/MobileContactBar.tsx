@@ -9,7 +9,7 @@ export function MobileContactBar() {
   return (
     <div
       role="region"
-      aria-label="전화, 카카오톡 상담"
+      aria-label="전화와 카카오톡 상담"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e6e9ee] bg-white px-3 pt-2 shadow-[0_-6px_20px_rgba(21,23,28,.08)] md:hidden"
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >

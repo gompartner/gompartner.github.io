@@ -126,7 +126,7 @@ export function PedB() {
               ["평일", "09:00 ~ 19:00"],
               ["토요일", "09:00 ~ 14:00"],
               ["점심시간", "13:00 ~ 14:00"],
-              ["휴진", "일요일, 공휴일"],
+              ["휴진", "일요일과 공휴일"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 border-b border-white/20 pb-2.5">
                 <dt className="text-white/75">{k}</dt>

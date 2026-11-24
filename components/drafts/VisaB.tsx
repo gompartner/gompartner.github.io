@@ -24,7 +24,7 @@ export function VisaB() {
             <span style={{ color: C.green }}>이음</span> 행정사
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#3f4a45" }}>
-            {["비자 종류", "연장, 변경", "준비 서류", "오시는 길"].map((m) => (
+            {["비자 종류", "연장과 변경", "준비 서류", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -91,7 +91,7 @@ export function VisaB() {
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">연장 신청 때 기본 서류</h2>
             <ul className="mt-7 grid gap-3">
               {[
-                ["여권, 외국인등록증", "원본"],
+                ["여권과 외국인등록증", "원본"],
                 ["통합 신청서", "사무소에서 작성"],
                 ["체류지 증빙", "임대차계약서 또는 숙소 제공 확인서"],
                 ["수수료", "인지 대금, 비자별 금액"],

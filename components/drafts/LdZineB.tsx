@@ -15,8 +15,7 @@ export function LdZineB() {
       <section className="px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-16">
         <div className="mx-auto grid max-w-[1120px] items-end gap-10 lg:grid-cols-[1fr_1fr]">
           <div>
-            <p className="text-[15px] font-bold tracking-[0.16em]" style={{ color: C.orange }}>ZINE FAIR 2026</p>
-            <h1 className="mt-4 text-[40px] font-bold leading-[1.18] tracking-[-0.05em] md:text-[64px]">
+            <h1 className="text-[40px] font-bold leading-[1.18] tracking-[-0.05em] md:text-[64px]">
               반쯤 접힌
               <br />
               북페어

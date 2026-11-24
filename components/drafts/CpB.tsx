@@ -74,7 +74,7 @@ export function CpB() {
         <div className="mx-auto max-w-[1200px]">
           <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">텐트 안에 준비된 것</h2>
           <ul className="mt-7 flex flex-wrap gap-2">
-            {["퀸 침대, 거위털 이불", "전기 난방 매트", "온풍기(11월 ~ 3월)", "냉장고", "전기포트, 컵", "수건, 세면도구", "바비큐 그릴, 숯", "캠핑 의자 2개"].map((m) => (
+            {["퀸 침대, 거위털 이불", "전기 난방 매트", "온풍기(11월 ~ 3월)", "냉장고", "전기포트와 컵", "수건과 세면도구", "바비큐 그릴, 숯", "캠핑 의자 2개"].map((m) => (
               <li key={m} className="rounded-full border px-4 py-1.5 font-semibold" style={{ borderColor: C.line }}>{m}</li>
             ))}
           </ul>

@@ -34,8 +34,7 @@ export function LaborA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="남산 아래로 늘어선 서울 도심 건물" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(8,20,46,0.9) 0%, rgba(8,20,46,0.65) 50%, rgba(8,20,46,0.3) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1320px] px-5 py-24 md:px-10">
-          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>LABOR LAW FIRM</p>
-          <h1 className="mt-5 text-[38px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[64px]">
+          <h1 className="text-[38px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[64px]">
             분쟁이 되기 전에
             <br />
             규정부터 바로잡습니다
@@ -66,13 +65,11 @@ export function LaborA() {
 
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.gold }}>PRACTICE</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">업무 분야</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">업무 분야</h2>
           <ul className="mt-14 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: C.line }}>
             {AREAS.map((a) => (
               <li key={a.t} className="flex flex-col bg-white p-8">
-                <p className="text-[12px] font-bold tracking-[0.22em]" style={{ color: C.gold }}>{a.e}</p>
-                <h3 className="mt-3 text-[24px] font-bold tracking-[-0.03em]" style={{ color: C.navy }}>{a.t}</h3>
+                <h3 className="text-[24px] font-bold tracking-[-0.03em]" style={{ color: C.navy }}>{a.t}</h3>
                 <p className="mt-2 flex-1 text-[15px]" style={{ color: C.sub }}>{a.d}</p>
                 <ArrowRight className="mt-8" size={20} aria-hidden />
               </li>
@@ -87,8 +84,7 @@ export function LaborA() {
             <Image src={`${IMG}/a-meet.jpg`} alt="나무 벽으로 둘러싸인 회의실과 긴 테이블" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
           </div>
           <div>
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.gold }}>RETAINER</p>
-            <h2 className="mt-4 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">월 자문 계약에 들어가는 것</h2>
+            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">월 자문 계약에 들어가는 것</h2>
             <ul className="mt-8 grid gap-3">
               {[
                 "인사노무 질의 전화, 메일 답변 (영업일 1일 안)",

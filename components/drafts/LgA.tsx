@@ -45,8 +45,7 @@ export function LgA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="상자가 가득 쌓인 높은 물류 선반 사이 통로" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/40" aria-hidden />
         <div className="relative mx-auto w-full max-w-[1320px] px-5 pb-16 md:px-10 md:pb-24">
-          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: "#8fc6f2" }}>FULFILLMENT</p>
-          <h1 className="mt-5 text-[40px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[72px]">
+          <h1 className="text-[40px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[72px]">
             오후 2시 주문까지
             <br />
             오늘 출고합니다

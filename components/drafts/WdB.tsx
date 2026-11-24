@@ -80,7 +80,7 @@ export function WdB() {
           <div>
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">포함 사항</h2>
             <ul className="mt-7 flex flex-wrap gap-2">
-              {["테이블 꽃 장식", "예식 진행, 사회", "음향, 마이크", "웰컴 보드", "케이크 커팅", "하객 주차 2시간"].map((m) => (
+              {["테이블 꽃 장식", "예식 진행, 사회", "음향과 마이크", "웰컴 보드", "케이크 커팅", "하객 주차 2시간"].map((m) => (
                 <li key={m} className="rounded-full border px-4 py-1.5 font-semibold" style={{ borderColor: C.line }}>{m}</li>
               ))}
             </ul>

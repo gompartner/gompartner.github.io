@@ -21,12 +21,12 @@ export function OptB() {
       <header className="absolute inset-x-0 z-20 text-white">
         <div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between px-5 md:px-10">
           <p className="text-[18px] font-bold tracking-[0.08em]">OPTIQUE SOL</p>
-          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold tracking-[0.06em] md:flex">
-            {["FRAMES", "SUNGLASSES", "EYE TEST", "STORE"].map((m) => (
+          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold md:flex">
+            {["안경테", "선글라스", "시력 검사", "매장"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="text-[14px] font-semibold md:hidden">MENU</span>
+          <span className="text-[14px] font-semibold md:hidden">메뉴</span>
         </div>
       </header>
 
@@ -46,7 +46,7 @@ export function OptB() {
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
           <div className="flex items-end justify-between border-b pb-4" style={{ borderColor: C.ink }}>
-            <h2 className="text-[14px] font-bold tracking-[0.2em]">FRAMES</h2>
+            <h2 className="text-[14px] font-bold ">안경테</h2>
             <span className="text-[14px]" style={{ color: C.sub }}>소재별</span>
           </div>
           <ul className="mt-2">
@@ -67,7 +67,7 @@ export function OptB() {
             <Image src={`${IMG}/b-rack.jpg`} alt="흰 선반에 나란히 놓인 검은 테 선글라스" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="flex flex-col justify-center p-2 md:p-12">
-            <h2 className="text-[14px] font-bold tracking-[0.2em]">SUNGLASSES</h2>
+            <h2 className="text-[14px] font-bold ">선글라스</h2>
             <p className="mt-4 text-[28px] font-bold leading-[1.4] tracking-[-0.04em] md:text-[36px]">선글라스에도 도수를 넣습니다</p>
             <ul className="mt-6 grid gap-2" style={{ color: C.sub }}>
               <li>짙은 색, 편광, 변색 렌즈 선택</li>
@@ -81,7 +81,7 @@ export function OptB() {
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
           <div>
-            <h2 className="text-[14px] font-bold tracking-[0.2em]">EYE TEST</h2>
+            <h2 className="text-[14px] font-bold ">시력 검사</h2>
             <p className="mt-4 text-[28px] font-bold leading-[1.4] tracking-[-0.04em] md:text-[36px]">검사부터 받아 가기까지</p>
             <dl className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {[
@@ -106,7 +106,7 @@ export function OptB() {
       <section className="px-5 pb-20 md:px-10 md:pb-28">
         <div className="mx-auto flex max-w-[1320px] flex-col gap-6 p-8 text-white md:flex-row md:items-center md:justify-between md:p-12" style={{ background: C.ink }}>
           <div>
-            <h2 className="text-[14px] font-bold tracking-[0.2em] text-white/60">STORE</h2>
+            <h2 className="text-[14px] font-bold text-white/60">매장</h2>
             <p className="mt-3 text-[24px] font-bold md:text-[30px]">성수동, 매일 11:00 ~ 20:00</p>
           </div>
           <p className="inline-flex items-center gap-1.5 text-[18px] font-bold">

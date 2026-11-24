@@ -10,10 +10,10 @@ const C = { ink: "#121212", sub: "#666", line: "#e6e6e6", soft: "#f5f5f5", orang
 
 const MAJORS = [
   ["기초디자인", "시각, 산업, 공예 디자인", "주제 사물을 화면에 구성, 채색"],
-  ["소묘", "회화, 조소", "석고, 정물, 인물 묘사"],
+  ["소묘", "회화와 조소", "석고, 정물, 인물 묘사"],
   ["발상과 표현", "디자인 계열", "제시어를 해석해 장면으로"],
   ["사고의 전환", "디자인 계열", "제시 사물의 형태를 바꿔 표현"],
-  ["애니메이션", "만화, 애니메이션", "캐릭터, 칸 연출, 상황 표현"],
+  ["애니메이션", "만화와 애니메이션", "캐릭터, 칸 연출, 상황 표현"],
 ];
 
 export function ArtA() {
@@ -37,8 +37,7 @@ export function ArtA() {
 
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.orange }}>ART ADMISSION</p>
-          <h1 className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[76px]">
+          <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[76px]">
             대학마다 다른 실기,
             <br />
             학교별로 준비합니다

@@ -14,7 +14,7 @@ const STEPS = [
   ["인허가", "1 ~ 2개월", "건축허가 또는 신고, 협의 대응"],
   ["실시설계", "2개월", "구조, 설비, 전기 도면과 공사 내역"],
   ["시공사 선정", "2 ~ 4주", "같은 도면으로 견적 비교"],
-  ["공사, 감리", "5 ~ 7개월", "현장 점검과 사용승인"],
+  ["공사와 감리", "5 ~ 7개월", "현장 점검과 사용승인"],
 ];
 
 export function ArcB() {
@@ -39,7 +39,7 @@ export function ArcB() {
       <section className="px-5 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14">
         <div className="mx-auto grid max-w-[1200px] items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <div>
-            <p className="text-[15px] font-bold" style={{ color: C.clay }}>단독주택, 전원주택 설계</p>
+            <p className="text-[15px] font-bold" style={{ color: C.clay }}>단독주택과 전원주택 설계</p>
             <h1 className="mt-4 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
               처음 짓는 집,
               <br />

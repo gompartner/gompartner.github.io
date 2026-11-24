@@ -9,7 +9,7 @@ const IMG = "/images/drafts/ps";
 const C = { ink: "#121212", sub: "#666", line: "#e7e5e1", soft: "#f6f5f2", gold: "#a8874a" };
 
 const COMMUNITY = [
-  ["피트니스, 골프 연습장", "지하 1층, 타석 12석"],
+  ["피트니스와 골프 연습장", "지하 1층, 타석 12석"],
   ["실내 수영장", "25m 4레인, 유아 풀"],
   ["스카이 라운지", "29층, 한강 조망 카페"],
   ["게스트 하우스", "방문 가족 숙박 4실"],
@@ -49,8 +49,7 @@ export function PsB() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.gold }}>PREMIUM</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">설계 특화</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">설계 특화</h2>
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: C.line }}>
             {[
               ["천장고 2.6m", "일반 아파트보다 30cm 높게"],

@@ -97,7 +97,7 @@ export function OrthoA() {
               {[
                 ["진단", "디지털 엑스레이, 근골격계 초음파로 당일 확인"],
                 ["시술", "신경차단술, 증식치료, 체외충격파"],
-                ["도수, 운동", "물리치료사 1:1 도수치료와 운동치료"],
+                ["도수와 운동", "물리치료사 1:1 도수치료와 운동치료"],
                 ["재검", "4주 단위로 통증과 움직임을 다시 확인"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-5 border-b pb-4" style={{ borderColor: C.line }}>
@@ -127,7 +127,7 @@ export function OrthoA() {
               ["화, 목 (야간)", "09:00 ~ 20:30"],
               ["토요일", "09:00 ~ 14:00 (점심시간 없음)"],
               ["점심시간", "13:00 ~ 14:00"],
-              ["휴진", "일요일, 공휴일"],
+              ["휴진", "일요일과 공휴일"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 border-b py-4" style={{ borderColor: C.line }}>
                 <dt style={{ color: C.sub }}>{k}</dt>

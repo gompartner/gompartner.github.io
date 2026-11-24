@@ -68,8 +68,8 @@ export function SkinB() {
       <section className="px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto grid max-w-[1200px] gap-5 md:grid-cols-2">
           {[
-            { t: "피부 질환 진료", s: "건강보험 적용", items: ["여드름, 모낭염", "아토피, 습진", "두드러기, 건선", "사마귀, 티눈"], dark: false },
-            { t: "피부 미용 시술", s: "상담 후 진행", items: ["기미, 잡티 레이저", "리프팅, 탄력", "여드름 흉터, 모공", "제모"], dark: true },
+            { t: "피부 질환 진료", s: "건강보험 적용", items: ["여드름과 모낭염", "아토피와 습진", "두드러기와 건선", "사마귀와 티눈"], dark: false },
+            { t: "피부 미용 시술", s: "상담 후 진행", items: ["기미와 잡티 레이저", "리프팅과 탄력", "여드름 흉터, 모공", "제모"], dark: true },
           ].map((g) => (
             <article key={g.t} className="flex flex-col justify-between rounded-[28px] p-8 md:p-12" style={g.dark ? { background: C.ink, color: "#fff" } : { background: C.soft }}>
               <div>
@@ -120,7 +120,7 @@ export function SkinB() {
               ["평일", "10:00 ~ 19:00"],
               ["화, 목 야간", "10:00 ~ 21:00"],
               ["토요일", "10:00 ~ 15:00"],
-              ["일요일, 공휴일", "휴진"],
+              ["일요일과 공휴일", "휴진"],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between rounded-[16px] px-6 py-4 text-[17px]" style={{ background: C.soft }}>
                 <dt style={{ color: C.sub }}>{k}</dt>

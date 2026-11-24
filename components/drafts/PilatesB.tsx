@@ -111,7 +111,7 @@ export function PilatesB() {
           {[
             { t: "그룹 8회", s: "주 2회, 1개월", p: "200,000원", d: ["기구 또는 매트 선택", "수업 4시간 전까지 변경"] },
             { t: "그룹 24회", s: "주 2회, 3개월", p: "528,000원", d: ["회당 22,000원", "연기 1회 가능"], pick: true },
-            { t: "개인 10회", s: "1:1, 2개월", p: "700,000원", d: ["체형 평가 2회 포함", "재활, 통증 관리"] },
+            { t: "개인 10회", s: "1:1, 2개월", p: "700,000원", d: ["체형 평가 2회 포함", "재활과 통증 관리"] },
           ].map((m) => (
             <article key={m.t} className="flex flex-col rounded-[24px] p-8" style={m.pick ? { background: C.ink, color: "#fff" } : { background: C.soft }}>
               <p className="text-[14px] font-bold" style={{ color: m.pick ? "#a9d3bb" : C.sage }}>{m.s}</p>

@@ -27,7 +27,7 @@ export function FamA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="창가 햇빛이 드는 조용한 거실" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(18,24,42,0.88) 0%, rgba(18,24,42,0.6) 55%, rgba(18,24,42,0.25) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1280px] px-5 py-24 md:px-10">
-          <p className="text-[15px] font-bold" style={{ color: C.sand }}>이혼, 가사 사건</p>
+          <p className="text-[15px] font-bold" style={{ color: C.sand }}>이혼과 가사 사건</p>
           <h1 className="mt-5 text-[36px] font-bold leading-[1.26] tracking-[-0.045em] md:text-[60px]">
             결정은 천천히,
             <br />
@@ -91,8 +91,8 @@ export function FamA() {
               {[
                 ["재산분할", "혼인 중 함께 모은 재산, 기여도"],
                 ["위자료", "혼인 파탄에 책임 있는 쪽에 청구"],
-                ["친권, 양육권", "자녀의 나이, 양육 환경, 자녀 의사"],
-                ["양육비, 면접교섭", "산정기준표, 만나는 날과 방법"],
+                ["친권과 양육권", "자녀의 나이, 양육 환경, 자녀 의사"],
+                ["양육비와 면접교섭", "산정기준표, 만나는 날과 방법"],
               ].map(([k, v]) => (
                 <li key={k} className="grid gap-1 border-b pb-3 sm:grid-cols-[150px_1fr]" style={{ borderColor: C.line }}>
                   <span className="font-bold">{k}</span>

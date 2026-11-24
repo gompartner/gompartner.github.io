@@ -12,7 +12,7 @@ const PRICE: [string, string, string, string, string][] = [
   ["외부 손세차", "40분", "3.0만", "3.5만", "4.0만"],
   ["실내외 세차", "1시간 30분", "6.0만", "7.0만", "8.0만"],
   ["실내 크리닝", "4시간", "15만", "18만", "22만"],
-  ["광택, 유리막", "1 ~ 2일", "45만", "55만", "65만"],
+  ["광택과 유리막", "1 ~ 2일", "45만", "55만", "65만"],
 ];
 
 export function CarB() {
@@ -71,9 +71,9 @@ export function CarB() {
             <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-4 border-b px-7 py-4 text-[14px] font-bold md:grid" style={{ borderColor: C.line, color: C.sub }}>
               <span>항목</span>
               <span>소요 시간</span>
-              <span className="text-right">경차, 소형</span>
+              <span className="text-right">경차와 소형</span>
               <span className="text-right">중형</span>
-              <span className="text-right">대형, SUV</span>
+              <span className="text-right">대형과 SUV</span>
             </div>
             <ul>
               {PRICE.map(([t, time, s, m, l]) => (
@@ -116,7 +116,7 @@ export function CarB() {
                 ["프리워시", "고압수로 모래와 먼지를 먼저 씻어 냅니다"],
                 ["폼 세차", "중성 거품을 올려 오염을 불립니다"],
                 ["투 버킷 손세차", "미트를 헹궈 가며 흠집 없이 닦습니다"],
-                ["건조, 마무리", "극세사 타월, 타이어와 유리까지"],
+                ["건조와 마무리", "극세사 타월, 타이어와 유리까지"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: C.blue }}>{i + 1}</span>

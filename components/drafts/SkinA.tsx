@@ -11,9 +11,9 @@ const C = { ink: "#1f1d1b", sub: "#6e6a65", line: "#e8e5e1", soft: "#f3f2f0", sa
 
 const CARE = [
   { en: "MEDICAL", t: "피부 질환", d: "여드름, 아토피, 습진, 두드러기를 건강보험으로 진료합니다." },
-  { en: "LIFTING", t: "탄력, 리프팅", d: "피부 두께와 처짐 정도를 측정한 뒤 장비와 횟수를 정합니다." },
-  { en: "PIGMENT", t: "기미, 색소", d: "색소의 깊이를 먼저 진단하고 레이저 종류를 고릅니다." },
-  { en: "SCAR", t: "흉터, 모공", d: "흉터 종류별로 시술을 나눠 단계별로 진행합니다." },
+  { en: "LIFTING", t: "탄력과 리프팅", d: "피부 두께와 처짐 정도를 측정한 뒤 장비와 횟수를 정합니다." },
+  { en: "PIGMENT", t: "기미와 색소", d: "색소의 깊이를 먼저 진단하고 레이저 종류를 고릅니다." },
+  { en: "SCAR", t: "흉터와 모공", d: "흉터 종류별로 시술을 나눠 단계별로 진행합니다." },
 ];
 
 export function SkinA() {
@@ -28,7 +28,7 @@ export function SkinA() {
           <span className="text-[15px] font-bold tabular-nums">02-000-0000</span>
         </div>
         <nav aria-label="진료 과목" className="mx-auto hidden max-w-[1280px] gap-0 border-t px-10 text-[15px] font-medium md:flex" style={{ borderColor: C.line }}>
-          {["병원 소개", "피부 질환", "리프팅", "색소, 기미", "흉터, 모공", "진료 안내", "오시는 길"].map((m, i) => (
+          {["병원 소개", "피부 질환", "리프팅", "색소와 기미", "흉터와 모공", "진료 안내", "오시는 길"].map((m, i) => (
             <span key={m} className="flex-1 py-3.5 text-center" style={{ color: i === 0 ? C.ink : C.sub }}>{m}</span>
           ))}
         </nav>
@@ -37,8 +37,7 @@ export function SkinA() {
       <section className="px-5 md:px-10" style={{ background: C.soft }}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 py-14 lg:grid-cols-[1fr_1.2fr] lg:gap-16 lg:py-0">
           <div className="lg:py-28">
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>SKIN, AS IT SHOULD BE</p>
-            <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[60px]">
+            <h1 className="text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[60px]">
               피부는 진단이
               <br />
               먼저입니다
@@ -59,13 +58,11 @@ export function SkinA() {
 
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1280px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>TREATMENTS</p>
-          <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
+          <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
           <ul className="mt-14 grid gap-px md:grid-cols-4" style={{ background: C.line }}>
             {CARE.map((c) => (
               <li key={c.en} className="bg-white p-7 md:p-8">
-                <p className="text-[12px] font-bold tracking-[0.22em]" style={{ color: C.sage }}>{c.en}</p>
-                <h3 className="mt-3 text-[24px] font-bold tracking-[-0.03em]">{c.t}</h3>
+                <h3 className="text-[24px] font-bold tracking-[-0.03em]">{c.t}</h3>
                 <p className="mt-3 text-[15px]" style={{ color: C.sub }}>{c.d}</p>
                 <p className="mt-8 inline-flex items-center gap-1 text-[14px] font-bold">
                   자세히 보기 <ArrowRight size={15} aria-hidden />
@@ -79,7 +76,6 @@ export function SkinA() {
       <section className="px-5 md:px-10">
         <div className="mx-auto grid max-w-[1280px] gap-5 md:grid-cols-[1fr_1.3fr]">
           <div className="flex flex-col justify-center gap-6 p-8 md:p-12" style={{ background: C.soft }}>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>CONSULTATION</p>
             <h2 className="text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[36px]">
               시술 전 상담은
               <br />
@@ -96,8 +92,7 @@ export function SkinA() {
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1280px] gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>HOURS</p>
-            <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[42px]">진료 시간</h2>
+            <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[42px]">진료 시간</h2>
             <dl className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["평일", "10:00 ~ 19:00"],

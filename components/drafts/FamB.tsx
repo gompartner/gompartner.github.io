@@ -30,7 +30,7 @@ export function FamB() {
       <section className="px-5 pb-16 pt-10 md:px-8 md:pb-24 md:pt-14">
         <div className="mx-auto grid max-w-[1200px] items-center gap-8 overflow-hidden rounded-[32px] lg:grid-cols-2" style={{ background: C.plumSoft }}>
           <div className="px-7 pt-10 md:px-14 lg:py-16">
-            <p className="inline-flex rounded-full bg-white px-3 py-1 text-[14px] font-bold" style={{ color: C.plum }}>재산분할, 양육 사건</p>
+            <p className="inline-flex rounded-full bg-white px-3 py-1 text-[14px] font-bold" style={{ color: C.plum }}>재산분할과 양육 사건</p>
             <h1 className="mt-5 text-[34px] font-bold leading-[1.25] tracking-[-0.045em] md:text-[50px]">
               이혼 뒤의 생활을
               <br />

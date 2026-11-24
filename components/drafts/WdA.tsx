@@ -44,8 +44,7 @@ export function WdA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.olive }}>PACKAGE</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">패키지</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">패키지</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {PACKS.map(([t, n, d]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[0.8fr_0.8fr_2fr_auto] md:items-center md:gap-8" style={{ borderColor: C.line }}>
@@ -89,7 +88,7 @@ export function WdA() {
                 ["13:00", "하객 맞이, 웰컴 드링크"],
                 ["14:00", "정원 예식 40분"],
                 ["15:00", "하우스 홀 식사와 축하 공연"],
-                ["17:30", "마무리, 정원 사진"],
+                ["17:30", "마무리와 정원 사진"],
               ].map(([k, v]) => (
                 <div key={k} className="grid grid-cols-[72px_1fr] gap-3 border-b py-4" style={{ borderColor: C.line }}>
                   <dt className="font-bold tabular-nums">{k}</dt>

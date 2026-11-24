@@ -13,13 +13,13 @@ const FORMS = [
   ["연질 캡슐", "오메가3, 루테인 같은 오일"],
   ["분말 스틱", "물에 타 먹는 3g 스틱포"],
   ["액상 파우치", "20mL 젤리, 액상"],
-  ["환", "홍삼, 한방 원료"],
+  ["환", "홍삼과 한방 원료"],
 ];
 
 const STEPS = [
   ["기획", "1주", "기능성, 원료, 제형, 목표 단가"],
   ["처방 개발", "3 ~ 4주", "배합비 설계, 시제품 2회"],
-  ["안정성, 표시", "2주", "표시사항 작성, 기능성 문구 검토"],
+  ["안정성과 표시", "2주", "표시사항 작성, 기능성 문구 검토"],
   ["생산", "3 ~ 4주", "GMP 라인 생산, 품질검사"],
 ];
 
@@ -82,7 +82,7 @@ export function FoB() {
           <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map(([t, w, d], i) => (
               <li key={t} className="rounded-[22px] border p-6" style={{ borderColor: C.line }}>
-                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.violet }}>STEP {i + 1}, {w}</p>
+                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.violet }}>{i + 1}단계, {w}</p>
                 <h3 className="mt-2 text-[21px] font-bold tracking-[-0.03em]">{t}</h3>
                 <p className="mt-1 text-[15px]" style={{ color: C.sub }}>{d}</p>
               </li>

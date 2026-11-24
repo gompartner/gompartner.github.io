@@ -6,10 +6,10 @@ const ICON: Record<AddonId, LucideIcon> = { page: FileText, board: LayoutList, t
 // 카탈로그에서 실제로 쓴 예
 const EXAMPLE: Partial<Record<AddonId, string>> = {
   tool: "예약 접수, 견적 계산, 시간표 조회",
-  board: "시공 사례, 신고 일정",
-  live: "객실, 좌석 현황",
-  map: "매물, 지점 찾기",
-  cart: "원두, 도자기 주문",
+  board: "시공 사례와 신고 일정",
+  live: "객실과 좌석 현황",
+  map: "매물과 지점 찾기",
+  cart: "원두와 도자기 주문",
 };
 
 export function AddonList({ only, id }: { only?: AddonId[]; id: string }) {

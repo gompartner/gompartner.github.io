@@ -13,7 +13,6 @@ export function LdPopupB() {
       <section className="px-5 pt-10 md:px-8 md:pt-14">
         <div className="mx-auto max-w-[1120px]">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 pb-4" style={{ borderColor: C.ink }}>
-            <p className="text-[16px] font-bold tracking-[0.12em]">BUNGEO LAB</p>
             <p className="text-[15px] font-bold tabular-nums">12. 5 ~ 12. 11, 성수</p>
           </div>
           <h1 className="mt-8 text-[48px] font-black leading-[1.02] tracking-[-0.06em] md:text-[120px]">

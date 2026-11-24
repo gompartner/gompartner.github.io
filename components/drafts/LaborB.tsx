@@ -79,7 +79,7 @@ export function LaborB() {
                 ["첫 상담", "30분, 사건 가능 여부와 기한 확인"],
                 ["자료 정리", "근로계약서, 급여 내역, 문자와 녹음"],
                 ["신청서 작성", "노동위원회, 노동청, 근로복지공단 제출"],
-                ["심문, 조사 출석", "노무사가 함께 출석해 진술을 돕습니다"],
+                ["심문과 조사 출석", "노무사가 함께 출석해 진술을 돕습니다"],
               ].map(([k, v], i) => (
                 <li key={k} className="flex gap-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: C.green }}>{i + 1}</span>

@@ -23,8 +23,8 @@ export function CarA() {
           <p className="text-[18px] font-bold tracking-[0.1em]">
             NOIR <span style={{ color: C.red }}>DETAIL</span>
           </p>
-          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold tracking-[0.06em] text-white/85 md:flex">
-            {["PPF", "COATING", "TINT", "WARRANTY", "CONTACT"].map((m) => (
+          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold text-white/85 md:flex">
+            {["PPF", "유리막 코팅", "썬팅", "시공 보증", "문의"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -49,8 +49,7 @@ export function CarA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.red }}>SERVICE</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">시공 항목과 기간</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">시공 항목과 기간</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {WORKS.map(([t, d, p]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[1fr_2fr_auto] md:items-center md:gap-8" style={{ borderColor: C.line }}>
@@ -82,7 +81,7 @@ export function CarA() {
         <div className="mx-auto grid max-w-[1320px] gap-10 md:grid-cols-2 md:gap-16">
           <div>
             <p className="flex items-center gap-2 text-[15px] font-bold" style={{ color: C.red }}>
-              <ShieldCheck size={18} aria-hidden /> WARRANTY
+              <ShieldCheck size={18} aria-hidden /> 시공 보증
             </p>
             <h2 className="mt-4 text-[30px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[42px]">시공 보증서를 드립니다</h2>
             <p className="mt-4" style={{ color: C.sub }}>필름 제조사 보증과 별도로 매장 시공 보증을 서면으로 드립니다. 들뜸, 기포, 변색은 기간 안에 다시 시공합니다.</p>

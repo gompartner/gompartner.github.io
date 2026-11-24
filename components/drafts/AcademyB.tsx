@@ -20,7 +20,7 @@ export function AcademyB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">수학, 영어 학원</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">수학과 영어 학원</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#3c4641" }}>
             {["학원 소개", "반 안내", "시간표", "교습비", "셔틀 노선"].map((m) => (
               <span key={m}>{m}</span>

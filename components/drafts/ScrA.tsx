@@ -11,7 +11,7 @@ const C = { ink: "#121a2b", sub: "#5a6375", line: "#e2e6ee", soft: "#f3f5f9", na
 const WORKS = [
   { i: Home, t: "부동산 등기", d: "매매, 증여, 상속 소유권 이전" },
   { i: Building2, t: "법인 등기", d: "설립, 임원 변경, 본점 이전" },
-  { i: Landmark, t: "공탁, 집행", d: "변제 공탁, 강제집행 신청" },
+  { i: Landmark, t: "공탁과 집행", d: "변제 공탁, 강제집행 신청" },
   { i: FileText, t: "근저당 설정, 말소", d: "대출 실행일 당일 접수" },
 ];
 
@@ -80,12 +80,12 @@ export function ScrA() {
           </div>
           <dl className="self-start border-t-2" style={{ borderColor: C.navy }}>
             {[
-              ["취득세, 지방교육세", "주택 가격과 보유 주택 수에 따라 1 ~ 12%"],
+              ["취득세와 지방교육세", "주택 가격과 보유 주택 수에 따라 1 ~ 12%"],
               ["국민주택채권", "매입 후 바로 매도, 할인 비용만 부담"],
               ["등기신청 수수료", "대법원 수수료, 부동산 1건 기준"],
               ["인지세", "거래 금액 1억 원 초과 시"],
               ["법무사 보수", "대한법무사협회 보수 기준 안에서 안내"],
-              ["교통비, 제증명", "현장 출장, 등본 발급 실비"],
+              ["교통비와 제증명", "현장 출장, 등본 발급 실비"],
             ].map(([k, v]) => (
               <div key={k} className="grid gap-1 border-b py-5 sm:grid-cols-[200px_1fr] sm:gap-6" style={{ borderColor: C.line }}>
                 <dt className="font-bold">{k}</dt>
@@ -107,7 +107,7 @@ export function ScrA() {
               ["당일 오후", "등기소 접수, 접수증 전달"],
             ].map(([k, v], i) => (
               <li key={k} className="bg-white p-7 md:p-8">
-                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.navy }}>STEP {i + 1}</p>
+                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.navy }}>{i + 1}단계</p>
                 <p className="mt-3 text-[21px] font-bold tracking-[-0.03em]">{k}</p>
                 <p className="mt-1 text-[15px]" style={{ color: C.sub }}>{v}</p>
               </li>

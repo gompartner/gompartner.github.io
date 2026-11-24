@@ -74,8 +74,7 @@ export function FoodA() {
       <section className="px-5 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 py-20 text-white md:grid-cols-[1fr_1.2fr] md:gap-16 md:py-28">
           <div>
-            <p className="text-[14px] font-bold tracking-[0.2em] text-white/60">OUR STORY</p>
-            <h2 className="mt-4 text-[30px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[44px]">
+            <h2 className="text-[30px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[44px]">
               처음 문을 연 날과
               <br />
               같은 상을 냅니다

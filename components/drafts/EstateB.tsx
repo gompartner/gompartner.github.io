@@ -22,7 +22,7 @@ export function EstateB() {
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
           <p className="text-[20px] font-bold tracking-[-0.03em]">부동산 공인중개사사무소</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#3c4450" }}>
-            {["매물", "전세 안전 확인", "매도, 임대 의뢰", "오시는 길"].map((m) => (
+            {["매물", "전세 안전 확인", "매도와 임대 의뢰", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -47,10 +47,10 @@ export function EstateB() {
           </div>
           <ul className="mt-12 grid grid-cols-2 gap-3 md:mt-20 md:grid-cols-4">
             {[
-              [Building2, "아파트", "매매, 전세"],
-              [Building, "오피스텔", "월세, 전세"],
-              [Home, "원룸, 투룸", "월세"],
-              [Store, "상가, 사무실", "임대, 매매"],
+              [Building2, "아파트", "매매와 전세"],
+              [Building, "오피스텔", "월세와 전세"],
+              [Home, "원룸과 투룸", "월세"],
+              [Store, "상가와 사무실", "임대와 매매"],
             ].map(([Icon, t, s]) => {
               const I = Icon as typeof Home;
               return (
@@ -105,7 +105,7 @@ export function EstateB() {
             {[
               ["등기부등본", "소유자, 근저당, 가압류 확인"],
               ["선순위 보증금", "다가구는 먼저 들어온 보증금 합계"],
-              ["건축물대장", "위반건축물, 용도 확인"],
+              ["건축물대장", "위반건축물과 용도 확인"],
               ["보증보험 가입", "전세보증금 반환보증 가능 여부"],
             ].map(([t, d]) => (
               <li key={t} className="rounded-[18px] bg-white p-6">

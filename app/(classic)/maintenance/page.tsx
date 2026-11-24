@@ -21,8 +21,8 @@ export const metadata: Metadata = pageMeta({
 // 11-01 보편 구성: 서비스 목록(세부 페이지로), 응대 기준, 진행 절차, 자주 묻는 질문. 상담 띠는 공통 틀에 있다.
 const PROMISES = [
   { icon: MessageSquareReply, num: "24시간", label: "이내 회신(영업일 기준)" },
-  { icon: Wrench, num: "작업 전 백업", label: "변경 대상 파일, DB" },
-  { icon: CalendarClock, num: "30일 전", label: "도메인, SSL 만료 알림" },
+  { icon: Wrench, num: "작업 전 백업", label: "변경 대상 파일과 DB" },
+  { icon: CalendarClock, num: "30일 전", label: "도메인과 SSL 만료 알림" },
   { icon: FileBarChart, num: "월 1회", label: "월간 점검 보고서" },
 ];
 
@@ -31,7 +31,7 @@ const INCIDENT: { title: string; body: string; cases?: [string, string][] }[] = 
   { title: "접수", body: "주소와 증상, 발생 시점을 받습니다." },
   { title: "원인 확인", body: "접속 상태, 오류 기록, 최근 변경 내역을 확인합니다." },
   {
-    title: "판정, 안내",
+    title: "판정과 안내",
     body: "확인 결과와 조치 방법을 회신합니다.",
     cases: [
       ["조치 가능", "원인과 처리 기간, 금액을 안내하고 수정합니다"],
@@ -47,12 +47,12 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     name: "유지보수",
     who: "소규모 홈페이지",
     what: "수정 요청을 건별로 처리합니다.",
-    rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별, 월 계약 없음"], ["비용", "건별 10,000원부터"]],
+    rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별 계약"], ["비용", "건별 10,000원부터"]],
     links: [["/maintenance/fix", "유지보수"], ["/contact", "수정 요청"]],
   },
   {
     name: "유지관리",
-    who: "기업, 기관 홈페이지",
+    who: "기업과 기관 홈페이지",
     what: "월 1회 정기 점검과 수정 요청 처리를 월 단위로 수행합니다.",
     rows: [["작업", "정기 점검 월 1회, 수정 요청 처리, 만료 관리, 월간 보고서"], ["계약", "월 계약, 영업일 기준 대응"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
     links: [["/maintenance/monthly", "유지관리"], ["/maintenance/update", "보안 업데이트"]],
@@ -62,7 +62,7 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     name: "성능 개선",
     who: "속도가 느려진 서비스",
     what: "원인을 진단하고 개선합니다.",
-    rows: [["작업", "성능 진단, 쿼리 튜닝, 캐시, 서버 설정"], ["산출물", "진단 보고서, 개선 전후 측정값"], ["비용", "진단 후 견적"]],
+    rows: [["작업", "성능 진단, 쿼리 튜닝, 캐시, 서버 설정"], ["산출물", "진단 보고서와 개선 전후 측정값"], ["비용", "진단 후 견적"]],
     links: [["/maintenance/perf", "성능 개선"], ["/contact", "진단 문의"]],
   },
   {
@@ -70,7 +70,7 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     who: "MVP, 시제품, 인수한 서비스",
     what: "운영 가능한 수준으로 기능과 구조를 보완합니다.",
     rows: [["작업", "현황 분석, 아키텍처 설계, 개발, 이관"], ["산출물", "시스템 구성도, 원본 소스, 인계 문서"], ["비용", "프로젝트 견적"]],
-    links: [["/maintenance/ai-site", "고도화"], ["/maintenance/takeover", "업체 변경, 인수"]],
+    links: [["/maintenance/ai-site", "고도화"], ["/maintenance/takeover", "업체 변경과 인수"]],
   },
 ];
 

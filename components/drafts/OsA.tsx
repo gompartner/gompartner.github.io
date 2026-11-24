@@ -21,7 +21,7 @@ export function OsA() {
         <div className="mx-auto flex h-[70px] max-w-[1320px] items-center justify-between px-5 md:px-10">
           <p className="text-[19px] font-bold tracking-[0.12em]">흙과불</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#4b4741" }}>
-            {["머그, 컵", "사발, 접시", "화병", "각인 선물", "배송 안내"].map((m) => (
+            {["머그와 컵", "사발과 접시", "화병", "각인 선물", "배송 안내"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -37,8 +37,7 @@ export function OsA() {
             <Image src={`${IMG}/a-hero.jpg`} alt="검은 배경 앞 흰 유약 컵 여러 개" fill priority sizes="100vw" className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" aria-hidden />
             <div className="absolute bottom-0 left-0 p-6 text-white md:p-12">
-              <p className="text-[14px] font-bold tracking-[0.2em] text-white/80">2026 WINTER</p>
-              <h1 className="mt-3 text-[34px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[60px]">
+              <h1 className="text-[34px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[60px]">
                 하나씩 빚어
                 <br />
                 하나씩 굽습니다
@@ -94,7 +93,7 @@ export function OsA() {
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto grid max-w-[1320px] gap-10 md:grid-cols-[1.2fr_1fr] md:gap-16">
           <div>
-            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">배송, 교환 안내</h2>
+            <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">배송과 교환 안내</h2>
             <dl className="mt-7 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["배송", "주문 뒤 2 ~ 3일 안에 출고, 5만 원 이상 무료"],

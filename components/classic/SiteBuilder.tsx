@@ -9,7 +9,7 @@ import s from "./SiteBuilder.module.css";
 // 장면 순서(사용자 확인): 1 빈 브라우저 창 > 2 뼈대가 선으로 그려짐 > 3 사진과 색이 위에서 아래로 입혀짐 > 4 상호가 한 자씩 써짐 > 5 모바일 화면이 옆에 섬 > 6 오픈 표시.
 export type BuilderItem = { group: string; id: string; slug: string; name: string; variants: { id: string; label: string }[] };
 
-const STEPS = ["업종, 시안 선택", "상호, 자료 반영", "견적", "제작, 수정", "오픈, 납품", "하자보수, 유지관리"];
+const STEPS = ["업종과 시안 선택", "상호와 자료 반영", "견적", "제작과 수정", "오픈과 납품", "하자보수와 유지관리"];
 const PCW = 1280, PCH = 800, MW = 390, MH = 780;
 
 export function SiteBuilder({ items }: { items: BuilderItem[] }) {
