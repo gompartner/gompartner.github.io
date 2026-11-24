@@ -370,6 +370,22 @@
   @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
   .gp-bar { position: fixed; top: 0; left: 0; right: 0; }
   :root { --top: calc(env(safe-area-inset-top, 0px) + 40px) !important; }
+
+  /* 11-24 버튼 순서: 견적 요청 다음에 메뉴 버튼(맨 오른쪽). 좁은 화면에서 폭, 금액 칸이 넘치지 않게 */
+  .top .cta { order: 2; }
+  .top .ibtn { order: 3; }
+  @media (max-width: 420px) {
+    .info button { padding: 6px 10px; gap: 6px; }
+    .wbtn svg { display: none; }
+    .wbtn b { font-size: 15px; }
+    .wbtn small { font-size: 12px; }
+    .pbtn b { font-size: 16px; }
+  }
+  @media (max-width: 335px) {
+    .wbtn small { display: none; }
+    .tile { font-size: 13px; }
+    .tile svg { width: 30px; height: 30px; }
+  }
 </style>
 <script type="importmap">
 { "imports": {

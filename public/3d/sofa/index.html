@@ -319,6 +319,22 @@
   :root.embed { --top: env(safe-area-inset-top, 0px) !important; }
   .embed .gp-bar { display: none; }
   @media (min-width: 900px) { .embed .top { padding-top: 18px; } .embed .info { top: 20px; } .embed .wallpop { top: 86px; } .embed .menu { top: 72px; } }
+
+  /* 11-24 버튼 순서: 견적 요청 다음에 메뉴 버튼(맨 오른쪽). 좁은 화면에서 폭, 금액 칸이 넘치지 않게 */
+  .top .cta { order: 2; }
+  .top .ibtn { order: 3; }
+  @media (max-width: 420px) {
+    .info button { padding: 6px 10px; gap: 6px; }
+    .wbtn svg { display: none; }
+    .wbtn b { font-size: 15px; }
+    .wbtn small { font-size: 12px; }
+    .pbtn b { font-size: 16px; }
+  }
+  @media (max-width: 335px) {
+    .wbtn small { display: none; }
+    .tile { font-size: 13px; }
+    .tile svg { width: 30px; height: 30px; }
+  }
 </style>
 <script>if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');</script>
 <script type="importmap">
