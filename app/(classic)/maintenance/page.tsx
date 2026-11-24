@@ -37,7 +37,7 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     who: "기관, 기업 홈페이지",
     what: "수정 요청 처리와 정기 점검을 월 단위로 수행합니다.",
     rows: [["작업", "요청 처리, 백업, 보안 업데이트, 만료 관리, 월간 보고서"], ["계약", "월 계약"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
-    links: [["/maintenance/monthly", "유지관리"], ["/maintenance/update", "보안 업데이트"], ["/maintenance/standard", "운영 기준"]],
+    links: [["/maintenance/monthly", "유지관리"], ["/maintenance/update", "보안 업데이트"]],
   },
   {
     id: "perf",
