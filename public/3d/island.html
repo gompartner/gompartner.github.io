@@ -854,10 +854,12 @@ if (document.createElement('canvas').getContext('webgl2')) {
   try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
 }
 if (!renderer) { document.body.classList.add('no-gl'); await new Promise(() => {}); }
-const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.75); // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
+const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.5); // 11-24 PC 1.75에서 1.5로(끌 때 프레임이 떨어짐) // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
 renderer.setPixelRatio(DPR);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false; // 11-24 그림자는 두 프레임에 한 번만 다시 그린다
+let shadowTick = 0;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
@@ -872,7 +874,7 @@ const skyU = { uTop: { value: new THREE.Color() }, uHor: { value: new THREE.Colo
 const sky = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.ShaderMaterial({
   uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
   vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-  fragmentShader: 'uniform vec3 uTop, uHor; uniform float uH; varying vec3 vD; void main(){ float h = clamp(gl_FragCoord.y / uH, 0.0, 1.0); gl_FragColor = vec4(mix(uHor, uTop, smoothstep(0.15, 1.0, h)), 1.0); }'
+  fragmentShader: 'uniform vec3 uTop, uHor; uniform float uH; varying vec3 vD; void main(){ float h = clamp(gl_FragCoord.y / uH, 0.0, 1.0); float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5; gl_FragColor = vec4(mix(uHor, uTop, smoothstep(0.15, 1.0, h)) + n * 0.012, 1.0); }'
 }));
 scene.add(sky);
 
@@ -2018,7 +2020,7 @@ function dayUI() {
 }
 
 // ---------- 끌어서 돌리기, 고르기 ----------
-const user = { az: 0, el: 0, idle: 99 };
+const user = { az: 0, el: 0, idle: 99, zoom: 1, zs: 1 };
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e) {
   const r = canvas.getBoundingClientRect();
@@ -2028,8 +2030,12 @@ function pick(e) {
   return h ? h.object.userData.id : null;
 }
 let drag = null;
-canvas.addEventListener('pointerdown', e => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, type: e.pointerType }; });
+const pts = new Map(); let pinch = 0;
+const setZoom = z => { user.zoom = clamp(z, 0.55, 1.5); user.idle = 0; dirty = true; };
+canvas.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); setZoom(user.zoom * Math.exp(e.deltaY * 0.0022)); }, { passive: false });
+canvas.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); drag = null; canvas.classList.remove('drag'); return; } } drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, type: e.pointerType }; });
 addEventListener('pointermove', e => {
+  if (pts.has(e.pointerId)) { pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (d > 0) { setZoom(user.zoom * pinch / d); pinch = d; } return; } }
   if (drag && e.pointerId === drag.id) {
     if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 7) {
       // 휴대폰은 가로로 끌 때만 돌립니다. 세로는 페이지 스크롤에 맡깁니다
@@ -2040,19 +2046,20 @@ addEventListener('pointermove', e => {
     if (drag.moved) {
       user.az -= (e.clientX - drag.lx) * 0.0055;
       if (drag.type === 'mouse') user.el += (e.clientY - drag.ly) * 0.003;
-      user.az = clamp(user.az, -1.0, 1.0); user.el = clamp(user.el, -0.3, 0.3);
+      user.el = clamp(user.el, -0.42, 0.42); // 11-24 좌우는 한 바퀴 자유롭게, 위아래만 제한
       user.idle = 0; dirty = true;
     }
     drag.lx = e.clientX; drag.ly = e.clientY;
   } else if (e.pointerType === 'mouse' && e.target === canvas) setHover(pick(e));
 }, { passive: true });
 addEventListener('pointerup', e => {
+  if (pts.delete(e.pointerId)) pinch = 0;
   if (!drag || e.pointerId !== drag.id) return;
   if (!drag.moved) { const id = pick(e); if (id) select(id, false); else deselect(); }
   canvas.classList.remove('drag');
   drag = null;
 });
-addEventListener('pointercancel', () => { drag = null; canvas.classList.remove('drag'); });
+addEventListener('pointercancel', e => { pts.delete(e.pointerId); pinch = 0; drag = null; canvas.classList.remove('drag'); });
 canvas.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !drag) setHover(null); });
 
 // ---------- 카메라 ----------
@@ -2081,7 +2088,7 @@ function placeCamera(dt) {
     des.t.set(wide ? -0.9 : 0, wide ? 0.2 : 1.2, wide ? 0.4 : 0.5); des.az = (wide ? 0.3 : PH.az) + user.az; des.el = (wide ? 0.74 : PH.el) + user.el;
     des.fw = wide ? 32.5 : 18.5; des.fh = wide ? 18 : 17;
     des.ox = 0; des.oy = wide ? 0.035 : PH.oy; des.aw = wide ? 1.0 : PH.aw; des.ah = wide ? 0.84 : PH.ah;
-    if (focus && !reduce && wide) { des.t.lerp(B[focus].view.t, 0.08); des.az += (B[focus].view.az - 0.3) * 0.12; }
+    // 11-24 이야기 순서에 따라 카메라가 조금씩 따라가던 것 없앰(가만히 있어도 윤곽이 계속 흔들림)
   }
   const rate = selected ? 2.4 : user.idle < 4 ? 6 : 0.55;
   const k = camInit && !reduce ? 1 - Math.exp(-dt * rate) : 1;
@@ -2106,7 +2113,7 @@ function placeCamera(dt) {
   if (!cam.dist || !camInit2) { cam.dist = distDes; camInit2 = true; }
   cam.dist += (distDes - cam.dist) * k;
   if (Math.abs(distDes - cam.dist) < 1e-4) cam.dist = distDes;
-  const dist = cam.dist;
+  const dist = cam.dist * (selected ? 1 : user.zs);
   camera.position.set(cam.t.x + Math.sin(cam.az) * Math.cos(cam.el) * dist, cam.t.y + Math.sin(cam.el) * dist, cam.t.z + Math.cos(cam.az) * Math.cos(cam.el) * dist);
   camera.lookAt(cam.t);
   camera.aspect = asp;
@@ -2501,7 +2508,8 @@ function loop(now) {
   if (now - fpsT > 1000) { window.__fps = Math.round(frames * 1000 / (now - fpsT)); frames = 0; fpsT = now; }
   const time = now / 1000;
   user.idle += dt;
-  if (user.idle > 4 && !selected && !drag) { const k = 1 - Math.exp(-dt * 0.5); user.az -= user.az * k; user.el -= user.el * k; if (Math.abs(user.az) < 1e-5) user.az = 0; if (Math.abs(user.el) < 1e-5) user.el = 0; }
+  // 11-24 돌려 둔 방향은 그대로 둔다(4초 뒤 제자리로 돌아가던 것 없앰)
+  if (Math.abs(user.zoom - user.zs) > 1e-4) { user.zs += (user.zoom - user.zs) * (1 - Math.exp(-dt * 10)); dirty = true; } else user.zs = user.zoom;
   if (reduce && !dirty && !drag) return;
   if (window.__freeze) { composer.render(); placePins(); return; }
   if (day.playing) day.t = (day.t + dt / CYCLE) % 1;
@@ -2520,6 +2528,7 @@ function loop(now) {
   placeCamera(dt);
   sky.position.copy(camera.position);
   finalPass.uniforms.uTime.value = time;
+  if ((shadowTick++ & 1) === 0) renderer.shadowMap.needsUpdate = true;
   composer.render();
   placePins();
   dayUI();
