@@ -169,7 +169,7 @@ export default function MaintenanceStandardPage() {
               <ArrowUpRight size={18} aria-hidden />
             </a>
             <Link href="/maintenance/monthly" className={`${btnLine} keep-light`}>
-              월 유지보수 보기
+              유지관리 보기
             </Link>
           </div>
         </div>

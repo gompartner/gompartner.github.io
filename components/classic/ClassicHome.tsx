@@ -25,7 +25,7 @@ const make = [
 const care = [
   { href: "/maintenance/fix", name: "유지보수", body: "수정 요청 건별 처리" },
   { href: "/maintenance/monthly", name: "유지관리", body: "정기 점검, 월간 보고" },
-  { href: "/maintenance#perf", name: "성능 개선", body: "속도 진단, 쿼리 튜닝" },
+  { href: "/maintenance/perf", name: "성능 개선", body: "속도 진단, 쿼리 튜닝" },
   { href: "/maintenance/ai-site", name: "고도화", body: "MVP, 시제품 완제품화" },
 ];
 

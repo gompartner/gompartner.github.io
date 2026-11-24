@@ -11,7 +11,7 @@ import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 유지보수, 유지관리 (오류 수정, 업체 변경, 보안 업데이트, 월 유지보수)",
+  title: "홈페이지 유지보수, 유지관리, 성능 개선, 고도화",
   description: "홈페이지 유지보수, 유지관리 업체 곰파트너. 다른 업체가 만든 사이트의 긴급 오류 수정, 연락 두절 업체 인수, 워드프레스, 그누보드, PHP 보안 업데이트, 유지보수, 유지관리, 성능 개선, 고도화로 나눠 수행합니다.",
   path: "/maintenance",
 });
@@ -30,14 +30,14 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     who: "소규모 홈페이지",
     what: "수정 요청을 건별로 처리합니다.",
     rows: [["작업", "문구, 이미지, 메뉴 수정, 오류 수정"], ["계약", "건별, 월 계약 없음"], ["비용", "건별 10,000원부터"]],
-    links: [["/maintenance/fix", "오류 수정"], ["/contact", "수정 요청"]],
+    links: [["/maintenance/fix", "유지보수"], ["/contact", "수정 요청"]],
   },
   {
     name: "유지관리",
     who: "기관, 기업 홈페이지",
     what: "수정 요청 처리와 정기 점검을 월 단위로 수행합니다.",
     rows: [["작업", "요청 처리, 백업, 보안 업데이트, 만료 관리, 월간 보고서"], ["계약", "월 계약"], ["비용", "월 방문자 수, 회원 수, 사이트 수 기준 견적"]],
-    links: [["/maintenance/monthly", "월 유지관리"], ["/maintenance/update", "보안 업데이트"], ["/maintenance/standard", "운영 기준"]],
+    links: [["/maintenance/monthly", "유지관리"], ["/maintenance/update", "보안 업데이트"], ["/maintenance/standard", "운영 기준"]],
   },
   {
     id: "perf",
@@ -45,14 +45,14 @@ const KINDS: { id?: string; name: string; who: string; what: string; rows: [stri
     who: "속도가 느려진 서비스",
     what: "원인을 진단하고 개선합니다.",
     rows: [["작업", "성능 진단, 쿼리 튜닝, 캐시, 서버 설정"], ["산출물", "진단 보고서, 개선 전후 측정값"], ["비용", "진단 후 견적"]],
-    links: [["/contact", "진단 문의"]],
+    links: [["/maintenance/perf", "성능 개선"], ["/contact", "진단 문의"]],
   },
   {
     name: "고도화",
     who: "MVP, 시제품, 인수한 서비스",
     what: "운영 가능한 수준으로 기능과 구조를 보완합니다.",
     rows: [["작업", "현황 분석, 아키텍처 설계, 개발, 이관"], ["산출물", "시스템 구성도, 원본 소스, 인계 문서"], ["비용", "프로젝트 견적"]],
-    links: [["/maintenance/ai-site", "AI로 만든 서비스"], ["/maintenance/takeover", "업체 변경, 인수"]],
+    links: [["/maintenance/ai-site", "고도화"], ["/maintenance/takeover", "업체 변경, 인수"]],
   },
 ];
 
@@ -63,7 +63,7 @@ const ld = [
     "@type": "Service",
     name: "홈페이지 유지보수",
     serviceType: "홈페이지 유지보수",
-    description: "홈페이지 오류 수정, 유지보수 업체 변경, AI로 만든 사이트 유지보수, 워드프레스 보안 업데이트, 월 유지보수.",
+    description: "홈페이지 유지보수(건별 수정), 유지관리(월 계약), 성능 개선, 고도화, 유지보수 업체 변경, 보안 업데이트.",
     areaServed: "KR",
     url: `${siteUrl}/maintenance`,
     // 11-08 AI 검색 답변이 업체마다 특징, 비용, 추천 대상을 뽑아 쓴다. 공개 시작 금액(PriceBand와 같은 값)

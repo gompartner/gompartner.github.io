@@ -13,7 +13,7 @@ const groups = [
     items: [
       { href: "/maintenance/fix", label: "유지보수" },
       { href: "/maintenance/monthly", label: "유지관리" },
-      { href: "/maintenance#perf", label: "성능 개선" },
+      { href: "/maintenance/perf", label: "성능 개선" },
       { href: "/maintenance/ai-site", label: "고도화" },
       { href: "/maintenance/standard", label: "운영 기준" },
     ],
