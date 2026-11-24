@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Clock } from "lucide-react";
 
 // 베이커리 시안 A 동네 빵집형(11-22 사례 분석: 빵아빵아처럼 메뉴와 매장 정보를 쉽게 찾게 둔다. 동네 손님은 몇 시에 무슨 빵이 나오는지, 케이크는 며칠 전에 주문하는지를 묻는다). 흰 바탕, 갈색과 빨강. 인물 없음. 메인 한 장, 기능 없음.
+// data-mt 표시는 유지보수 화면의 수정 요청 처리 연출(RequestFlow)이 바꿀 자리를 찾는 데 쓴다.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/bk/a-*)
 const IMG = "/images/drafts/bk";
 const C = { ink: "#1e1712", sub: "#6a6058", line: "#ece6e0", soft: "#f7f4f1", brown: "#8a4b22", red: "#c8402e" };
@@ -47,7 +48,7 @@ export function BkA() {
               그날 구운 빵은 그날 팝니다. 저녁 8시 이후 남은 빵은 반값에 드립니다.
             </p>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
+          <div data-mt="photo" className="relative aspect-[4/3] overflow-hidden rounded-[28px]">
             <Image src={`${IMG}/a-hero.jpg`} alt="나무 선반에 줄지어 놓인 식빵" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
           </div>
         </div>
@@ -58,7 +59,7 @@ export function BkA() {
           <h2 className="flex items-center gap-3 text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">
             <Clock size={30} style={{ color: C.brown }} aria-hidden /> 빵 나오는 시간
           </h2>
-          <ul className="mt-10 overflow-hidden rounded-[22px] bg-white">
+          <ul data-mt="bake" className="mt-10 overflow-hidden rounded-[22px] bg-white">
             {BAKE.map(([t, d]) => (
               <li key={t} className="grid grid-cols-[76px_1fr] gap-x-4 border-b px-6 py-5 last:border-b-0 md:grid-cols-[140px_1fr] md:px-8" style={{ borderColor: C.line }}>
                 <span className="text-[19px] font-bold tabular-nums" style={{ color: C.brown }}>{t}</span>
@@ -112,7 +113,7 @@ export function BkA() {
           <div className="flex flex-col justify-between rounded-[28px] p-8 text-white md:p-10" style={{ background: C.brown }}>
             <div>
               <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">매장</h2>
-              <p className="mt-3 text-white/80">매일 07:30 ~ 21:00, 매주 월요일 쉽니다. 시장 입구 건너편 1층.</p>
+              <p className="mt-3 text-white/80"><span data-mt="hours">매일 07:30 ~ 21:00</span>, 매주 월요일 쉽니다. 시장 입구 건너편 1층.</p>
             </div>
             <p className="mt-8 text-[30px] font-bold tabular-nums tracking-[-0.02em]">02-000-0000</p>
           </div>

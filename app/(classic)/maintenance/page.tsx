@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, FileBarChart, MessageSquareReply, Wrench } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
+import { RequestFlow } from "@/components/classic/RequestFlow";
 import { ReviewRequest } from "@/components/classic/ReviewRequest";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
@@ -111,6 +112,11 @@ export default function ClassicMaintenancePage() {
         ]}
       />
       <SubTabs items={maintenanceTabs} current="/maintenance" />
+
+      {/* 11-25 첫 화면: 수정 요청이 처리되는 과정(메인의 제작 과정과 같은 창). 이어서 사전 검토 신청 */}
+      <section aria-label="수정 요청 처리 과정" className={`${wrap} pt-10 md:pt-14`}>
+        <RequestFlow />
+      </section>
 
       <section aria-label="사전 검토 신청" className={`${wrap} pt-10 md:pt-14`}>
         <ReviewRequest />
