@@ -45,6 +45,7 @@ html.gp-dark .cl .bg-\[\#f1f4f9\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#f1f4f9\]:hover:not(.keep-light *) { background-color: #171b22; }
 html.gp-dark .cl .bg-\[\#f3effc\]:not(.keep-light *) { background-color: #191425; }
 html.gp-dark .cl .bg-\[\#f4f6f9\]:not(.keep-light *) { background-color: #181b1f; }
+html.gp-dark .cl .bg-\[\#f4f6fa\]:not(.keep-light *) { background-color: #171a20; }
 html.gp-dark .cl .bg-\[\#f5f7fa\]:not(.keep-light *) { background-color: #171a1f; }
 html.gp-dark .cl .bg-\[\#f6f7f9\]:not(.keep-light *) { background-color: #191a1e; }
 html.gp-dark .cl .bg-\[\#f6f8fb\]:not(.keep-light *) { background-color: #161a1f; }
