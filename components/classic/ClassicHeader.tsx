@@ -66,6 +66,7 @@ export const classicMenu = [
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
 const subMenu = [
   { href: "/story", label: "회사소개" },
+  { href: "/history", label: "연혁" },
   { href: "/notice", label: "공지사항" },
   { href: "/faq", label: "자주 묻는 질문" },
 ];
