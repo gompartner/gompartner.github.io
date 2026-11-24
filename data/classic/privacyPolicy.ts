@@ -15,6 +15,12 @@ export type PolicyVersion = {
   sections: PolicySection[];
 };
 
+/** 곰파트너가 운영하는 다른 서비스의 처리방침. 서비스마다 받는 정보가 달라 따로 두고 서로 연결한다(11-24) */
+export const relatedPolicies = [
+  { name: "사이트 지킴이", href: "https://jikimi.gompartner.co.kr/privacy" },
+  { name: "거래장부", href: "https://jangbu.gompartner.co.kr/privacy" },
+];
+
 export const privacyVersions: PolicyVersion[] = [
   {
     id: "7",

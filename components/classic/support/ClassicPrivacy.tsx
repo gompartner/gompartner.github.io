@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
-import { privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
+import { relatedPolicies, privacyVersions, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
 
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/privacy" : `/privacy/${id}`);
@@ -94,6 +94,17 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             ))}
           </div>
 
+          {/* 곰파트너의 다른 서비스 처리방침 */}
+          <nav aria-label="다른 서비스 개인정보처리방침" className="mt-12 rounded-[8px] border border-[#e6e9ee] bg-[#f6f7f9] px-5 py-4 text-[15px] leading-[1.7]">
+            <p className="font-bold text-[#15171c]">곰파트너의 다른 서비스 개인정보처리방침</p>
+            <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1">
+              {relatedPolicies.map((r) => (
+                <li key={r.href}>
+                  <a href={r.href} className="text-[#256ef4] underline underline-offset-4">{r.name}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </div>
     </>
