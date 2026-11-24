@@ -19,7 +19,7 @@ export const metadata: Metadata = pageMeta({
 // 11-01 보편 구성: 서비스 목록(세부 페이지로), 응대 기준, 진행 절차, 자주 묻는 질문. 상담 띠는 공통 틀에 있다.
 const PROMISES = [
   { icon: MessageSquareReply, num: "24시간", label: "이내 회신(영업일 기준)" },
-  { icon: Wrench, num: "전체 백업", label: "작업 전 파일, DB 백업" },
+  { icon: Wrench, num: "작업 전 백업", label: "변경 대상 파일, DB" },
   { icon: CalendarClock, num: "30일 전", label: "도메인, SSL 만료 알림" },
   { icon: FileBarChart, num: "월 1회", label: "월간 점검 보고서" },
 ];
