@@ -41,6 +41,15 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
 
   // 업종이나 시안을 바꾸면 처음 장면부터 다시 만든다
   useEffect(() => { setPhase(0); setLoaded(false); }, [src]);
+  // 화면이 스크립트보다 먼저 다 뜨면 onLoad를 놓친다. 뜬 상태인지 직접 확인한다
+  useEffect(() => {
+    if (loaded) return;
+    const t = setInterval(() => {
+      const d = pc.current?.contentDocument;
+      if (d && d.readyState === "complete" && d.querySelector("header")) { setLoaded(true); apply(pc.current); }
+    }, 200);
+    return () => clearInterval(t);
+  }, [loaded, src]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (phase === 0 && loaded) { const t = setTimeout(() => setPhase(1), reduce ? 0 : 1500); return () => clearTimeout(t); }
