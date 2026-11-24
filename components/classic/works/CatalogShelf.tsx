@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { wrap } from "@/components/classic/ui";
 import s from "./CatalogShelf.module.css";
 
-// 카탈로그 진열대(11-24): 샘플 첫 화면을 휴대폰 크기 그대로 옆으로 넘겨 보고, 같은 자리에서 시안 A, B를 바꾼다.
+// 카탈로그 슬라이드(11-24): 시안 첫 화면을 모바일 크기 그대로 좌우로 넘기고, 같은 자리에서 시안 A, B를 전환한다.
 export type ShelfItem = { id: string; name: string; group: string; variants: { ab: string; label: string; href: string; img: string }[] };
 
 export function CatalogShelf({ items }: { items: ShelfItem[] }) {
@@ -48,9 +48,9 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
 
   if (!item) return null;
   return (
-    <section aria-label="카탈로그 넘겨 보기" className={s.shelf}>
+    <section aria-label="카탈로그 슬라이드" className={s.shelf}>
       <div className={wrap}>
-        <div className={s.chips} role="group" aria-label="분류">
+        <div className={s.chips} role="group" aria-label="카테고리">
           {groups.map((g) => (
             <button key={g} type="button" className={s.chip} aria-pressed={g === group} onClick={() => setGroup(g)}>
               {g}
@@ -63,7 +63,7 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
         ref={track}
         className={s.track}
         tabIndex={0}
-        aria-label="샘플 화면"
+        aria-label="시안 미리보기"
         onKeyDown={(e) => { if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1); } else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1); } }}
       >
         {list.map((d, i) => (
@@ -102,10 +102,10 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
                 : null}
             </div>
             <a className={s.open} href={(item.variants[sel] ?? item.variants[0]).href} data-gtm-cta="catalog_shelf_open">
-              열어 보기
+              {item.variants.length > 1 ? "시안 보기" : "데모 보기"}
             </a>
           </div>
-          <input className={s.scrub} type="range" min={0} max={list.length - 1} step={1} value={cur} aria-label="샘플 빠르게 넘기기" onChange={(e) => go(Number(e.target.value), false)} />
+          <input className={s.scrub} type="range" min={0} max={list.length - 1} step={1} value={cur} aria-label="슬라이드 이동" onChange={(e) => go(Number(e.target.value), false)} />
         </div>
       </div>
     </section>
