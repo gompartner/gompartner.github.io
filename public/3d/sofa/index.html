@@ -315,7 +315,12 @@
   @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
   .gp-bar { position: fixed; top: 0; left: 0; right: 0; }
   :root { --top: calc(env(safe-area-inset-top, 0px) + 40px) !important; }
+  /* 11-24 곰파트너 메인 첫 화면에 넣을 때(?embed=1): 바로가기 줄 숨김 */
+  :root.embed { --top: env(safe-area-inset-top, 0px) !important; }
+  .embed .gp-bar { display: none; }
+  @media (min-width: 900px) { .embed .top { padding-top: 18px; } .embed .info { top: 20px; } .embed .wallpop { top: 86px; } .embed .menu { top: 72px; } }
 </style>
+<script>if (/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');</script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
