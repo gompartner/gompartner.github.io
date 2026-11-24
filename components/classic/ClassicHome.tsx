@@ -98,20 +98,20 @@ function Products() {
         서비스
       </h2>
       <h3 className="mt-8 text-[16px] font-bold text-[#256ef4] md:mt-10">제작</h3>
-      <ul className="mt-3 grid border-l border-t border-[#15171c] sm:grid-cols-2 lg:grid-cols-3" role="list">
+      <ul className="mt-3 grid grid-cols-2 border-l border-t border-[#15171c] lg:grid-cols-3" role="list">
         {make.map((s) => (
           <li key={s.href} className="border-b border-r border-[#15171c]">
-            <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.slice(1)}`} className="group flex h-full flex-col gap-6 px-5 py-6 md:px-7 md:py-8">
+            <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.slice(1)}`} className="group flex h-full flex-col gap-4 px-3.5 py-4 sm:gap-6 sm:px-5 sm:py-6 md:px-7 md:py-8">
               <span className="flex items-start justify-between gap-3">
                 <span>
-                  <span className="block text-[21px] font-[800] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] md:text-[24px]">{s.name}</span>
-                  <span className="mt-1 block text-[15.5px] text-[#5b6370] md:text-[16px]">{s.body}</span>
+                  <span className="block break-keep text-[17px] font-[800] leading-[1.3] tracking-[-0.04em] transition-colors group-hover:text-[#256ef4] sm:text-[21px] md:text-[24px]">{s.name}</span>
+                  <span className="mt-1 hidden text-[15.5px] text-[#5b6370] sm:block md:text-[16px]">{s.body}</span>
                 </span>
-                <ArrowUpRight size={22} aria-hidden className="mt-1 shrink-0 text-[#6b7280] transition-[color,transform] duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] motion-reduce:transition-none" />
+                <ArrowUpRight size={22} aria-hidden className="mt-1 hidden shrink-0 text-[#6b7280] transition-[color,transform] sm:block duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#256ef4] motion-reduce:transition-none" />
               </span>
-              <span className="mt-auto text-[22px] font-[800] tracking-[-0.04em] tabular-nums md:text-[26px]">
+              <span className="mt-auto whitespace-nowrap text-[19px] font-[800] tracking-[-0.04em] tabular-nums sm:text-[22px] md:text-[26px]">
                 {s.price}
-                {s.from ? <span className="ml-1 text-[15px] font-bold tracking-[-0.02em] md:text-[16px]">부터</span> : null}
+                {s.from ? <span className="ml-1 text-[13px] font-bold tracking-[-0.02em] sm:text-[15px] md:text-[16px]">부터</span> : null}
               </span>
             </NavLink>
           </li>
@@ -180,17 +180,17 @@ function Portfolio() {
           전체 보기 <ArrowUpRight size={18} aria-hidden />
         </NavLink>
       </div>
-      <ul className="grid gap-7 md:grid-cols-2 md:gap-x-7 md:gap-y-10" role="list">
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-6 md:gap-x-7 md:gap-y-10" role="list">
         {portfolio.map((p) => (
           <li key={p.href}>
             <NavLink href={p.href} data-gtm-cta={`classic_portfolio_${p.href.split("/").filter(Boolean).pop()}`} className="group block">
               <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] bg-[#f4f6fa]">
-                <Image src={p.img} alt={p.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.025] motion-reduce:transition-none" />
+                <Image src={p.img} alt={p.alt} fill sizes="50vw" className="object-cover transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.025] motion-reduce:transition-none" />
               </span>
-              <span className="flex items-baseline gap-2.5 pt-3">
-                <span className="shrink-0 text-[14px] font-bold text-[#256ef4]">{p.kind}</span>
-                <span className="min-w-0 flex-1 text-[19px] font-[800] tracking-[-0.04em] md:text-[21px]">{p.name}</span>
-                <span className="shrink-0 text-[15px] font-bold text-[#5b6370] group-hover:text-[#256ef4]">상세보기</span>
+              <span className="block pt-2.5 md:flex md:items-baseline md:gap-2.5 md:pt-3">
+                <span className="block shrink-0 text-[13px] font-bold text-[#256ef4] md:text-[14px]">{p.kind}</span>
+                <span className="block min-w-0 flex-1 break-keep text-[16px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[21px]">{p.name}</span>
+                <span className="hidden shrink-0 text-[15px] font-bold text-[#5b6370] group-hover:text-[#256ef4] md:block">상세보기</span>
               </span>
             </NavLink>
           </li>
