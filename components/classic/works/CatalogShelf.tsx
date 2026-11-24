@@ -102,7 +102,7 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
                 : null}
             </div>
             <a className={s.open} href={(item.variants[sel] ?? item.variants[0]).href} data-gtm-cta="catalog_shelf_open">
-              {item.variants.length > 1 ? "시안 보기" : "데모 보기"}
+              상세보기
             </a>
           </div>
           <input className={s.scrub} type="range" min={0} max={list.length - 1} step={1} value={cur} aria-label="슬라이드 이동" onChange={(e) => go(Number(e.target.value), false)} />
