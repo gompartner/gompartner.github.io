@@ -35,7 +35,8 @@ export function FoA() {
 
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto max-w-[1320px]">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.orange }}>FOOD OEM</p>
+          <div className="mt-4 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[72px]">
               레시피만 가져오시면
               <br />

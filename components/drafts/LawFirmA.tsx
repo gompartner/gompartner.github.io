@@ -32,6 +32,7 @@ export function LawFirmA() {
         <div className="mx-auto flex h-[76px] max-w-[1240px] items-center justify-between px-5 md:px-8">
           <p className="flex items-baseline gap-2">
             <span className="text-[20px] font-bold tracking-[-0.02em]">법률사무소 정도</span>
+            <span className="text-[11px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>LAW OFFICE</span>
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-semibold lg:flex">
             {["사무소 소개", "업무분야", "업무 사례", "상담 안내", "오시는 길"].map((m) => (
@@ -49,7 +50,8 @@ export function LawFirmA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="해 질 녘 서울 도심 전경" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(14,17,22,0.55) 0%, rgba(14,17,22,0.2) 40%, rgba(14,17,22,0.95) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1240px] px-5 pb-20 md:px-8 md:pb-28">
-          <h1 className="max-w-[900px] text-[36px] font-bold leading-[1.25] tracking-[-0.035em] md:text-[64px]">
+          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.gold }}>SEOUL LAW OFFICE</p>
+          <h1 className="mt-5 max-w-[900px] text-[36px] font-bold leading-[1.25] tracking-[-0.035em] md:text-[64px]">
             처음 상담한 변호사가
             <br />
             판결까지 맡습니다
@@ -73,7 +75,8 @@ export function LawFirmA() {
         <div className="mx-auto max-w-[1240px]">
           <div className="grid gap-6 md:grid-cols-[1fr_1.4fr] md:items-end">
             <div>
-              <h2 className="text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[46px]">업무분야</h2>
+              <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.gold }}>PRACTICE AREAS</p>
+              <h2 className="mt-4 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[46px]">업무분야</h2>
             </div>
             <p className="max-w-[520px] md:justify-self-end" style={{ color: C.sub }}>
               분야마다 같은 유형의 사건을 반복해 온 변호사가 맡습니다. 처음 상담에서 예상 기간과 비용을 먼저 말씀드립니다.
@@ -82,7 +85,8 @@ export function LawFirmA() {
           <ul className="mt-14 grid gap-px border-y md:grid-cols-2 lg:grid-cols-3" style={{ background: C.line, borderColor: C.line }}>
             {AREAS.map((a) => (
               <li key={a.en} className="px-1 py-9 md:px-8" style={{ background: C.bg }}>
-                <h3 className="text-[22px] font-bold tracking-[-0.02em] md:text-[24px]">{a.t}</h3>
+                <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.gold }}>{a.en}</p>
+                <h3 className="mt-3 text-[22px] font-bold tracking-[-0.02em] md:text-[24px]">{a.t}</h3>
                 <p className="mt-3 text-[15px] leading-[1.8]" style={{ color: C.sub }}>{a.d}</p>
               </li>
             ))}
@@ -97,7 +101,7 @@ export function LawFirmA() {
           </div>
           <div className="flex items-center px-5 py-20 md:px-16" style={{ background: C.panel }}>
             <div className="max-w-[480px]">
-              <p className="text-[13px] font-bold tracking-normal" style={{ color: C.gold }}>사무소 원칙</p>
+              <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.gold }}>OUR PRINCIPLE</p>
               <h2 className="mt-4 text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[38px]">
                 이길 수 있는 사건과
                 <br />
@@ -124,7 +128,8 @@ export function LawFirmA() {
         <Image src={`${IMG}/a-books.jpg`} alt="법률 서적이 꽂힌 서가" fill sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "rgba(14,17,22,0.88)" }} aria-hidden />
         <div className="relative mx-auto max-w-[1240px]">
-          <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">업무 사례</h2>
+          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.gold }}>CASES</p>
+          <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">업무 사례</h2>
           <ul className="mt-12 grid gap-px md:grid-cols-2" style={{ background: C.line }}>
             {CASES.map((c) => (
               <li key={c.t} className="p-8 md:p-10" style={{ background: "rgba(21,26,33,0.92)" }}>

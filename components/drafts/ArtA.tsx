@@ -37,7 +37,8 @@ export function ArtA() {
 
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto max-w-[1320px]">
-          <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[76px]">
+          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.orange }}>ART ADMISSION</p>
+          <h1 className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[76px]">
             대학마다 다른 실기,
             <br />
             학교별로 준비합니다

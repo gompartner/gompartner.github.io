@@ -106,7 +106,7 @@ export function VisaA() {
                 ["접수, 보완", "방문 접수, 보완 요청 대응"],
               ].map(([k, v], i) => (
                 <li key={k} className="bg-white p-6 md:p-7">
-                  <p className="text-[14px] font-bold tabular-nums" style={{ color: C.red }}>{i + 1}단계</p>
+                  <p className="text-[14px] font-bold tabular-nums" style={{ color: C.red }}>STEP {i + 1}</p>
                   <p className="mt-2 text-[19px] font-bold">{k}</p>
                   <p className="text-[15px]" style={{ color: C.sub }}>{v}</p>
                 </li>

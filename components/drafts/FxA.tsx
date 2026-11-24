@@ -98,7 +98,7 @@ export function FxA() {
             ["사진 코스", "꽃 시계, 하트 아치, 튤립 언덕", "오전 10시 전이 한적합니다"],
           ].map(([t, r, n], i) => (
             <div key={t} className="flex flex-col border p-7" style={{ borderColor: C.line }}>
-              <p className="text-[14px] font-bold" style={{ color: C.pink }}>{String(i + 1).padStart(2, "0")}</p>
+              <p className="text-[14px] font-bold" style={{ color: C.pink }}>COURSE {i + 1}</p>
               <h3 className="mt-2 text-[22px] font-bold tracking-[-0.03em]">{t}</h3>
               <p className="mt-2" style={{ color: C.sub }}>{r}</p>
               <p className="mt-auto pt-5 text-[15px] font-semibold" style={{ color: C.green }}>{n}</p>

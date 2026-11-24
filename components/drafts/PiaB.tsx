@@ -47,7 +47,8 @@ export function PiaB() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">레벨별로 칠 수 있게 되는 곡</h2>
+          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.gold }}>LEVEL</p>
+          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">레벨별로 칠 수 있게 되는 곡</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {LEVELS.map(([t, p, d]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[1fr_0.6fr_2fr] md:items-center md:gap-8" style={{ borderColor: C.line }}>

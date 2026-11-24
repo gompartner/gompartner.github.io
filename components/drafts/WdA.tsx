@@ -44,7 +44,8 @@ export function WdA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">패키지</h2>
+          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.olive }}>PACKAGE</p>
+          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">패키지</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {PACKS.map(([t, n, d]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[0.8fr_0.8fr_2fr_auto] md:items-center md:gap-8" style={{ borderColor: C.line }}>

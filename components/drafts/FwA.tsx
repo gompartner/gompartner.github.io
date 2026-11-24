@@ -34,7 +34,8 @@ export function FwA() {
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto grid max-w-[1320px] gap-10 md:grid-cols-[1fr_1.4fr] md:items-end">
           <div className="pb-2">
-            <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[64px]">
+            <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.walnut }}>CUSTOM FURNITURE</p>
+            <h1 className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[64px]">
               집 치수에 맞춰
               <br />
               한 점씩 짭니다

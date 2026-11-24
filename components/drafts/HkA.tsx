@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Leaf } from "lucide-react";
 
 // 한옥 카페 시안 A 전통 찻집형(11-22 사례 분석: 한옥호텔 담처럼 처마와 대나무 사진, 먹 산수 같은 여백, 한옥 스테이 사례는 큰 사진과 공간 설명 중심. 찻집 손님은 차 종류, 계절 디저트, 좌식인지 입식인지를 묻는다). 흰 바탕, 먹색과 황토. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/hk/a-*)
@@ -44,7 +45,10 @@ export function HkA() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">차</h2>
+          <p className="flex items-center gap-2 text-[14px] font-bold tracking-[0.2em]" style={{ color: C.ochre }}>
+            <Leaf size={16} aria-hidden /> TEA
+          </p>
+          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">차</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {TEA.map(([t, d, p]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[0.8fr_2fr_0.6fr] md:items-center md:gap-8" style={{ borderColor: C.line }}>

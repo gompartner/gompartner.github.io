@@ -49,7 +49,8 @@ export function PsB() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">설계 특화</h2>
+          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.gold }}>PREMIUM</p>
+          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">설계 특화</h2>
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: C.line }}>
             {[
               ["천장고 2.6m", "일반 아파트보다 30cm 높게"],

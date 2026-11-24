@@ -21,12 +21,12 @@ export function ArcA() {
       <header className="absolute inset-x-0 z-20">
         <div className="mx-auto flex h-[76px] max-w-[1400px] items-center justify-between px-5 md:px-10">
           <p className="text-[18px] font-bold tracking-[0.02em]">ONDO ARCHITECTS</p>
-          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold md:flex">
-            {["작업", "사무소", "설계 원칙", "문의"].map((m) => (
+          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-semibold tracking-[0.06em] md:flex">
+            {["WORKS", "OFFICE", "APPROACH", "CONTACT"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="text-[14px] font-semibold md:hidden">메뉴</span>
+          <span className="text-[14px] font-semibold md:hidden">MENU</span>
         </div>
       </header>
 
@@ -51,7 +51,7 @@ export function ArcA() {
       <section className="px-5 pb-20 md:px-10 md:pb-32">
         <div className="mx-auto max-w-[1400px]">
           <div className="flex items-end justify-between border-b pb-4" style={{ borderColor: C.ink }}>
-            <h2 className="text-[14px] font-bold tracking-normal">주요 작업</h2>
+            <h2 className="text-[14px] font-bold tracking-[0.2em]">SELECTED WORKS</h2>
             <span className="text-[14px]" style={{ color: C.sub }}>2019 ~ 2025</span>
           </div>
           <ul className="mt-10 grid gap-x-8 gap-y-14 md:grid-cols-2">
@@ -78,7 +78,7 @@ export function ArcA() {
       <section className="px-5 py-20 text-white md:px-10 md:py-28" style={{ background: C.ink }}>
         <div className="mx-auto grid max-w-[1400px] gap-12 md:grid-cols-[1fr_1.4fr]">
           <div>
-            <h2 className="text-[14px] font-bold tracking-normal text-white/60">설계 원칙</h2>
+            <h2 className="text-[14px] font-bold tracking-[0.2em] text-white/60">APPROACH</h2>
             <p className="mt-5 text-[28px] font-bold leading-[1.4] tracking-[-0.04em] md:text-[38px]">설계는 세 가지를 지킵니다</p>
           </div>
           <ol className="grid gap-px bg-white/15 sm:grid-cols-3">
@@ -103,7 +103,7 @@ export function ArcA() {
             <Image src={`${IMG}/a-p5.jpg`} alt="흐린 하늘 아래 흰 상자 모양 주택" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
           </div>
           <div>
-            <h2 className="text-[14px] font-bold tracking-normal">사무소 개요</h2>
+            <h2 className="text-[14px] font-bold tracking-[0.2em]">OFFICE</h2>
             <dl className="mt-6 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["업무", "건축 설계, 인허가, 감리, 리모델링"],

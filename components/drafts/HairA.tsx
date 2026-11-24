@@ -20,9 +20,9 @@ export function HairA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="absolute inset-x-0 z-20 text-white">
         <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-5 md:px-10">
-          <p className="text-[19px] font-bold tracking-[-0.02em]">헤어담</p>
-          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-medium text-white/85 lg:flex">
-            {["소개", "가격", "공간", "예약"].map((m) => (
+          <p className="text-[17px] font-bold tracking-[0.3em]">헤어담</p>
+          <nav aria-label="주 메뉴" className="hidden gap-10 text-[14px] font-medium tracking-[0.14em] text-white/85 lg:flex">
+            {["ABOUT", "PRICE", "SPACE", "BOOKING"].map((m) => (
               <span key={m}>{m}</span>
             ))}
           </nav>
@@ -47,7 +47,7 @@ export function HairA() {
         <div className="mx-auto max-w-[1320px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[14px] font-bold" style={{ color: C.sub }}>가격</p>
+              <p className="text-[13px] font-bold tracking-[0.28em]" style={{ color: C.sub }}>PRICE</p>
               <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">시술 메뉴</h2>
             </div>
             <p className="text-[15px]" style={{ color: C.sub }}>기장과 모발 상태에 따라 상담 후 확정합니다. 디자이너 지정 비용은 없습니다.</p>
@@ -55,7 +55,8 @@ export function HairA() {
           <ul className="mt-14 grid gap-px md:grid-cols-4" style={{ background: C.line }}>
             {MENU.map((m) => (
               <li key={m.t} className="flex flex-col bg-white p-8">
-                <h3 className="text-[26px] font-bold tracking-[-0.03em]">{m.k}</h3>
+                <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sub }}>{m.t}</p>
+                <h3 className="mt-3 text-[26px] font-bold tracking-[-0.03em]">{m.k}</h3>
                 <p className="mt-2 flex-1 text-[15px]" style={{ color: C.sub }}>{m.d}</p>
                 <p className="mt-8 text-[22px] font-bold tabular-nums">{m.p}</p>
               </li>
@@ -74,7 +75,7 @@ export function HairA() {
               <Image src={`${IMG}/a-wash.jpg`} alt="검은 가죽 샴푸 의자" fill sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
             </div>
             <div className="flex flex-col justify-center p-8 text-white md:p-10" style={{ background: "rgba(255,255,255,0.06)" }}>
-              <p className="text-[14px] font-bold text-white/55">공간</p>
+              <p className="text-[13px] font-bold tracking-[0.28em] text-white/55">SPACE</p>
               <h2 className="mt-3 text-[26px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[32px]">의자 네 개, 샴푸실은 따로</h2>
               <p className="mt-3 text-white/70">옆 손님과 거리를 두고 앉습니다. 샴푸는 누워서 받는 별도 공간에서 합니다.</p>
             </div>
@@ -85,7 +86,7 @@ export function HairA() {
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1320px] gap-12 md:grid-cols-2 md:gap-16">
           <div>
-            <p className="text-[14px] font-bold" style={{ color: C.sub }}>예약</p>
+            <p className="text-[13px] font-bold tracking-[0.28em]" style={{ color: C.sub }}>BOOKING</p>
             <h2 className="mt-4 text-[32px] font-bold leading-[1.3] tracking-[-0.04em] md:text-[46px]">
               원하는 사진 한 장이면
               <br />

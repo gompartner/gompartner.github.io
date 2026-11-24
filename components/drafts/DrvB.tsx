@@ -47,7 +47,8 @@ export function DrvB() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[1320px]">
-          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">연수 과정</h2>
+          <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.blue }}>COURSE</p>
+          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[46px]">연수 과정</h2>
           <ul className="mt-12 border-t" style={{ borderColor: C.ink }}>
             {COURSES.map(([t, h, days, d]) => (
               <li key={t} className="grid gap-1 border-b py-6 md:grid-cols-[1fr_0.5fr_0.7fr_1.8fr] md:items-center md:gap-8" style={{ borderColor: C.line }}>

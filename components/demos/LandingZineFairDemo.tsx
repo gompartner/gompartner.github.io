@@ -25,7 +25,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 
 const display = Gasoek_One;
 
-const NAME = "책마당 독립출판 북페어";
+const NAME = "책마당 북페어";
 const PLACE = "서울 마포구 망원동, 망원 창고 2층";
 const INSTA = "인스타그램 공식 계정";
 
@@ -141,7 +141,7 @@ export function LandingZineFairDemo() {
       <header className="relative z-10 mx-auto flex max-w-[1200px] items-center justify-between gap-3 px-4 py-4 md:px-6">
         <span className="inline-flex min-w-0 items-center gap-2" style={{ color: C.black }}>
           <span className="flex flex-col whitespace-nowrap leading-none">
-            <span className="text-[15px] sm:text-[22px]" style={dF}>
+            <span className="text-[22px]" style={dF}>
               {NAME}
             </span>
           </span>

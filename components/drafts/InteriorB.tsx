@@ -44,12 +44,12 @@ export function InteriorB() {
           </p>
           <div className="mt-12 grid gap-4 md:grid-cols-2">
             {[
-              ["b-before", "철거 중인 아파트 내부", "시공 전"],
-              ["b-after", "흰 벽과 원목 바닥으로 마감한 거실", "시공 후"],
+              ["b-before", "철거 중인 아파트 내부", "BEFORE"],
+              ["b-after", "흰 벽과 원목 바닥으로 마감한 거실", "AFTER"],
             ].map(([img, alt, t]) => (
               <figure key={t} className="relative aspect-[4/3] overflow-hidden rounded-[20px]">
                 <Image src={`${IMG}/${img}.jpg`} alt={alt} fill priority sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
-                <figcaption className="absolute left-4 top-4 rounded-full px-3.5 py-1 text-[13px] font-bold text-white" style={{ background: t === "시공 후" ? C.wood : "rgba(0,0,0,0.6)" }}>{t}</figcaption>
+                <figcaption className="absolute left-4 top-4 rounded-full px-3.5 py-1 text-[13px] font-bold tracking-[0.14em] text-white" style={{ background: t === "AFTER" ? C.wood : "rgba(0,0,0,0.6)" }}>{t}</figcaption>
               </figure>
             ))}
           </div>

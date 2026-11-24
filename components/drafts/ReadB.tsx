@@ -36,7 +36,8 @@ export function ReadB() {
 
       <section className="px-5 pt-12 md:px-10 md:pt-20">
         <div className="mx-auto max-w-[1320px]">
-          <h1 className="text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[72px]">
+          <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.navy }}>KOREAN &amp; ESSAY</p>
+          <h1 className="mt-4 text-[38px] font-bold leading-[1.2] tracking-[-0.05em] md:text-[72px]">
             지문을 읽는 순서부터
             <br />
             바로잡습니다

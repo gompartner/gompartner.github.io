@@ -38,7 +38,7 @@ export function OrthoA() {
         <Image src={`${IMG}/a-hero.jpg`} alt="밝은 조명의 넓은 병원 접수 데스크와 대기 공간" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(10,24,48,0.88) 0%, rgba(10,24,48,0.6) 45%, rgba(10,24,48,0.15) 100%)" }} aria-hidden />
         <div className="relative mx-auto w-full max-w-[1280px] px-5 py-20 md:px-10">
-          <p className="text-[14px] font-bold text-white/70">척추, 관절</p>
+          <p className="text-[14px] font-bold tracking-[0.2em] text-white/70">SPINE &amp; JOINT</p>
           <h1 className="mt-5 text-[38px] font-bold leading-[1.22] tracking-[-0.045em] md:text-[64px]">
             수술을 정하기 전에
             <br />

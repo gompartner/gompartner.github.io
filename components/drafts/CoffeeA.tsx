@@ -19,7 +19,7 @@ export function CoffeeA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="absolute inset-x-0 z-20 text-white">
         <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-5 md:px-10">
-          <p className="text-[19px] font-bold tracking-[-0.02em]">검은콩 로스터리</p>
+          <p className="text-[17px] font-bold tracking-[0.28em]">검은콩 로스터리</p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium text-white/85 lg:flex">
             {["원두", "로스팅 일정", "카페 납품", "매장"].map((m) => (
               <span key={m}>{m}</span>
@@ -46,7 +46,8 @@ export function CoffeeA() {
         <div className="mx-auto max-w-[1320px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">이번 주 원두</h2>
+              <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>THIS WEEK</p>
+              <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">이번 주 원두</h2>
             </div>
             <p className="text-[15px]" style={{ color: C.sub }}>200g 가격입니다. 500g, 1kg은 상세에서 고릅니다.</p>
           </div>
@@ -70,7 +71,7 @@ export function CoffeeA() {
       <section className="px-5 md:px-10">
         <div className="mx-auto grid max-w-[1320px] gap-5 md:grid-cols-[1fr_1.3fr]">
           <div className="flex flex-col justify-center gap-6 p-8 md:p-12" style={{ background: C.soft }}>
-            <p className="text-[14px] font-bold" style={{ color: C.sub }}>로스팅</p>
+            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>ROASTING</p>
             <h2 className="text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[36px]">
               생두는 산지별로,
               <br />
@@ -100,7 +101,8 @@ export function CoffeeA() {
           <Image src={`${IMG}/a-bag.jpg`} alt="" fill sizes="100vw" className="object-cover opacity-35" />
           <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">카페 원두 납품</h2>
+              <p className="text-[13px] font-bold tracking-[0.26em] text-white/60">WHOLESALE</p>
+              <h2 className="mt-3 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">카페 원두 납품</h2>
               <p className="mt-3 max-w-[520px] text-white/75">월 10kg부터 받습니다. 샘플 원두 3종을 보내 드리고, 매장 머신에 맞춰 추출 레시피를 함께 잡습니다.</p>
             </div>
             <span className="inline-flex h-[58px] shrink-0 items-center gap-2 self-start bg-white px-8 text-[17px] font-bold md:self-auto" style={{ color: C.ink }}>

@@ -138,7 +138,7 @@ export function LandingMoveCleanDemo() {
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-4 md:px-6">
           <span className="inline-flex items-center gap-2 text-white">
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-              <span className="text-[22px] font-extrabold tracking-[-0.03em]">{SHOP}</span>
+              <span className="text-[22px] font-extrabold tracking-[-0.03em]">입주청소</span>
             </span>
           </span>
           <a href={`tel:${TEL}`} className="inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
