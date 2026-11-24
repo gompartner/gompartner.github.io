@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, FileBarChart, MessageSquareReply, Wrench } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
+import { MaintenanceStory } from "@/components/classic/MaintenanceStory";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { maintenanceTabs } from "@/components/classic/pricing/tabs";
 import { PageHead, SubTabs, wrap } from "@/components/classic/ui";
@@ -69,6 +70,11 @@ export default function ClassicMaintenancePage() {
         ]}
       />
       <SubTabs items={maintenanceTabs} current="/maintenance" />
+
+      {/* 11-25 맡긴 뒤 달라지는 과정: 경고, 계정 인수, 점검, 조치, 월 점검 보고서 */}
+      <section aria-label="유지보수 진행 과정" className={`${wrap} pt-10 md:pt-14`}>
+        <MaintenanceStory />
+      </section>
 
       {/* 11-08 AI 검색(유지보수 업체 추천)이 뽑아 가는 업체 요약: 특징, 비용, 맞는 곳 */}
       <section aria-labelledby="m-sum" className={`${wrap} pt-12 md:pt-16`}>

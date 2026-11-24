@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { SupportTabs } from "@/components/classic/support/SupportTabs";
-import { history, historyLead } from "@/data/classic/history";
+import { ChevronDown } from "lucide-react";
+import { history, historyLead, type HistoryItem } from "@/data/classic/history";
 import { LdScript } from "@/components/seo/JsonLd";
 import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
@@ -11,6 +12,24 @@ export const metadata: Metadata = pageMeta({
   description: `곰파트너 연혁. ${historyLead}`,
   path: "/history",
 });
+
+// 11-25 달 단위로 묶는다(날짜마다 한 줄이면 자주 바뀌는 사이트로만 보임). 큰 일만 보이고 날짜별 내역은 접어 둔다
+const months = Array.from(new Set(history.map((h) => h.date.slice(0, 7)))).map((ym) => {
+  const items = history.filter((h) => h.date.startsWith(ym));
+  return { ym, items, cover: items.find((h) => h.cover) ?? items[0] };
+});
+
+function Shot({ h, priority = false, small = false }: { h: HistoryItem; priority?: boolean; small?: boolean }) {
+  return (
+    <div className="relative aspect-[1100/725] overflow-hidden rounded-lg border border-[#d9dee5] bg-[#f4f6fa]">
+      {h.video && !small ? (
+        // 움직이는 화면: 소리 없는 반복 재생. 동작 줄이기 설정이면 첫 장면 그림만 보인다
+        <video src={`/images/history/${h.img}.mp4`} poster={`/images/history/${h.img}.jpg`} aria-label={h.alt} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover object-top motion-reduce:hidden" />
+      ) : null}
+      <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={priority} sizes={small ? "220px" : "(min-width: 768px) 520px, 100vw"} className={`object-cover object-top ${h.video && !small ? "motion-safe:hidden" : ""}`} />
+    </div>
+  );
+}
 
 export default function ClassicHistoryPage() {
   return (
@@ -21,20 +40,39 @@ export default function ClassicHistoryPage() {
       <section aria-label="연혁" className={`${wrap} py-14 md:py-20`}>
         <p className="max-w-[760px] break-keep text-[17px] leading-[1.75] text-[#3d4450] md:text-[19px]">{historyLead}</p>
         <ol className="mt-10 border-t-2 border-[#15171c]" role="list">
-          {history.map((h, i) => (
-            <li key={h.date} className="grid gap-5 border-b border-[#d9dee5] py-8 md:grid-cols-[200px_1fr_1.2fr] md:gap-10 md:py-10">
-              <p className="text-[17px] font-[800] tabular-nums text-[#256ef4] md:text-[19px]">{h.date}</p>
-              <div>
-                <h2 className="break-keep text-[22px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[26px]">{h.title}</h2>
-                <p className="mt-2 break-keep text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{h.body}</p>
+          {months.map((m, i) => (
+            <li key={m.ym} className="border-b border-[#d9dee5] py-8 md:py-10">
+              <div className="grid gap-5 md:grid-cols-[200px_1fr_1.2fr] md:gap-10">
+                <p className="text-[19px] font-[800] tabular-nums text-[#256ef4] md:text-[22px]">{m.ym}</p>
+                <ul className="grid content-start gap-1.5" role="list">
+                  {m.items.map((h) => (
+                    <li key={h.date} className="break-keep text-[20px] font-[800] leading-[1.4] tracking-[-0.04em] md:text-[24px]">{h.title}</li>
+                  ))}
+                </ul>
+                <Shot h={m.cover} priority={i === 0} />
               </div>
-              <div className="relative aspect-[1100/725] overflow-hidden rounded-lg border border-[#d9dee5] bg-[#f4f6fa]">
-                {h.video ? (
-                  // 움직이는 화면: 소리 없는 반복 재생(GIF보다 가볍다). 동작 줄이기 설정이면 첫 장면 그림만 보인다
-                  <video src={`/images/history/${h.img}.mp4`} poster={`/images/history/${h.img}.jpg`} aria-label={h.alt} autoPlay muted loop playsInline preload="metadata" className="absolute inset-0 h-full w-full object-cover object-top motion-reduce:hidden" />
-                ) : null}
-                <Image src={`/images/history/${h.img}.jpg`} alt={h.alt} fill priority={i === 0} sizes="(min-width: 768px) 520px, 100vw" className={`object-cover object-top ${h.video ? "motion-safe:hidden" : ""}`} />
-              </div>
+              {m.items.length > 1 ? (
+                <details className="group mt-6 md:ml-[240px]">
+                  <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 text-[15px] font-bold text-[#256ef4] [&::-webkit-details-marker]:hidden">
+                    세부 내역 {m.items.length}건
+                    <ChevronDown size={17} aria-hidden className="transition-transform group-open:rotate-180 motion-reduce:transition-none" />
+                  </summary>
+                  <ul className="mt-2 border-t border-[#d9dee5]" role="list">
+                    {m.items.map((h) => (
+                      <li key={h.date} className="grid gap-3 border-b border-[#e6e9ee] py-5 md:grid-cols-[110px_1fr_220px] md:gap-6">
+                        <p className="text-[15px] font-bold tabular-nums text-[#5b6370]">{h.date}</p>
+                        <div>
+                          <h3 className="break-keep text-[17px] font-[800] tracking-[-0.03em] md:text-[18px]">{h.title}</h3>
+                          <p className="mt-1 break-keep text-[15.5px] leading-[1.7] text-[#3d4450]">{h.body}</p>
+                        </div>
+                        {h === m.cover ? null : <Shot h={h} small />}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : (
+                <p className="mt-3 break-keep text-[16px] leading-[1.7] text-[#3d4450] md:ml-[240px] md:text-[17px]">{m.items[0].body}</p>
+              )}
             </li>
           ))}
         </ol>

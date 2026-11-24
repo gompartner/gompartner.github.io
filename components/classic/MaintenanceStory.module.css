@@ -1,0 +1,46 @@
+/* 유지보수 첫 화면: 왼쪽은 운영 중인 사이트(경고가 붙었다 사라짐), 오른쪽은 장면별 내용(인수, 점검, 조치, 보고서) */
+.root{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:1024px){.root{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start}}
+.window{border:1.5px solid #15171c;border-radius:12px;overflow:hidden;background:#fff}
+.chrome{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-bottom:1.5px solid #15171c;background:#f4f6fa}
+.dots{display:flex;gap:6px;flex:none}.dots i{width:10px;height:10px;border-radius:50%;background:#c9d0da}
+.addr{flex:1;min-width:0;height:26px;display:flex;align-items:center;padding:0 12px;border-radius:13px;background:#fff;border:1px solid #d9dee5;font-size:13.5px;font-weight:700;color:#15171c;white-space:nowrap;overflow:hidden}
+.state{flex:none;height:26px;padding:0 11px;display:inline-flex;align-items:center;border-radius:13px;background:#c2410c;color:#fff;font-size:13px;font-weight:800;transition:background .4s}
+.state.ok{background:#16794c}
+.site{position:relative;aspect-ratio:16/10;background:#e9edf3;overflow:hidden}
+.dim{filter:saturate(.35) brightness(.86);transition:filter .6s}
+.site img{transition:filter .6s}
+.warn{position:absolute;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:6px;background:#fff;border:1.5px solid #c2410c;color:#9a3412;font-size:14px;font-weight:800;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18);opacity:0;transform:translateY(8px) scale(.92);transition:opacity .28s,transform .28s cubic-bezier(.2,1.4,.4,1)}
+.warn.show{opacity:1;transform:none}
+@media (max-width:480px){.warn{height:28px;padding:0 8px;font-size:12px;gap:4px}}
+
+.panel{border:1.5px solid #15171c;border-radius:12px;background:#fff;display:flex;flex-direction:column;min-height:330px}
+.head{display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;border-bottom:1.5px solid #15171c}
+.count{margin:0;font-size:14px;font-weight:800;color:#1552cc;font-variant-numeric:tabular-nums;flex:none}
+.title{margin:0;flex:1;min-width:0;font-size:19px;font-weight:800;letter-spacing:-0.04em;color:#15171c}
+.replay{flex:none;width:40px;height:40px;display:grid;place-items:center;border:1px solid #c9d0da;border-radius:8px;background:#fff;color:#15171c}
+.body{flex:1;padding:6px 16px 14px;position:relative}
+.list{margin:0;padding:0;list-style:none}
+.row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:50px;border-bottom:1px solid #e1e5eb;color:#15171c;transition:opacity .3s}
+.row.wait{opacity:.38}
+.mark{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#f1f3f6;color:#9a3412}
+.done .mark{background:#16794c;color:#fff}
+.txt{font-size:16px;font-weight:700;min-width:0}
+.tag{font-size:13px;font-weight:800;color:#5b6370;white-space:nowrap}
+.done .tag{color:#16794c}.run .tag{color:#1552cc}
+.spin{width:14px;height:14px;border-radius:50%;border:2.5px solid #c9d6f2;border-top-color:#1552cc;animation:spin .7s linear infinite}
+
+.stack{position:relative;height:262px;margin:16px 26px 0 0}
+.sheet{position:absolute;inset:0 0 auto 0;border:1.5px solid #15171c;background:#fff;padding:12px 14px 6px;opacity:0;transition:transform .5s cubic-bezier(.2,.9,.3,1),opacity .35s;box-shadow:0 4px 14px rgba(15,27,61,.12)}
+.sheet.in{opacity:1}
+.sheetHead{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-bottom:8px;border-bottom:3px double #15171c}
+.sheetHead b{font-size:17px;font-weight:800;letter-spacing:-0.03em;color:#15171c}
+.sheetHead span{font-size:12.5px;color:#5b6370}
+.sheet dl{margin:0}
+.sheet dl div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e1e5eb;font-size:14.5px;transition:opacity .35s}
+.sheet dl div:last-child{border-bottom:0}
+.sheet dt{color:#5b6370;flex:none}
+.sheet dd{margin:0;font-weight:700;text-align:right;color:#15171c}
+.blank{opacity:.12}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.warn,.sheet,.row,.dim,.site img{transition:none}.spin{animation:none}}
