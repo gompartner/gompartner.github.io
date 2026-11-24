@@ -38,8 +38,7 @@ export function CeA() {
       <section className="px-5 pb-16 pt-10 md:px-10 md:pb-24 md:pt-14">
         <div className="mx-auto grid max-w-[1320px] items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <div>
-            <p className="text-[14px] font-bold tracking-[0.2em]" style={{ color: C.teal }}>TESTING &amp; CERTIFICATION</p>
-            <h1 className="mt-4 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[58px]">
+            <h1 className="text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[58px]">
               수출할 나라를 알려 주시면
               <br />
               필요한 인증을 정리합니다

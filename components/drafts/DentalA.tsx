@@ -11,10 +11,10 @@ const C = { ink: "#1a1c1f", sub: "#6b7079", line: "#e5e6e8", soft: "#f2f2f0", te
 const TEL = "02-000-0000";
 
 const CARE = [
-  { en: "IMPLANT", t: "임플란트", d: "3D CT로 뼈 두께와 신경 위치를 확인한 뒤 식립 위치를 미리 설계합니다." },
-  { en: "ORTHODONTICS", t: "치아교정", d: "투명교정과 설측교정 중 생활 방식에 맞는 방법을 상담에서 비교해 드립니다." },
-  { en: "AESTHETIC", t: "심미 보철", d: "라미네이트와 올세라믹으로 자연 치아에 가까운 색과 모양을 맞춥니다." },
-  { en: "GENERAL", t: "일반 진료", d: "충치, 신경치료, 잇몸 치료와 정기 검진, 스케일링을 진행합니다." },
+  { en: "01", t: "임플란트", d: "3D CT로 뼈 두께와 신경 위치를 확인한 뒤 식립 위치를 미리 설계합니다." },
+  { en: "02", t: "치아교정", d: "투명교정과 설측교정 중 생활 방식에 맞는 방법을 상담에서 비교해 드립니다." },
+  { en: "03", t: "심미 보철", d: "라미네이트와 올세라믹으로 자연 치아에 가까운 색과 모양을 맞춥니다." },
+  { en: "04", t: "일반 진료", d: "충치, 신경치료, 잇몸 치료와 정기 검진, 스케일링을 진행합니다." },
 ];
 
 export function DentalA() {
@@ -23,8 +23,7 @@ export function DentalA() {
       <header className="absolute inset-x-0 z-20">
         <div className="mx-auto flex h-[78px] max-w-[1280px] items-center justify-between px-5 md:px-10">
           <p className="flex items-baseline gap-2">
-            <span className="text-[20px] font-bold tracking-[-0.02em]">치과의원</span>
-            <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: C.sub }}>DENTAL CLINIC</span>
+            <span className="text-[20px] font-bold tracking-[-0.02em]">서로치과의원</span>
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium lg:flex" style={{ color: "#3b3f45" }}>
             {["병원 소개", "진료 과목", "둘러보기", "진료 안내", "오시는 길"].map((m) => (
@@ -40,8 +39,7 @@ export function DentalA() {
       <section className="relative px-5 pt-[78px] md:px-10" style={{ background: C.soft }}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 pb-16 pt-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16 lg:pb-0 lg:pt-0">
           <div className="lg:py-28">
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>QUIET, PRECISE CARE</p>
-            <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[62px]">
+            <h1 className="text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[62px]">
               조용하고 정확하게,
               <br />
               필요한 만큼만
@@ -63,7 +61,7 @@ export function DentalA() {
       <section className="px-5 pt-16 md:px-10 md:pt-24">
         <div className="mx-auto grid max-w-[1280px] gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>SCHEDULE</p>
+            <p className="text-[13px] font-bold" style={{ color: C.teal }}>진료 일정</p>
             <h2 className="mt-4 text-[30px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[42px]">
               화, 목요일은
               <br />
@@ -81,8 +79,7 @@ export function DentalA() {
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>TREATMENTS</p>
-              <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
+              <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
             </div>
             <p className="max-w-[420px]" style={{ color: C.sub }}>과목마다 진료 순서와 기간, 비용 범위를 진료 전에 서면으로 안내합니다.</p>
           </div>
@@ -106,7 +103,7 @@ export function DentalA() {
           </div>
           <div className="flex flex-col justify-between gap-10 p-8 md:p-12" style={{ background: C.soft }}>
             <div>
-              <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>CLINIC</p>
+              <p className="text-[13px] font-bold" style={{ color: C.teal }}>진료실</p>
               <h2 className="mt-4 text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[36px]">
                 진료실은 모두
                 <br />
@@ -136,8 +133,7 @@ export function DentalA() {
       <section className="px-5 py-24 md:px-10 md:py-36">
         <div className="mx-auto grid max-w-[1280px] items-center gap-12 md:grid-cols-2 md:gap-20">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.teal }}>HOURS</p>
-            <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 시간</h2>
+            <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 시간</h2>
             <dl className="mt-10 grid gap-0 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["월, 수, 금", "09:30 ~ 18:30"],
@@ -174,7 +170,7 @@ export function DentalA() {
 
       <footer className="px-5 py-10 text-[14px] md:px-10" style={{ color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>치과의원, 서울특별시 송파구 일대, 지하철역 2번 출구 앞</p>
+          <p>서로치과의원, 서울특별시 송파구 일대, 지하철역 2번 출구 앞</p>
           <p>예약 문의 {TEL}</p>
         </div>
       </footer>

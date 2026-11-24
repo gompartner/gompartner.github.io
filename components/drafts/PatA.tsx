@@ -37,8 +37,7 @@ export function PatA() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-[1280px] lg:grid-cols-[1fr_1.1fr]">
           <div className="px-5 py-14 md:px-10 md:py-24">
-            <p className="text-[14px] font-bold tracking-[0.18em]" style={{ color: C.teal }}>PATENT &amp; IP</p>
-            <h1 className="mt-5 text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
+            <h1 className="text-[36px] font-bold leading-[1.24] tracking-[-0.045em] md:text-[56px]">
               기술을 공개하기 전에,
               <br />
               출원부터 하십시오
@@ -71,8 +70,7 @@ export function PatA() {
           <ul className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: C.line }}>
             {AREAS.map((a) => (
               <li key={a.t} className="flex flex-col bg-white p-7 md:p-8">
-                <p className="text-[12px] font-bold tracking-[0.2em]" style={{ color: C.teal }}>{a.e}</p>
-                <h3 className="mt-3 text-[22px] font-bold tracking-[-0.03em]">{a.t}</h3>
+                <h3 className="text-[22px] font-bold tracking-[-0.03em]">{a.t}</h3>
                 <p className="mt-1 flex-1 text-[15px]" style={{ color: C.sub }}>{a.d}</p>
                 <ArrowRight className="mt-8" size={20} aria-hidden />
               </li>

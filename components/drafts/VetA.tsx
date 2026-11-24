@@ -56,8 +56,7 @@ export function VetA() {
         <div className="mx-auto max-w-[1320px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.orange }}>MEDICAL</p>
-              <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">진료 과목</h2>
+              <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[48px]">진료 과목</h2>
             </div>
             <p className="text-[15px]" style={{ color: C.sub }}>수의사 6명이 3교대로 진료합니다.</p>
           </div>
@@ -78,7 +77,7 @@ export function VetA() {
       <section className="px-5 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto grid max-w-[1320px] gap-4 py-20 md:grid-cols-[1fr_1.15fr] md:py-28">
           <div className="flex flex-col justify-center p-2 text-white md:p-8">
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.orange }}>CAT FRIENDLY</p>
+            <p className="text-[13px] font-bold" style={{ color: C.orange }}>고양이 진료</p>
             <h2 className="mt-4 text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[40px]">고양이는 따로 기다리고, 따로 입원합니다</h2>
             <p className="mt-4 text-white/70">고양이 전용 대기실과 진료실, 입원실을 분리했습니다. 개 짖는 소리가 들리지 않는 층에 있습니다.</p>
           </div>
@@ -94,8 +93,7 @@ export function VetA() {
             <Image src={`${IMG}/a-room.jpg`} alt="수술등과 수술대가 있는 하얀 수술실" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
           </div>
           <div className="self-center">
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.orange }}>HOURS</p>
-            <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[44px]">진료시간</h2>
+            <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[44px]">진료시간</h2>
             <dl className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["일반 진료", "매일 09:00 ~ 21:00"],

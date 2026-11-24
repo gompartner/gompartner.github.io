@@ -18,7 +18,7 @@ export function HairB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">헤어 살롱</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">단정헤어</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#4a423c" }}>
             {["가격표", "처음 오시는 분", "매장 안내", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -131,7 +131,7 @@ export function HairB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>헤어 살롱, 경기도 화성시 동탄 일대</p>
+          <p>단정헤어, 경기도 화성시 동탄 일대</p>
           <p>예약 문의 031-000-0000</p>
         </div>
       </footer>

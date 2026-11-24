@@ -19,7 +19,7 @@ export function InteriorB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">리모델링 인테리어</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">새집처럼 리모델링</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#45413c" }}>
             {["평형별 비용", "시공 사례", "공정 기간", "A/S 안내"].map((m) => (
               <span key={m}>{m}</span>
@@ -44,12 +44,12 @@ export function InteriorB() {
           </p>
           <div className="mt-12 grid gap-4 md:grid-cols-2">
             {[
-              ["b-before", "철거 중인 아파트 내부", "BEFORE"],
-              ["b-after", "흰 벽과 원목 바닥으로 마감한 거실", "AFTER"],
+              ["b-before", "철거 중인 아파트 내부", "시공 전"],
+              ["b-after", "흰 벽과 원목 바닥으로 마감한 거실", "시공 후"],
             ].map(([img, alt, t]) => (
               <figure key={t} className="relative aspect-[4/3] overflow-hidden rounded-[20px]">
                 <Image src={`${IMG}/${img}.jpg`} alt={alt} fill priority sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
-                <figcaption className="absolute left-4 top-4 rounded-full px-3.5 py-1 text-[13px] font-bold tracking-[0.14em] text-white" style={{ background: t === "AFTER" ? C.wood : "rgba(0,0,0,0.6)" }}>{t}</figcaption>
+                <figcaption className="absolute left-4 top-4 rounded-full px-3.5 py-1 text-[13px] font-bold text-white" style={{ background: t === "시공 후" ? C.wood : "rgba(0,0,0,0.6)" }}>{t}</figcaption>
               </figure>
             ))}
           </div>
@@ -122,7 +122,7 @@ export function InteriorB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>리모델링 인테리어, 서울특별시 양천구 목동 일대, 실내건축공사업 등록</p>
+          <p>새집처럼 리모델링, 서울특별시 양천구 목동 일대, 실내건축공사업 등록</p>
           <p>견적 문의 02-000-0000</p>
         </div>
       </footer>

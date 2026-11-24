@@ -24,7 +24,7 @@ export function DentalB() {
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
           <p className="flex items-center gap-2 text-[20px] font-bold tracking-[-0.03em]">
             <span className="h-3 w-3 rounded-full" style={{ background: C.orange }} aria-hidden />
-            가족치과
+            새봄가족치과
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#4a4540" }}>
             {["병원 소개", "진료 과목", "어린이 진료", "진료 시간", "오시는 길"].map((m) => (
@@ -147,7 +147,7 @@ export function DentalB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>가족치과, 경기도 고양시 일산동구 일대</p>
+          <p>새봄가족치과, 경기도 고양시 일산동구 일대</p>
           <p>예약 문의 {TEL}</p>
         </div>
       </footer>

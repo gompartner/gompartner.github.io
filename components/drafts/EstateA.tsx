@@ -20,7 +20,7 @@ export function EstateA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-5 md:px-10">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">공인중개사사무소</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">푸른단지 공인중개사사무소</p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium lg:flex" style={{ color: C.sub }}>
             {["단지 정보", "추천 매물", "중개 과정", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -125,7 +125,7 @@ export function EstateA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto grid max-w-[1280px] gap-1.5">
-          <p className="font-bold" style={{ color: C.ink }}>공인중개사사무소</p>
+          <p className="font-bold" style={{ color: C.ink }}>푸른단지 공인중개사사무소</p>
           <p>소재지 서울특별시 용산구 일대 상가 1층 | 중개사무소 등록번호 제00000-0000-00000호 | 대표 공인중개사</p>
           <p>전화 02-000-0000 | 사업자등록번호 000-00-00000</p>
         </div>

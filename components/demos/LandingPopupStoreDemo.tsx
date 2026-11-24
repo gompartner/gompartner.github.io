@@ -26,10 +26,10 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
 const mono = Nanum_Gothic_Coding;
 const heavy = Gasoek_One;
 
-const BRAND = "팝업스토어";
+const BRAND = "붕어빵 팝업스토어";
 const IMG = "/images/demo-popup";
-const ADDRESS = "서울 성동구 ㅇㅇ길 00, 1층";
-const KAKAO = "카카오톡 채널 팝업스토어";
+const ADDRESS = "서울 성동구 성수동 연무장길, 1층";
+const KAKAO = `카카오톡 채널 ${BRAND}`;
 const CAP = 12;
 
 const C = {
@@ -125,7 +125,7 @@ export function LandingPopupStoreDemo() {
         <span className="inline-flex min-w-0 items-center gap-2" style={{ color: C.paper }}>
           <FishMark size={30} />
           <span className="flex flex-col whitespace-nowrap leading-none">
-            <span className="text-[20px]" style={heavyF}>
+            <span className="text-[16px] sm:text-[20px]" style={heavyF}>
               {BRAND}
             </span>
           </span>
@@ -294,10 +294,12 @@ function HeroReceipt({ start, end, onPick, onReserve }: { start: Date; end: Date
     <>
       <p className="text-center text-[13px]">*** 성수 7일 한정 ***</p>
       <h1 className="mt-2 text-center text-[44px] leading-[1.05] md:text-[48px]" style={heavyF}>
-        붕어빵 연구소
+        붕어빵
+        <br />
+        팝업스토어
       </h1>
       <p className="mt-2 text-center text-[13px]">
-        서울 성동구 ㅇㅇ길 00, {start.getMonth() + 1}.{start.getDate()}~{end.getMonth() + 1}.{end.getDate()}
+        서울 성동구 성수동, {start.getMonth() + 1}.{start.getDate()}~{end.getMonth() + 1}.{end.getDate()}
       </p>
       <Dash />
       <Row k="영업" v="11:00 - 20:00" />
@@ -590,7 +592,7 @@ const MENU = [
   { id: "potato", name: "고구마 치즈", unit: "2마리", price: 4000 },
   { id: "sesame", name: "흑임자 크림", unit: "2마리", price: 4500, note: "하루 200마리" },
   { id: "keyring", name: "붕어 키링", unit: "1개", price: 12000 },
-  { id: "ecobag", name: "팝업스토어 에코백", unit: "1개", price: 18000 },
+  { id: "ecobag", name: "붕어빵 에코백", unit: "1개", price: 18000 },
 ];
 
 function MenuReceipt() {

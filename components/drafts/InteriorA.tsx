@@ -19,7 +19,7 @@ export function InteriorA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="absolute inset-x-0 z-20 text-white">
         <div className="mx-auto flex h-[78px] max-w-[1320px] items-center justify-between px-5 md:px-10">
-          <p className="text-[18px] font-bold tracking-[0.18em]">INTERIOR STUDIO</p>
+          <p className="text-[19px] font-bold tracking-[-0.02em]">공간담 인테리어</p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium text-white/90 lg:flex">
             {["스튜디오", "시공 사례", "진행 과정", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -46,8 +46,7 @@ export function InteriorA() {
         <div className="mx-auto max-w-[1320px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sub }}>PORTFOLIO</p>
-              <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">최근 시공 사례</h2>
+              <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">최근 시공 사례</h2>
             </div>
             <p className="flex gap-5 text-[15px] font-bold">
               {["전체", "아파트", "주택", "상업 공간"].map((t, i) => (
@@ -76,8 +75,7 @@ export function InteriorA() {
 
       <section className="px-5 py-24 md:px-10 md:py-32" style={{ background: C.soft }}>
         <div className="mx-auto max-w-[1320px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sub }}>PROCESS</p>
-          <h2 className="mt-4 text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">진행 과정</h2>
+          <h2 className="text-[32px] font-bold tracking-[-0.04em] md:text-[50px]">진행 과정</h2>
           <ol className="mt-14 grid gap-px md:grid-cols-5" style={{ background: C.line }}>
             {[
               ["상담, 실측", "현장을 재고 생활 방식과 예산을 듣습니다."],
@@ -87,7 +85,7 @@ export function InteriorA() {
               ["입주, A/S", "입주 후 1년 무상 하자 점검을 합니다."],
             ].map(([t, d], i) => (
               <li key={t} className="p-7" style={{ background: C.soft }}>
-                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.sub }}>STEP {i + 1}</p>
+                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.sub }}>{i + 1}단계</p>
                 <h3 className="mt-3 text-[21px] font-bold">{t}</h3>
                 <p className="mt-2 text-[15px]" style={{ color: C.sub }}>{d}</p>
               </li>
@@ -115,7 +113,7 @@ export function InteriorA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1320px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>INTERIOR STUDIO, 서울특별시 성동구 성수동 일대, 실내건축공사업 등록</p>
+          <p>공간담 인테리어, 서울특별시 성동구 성수동 일대, 실내건축공사업 등록</p>
           <p>견적 문의 02-000-0000</p>
         </div>
       </footer>

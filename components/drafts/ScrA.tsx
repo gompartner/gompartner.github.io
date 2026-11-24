@@ -107,7 +107,7 @@ export function ScrA() {
               ["당일 오후", "등기소 접수, 접수증 전달"],
             ].map(([k, v], i) => (
               <li key={k} className="bg-white p-7 md:p-8">
-                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.navy }}>STEP {i + 1}</p>
+                <p className="text-[14px] font-bold tabular-nums" style={{ color: C.navy }}>{i + 1}단계</p>
                 <p className="mt-3 text-[21px] font-bold tracking-[-0.03em]">{k}</p>
                 <p className="mt-1 text-[15px]" style={{ color: C.sub }}>{v}</p>
               </li>

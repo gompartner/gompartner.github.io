@@ -22,8 +22,7 @@ export function SkinA() {
       <header className="border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-5 md:px-10">
           <p className="flex items-baseline gap-2">
-            <span className="text-[20px] font-bold tracking-[-0.02em]">피부과의원</span>
-            <span className="text-[11px] font-bold tracking-[0.22em]" style={{ color: C.sage }}>DERMATOLOGY</span>
+            <span className="text-[20px] font-bold tracking-[-0.02em]">맑은결피부과의원</span>
           </p>
           <span className="text-[15px] font-bold tabular-nums">02-000-0000</span>
         </div>
@@ -37,8 +36,7 @@ export function SkinA() {
       <section className="px-5 md:px-10" style={{ background: C.soft }}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 py-14 lg:grid-cols-[1fr_1.2fr] lg:gap-16 lg:py-0">
           <div className="lg:py-28">
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>SKIN, AS IT SHOULD BE</p>
-            <h1 className="mt-6 text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[60px]">
+            <h1 className="text-[38px] font-bold leading-[1.25] tracking-[-0.04em] md:text-[60px]">
               피부는 진단이
               <br />
               먼저입니다
@@ -59,13 +57,11 @@ export function SkinA() {
 
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1280px]">
-          <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>TREATMENTS</p>
-          <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
+          <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[46px]">진료 과목</h2>
           <ul className="mt-14 grid gap-px md:grid-cols-4" style={{ background: C.line }}>
             {CARE.map((c) => (
               <li key={c.en} className="bg-white p-7 md:p-8">
-                <p className="text-[12px] font-bold tracking-[0.22em]" style={{ color: C.sage }}>{c.en}</p>
-                <h3 className="mt-3 text-[24px] font-bold tracking-[-0.03em]">{c.t}</h3>
+                <h3 className="text-[24px] font-bold tracking-[-0.03em]">{c.t}</h3>
                 <p className="mt-3 text-[15px]" style={{ color: C.sub }}>{c.d}</p>
                 <p className="mt-8 inline-flex items-center gap-1 text-[14px] font-bold">
                   자세히 보기 <ArrowRight size={15} aria-hidden />
@@ -79,7 +75,7 @@ export function SkinA() {
       <section className="px-5 md:px-10">
         <div className="mx-auto grid max-w-[1280px] gap-5 md:grid-cols-[1fr_1.3fr]">
           <div className="flex flex-col justify-center gap-6 p-8 md:p-12" style={{ background: C.soft }}>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>CONSULTATION</p>
+            <p className="text-[13px] font-bold" style={{ color: C.sage }}>상담</p>
             <h2 className="text-[28px] font-bold leading-[1.4] tracking-[-0.03em] md:text-[36px]">
               시술 전 상담은
               <br />
@@ -96,8 +92,7 @@ export function SkinA() {
       <section className="px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1280px] gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.24em]" style={{ color: C.sage }}>HOURS</p>
-            <h2 className="mt-4 text-[30px] font-bold tracking-[-0.03em] md:text-[42px]">진료 시간</h2>
+            <h2 className="text-[30px] font-bold tracking-[-0.03em] md:text-[42px]">진료 시간</h2>
             <dl className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {[
                 ["평일", "10:00 ~ 19:00"],
@@ -120,7 +115,7 @@ export function SkinA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>피부과의원, 서울특별시 강남구 신사동 일대, 피부과 전문의 진료</p>
+          <p>맑은결피부과의원, 서울특별시 강남구 신사동 일대, 피부과 전문의 진료</p>
           <p>예약 문의 02-000-0000</p>
         </div>
       </footer>

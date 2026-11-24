@@ -20,7 +20,7 @@ export function AcademyA() {
       <header className="sticky top-0 z-20 border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1240px] items-center justify-between px-5 md:px-8">
           <p className="flex items-baseline gap-2">
-            <span className="text-[21px] font-extrabold tracking-[-0.03em]" style={{ color: C.blue }}>수학전문학원</span>
+            <span className="text-[21px] font-extrabold tracking-[-0.03em]" style={{ color: C.blue }}>정석수학학원</span>
             <span className="hidden text-[12px] font-bold sm:inline" style={{ color: C.sub }}>대치 본원</span>
           </p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-bold lg:flex">
@@ -155,7 +155,7 @@ export function AcademyA() {
 
       <footer className="px-5 py-10 text-[14px] md:px-8" style={{ color: C.sub }}>
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>수학전문학원, 서울특별시 강남구 대치동 학원가, 교습과목 수학</p>
+          <p>정석수학학원, 서울특별시 강남구 대치동 학원가, 교습과목 수학</p>
           <p>상담 문의 02-000-0000</p>
         </div>
       </footer>

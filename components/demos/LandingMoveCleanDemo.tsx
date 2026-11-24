@@ -22,7 +22,7 @@ import { DemoMakerInfo } from "@/components/demos/DemoMakerInfo";
    사진(public/images/demo-landing-move-clean): before·after(같은 거실 청소 전후), kitchen. AI 생성. */
 
 const IMG = "/images/demo-landing-move-clean";
-const SHOP = "입주청소";
+const SHOP = "반짝 입주청소";
 const TEL = "1600-0000";
 
 const C = {
@@ -88,7 +88,7 @@ const STEPS = [
 ];
 
 const REVIEWS = [
-  { name: "변ㅅ빈", where: "ㅇㅇ동 신축 아파트 32평", body: "입주 전날이라 시간이 빠듯했는데 창틀 레일 모래까지 다 빼 주셨어요. 견적 화면에서 본 금액 그대로 냈습니다.", ago: 6 },
+  { name: "변ㅅ빈", where: "동탄 신축 아파트 32평", body: "입주 전날이라 시간이 빠듯했는데 창틀 레일 모래까지 다 빼 주셨어요. 견적 화면에서 본 금액 그대로 냈습니다.", ago: 6 },
   { name: "박ㅅ연", where: "빌라 18평, 짐 있는 상태", body: "짐이 있어서 추가 요금 걱정했는데 처음 계산할 때 '짐 있음'을 고르니 미리 반영돼 있었어요.", ago: 13 },
   { name: "이ㅈ민", where: "오피스텔 11평", body: "욕실 줄눈이 누렇게 돼 있었는데 하얗게 돌아왔어요. 끝나고 보내 주신 전후 사진이 제일 좋았습니다.", ago: 21 },
 ];
@@ -138,7 +138,7 @@ export function LandingMoveCleanDemo() {
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-4 md:px-6">
           <span className="inline-flex items-center gap-2 text-white">
             <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-              <span className="text-[22px] font-extrabold tracking-[-0.03em]">입주청소</span>
+              <span className="text-[22px] font-extrabold tracking-[-0.03em]">{SHOP}</span>
             </span>
           </span>
           <a href={`tel:${TEL}`} className="inline-flex items-center gap-1.5 rounded-[6px] px-3 py-2 text-[15px] font-bold" style={{ background: C.lemon, color: C.ink }}>
@@ -770,7 +770,7 @@ function ApplyForm(p: { today: Date; type: HomeType; py: number; opts: OptId[]; 
       </div>
       <label className="mt-5 block text-[16px] font-bold">
         청소할 곳
-        <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="예: ㅇㅇ동 ㅎㅇ아파트 103동" className={inputCls} style={{ borderColor: C.line }} />
+        <input value={addr} onChange={(e) => setAddr(e.target.value)} placeholder="동, 아파트 이름" className={inputCls} style={{ borderColor: C.line }} />
         {err("addr")}
       </label>
 

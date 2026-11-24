@@ -19,10 +19,7 @@ export function FoodA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="absolute inset-x-0 z-20 text-white">
         <div className="mx-auto flex h-[78px] max-w-[1280px] items-center justify-between px-5 md:px-10">
-          <p className="flex items-baseline gap-2">
-            <span className="text-[21px] font-bold tracking-[-0.03em]">한식당</span>
-            <span className="text-[12px] font-bold tracking-[0.2em] text-white/70">SINCE 1998</span>
-          </p>
+          <p className="text-[21px] font-bold tracking-[-0.03em]">석교옥</p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium text-white/90 lg:flex">
             {["이야기", "메뉴", "매장", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -74,7 +71,7 @@ export function FoodA() {
       <section className="px-5 md:px-10" style={{ background: C.ink }}>
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 py-20 text-white md:grid-cols-[1fr_1.2fr] md:gap-16 md:py-28">
           <div>
-            <p className="text-[14px] font-bold tracking-[0.2em] text-white/60">OUR STORY</p>
+            <p className="text-[14px] font-bold text-white/60">이야기</p>
             <h2 className="mt-4 text-[30px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[44px]">
               처음 문을 연 날과
               <br />
@@ -138,7 +135,7 @@ export function FoodA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>한식당, 서울특별시 종로구 일대, 원산지 표시는 매장 메뉴판에 있습니다</p>
+          <p>석교옥, 서울특별시 종로구 일대, 원산지 표시는 매장 메뉴판에 있습니다</p>
           <p>예약 문의 02-000-0000</p>
         </div>
       </footer>

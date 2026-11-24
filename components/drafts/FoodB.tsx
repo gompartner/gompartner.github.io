@@ -18,7 +18,7 @@ export function FoodB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[21px] font-extrabold tracking-[-0.04em]" style={{ color: C.red }}>순두부 밥집</p>
+          <p className="text-[21px] font-extrabold tracking-[-0.04em]" style={{ color: C.red }}>초당골 순두부</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#443d39" }}>
             {["메뉴", "점심 정식", "단체 예약", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -129,7 +129,7 @@ export function FoodB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>순두부 밥집, 경기도 고양시 일산동구 일대</p>
+          <p>초당골 순두부, 경기도 고양시 일산동구 일대</p>
           <p>포장, 예약 02-000-0000</p>
         </div>
       </footer>

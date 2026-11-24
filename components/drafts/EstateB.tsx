@@ -20,7 +20,7 @@ export function EstateB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">부동산 공인중개사사무소</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">우리집 공인중개사사무소</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#3c4450" }}>
             {["매물", "전세 안전 확인", "매도, 임대 의뢰", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -136,7 +136,7 @@ export function EstateB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto grid max-w-[1200px] gap-1.5">
-          <p className="font-bold" style={{ color: C.ink }}>부동산 공인중개사사무소</p>
+          <p className="font-bold" style={{ color: C.ink }}>우리집 공인중개사사무소</p>
           <p>소재지 서울특별시 성동구 일대 | 중개사무소 등록번호 제00000-0000-00000호 | 대표 공인중개사</p>
           <p>전화 02-000-0000 | 사업자등록번호 000-00-00000</p>
         </div>

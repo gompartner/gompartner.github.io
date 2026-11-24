@@ -13,7 +13,7 @@ export function SkinB() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center justify-between px-5 md:px-8">
-          <p className="text-[20px] font-bold tracking-[-0.03em]">피부과의원</p>
+          <p className="text-[20px] font-bold tracking-[-0.03em]">고운날피부과의원</p>
           <nav aria-label="주 메뉴" className="hidden gap-9 text-[15px] font-semibold lg:flex" style={{ color: "#4a3f41" }}>
             {["피부 질환", "피부 미용", "이달의 안내", "진료 시간", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -133,7 +133,7 @@ export function SkinB() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>피부과의원, 경기도 성남시 분당구 일대</p>
+          <p>고운날피부과의원, 경기도 성남시 분당구 일대</p>
           <p>예약 문의 031-000-0000</p>
         </div>
       </footer>

@@ -31,7 +31,7 @@ export function NailA() {
     <div className="min-h-screen bg-white text-[16px] leading-[1.75] md:text-[17px]" style={{ color: C.ink }}>
       <header className="border-b bg-white" style={{ borderColor: C.line }}>
         <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-5 md:px-10">
-          <p className="text-[18px] font-bold tracking-[0.26em]">NAIL STUDIO</p>
+          <p className="text-[20px] font-bold tracking-[-0.02em]">손끝네일</p>
           <nav aria-label="주 메뉴" className="hidden gap-10 text-[15px] font-medium lg:flex" style={{ color: C.sub }}>
             {["이달의 컬러", "디자인", "가격", "오시는 길"].map((m) => (
               <span key={m}>{m}</span>
@@ -44,7 +44,7 @@ export function NailA() {
       <section className="px-5 md:px-10">
         <div className="mx-auto grid max-w-[1280px] items-center gap-10 py-14 lg:grid-cols-[1fr_1.3fr] lg:gap-16 lg:py-20">
           <div>
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>WINTER 2026</p>
+            <p className="text-[14px] font-bold" style={{ color: C.sub }}>2026 겨울</p>
             <h1 className="mt-5 text-[40px] font-bold leading-[1.2] tracking-[-0.045em] md:text-[64px]">
               손끝에
               <br />
@@ -62,8 +62,7 @@ export function NailA() {
         <div className="mx-auto max-w-[1280px]">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>COLOR OF THE MONTH</p>
-              <h2 className="mt-4 text-[30px] font-bold tracking-[-0.04em] md:text-[46px]">12월의 컬러</h2>
+              <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[46px]">12월의 컬러</h2>
             </div>
             <p className="text-[15px]" style={{ color: C.sub }}>이달의 컬러로 원컬러를 하시면 아트 한 개를 더해 드립니다.</p>
           </div>
@@ -84,8 +83,7 @@ export function NailA() {
             <Image src={`${IMG}/a-bottles.jpg`} alt="흰 바탕 위의 여러 색 매니큐어 병" fill sizes="(min-width: 768px) 45vw, 100vw" className="object-cover" />
           </div>
           <div className="self-center">
-            <p className="text-[13px] font-bold tracking-[0.26em]" style={{ color: C.sub }}>PRICE</p>
-            <h2 className="mt-4 text-[30px] font-bold tracking-[-0.04em] md:text-[46px]">가격</h2>
+            <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[46px]">가격</h2>
             <dl className="mt-8 border-t" style={{ borderColor: C.ink }}>
               {MENU.map(([k, v]) => (
                 <div key={k} className="flex justify-between gap-4 border-b py-4" style={{ borderColor: C.line }}>
@@ -114,7 +112,7 @@ export function NailA() {
 
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
-          <p>NAIL STUDIO, 서울특별시 마포구 연남동 일대, 매일 11:00 ~ 21:00</p>
+          <p>손끝네일, 서울특별시 마포구 연남동 일대, 매일 11:00 ~ 21:00</p>
           <p>예약 문의 02-000-0000</p>
         </div>
       </footer>

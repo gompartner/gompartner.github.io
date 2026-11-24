@@ -163,7 +163,7 @@ function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2" style={{ color: light ? C.white : C.ink }}>
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[22px] font-extrabold tracking-[-0.03em]">정수기 렌탈</span>
+        <span className="text-[22px] font-extrabold tracking-[-0.03em]">샘물 정수기 렌탈</span>
       </span>
     </span>
   );

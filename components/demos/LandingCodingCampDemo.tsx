@@ -95,7 +95,7 @@ function Logo() {
   return (
     <span className="inline-flex items-center gap-2.5">
       <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-        <span className="text-[19px] font-bold tracking-[-0.01em]">코딩 교실</span>
+        <span className="text-[19px] font-bold tracking-[-0.01em]">생각코딩 교실</span>
       </span>
     </span>
   );
@@ -149,7 +149,7 @@ export function LandingCodingCampDemo() {
       />
 
       <footer className="mx-auto mt-16 max-w-[1080px] border-t-2 px-5 pt-6 text-[14px] leading-[1.8] md:px-8" style={{ borderColor: C.ink, color: C.muted }}>
-        <p className="font-bold" style={{ color: C.ink }}>코딩 교실</p>
+        <p className="font-bold" style={{ color: C.ink }}>생각코딩 교실</p>
         <DemoMakerInfo className="mt-1" />
       </footer>
 

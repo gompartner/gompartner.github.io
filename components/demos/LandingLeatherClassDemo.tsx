@@ -243,7 +243,7 @@ export function LandingLeatherClassDemo() {
           <div className="relative z-[1] flex items-center justify-between gap-3 px-4 pt-4 md:px-12 md:pt-7">
             <a href="#top" className={`inline-flex min-w-0 items-center gap-2 rounded-[4px] ${focusRing}`}>
               <span className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-                <span className="text-[19px] font-bold tracking-[-0.02em]">가죽 공방</span>
+                <span className="text-[19px] font-bold tracking-[-0.02em]">손때 가죽공방</span>
               </span>
             </a>
             <nav aria-label="이 페이지 차례" className="hidden items-center gap-6 text-[15px] font-semibold lg:flex">
@@ -289,7 +289,7 @@ export function LandingLeatherClassDemo() {
                   [CreditCard, "수강료", `${won(PRICE)}, 재료 포함`],
                   [Clock, "시간", "2시간"],
                   [Users, "정원", `회차당 ${CAP}명`],
-                  [MapPin, "장소", "서울 ㅇㅇ구, 2층"],
+                  [MapPin, "장소", "서울 마포구 연남동, 2층"],
                 ] as const
               ).map(([I, k, v]) => (
                 <div key={k} className="flex min-w-0 items-start gap-2">
@@ -620,7 +620,7 @@ export function LandingLeatherClassDemo() {
         <div className={`${wrap} grid gap-2 md:grid-cols-[1fr_auto] md:items-end`}>
           <div>
             <p className="text-[17px] font-bold" style={{ color: C.ink }}>
-              가죽 공방
+              손때 가죽공방
             </p>
             <DemoMakerInfo className="mt-1" />
           </div>
