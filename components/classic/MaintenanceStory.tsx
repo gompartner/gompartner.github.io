@@ -36,7 +36,7 @@ export function MaintenanceStory() {
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    const io = new IntersectionObserver((es) => { if (es[0].isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.35 });
+    const io = new IntersectionObserver((es) => { if (es[0].isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.7 });
     io.observe(el);
     return () => io.disconnect();
   }, []);

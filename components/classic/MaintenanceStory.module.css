@@ -44,3 +44,5 @@
 .blank{opacity:.12}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.warn,.sheet,.row,.dim,.site img{transition:none}.spin{animation:none}}
+/* 모바일: 사이트 화면을 낮게 해서 아래 내용 칸이 한 화면에 같이 보이게 */
+@media (max-width:1023px){.root{gap:10px}.site{aspect-ratio:16/7.2}.panel{min-height:0}.row{min-height:44px}.head{height:48px}.stack{height:238px;margin-top:12px}}
