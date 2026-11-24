@@ -7,6 +7,7 @@ export const serviceTabs = [
   { href: "/app", label: "앱 제작" },
   { href: "/kiosk", label: "키오스크 화면 제작" },
   { href: "/3d", label: "3D 웹 제작" },
+  { href: "/works", label: "포트폴리오" },
 ];
 
 /** 유지보수 묶음 하위 탭: 전체 안내와 세부 4개(11-04) */

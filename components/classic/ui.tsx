@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
+import { TabScroll } from "@/components/classic/TabScroll";
 import { ChevronRight, Home } from "lucide-react";
 
 // 클래식 보기 공용 조각. 색은 흰 바탕 + 남색 배너 + 곰파트너 파랑 하나.
@@ -48,10 +49,26 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
 }
 
 /** 페이지 안 하위 메뉴 탭(같은 메뉴 묶음의 다른 페이지로 이동). */
-export function SubTabs({ items, current }: { items: { href: string; label: string }[]; current: string }) {
+export function SubTabs({ items, current, level = 2 }: { items: { href: string; label: string }[]; current: string; level?: 2 | 3 }) {
+  // 11-25 level 3은 2단 탭 아래 한 단 더(포트폴리오 업종). 작은 글씨, 연한 바탕
+  if (level === 3)
+    return (
+      <div className={`border-b ${line} bg-[#f6f7f9]`}>
+        <ul data-subtabs className={`${wrap} relative flex gap-5 overflow-x-auto`} role="list">
+          {items.map((i) => (
+            <li key={i.href} className="shrink-0">
+              <NavLink href={i.href} aria-current={i.href === current ? "page" : undefined} className={`flex min-h-11 items-center text-[15px] ${i.href === current ? "font-bold text-[#15171c]" : "text-[#5b6370] hover:text-[#15171c]"}`}>
+                {i.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   return (
     <div className={`border-b ${line} bg-white`}>
-      <ul className={`${wrap} flex gap-6 overflow-x-auto`} role="list">
+      <TabScroll />
+      <ul data-subtabs className={`${wrap} relative flex gap-6 overflow-x-auto`} role="list">
         {items.map((i) => (
           <li key={i.href} className="shrink-0">
             <NavLink

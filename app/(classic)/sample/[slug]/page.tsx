@@ -55,7 +55,8 @@ export default async function ClassicSamplePage({ params }: Props) {
       <PageHead
         title={p.title}
         trail={[
-          { href: "/works", label: "카탈로그" },
+          { href: "/homepage", label: "제작" },
+          { href: "/works", label: "포트폴리오" },
           ...(ind ? [{ href: `/works/${ind.slug}`, label: ind.label }] : []),
           { href: `/sample/${slug}`, label: p.title },
         ]}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Check, ChevronRight } from "lucide-react";
 import { PageHead, SubTabs, h2, wrap } from "@/components/classic/ui";
+import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
 import { buildCatalogIndex, topKeywords } from "@/components/classic/search/index";
@@ -39,11 +40,13 @@ export default async function ClassicIndustryPage({ params }: Props) {
       <PageHead
         title={ind.label}
         trail={[
-          { href: "/works", label: "카탈로그" },
+          { href: "/homepage", label: "제작" },
+          { href: "/works", label: "포트폴리오" },
           { href, label: ind.label },
         ]}
       />
-      <SubTabs items={worksTabs} current={href} />
+      <SubTabs items={serviceTabs} current="/works" />
+      <SubTabs items={worksTabs} current={href} level={3} />
 
       <section aria-labelledby="c-ind" className={`${wrap} grid gap-10 py-14 md:grid-cols-[minmax(0,1fr)_380px] md:gap-16 md:py-20`}>
         <div className="min-w-0">

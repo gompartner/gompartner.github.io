@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
+import { serviceTabs } from "@/components/classic/pricing/tabs";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { catalogGroups, catalogProjects, homepageProjects, samplesIn, worksTabs } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
@@ -21,8 +22,15 @@ const LIMIT = 6;
 export default function ClassicWorksPage() {
   return (
     <>
-      <PageHead title="카탈로그" trail={[{ href: "/works", label: "카탈로그" }]} />
-      <SubTabs items={worksTabs} current="/works" />
+      <PageHead
+        title="포트폴리오"
+        trail={[
+          { href: "/homepage", label: "제작" },
+          { href: "/works", label: "포트폴리오" },
+        ]}
+      />
+      <SubTabs items={serviceTabs} current="/works" />
+      <SubTabs items={worksTabs} current="/works" level={3} />
       <p className={`${wrap} pt-10 text-[17px] font-bold leading-[1.6] md:pt-12 md:text-[19px]`}>
         업종마다 시안 두 가지를 준비했습니다. 화면을 누르면 그 시안이 바로 열립니다.
       </p>

@@ -15,7 +15,7 @@ export function CatalogSearch({ index, children, bare = false, suggestions = SUG
   if (bare)
     return (
       <>
-        <SearchBox id="catalog-search" value={q} onChange={setQ} placeholder="이름, 기능으로 이 분야 카탈로그 검색" suggestions={suggestions} />
+        <SearchBox id="catalog-search" value={q} onChange={setQ} placeholder="이름, 기능으로 검색" suggestions={suggestions} />
         {q ? (
           <p className="mt-6 text-[15px] text-[#5b6370]" role="status">
             <b className="text-[#15171c]">{q}</b> 카탈로그 <b className="tabular-nums text-[#15171c]">{found.length}</b>개
@@ -27,7 +27,7 @@ export function CatalogSearch({ index, children, bare = false, suggestions = SUG
   return (
     <>
       <div className="mx-auto w-full max-w-[1248px] px-4 pt-10 md:px-6 md:pt-14">
-        <SearchBox id="catalog-search" value={q} onChange={setQ} placeholder="업종, 이름, 기능으로 카탈로그 검색" suggestions={SUGGEST} />
+        <SearchBox id="catalog-search" value={q} onChange={setQ} placeholder="업종, 이름, 기능으로 검색" suggestions={SUGGEST} />
         {q ? (
           <p className="mt-6 text-[15px] text-[#5b6370]" role="status">
             <b className="text-[#15171c]">{q}</b> 카탈로그 <b className="tabular-nums text-[#15171c]">{found.length}</b>개

@@ -14,7 +14,7 @@ const pages = [
   { href: "/", label: "첫 화면" },
   { href: "/homepage", label: "홈페이지 제작" },
   { href: "/maintenance", label: "유지보수" },
-  { href: "/works", label: "카탈로그" },
+  { href: "/works", label: "포트폴리오" },
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/contact", label: "상담 신청" },
 ];

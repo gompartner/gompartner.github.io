@@ -31,7 +31,7 @@ export const classicMenu = [
   {
     label: "제작",
     href: "/homepage",
-    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
+    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d", "/works", "/sample"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
       { href: "/homepage", label: "홈페이지 제작" },
@@ -40,6 +40,8 @@ export const classicMenu = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
+      // 11-25 포트폴리오(옛 카탈로그 /works)를 제작 아래로
+      { href: "/works", label: "포트폴리오" },
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
