@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 
 // 피부과 시안 C 2026 터치 인터랙션(11-25). 2026 흐름: 손으로 만지는 3D, 스크롤에 따라 바뀌는 장면, 큰 글자.
 // 장면 순서(사용자 확인): 1 화면 가득 피부결, 쓸면 매끈해짐 2 레이저 토닝(빛줄기, 잡티 옅어짐), 리프팅(빛이 한 점에 모임, 잔주름 펴짐), 보습(물방울이 스며듦)
-// 3 표면이 정리되며 원장 소개, 진료 시간, 오시는 길, 네이버 예약 버튼. 시술 전후 사진, 효과 장담 문구는 넣지 않는다(의료광고).
+// 3 표면이 정리되며 원장 소개, 진료 시간, 오시는 길. 시술 전후 사진, 효과 장담 문구는 넣지 않는다(의료광고).
 const Skin3D = dynamic(() => import("./skin3d/Skin3D"), { ssr: false });
 
 const NAME = "새결피부과의원";
@@ -173,9 +173,6 @@ export function SkinC2026() {
               건물 지하 주차장 1시간 무료
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="inline-flex h-14 items-center gap-2 rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>
-                네이버 예약 <ArrowUpRight size={18} aria-hidden />
-              </span>
               <a href={`tel:${TEL.replace(/-/g, "")}`} className="inline-flex h-14 items-center gap-2 rounded-full border-2 px-7 text-[17px] font-bold" style={{ borderColor: C.ink }}>
                 <Phone size={17} aria-hidden /> 전화 상담
               </a>

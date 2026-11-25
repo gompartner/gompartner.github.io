@@ -30,9 +30,6 @@ export function KmB() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.green }}>
-            상담 예약
-          </span>
         </div>
       </header>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 // 노무사 시안 B 근로자 상담형(11-22 사례 분석: 더하다 법률사무소처럼 사건별 카드와 상담 방법을 앞에. 근로자는 부당해고, 임금체불, 산재로 찾아오고 신청 기한을 먼저 궁금해한다). 흰 바탕, 짙은 초록. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/lab/b-*)
@@ -28,9 +28,6 @@ export function LaborB() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.green }}>
-            상담 예약
-          </span>
         </div>
       </header>
 
@@ -102,9 +99,6 @@ export function LaborB() {
           <div>
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">비용 안내</h2>
             <p className="mt-3 text-white/75">착수금과 성공보수는 사건마다 계약서에 적어 드립니다. 첫 상담 30분은 비용을 받지 않습니다.</p>
-            <p className="mt-6 inline-flex items-center gap-1.5 font-bold">
-              상담 예약 <ArrowRight size={17} aria-hidden />
-            </p>
           </div>
           <dl className="grid gap-2.5">
             {[

@@ -21,9 +21,6 @@ export function PenB() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.green }}>
-            네이버 예약
-          </span>
         </div>
       </header>
 
@@ -97,10 +94,10 @@ export function PenB() {
           </div>
           <div className="flex flex-col justify-between rounded-[28px] p-8 text-white md:p-10" style={{ background: C.green }}>
             <div>
-              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">예약</h2>
-              <p className="mt-3 text-white/80">남은 날짜와 객실은 네이버 예약에서 바로 보고 고르실 수 있습니다.</p>
+              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">문의</h2>
+              <p className="mt-3 text-white/80">날짜와 인원을 문자로 남겨 주시면 1시간 안에 답을 드립니다.</p>
             </div>
-            <div className="mt-8"><span className="inline-flex h-14 shrink-0 items-center rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>네이버 예약</span></div>
+            <p className="mt-8 text-[30px] font-bold tabular-nums tracking-[-0.02em]">033-000-0000</p>
           </div>
         </div>
       </section>

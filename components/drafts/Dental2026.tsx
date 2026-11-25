@@ -2,12 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 
 // 치과 2026형(11-25). 2026 흐름: 손으로 돌려 보는 3D 물건, 스크롤에 따라 움직이는 장면, 크고 굵은 글자, 한 가지 강한 색.
 // 장면 순서(사용자 확인): 1 첫 화면 임플란트가 돌고 손으로 돌려 봄 2 스크롤하면 크라운, 지대주, 픽스처로 나뉘며 설명
-// 3 다시 붙은 치아가 비켜나며 진료 과목이 큰 글씨로 지나감 4 원장 소개, 오시는 길, 네이버 예약 버튼.
-// 예약, 달력 같은 기능은 넣지 않는다(네이버 예약 연결 버튼 하나).
+// 3 다시 붙은 치아가 비켜나며 진료 과목이 큰 글씨로 지나감 4 원장 소개, 오시는 길.
+// 예약, 달력 같은 기능과 예약 버튼은 넣지 않는다(11-25 대표: 예약은 안 보여도 됨).
 const Implant3D = dynamic(() => import("./dental3d/Implant3D"), { ssr: false });
 
 const NAME = "바른결치과의원";
@@ -199,9 +199,6 @@ export function Dental2026() {
               건물 지하 주차장 2시간 무료
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="inline-flex h-14 items-center gap-2 rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>
-                네이버 예약 <ArrowUpRight size={18} aria-hidden />
-              </span>
               <a href={`tel:${TEL.replace(/-/g, "")}`} className="inline-flex h-14 items-center gap-2 rounded-full border-2 px-7 text-[17px] font-bold" style={{ borderColor: C.ink }}>
                 <Phone size={17} aria-hidden /> 전화 상담
               </a>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+
 
 // 미용실 시안 A 프리미엄 살롱형(11-21 사례 분석: IPS HAIR처럼 큰 사진 한 장과 얇은 글씨, 머리글에 가격과 예약 메뉴. 인물 대신 공간 사진과 시술 메뉴로 채운다). 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/hair/a-*)
@@ -26,7 +26,6 @@ export function HairA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -92,10 +91,6 @@ export function HairA() {
               <br />
               상담이 빨라집니다
             </h2>
-            <span className="mt-10 inline-flex h-[56px] items-center gap-2 px-8 text-[16px] font-bold text-white" style={{ background: C.ink }}>
-              네이버 예약
-              <ArrowRight size={18} aria-hidden />
-            </span>
           </div>
           <dl className="self-end border-t" style={{ borderColor: C.ink }}>
             {[

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 
 // 치과 2027 종이 무대(11-25). 실제 공간 사진을 깊이별로 세 겹(뒤 벽, 가운데, 앞 물건)으로 오려 흰 종이 테두리와 그림자를 입히고,
 // 종이 무대(디오라마)처럼 세운다. 스크롤하면 작은 무대가 다가와 화면을 채우고, 겹이 벌어지며 그 사이로 걸어 들어간다.
-// 장면 순서(사용자 확인): 1 종이 바탕 위 작은 무대(접수대)와 병원 이름 2 무대 안으로 3 대기실, 진료실, 상담 무대를 차례로 4 오시는 길과 예약 버튼.
+// 장면 순서(사용자 확인): 1 종이 바탕 위 작은 무대(접수대)와 병원 이름 2 무대 안으로 3 대기실, 진료실, 상담 무대를 차례로 4 오시는 길.
 // 3D 라이브러리 없이 CSS 3D만(휴대폰 가볍게). 층 이미지는 scripts/stage-cut.py로 만든다(public/images/drafts/dent27s).
 // 사진: 접수 Unsplash ECBg5FQkBXI, 대기실 Unsplash pxOQ-P97sA8(액자 글자 지움), 진료실 Pexels 9062525, 거울 Unsplash rubu_NvklJE.
 
@@ -218,9 +218,6 @@ export function Dental2027Stage() {
                 서울특별시 마포구 일대. 건물 뒤편 주차장 1시간 무료
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <span className="inline-flex h-14 items-center gap-2 rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>
-                  네이버 예약 <ArrowUpRight size={18} aria-hidden />
-                </span>
                 <a href={`tel:${TEL.replace(/-/g, "")}`} className="inline-flex h-14 items-center gap-2 rounded-full border-2 px-7 text-[17px] font-bold" style={{ borderColor: C.ink }}>
                   <Phone size={17} aria-hidden /> 전화 상담
                 </a>

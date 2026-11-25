@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+
 
 // 필라테스 시안 A 프리미엄 미니멀(11-21 사례 분석: 웰핏, Alas, MELUA처럼 흑백, 베이지 톤에 큰 스튜디오 사진, 영문 한 줄과 한국어 한 줄, 수업 구성을 A, B, C 표로). 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/pil/a-*)
@@ -25,7 +25,6 @@ export function PilatesA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -92,10 +91,6 @@ export function PilatesA() {
             체형 평가부터
           </h2>
           <div className="flex flex-col gap-3 md:items-end">
-            <span className="inline-flex h-[58px] items-center gap-2 px-8 text-[17px] font-bold text-white" style={{ background: C.ink }}>
-              체형 평가 상담 예약
-              <ArrowRight size={18} aria-hidden />
-            </span>
             <span className="text-[15px]" style={{ color: C.sub }}>평일 07:00 ~ 22:00, 토요일 09:00 ~ 15:00</span>
           </div>
         </div>

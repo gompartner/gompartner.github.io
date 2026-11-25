@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+
 
 // 네일 시안 A 컬러 갤러리형(11-21 사례 분석: 네일샵 사이트는 "고객이 네일 디자인을 쉽게 찾아보도록" 메인 이미지와 디자인 묶음을 크게 둔다). 인물, 손 사진 없이 색과 병 사진으로. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/nail/a-*)
@@ -37,7 +37,6 @@ export function NailA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="text-[15px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -105,10 +104,6 @@ export function NailA() {
             <h2 className="text-[26px] font-bold leading-[1.4] tracking-[-0.04em] md:text-[36px]">원하는 디자인 사진을 보내 주세요</h2>
             <p className="mt-2 text-white/70">가능 여부와 가격, 걸리는 시간을 미리 알려 드립니다.</p>
           </div>
-          <span className="inline-flex h-[56px] shrink-0 items-center gap-2 self-start bg-white px-7 text-[16px] font-bold md:self-auto" style={{ color: C.ink }}>
-            네이버 예약
-            <ArrowRight size={18} aria-hidden />
-          </span>
         </div>
       </section>
 

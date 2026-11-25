@@ -25,7 +25,6 @@ export function EyeA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 
 // 치과 2027 글자 창문(11-25). 2027 흐름 예상: 진짜 공간 사진을 크게, 첫 장면은 글자 하나로 강하게.
 // 장면 순서(사용자 확인): 1 흰 화면에 큰 "온담", 글자 속으로만 접수대 사진이 보임 2 스크롤하면 글자가 화면 밖까지 커지며 안으로 들어가고 공간이 펼쳐짐
-// 3 다음 공간(대기실, 진료실, 상담)이 둥근 창으로 열리며 바뀜 4 밝아지며 오시는 길과 네이버 예약 버튼.
+// 3 다음 공간(대기실, 진료실, 상담)이 둥근 창으로 열리며 바뀜 4 밝아지며 오시는 길.
 // 3D 라이브러리 없이 CSS와 2D 캔버스만 쓴다(휴대폰 가볍게). 글자 창문은 캔버스에 흰 판을 칠하고 글자 모양을 지워 구멍을 낸다.
 // 사진: 접수 Unsplash ECBg5FQkBXI, 대기실 Unsplash pxOQ-P97sA8(액자 글자 지움), 진료실 Pexels 9062525, 거울 Unsplash rubu_NvklJE.
 
@@ -288,9 +288,6 @@ export function Dental2027Window() {
                 서울특별시 마포구 일대. 건물 뒤편 주차장 1시간 무료
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <span className="inline-flex h-14 items-center gap-2 rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>
-                  네이버 예약 <ArrowUpRight size={18} aria-hidden />
-                </span>
                 <a href={`tel:${TEL.replace(/-/g, "")}`} className="inline-flex h-14 items-center gap-2 rounded-full border-2 px-7 text-[17px] font-bold" style={{ borderColor: C.ink }}>
                   <Phone size={17} aria-hidden /> 전화 상담
                 </a>

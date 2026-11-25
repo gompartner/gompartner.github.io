@@ -2,12 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 import type { DropScene } from "./skin3d/DropLens";
 
 // 피부과 시안 D 2027 리퀴드 글래스(11-25). 2027 흐름 예상: 진짜 공간 사진을 크게, 그 위에 맑은 유리와 물의 재질.
 // 장면 순서(사용자 확인): 1 실제 피부과 라운지 사진 위 큰 물방울 하나(굴절, 확대) 2 물방울이 흘러가며 시술실, 화장품 선반, 세럼을 확대해 보여 주고 설명이 붙음
-// 3 물방울 안에 다음 공간이 비치다가 화면 가득 커지며 넘어감 4 밝아지며 오시는 길과 예약 버튼. 시술 전후 사진, 효과 장담 문구는 넣지 않는다.
+// 3 물방울 안에 다음 공간이 비치다가 화면 가득 커지며 넘어감 4 밝아지며 오시는 길. 시술 전후 사진, 효과 장담 문구는 넣지 않는다.
 // 사진: 라운지 Unsplash X8Y3CJA0aNs, 시술실 Pexels 16571735, 선반 Unsplash uaD-0u_DwQw, 세럼 Unsplash yXcBwMp05Us(병 글자 지움).
 const DropLens = dynamic(() => import("./skin3d/DropLens"), { ssr: false });
 
@@ -164,9 +164,6 @@ export function SkinD2027() {
                 서울특별시 성동구 성수동 일대. 건물 지하 주차장 2시간 무료
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <span className="inline-flex h-14 items-center gap-2 rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>
-                  네이버 예약 <ArrowUpRight size={18} aria-hidden />
-                </span>
                 <a href={`tel:${TEL.replace(/-/g, "")}`} className="inline-flex h-14 items-center gap-2 rounded-full border-2 px-7 text-[17px] font-bold" style={{ borderColor: C.ink }}>
                   <Phone size={17} aria-hidden /> 전화 상담
                 </a>

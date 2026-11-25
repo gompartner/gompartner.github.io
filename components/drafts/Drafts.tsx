@@ -133,12 +133,12 @@ export function DentalDrafts() {
   return v === "b" ? (
     <>
       <DentalB />
-      <QuickMenu accent="#f06a2f" cta="네이버 예약" />
+      <QuickMenu accent="#f06a2f" cta="상담 문의" />
     </>
   ) : (
     <>
       <DentalA />
-      <QuickMenu accent="#1a1c1f" cta="네이버 예약" />
+      <QuickMenu accent="#1a1c1f" cta="상담 문의" />
     </>
   );
 }
@@ -175,12 +175,12 @@ export function SkinDrafts() {
   return v === "b" ? (
     <>
       <SkinB />
-      <QuickMenu accent="#d14d6a" cta="네이버 예약" />
+      <QuickMenu accent="#d14d6a" cta="상담 문의" />
     </>
   ) : (
     <>
       <SkinA />
-      <QuickMenu accent="#1f1d1b" cta="네이버 예약" />
+      <QuickMenu accent="#1f1d1b" cta="상담 문의" />
     </>
   );
 }
@@ -188,12 +188,12 @@ export function FoodDrafts() {
   return useVariant("korean-restaurant") === "b" ? (
     <>
       <FoodB />
-      <QuickMenu accent="#d8321f" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#d8321f" cta="상담 문의" tel="02-000-0000" />
     </>
   ) : (
     <>
       <FoodA />
-      <QuickMenu accent="#a4271c" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#a4271c" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -206,7 +206,7 @@ export function PilatesDrafts() {
   ) : (
     <>
       <PilatesA />
-      <QuickMenu accent="#141312" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#141312" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -227,12 +227,12 @@ export function HairDrafts() {
   return useVariant("hair-salon") === "b" ? (
     <>
       <HairB />
-      <QuickMenu accent="#c2603e" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#c2603e" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
       <HairA />
-      <QuickMenu accent="#1f3a32" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#1f3a32" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -240,12 +240,12 @@ export function NailDrafts() {
   return useVariant("nail-shop") === "b" ? (
     <>
       <NailB />
-      <QuickMenu accent="#c94f6d" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#c94f6d" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
       <NailA />
-      <QuickMenu accent="#1a1718" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#1a1718" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -271,7 +271,7 @@ export function OrthoDrafts() {
   ) : (
     <>
       <OrthoA />
-      <QuickMenu accent="#13294b" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#13294b" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -279,7 +279,7 @@ export function PedDrafts() {
   return useVariant("pediatrics") === "b" ? (
     <>
       <PedB />
-      <QuickMenu accent="#1f9d62" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#1f9d62" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
@@ -292,12 +292,12 @@ export function KmDrafts() {
   return useVariant("korean-medicine") === "b" ? (
     <>
       <KmB />
-      <QuickMenu accent="#4e6b3a" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#4e6b3a" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
       <KmA />
-      <QuickMenu accent="#4a3020" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#4a3020" cta="상담 문의" tel="02-000-0000" />
     </>
   );
 }
@@ -310,7 +310,7 @@ export function EyeDrafts() {
   ) : (
     <>
       <EyeA />
-      <QuickMenu accent="#0d4a57" cta="네이버 예약" tel="051-000-0000" />
+      <QuickMenu accent="#0d4a57" cta="상담 문의" tel="051-000-0000" />
     </>
   );
 }
@@ -318,7 +318,7 @@ export function VetDrafts() {
   return useVariant("animal-hospital") === "b" ? (
     <>
       <VetB />
-      <QuickMenu accent="#2e8b57" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#2e8b57" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
@@ -331,7 +331,7 @@ export function LaborDrafts() {
   return useVariant("labor-firm") === "b" ? (
     <>
       <LaborB />
-      <QuickMenu accent="#1d5c4a" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#1d5c4a" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
@@ -401,7 +401,7 @@ export function FamilyLawDrafts() {
   return useVariant("family-law") === "b" ? (
     <>
       <FamB />
-      <QuickMenu accent="#6b2f4a" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#6b2f4a" cta="상담 문의" tel="031-000-0000" />
     </>
   ) : (
     <>
@@ -448,7 +448,7 @@ export function OpticalDrafts() {
   ) : (
     <>
       <OptA />
-      <QuickMenu accent="#1d3366" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#1d3366" cta="상담 문의" tel="031-000-0000" />
     </>
   );
 }
@@ -457,7 +457,7 @@ export function CarDetailingDrafts() {
   return useVariant("car-detailing") === "b" ? (
     <>
       <CarB />
-      <QuickMenu accent="#0f6fd6" cta="네이버 예약" tel="02-000-0000" />
+      <QuickMenu accent="#0f6fd6" cta="상담 문의" tel="02-000-0000" />
     </>
   ) : (
     <>
@@ -569,12 +569,12 @@ export function PensionDrafts() {
   return useVariant("pension") === "b" ? (
     <>
       <PenB />
-      <QuickMenu accent="#2f5a3c" cta="네이버 예약" tel="033-000-0000" />
+      <QuickMenu accent="#2f5a3c" cta="상담 문의" tel="033-000-0000" />
     </>
   ) : (
     <>
       <PenA />
-      <QuickMenu accent="#173a63" cta="네이버 예약" tel="033-000-0000" />
+      <QuickMenu accent="#173a63" cta="상담 문의" tel="033-000-0000" />
     </>
   );
 }
@@ -639,12 +639,12 @@ export function CampsiteDrafts() {
   return useVariant("campsite") === "b" ? (
     <>
       <CpB />
-      <QuickMenu accent="#9a6b3c" cta="네이버 예약" tel="041-000-0000" />
+      <QuickMenu accent="#9a6b3c" cta="상담 문의" tel="041-000-0000" />
     </>
   ) : (
     <>
       <CpA />
-      <QuickMenu accent="#2c5a36" cta="네이버 예약" tel="031-000-0000" />
+      <QuickMenu accent="#2c5a36" cta="상담 문의" tel="031-000-0000" />
     </>
   );
 }

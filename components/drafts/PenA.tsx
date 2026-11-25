@@ -28,7 +28,6 @@ export function PenA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -102,10 +101,10 @@ export function PenA() {
           </div>
           <div className="flex flex-col justify-between gap-8 p-8 text-white md:p-10" style={{ background: C.navy }}>
             <div>
-              <h3 className="text-[24px] font-bold tracking-[-0.03em]">예약</h3>
-              <p className="mt-3 text-white/75">남은 객실과 날짜는 네이버 예약에서 바로 보고 고르실 수 있습니다. 양양 IC에서 15분.</p>
+              <h3 className="text-[24px] font-bold tracking-[-0.03em]">문의</h3>
+              <p className="mt-3 text-white/75">원하시는 날짜와 인원을 알려 주시면 남은 객실을 바로 알려 드립니다. 양양 IC에서 15분.</p>
             </div>
-            <span className="inline-flex h-14 shrink-0 items-center rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>네이버 예약</span>
+            <p className="text-[28px] font-bold tabular-nums" style={{ color: C.sand }}>033-000-0000</p>
           </div>
         </div>
       </section>

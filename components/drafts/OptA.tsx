@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+
 
 // 안경원 시안 A 누진 다초점 검안형(11-22 사례 분석: 아임웹 납품 사례 없음. 지역 기사에 나온 누진 다초점 안경원은 정밀 검사, 동공간거리와 독서 거리 측정, 적응 기간 안내를 내세운다). 흰 바탕, 남색. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/opt/a-*)
@@ -27,9 +27,6 @@ export function OptA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-11 items-center px-5 text-[15px] font-bold text-white" style={{ background: C.navy }}>
-            네이버 예약
-          </span>
         </div>
       </header>
 
@@ -107,9 +104,6 @@ export function OptA() {
                 <li key={x} className="border-b pb-3" style={{ borderColor: C.line }}>{x}</li>
               ))}
             </ul>
-            <p className="mt-8 inline-flex items-center gap-1.5 font-bold" style={{ color: C.navy }}>
-              네이버 예약 <ArrowRight size={18} aria-hidden />
-            </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden">
             <Image src={`${IMG}/a-frames.jpg`} alt="흰 판 위에 줄지어 놓인 갈색, 검정 안경테" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />

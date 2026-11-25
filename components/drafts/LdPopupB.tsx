@@ -83,9 +83,6 @@ export function LdPopupB() {
             <h2 className="text-[26px] font-bold tracking-[-0.04em] md:text-[34px]">오시는 길</h2>
             <p className="mt-2 text-white/70">성수역 3번 출구에서 6분. 매일 11:00 ~ 20:00, 입장 마감 19:30.</p>
           </div>
-          <button type="button" className="h-14 shrink-0 rounded-full px-10 text-[17px] font-bold text-white" style={{ background: C.pink }}>
-            회차 예약하기
-          </button>
         </div>
       </section>
 
