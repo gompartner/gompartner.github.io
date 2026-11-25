@@ -5,20 +5,25 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { LongShot } from "@/components/classic/board/LongShot";
 import { MotionShot } from "@/components/classic/board/MotionShot";
+import { LiveFrame } from "@/components/classic/catalog/LiveFrame";
+import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 
 // 카탈로그 화면 한 장을 크게 보는 팝업과 그림 틀. 카탈로그 판(CatalogBoard)과 통합검색 결과(SearchResults)가 함께 쓴다.
 // 11-26 사용자 "검색에서 레이어팝업을 닫으면 통합검색이 유지되도록": 검색 결과에서는 카탈로그로 옮겨 가지 않고 그 자리에서 이 팝업을 연다.
 
 /** long: 페이지 전체를 찍은 긴 캡처(있으면 창 안에서 저절로 내려가며 보여 주고, 크게 보기에서는 통째로 편다) */
-/** video: 화면을 내려 보며 녹화한 영상(있으면 그림 대신 영상이 돈다) */
-export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number }; video?: { src: string; w: number; h: number } };
+/** video: 화면을 내려 보며 녹화한 영상(있으면 그림 대신 영상이 돈다). live: 실제 화면 주소(있으면 크게 보기에서 그 화면을 직접 만진다) */
+export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number }; video?: { src: string; w: number; h: number }; live?: string };
 /** tag: 연도와 기법처럼 제목 옆에 붙는 이름표(그 해의 연출로 만든 화면) */
 export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[]; tag?: string };
 export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
 
 /** 그림 한 장을 브라우저, 휴대폰, 키오스크 틀에 넣는다. scene은 기기를 이미 담은 그림이라 테두리만 둔다 */
 export function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?: boolean }) {
-  const img = shot.video ? (
+  const img = full && shot.live ? (
+    // 크게 보기: 영상이 아니라 실제 화면. PC는 1280 폭(16:10), 휴대폰은 390 폭(390:844)으로 그려 틀에 맞춰 줄인다
+    <LiveFrame src={shot.live} title={shot.alt} base={shot.frame === "phone" ? 390 : 1280} ratio={shot.frame === "phone" ? 844 / 390 : 10 / 16} />
+  ) : shot.video ? (
     <MotionShot src={shot.video.src} poster={shot.src} alt={shot.alt} w={shot.video.w} h={shot.video.h} full={full} />
   ) : shot.long ? (
     full ? (
@@ -94,12 +99,20 @@ export function CatalogDialog({ item, onClose, start = "main" }: { item: Catalog
                 <X size={22} aria-hidden />
               </button>
               {item.side && (
-                <div className="order-3 col-span-2 flex gap-2 border-t border-white/12 px-5 py-3 md:px-8 [@media(max-height:520px)]:order-2 [@media(max-height:520px)]:col-span-1 [@media(max-height:520px)]:border-t-0 [@media(max-height:520px)]:p-0" role="tablist" aria-label="화면 종류">
+                <div className="order-3 col-span-2 flex gap-2 border-t border-white/12 px-5 py-3 md:px-8 [@media(max-height:520px)]:order-2 [@media(max-height:520px)]:col-span-1 [@media(max-height:520px)]:border-t-0 [@media(max-height:520px)]:p-0">
+                  <div className="flex gap-2" role="tablist" aria-label="화면 종류">
                   {([["main", item.main.frame === "browser" ? "PC" : "전체"], ["side", item.side.frame === "screen" ? "키오스크" : "모바일"]] as const).map(([k, label]) => (
                     <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={`min-h-11 rounded-full px-5 text-[15px] font-bold transition-colors [@media(max-height:520px)]:px-4 ${view === k ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white hover:border-white"}`}>
                       {label}
                     </button>
                   ))}
+                  </div>
+                  {item.main.live ? (
+                    <a href={item.main.live} {...NEW_TAB} className="ml-auto inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[15px] font-bold text-[#c9ced6] hover:text-white [@media(max-height:520px)]:hidden">
+                      새 창으로 열기
+                      <NewTabMark size={15} />
+                    </a>
+                  ) : null}
                 </div>
               )}
             </div>
