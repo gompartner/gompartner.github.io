@@ -52,8 +52,8 @@ const css = `
 [data-asm] [data-part]:not([data-go]) { opacity: 0; }
 [data-asm] [data-part][data-go] {
   outline: 1.5px solid transparent; outline-offset: 5px;
-  animation: gp-dock2 0.9s cubic-bezier(0.16, 0.84, 0.3, 1) both, gp-glow 0.6s ease-out none;
-  animation-delay: var(--delay), calc(var(--delay) + 0.72s);
+  animation: gp-dock2 0.55s cubic-bezier(0.16, 0.84, 0.3, 1) both, gp-glow 0.5s ease-out none;
+  animation-delay: var(--delay), calc(var(--delay) + 0.44s);
 }
 [data-asm] [data-clunk] { animation: gp-clunk2 0.3s ease-out both; }
 /* 이미 조립한 부품이 다시 보일 때: 테두리 반짝과 광택만 */
@@ -117,7 +117,7 @@ export function Assemble({ children }: { children: ReactNode }) {
         const fresh = hits.filter((el) => !built && !("go" in el.dataset));
         // 처음 보는 부품은 조립
         fresh.forEach((el, k) => {
-          el.style.setProperty("--delay", `${k * 0.12}s`);
+          el.style.setProperty("--delay", `${k * 0.06}s`);
           el.dataset.go = "";
         });
         const sec = fresh[0]?.closest("section");
@@ -125,7 +125,7 @@ export function Assemble({ children }: { children: ReactNode }) {
           timers.push(window.setTimeout(() => {
             sec.dataset.clunk = "";
             timers.push(window.setTimeout(() => delete sec.dataset.clunk, 320));
-          }, (fresh.length - 1) * 120 + 760));
+          }, (fresh.length - 1) * 60 + 460));
         }
         // 이미 조립한 부품이 다시 들어오면 반짝과 광택만
         hits.filter((el) => !fresh.includes(el) && seen.has(el)).forEach((el, k) => shine(el, k * 80));

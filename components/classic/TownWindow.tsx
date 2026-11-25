@@ -14,13 +14,13 @@ export function TownWindow() {
   useEffect(() => {
     const phone = matchMedia("(max-width: 767px), (pointer: coarse)").matches;
     if (phone) return;
-    // 조립 연출(약 3초)이 끝난 뒤, 브라우저가 한가할 때. 자식 효과가 먼저 돌아 asm.hero는 아직 이번 조립 전 값이다
+    // 조립 연출(약 1.6초)이 끝난 뒤, 브라우저가 한가할 때. 자식 효과가 먼저 돌아 asm.hero는 아직 이번 조립 전 값이다
     let idle = 0;
     const t = window.setTimeout(() => {
       const go = () => setLoad(true);
       if ("requestIdleCallback" in window) idle = window.requestIdleCallback(go, { timeout: 2000 });
       else go();
-    }, asm.hero ? 300 : 3200); // 이미 조립한 화면으로 돌아왔으면 바로
+    }, asm.hero ? 300 : 1900); // 이미 조립한 화면으로 돌아왔으면 바로
     return () => {
       window.clearTimeout(t);
       if (idle && "cancelIdleCallback" in window) window.cancelIdleCallback(idle);
