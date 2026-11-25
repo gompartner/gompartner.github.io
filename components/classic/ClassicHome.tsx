@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { JobApply } from "@/components/classic/JobApply";
 import { HeroSwitch } from "@/components/classic/HeroSwitch";
+import { HeroBuild } from "@/components/classic/HeroBuild";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
@@ -65,7 +66,7 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Suspense fallback={<HeroUs />}>
-        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} />
+        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild shots={works} />} />
       </Suspense>
       <Services />
       <Why />

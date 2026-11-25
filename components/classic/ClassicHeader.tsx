@@ -81,7 +81,7 @@ export function ClassicHeader() {
     () => new URLSearchParams(window.location.search).get("v") ?? "us",
     () => "us",
   );
-  const dark = landing && heroV === "us";
+  const dark = landing && (heroV === "us" || heroV === "build");
   const [open, setOpen] = useState(false);
   // 손가락이나 펜으로 누르면 hover가 없으니, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다.
   // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
