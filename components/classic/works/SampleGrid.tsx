@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { NavLink as Link } from "@/components/classic/NavLink";
 import type { Project } from "@/lib/types";
-import { hasPair, hrefOf, isDeviceCatalog, mobileShotOf, thumbBOf, thumbOf } from "./samples";
+import { extraShotsOf, hasPair, hrefOf, isDeviceCatalog, mobileShotOf, thumbBOf, thumbOf } from "./samples";
 import { VARIANTS } from "@/lib/variants";
 
 // 샘플 카드 격자. 홈 화면 샘플 목록과 같은 모양(썸네일 선 하나, 그림자 없음).
@@ -120,6 +120,16 @@ function PairGrid({ items, mobileMax }: { items: Project[]; mobileMax?: number }
                 </Link>
               ))}
             </div>
+            {/* 11-25 A, B 말고 더 있는 시안(연도별)은 카드 아래 작은 줄로. 목록이 들쭉날쭉해지지 않게 */}
+            {extraShotsOf(p).length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {extraShotsOf(p).map((x) => (
+                  <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} className="rounded-full border border-[#d5dbe3] bg-white px-2.5 py-1 text-[13px] font-bold text-[#3b4350] hover:border-[#1d5fd6] hover:text-[#1d5fd6]">
+                    + {x.label}
+                  </Link>
+                ))}
+              </div>
+            )}
             <Link href={hrefOf(p)} className="group mt-3 block">
               <span className="block break-keep text-[19px] font-bold leading-[1.35] tracking-[-0.03em] group-hover:underline md:text-[20px]">{shortTitle(p.title)}</span>
               <span className="mt-1 block break-keep text-[15px] leading-[1.5] text-[#5b6370]">{p.features.slice(0, 3).join(", ")}</span>

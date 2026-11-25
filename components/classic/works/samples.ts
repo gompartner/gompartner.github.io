@@ -53,6 +53,15 @@ export function thumbBOf(p: Project) {
   return exists(b) ? `${b}?v=${IMG_VER}` : null;
 }
 
+/** 11-25 A, B 다음 시안(C 2026형, D, E 2027형 등). 첫 화면 캡처는 public/images/demos/var/<slug>-<id>.jpg */
+export function extraShotsOf(p: Project) {
+  const slug = slugOf(p.demoUrl);
+  return (VARIANTS[slug] ?? []).slice(2).map((v) => {
+    const f = `/images/demos/var/${slug}-${v.id}.jpg`;
+    return { id: v.id, label: v.label.replace(/^시안 /, ""), src: exists(f) ? `${f}?v=${IMG_VER}` : null };
+  });
+}
+
 export function mobileShotOf(p: Project) {
   const m = `/images/demos/m/${slugOf(p.demoUrl)}.jpg`;
   return exists(m) ? `${m}?v=${IMG_VER}` : null;

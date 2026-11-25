@@ -7,7 +7,7 @@ import { Check, Plus, Pointer } from "lucide-react";
 import { PageHead, btnLine, btnPrimary, h2, h3, more, wrap } from "@/components/classic/ui";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
 import { Kiosk3dLink } from "@/components/classic/works/Kiosk3dLink";
-import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf, thumbBOf, hasPair } from "@/components/classic/works/samples";
+import { isDeviceCatalog, isProgram, catalogProjects, demoProjects, findBySlug, groupOf, industryOf, isMaintenance, mobileShotOf, samplesIn, slugOf, thumbBOf, hasPair, extraShotsOf } from "@/components/classic/works/samples";
 import { VARIANTS } from "@/lib/variants";
 import { estimateFor } from "@/data/classic/pricing";
 import { designConcepts } from "@/data/classic/designConcepts";
@@ -43,6 +43,7 @@ export default async function ClassicSamplePage({ params }: Props) {
   const isDraft = p.layout === "시안 2종";
   // 랜딩은 시안 A가 기능이 도는 기존 랜딩이라 견적, 체험 표시는 그대로 두고 첫 화면만 두 시안을 나란히
   const pair = hasPair(p);
+  const extras = extraShotsOf(p);
   const est = isDraft ? null : estimateFor(p.id);
   const concept = designConcepts[slug];
   const mobileShot = mobileShotOf(p);
@@ -89,7 +90,32 @@ export default async function ClassicSamplePage({ params }: Props) {
                 </Link>
               ))}
             </div>
-          ) : isDeviceCatalog(p) ? (
+          ) : null}
+          {/* 11-25 A, B 다음 시안(연도별 흐름). 누르면 그 시안이 열린다 */}
+          {pair && extras.length > 0 && (
+            <div className="mx-auto mt-10 max-w-[1120px] md:mt-12">
+              <h2 className="text-[17px] font-bold md:text-[18px]">연도별 흐름 시안</h2>
+              <div className="mt-4 grid gap-6 md:grid-cols-3 md:gap-5">
+                {extras.map((x) => (
+                  <Link key={x.id} href={`${p.demoUrl}?v=${x.id}&from=c`} prefetch={false} aria-label={`${p.title} ${x.label} 보기`} className="group block min-w-0">
+                    <span className="relative block overflow-hidden rounded-lg border border-[#d9dee5] bg-white">
+                      {x.src ? (
+                        <Image src={x.src} alt={`${p.title} ${x.label} 첫 화면`} width={1080} height={675} sizes="(min-width: 1168px) 360px, (min-width: 768px) 30vw, 92vw" className="aspect-[16/10] w-full object-cover object-top" />
+                      ) : (
+                        <span className="block aspect-[16/10] w-full bg-[#eef1f5]" />
+                      )}
+                      <TapHint label="눌러서 시안 보기" />
+                    </span>
+                    <span className="mt-3 flex items-center justify-between gap-3">
+                      <span className="break-keep text-[16px] font-bold md:text-[17px]">{x.label}</span>
+                      <span className="shrink-0 text-[15px] font-bold text-[#256ef4] group-hover:underline">시안 보기</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          {pair ? null : isDeviceCatalog(p) ? (
             <Link href={p.demoUrl} prefetch={false} aria-label={`${p.title} 체험하기`} className="group relative mx-auto block max-w-[1040px] overflow-hidden rounded-lg bg-[#eef0f3]">
               <Image src={p.imageUrl} alt={p.imageAlt} width={1440} height={900} priority sizes="(min-width: 1088px) 1040px, 92vw" className="aspect-[16/10] w-full object-cover object-center" />
               <TapHint />
@@ -128,7 +154,8 @@ export default async function ClassicSamplePage({ params }: Props) {
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] font-bold">
             <span className="text-[#256ef4]">{p.category}</span>
             <span aria-hidden className="h-3.5 w-px bg-[#c9cfd8]" />
-            <span className="text-[#5b6370]">{p.layout}</span>
+            {/* 시안 수는 실제 시안 목록에서 센다(11-25 치과처럼 C, D, E가 붙으면 늘어난다) */}
+            <span className="text-[#5b6370]">{isDraft && pair ? `시안 ${VARIANTS[slug]?.length ?? 2}종` : p.layout}</span>
           </p>
           <p className="mt-4 break-keep text-[18px] leading-[1.75] md:text-[19px]">{p.description}</p>
 
