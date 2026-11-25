@@ -39,7 +39,7 @@ const services: { no: string; name: string; body: string; price: string; href: s
   { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/homepage", tone: "blue", span: "md:col-span-4" },
   { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/program", tone: "white", span: "md:col-span-2" },
   { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지. 예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터`, href: "/app", tone: "yellow", span: "md:col-span-2" },
-  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받습니다. 요청하면 영업일 24시간 안에 원인과 금액을 회신합니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
+  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
   blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white/80", arrow: "bg-white text-[#256ef4]" },
@@ -51,7 +51,7 @@ const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string 
 // 누구나 하는 것(소스 제공, 문서 납품, 계약서 발행)은 쓰지 않는다. 다른 곳과 실제로 다른 것만, 비용 페이지와 유지보수 페이지에 있는 숫자로
 const reasons = [
   { name: "가격과 기간을 먼저 공개합니다", body: `소개 홈페이지 ${manwon(plans[0].price)}에 ${plans[0].days}일, 랜딩페이지 ${manwon(landingPlans[0].price)}에 ${landingPlans[0].days}일. 견적을 기다리지 않아도 비용 페이지에서 바로 확인할 수 있습니다.`, c: "#7aa7ff" },
-  { name: "수정은 한 건부터 받습니다", body: "월 계약 없이 문구, 이미지 수정을 건별 10,000원부터 맡습니다. 요청하면 영업일 24시간 안에 금액을 알려 드립니다.", c: "#ffd84d" },
+  { name: "수정은 한 건부터 받습니다", body: "월 계약 없이 문구, 이미지 수정을 건별 10,000원부터 맡습니다. 작업 전에 금액부터 알려 드립니다.", c: "#ffd84d" },
   { name: "다른 곳에서 만든 사이트도 이어받습니다", body: "만든 업체와 연락이 끊겼거나 수정이 막힌 사이트를 넘겨받아 고치고 운영합니다. 아임웹, 카페24, 워드프레스, 그누보드 모두 맡습니다.", c: "#ffffff" },
   { name: "서비스를 직접 운영하고 있습니다", body: "사이트 지킴이와 거래장부를 만들어 운영합니다. 오픈한 뒤에 생기는 문제를 직접 겪고 고쳐 온 방식 그대로 만듭니다.", c: "#7aa7ff" },
 ];
@@ -337,7 +337,7 @@ function Apply() {
         <div>
           <Head no="06" en="CONTACT" title="무료 견적 받기" id="c-apply" />
           <p data-part className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-            만들거나 고칠 것을 한 줄만 남겨 주세요. 영업일 24시간 안에 범위, 금액, 일정을 정리해 회신합니다.
+            만들거나 고칠 것을 한 줄만 남겨 주세요. 범위, 금액, 일정을 정리해 회신합니다.
           </p>
           <ul data-part className="mt-9 space-y-3" role="list">
             <li>
