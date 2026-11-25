@@ -1,0 +1,74 @@
+{
+ "pediatrics": {
+  "pc": {
+   "src": "/images/catalog/long/pediatrics-pc.jpg",
+   "w": 1200,
+   "h": 1864
+  },
+  "m": {
+   "src": "/images/catalog/long/pediatrics-m.jpg",
+   "w": 390,
+   "h": 3442
+  }
+ },
+ "bakery-cafe": {
+  "pc": {
+   "src": "/images/catalog/long/bakery-cafe-pc.jpg",
+   "w": 1200,
+   "h": 2520
+  },
+  "m": {
+   "src": "/images/catalog/long/bakery-cafe-m.jpg",
+   "w": 390,
+   "h": 3264
+  }
+ },
+ "pension": {
+  "pc": {
+   "src": "/images/catalog/long/pension-pc.jpg",
+   "w": 1200,
+   "h": 2614
+  },
+  "m": {
+   "src": "/images/catalog/long/pension-m.jpg",
+   "w": 390,
+   "h": 3521
+  }
+ },
+ "company": {
+  "pc": {
+   "src": "/images/catalog/long/company-pc.jpg",
+   "w": 1200,
+   "h": 2351
+  },
+  "m": {
+   "src": "/images/catalog/long/company-m.jpg",
+   "w": 390,
+   "h": 3226
+  }
+ },
+ "landing-move-clean": {
+  "pc": {
+   "src": "/images/catalog/long/landing-move-clean-pc.jpg",
+   "w": 1200,
+   "h": 5357
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-move-clean-m.jpg",
+   "w": 390,
+   "h": 5600
+  }
+ },
+ "landing-coding-camp": {
+  "pc": {
+   "src": "/images/catalog/long/landing-coding-camp-pc.jpg",
+   "w": 1200,
+   "h": 3838
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-coding-camp-m.jpg",
+   "w": 390,
+   "h": 5600
+  }
+ }
+}

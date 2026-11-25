@@ -1,5 +1,7 @@
 "use client";
 
+import historyLong from "@/data/classic/historyLong.json";
+import { LongShot } from "@/components/classic/board/LongShot";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Maximize2, X } from "lucide-react";
@@ -15,7 +17,13 @@ const css = `
 @media (prefers-reduced-motion: reduce) { .sw-layer { transition: none; } }
 `;
 
-function Shot({ s, sizes, priority = false }: { s: Stage; sizes: string; priority?: boolean }) {
+// 단계마다 그날의 페이지 전체를 찍은 긴 캡처(data/classic/historyLong.json). 창 안에서 저절로 내려가며 보여 준다(LongShot)
+const LONG = historyLong as Record<string, { src: string; w: number; h: number }>;
+const longOf = (s: Stage) => LONG[s.img.split("/").pop()?.replace(/\.jpg.*$/, "") ?? ""];
+
+function Shot({ s, sizes, priority = false, active = true }: { s: Stage; sizes: string; priority?: boolean; active?: boolean }) {
+  const lg = longOf(s);
+  if (lg) return <LongShot src={lg.src} alt={s.alt} w={lg.w} h={lg.h} ratio="16/10" eager={priority} active={active} />;
   return <Image src={s.img} alt={s.alt} fill sizes={sizes} priority={priority} className="object-cover object-top" />;
 }
 
@@ -71,7 +79,7 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
                 // 다음 단계 그림까지만 미리 올려 둔다(여덟 장을 한꺼번에 받지 않게)
                 i <= Math.max(seen, on) + 1 ? (
                   <span key={s.no} aria-hidden={i !== on} className={`sw-layer absolute inset-0 ${i === on ? "opacity-100" : "opacity-0"}`}>
-                    <Shot s={s} sizes="(min-width: 1280px) 700px, 58vw" priority={i === 0} />
+                    <Shot s={s} sizes="(min-width: 1280px) 700px, 58vw" priority={i === 0} active={i === on} />
                   </span>
                 ) : null,
               )}
@@ -163,7 +171,12 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
             </div>
             {/* 좁은 화면에서는 그림을 줄이지 않고 옆으로 밀어 본다 */}
             <div className="min-h-0 overflow-auto">
-              <Image src={zoom.img} alt={zoom.alt} width={1920} height={1200} sizes="1400px" className="h-auto w-full min-w-[900px]" />
+              {longOf(zoom) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={longOf(zoom).src} alt={zoom.alt} width={longOf(zoom).w} height={longOf(zoom).h} className="block h-auto w-full min-w-[900px]" />
+              ) : (
+                <Image src={zoom.img} alt={zoom.alt} width={1920} height={1200} sizes="1400px" className="h-auto w-full min-w-[900px]" />
+              )}
             </div>
           </div>
         )}

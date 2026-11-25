@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Maximize2, Plus, X } from "lucide-react";
+import { LongShot } from "@/components/classic/board/LongShot";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 
 // 11-26 카탈로그 한 판(사용자 "기대한 것, 불편한 점을 모아 어떤 고민을 해서 결과를 만들었는지. 잘 이야기하고 진열을 잘하는 게 중요. 이미지 대충 넣지 말고").
@@ -13,7 +14,8 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 // (3)으로 했다. 내려가며 읽기만 하면 이야기가 다 보이고, PC와 휴대폰 화면을 틀에 넣어 크게 둘 자리가 나온다.
 // 길어지는 것은 맨 위 종류 버튼으로 줄인다(이야기와 아래 격자를 함께 거른다). 나머지 화면은 아래에 작은 격자로 두고 8개만 먼저 보여 준다.
 
-export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string };
+/** long: 페이지 전체를 찍은 긴 캡처(있으면 창 안에서 저절로 내려가며 보여 주고, 크게 보기에서는 통째로 편다) */
+export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number } };
 export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[] };
 export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
 
@@ -30,8 +32,15 @@ const css = `
 `;
 
 /** 그림 한 장을 브라우저, 휴대폰, 키오스크 틀에 넣는다. scene은 기기를 이미 담은 그림이라 테두리만 둔다 */
-function Frame({ shot, sizes }: { shot: Shot; sizes: string }) {
-  const img = (
+function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?: boolean }) {
+  const img = shot.long ? (
+    full ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={shot.long.src} alt={shot.alt} width={shot.long.w} height={shot.long.h} loading="lazy" decoding="async" className="block h-auto w-full" />
+    ) : (
+      <LongShot src={shot.long.src} alt={shot.alt} w={shot.long.w} h={shot.long.h} ratio={shot.ratio} />
+    )
+  ) : (
     <span className="relative block w-full bg-[#0f131b]" style={{ aspectRatio: shot.ratio }}>
       <Image src={shot.src} alt={shot.alt} fill sizes={sizes} className="object-cover object-top" />
     </span>
@@ -197,11 +206,11 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
                 <X size={22} aria-hidden />
               </button>
             </div>
-            <div className={`mt-5 grid items-end gap-5 md:mt-6 md:gap-7 ${open.side ? "md:grid-cols-[minmax(0,1fr)_minmax(0,0.26fr)]" : ""}`}>
-              <Frame shot={open.main} sizes="(min-width: 768px) 860px, 94vw" />
+            <div className={`mt-5 grid gap-5 md:mt-6 md:gap-7 ${open.main.long ? "items-start" : "items-end"} ${open.side ? "md:grid-cols-[minmax(0,1fr)_minmax(0,0.26fr)]" : ""}`}>
+              <Frame shot={open.main} sizes="(min-width: 768px) 860px, 94vw" full />
               {open.side && (
                 <span className="mx-auto block w-[62%] md:w-full">
-                  <Frame shot={open.side} sizes="(min-width: 768px) 230px, 60vw" />
+                  <Frame shot={open.side} sizes="(min-width: 768px) 230px, 60vw" full />
                 </span>
               )}
             </div>

@@ -5,6 +5,9 @@ import { CatalogBoard, type CatalogItem, type CatalogStoryView, type Shot } from
 import { demoProjects, isLanding, isMaintenance, isProgram, mobileShotOf, thumbOf, threeProjects } from "@/components/classic/works/samples";
 import { catalogStories } from "@/data/classic/catalogStories";
 import { pageMeta } from "@/lib/seo";
+import catalogLong from "@/data/classic/catalogLong.json";
+
+type Long = { src: string; w: number; h: number };
 
 // 11-26 카탈로그 한 판. 위에는 이야기와 함께 올린 화면 11개(data/classic/catalogStories), 아래에는 나머지 화면을 작은 그림으로 둔다.
 // 데모, 샘플 주소(/demo, /sample, /work, /works/업종)는 내렸다(사용자 "이제 안 씀, 검색 오류 나도 됨"). 화면은 누르면 그 자리에서 크게 본다.
@@ -54,6 +57,10 @@ export default function WorksPage() {
     if (!base) continue;
     const main: Shot = s.main && exists(s.main.src) ? { ...base.main, ...s.main } : base.main;
     const side: Shot | undefined = s.side && exists(s.side.src) ? { ...s.side, alt: `${base.title} ${s.side.frame === "screen" ? "키오스크" : "휴대폰"} 화면` } : base.side;
+    // 페이지 전체 캡처가 있으면 붙인다(data/classic/catalogLong.json, 11-26)
+    const lg = (catalogLong as Record<string, { pc?: Long; m?: Long }>)[s.id];
+    if (lg?.pc && main.frame === "browser" && exists(lg.pc.src)) main.long = lg.pc;
+    if (lg?.m && side?.frame === "phone" && exists(lg.m.src)) side.long = lg.m;
     stories.push({ ...base, main, side, headline: s.headline, wantLabel: s.wantLabel, want: s.want, think: s.think, made: s.made });
   }
   stories.sort((a, b) => CATS.indexOf(a.cat) - CATS.indexOf(b.cat));
