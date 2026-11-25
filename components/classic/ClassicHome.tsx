@@ -267,9 +267,9 @@ function Stack() {
         <h2 data-part id="c-stack" className="shrink-0 text-[17px] font-[800] tracking-[-0.02em] md:text-[19px]">
           다루는 기술과 플랫폼
         </h2>
-        <ul className="flex flex-wrap gap-2" role="list">
+        <ul data-part className="flex flex-wrap gap-2" role="list">
           {stack.map((t) => (
-            <li data-part key={t} className="rounded-full border border-[#d9dee5] bg-white px-3.5 py-1.5 text-[15px] font-bold text-[#3d4450]">
+            <li key={t} className="rounded-full border border-[#d9dee5] bg-white px-3.5 py-1.5 text-[15px] font-bold text-[#3d4450]">
               {t}
             </li>
           ))}
@@ -327,9 +327,9 @@ function Process() {
             </li>
           ))}
         </ol>
-        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3" role="list">
+        <ul data-part className="mt-10 flex flex-wrap gap-x-8 gap-y-3" role="list">
           {deliver.map((d) => (
-            <li data-part key={d} className="flex items-center gap-2 text-[16px] font-bold md:text-[18px]">
+            <li key={d} className="flex items-center gap-2 text-[16px] font-bold md:text-[18px]">
               <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#7aa7ff]" />
               {d}
             </li>
