@@ -17,7 +17,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 가족형" },
     { id: "2026", label: "2026형" },
-    { id: "2027", label: "2027형" },
+    { id: "2027-window", label: "2027 글자 창문" },
   ],
   academy: [
     { id: "a", label: "시안 A 입시형" },
@@ -231,4 +231,9 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 진료 안내형" },
   ],
+};
+
+// 예전 주소를 새 시안으로 잇는다(11-25 치과 2027형을 2027 글자 창문으로 바꿈). 키는 "프로젝트:옛 id"
+export const VARIANT_ALIAS: Record<string, string> = {
+  "dental-homepage:2027": "2027-window",
 };

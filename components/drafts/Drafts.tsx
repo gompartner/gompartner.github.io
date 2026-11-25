@@ -9,7 +9,7 @@ const TaxB = dynamic(() => import("./TaxB").then((m) => m.TaxB));
 const DentalA = dynamic(() => import("./DentalA").then((m) => m.DentalA));
 const DentalB = dynamic(() => import("./DentalB").then((m) => m.DentalB));
 const Dental2026 = dynamic(() => import("./Dental2026").then((m) => m.Dental2026));
-const Dental2027 = dynamic(() => import("./Dental2027").then((m) => m.Dental2027));
+const Dental2027Window = dynamic(() => import("./Dental2027Window").then((m) => m.Dental2027Window));
 const AcademyA = dynamic(() => import("./AcademyA").then((m) => m.AcademyA));
 const AcademyB = dynamic(() => import("./AcademyB").then((m) => m.AcademyB));
 const InteriorA = dynamic(() => import("./InteriorA").then((m) => m.InteriorA));
@@ -125,7 +125,7 @@ export function DentalDrafts() {
   const v = useVariant("dental-homepage");
   // 11-25 연도별 시안(2026형, 2027형). 예약 기능 대신 3D 장면으로 차이를 둔다
   if (v === "2026") return <Dental2026 />;
-  if (v === "2027") return <Dental2027 />;
+  if (v === "2027-window") return <Dental2027Window />;
   return v === "b" ? (
     <>
       <DentalB />
