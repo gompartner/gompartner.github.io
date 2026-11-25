@@ -5,7 +5,7 @@ import { NavLink } from "@/components/classic/NavLink";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
-import { appPlans, manwon, plans } from "@/data/classic/pricing";
+import { appPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
 
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
@@ -36,7 +36,7 @@ html.gp-dark .cl .gp-home { color-scheme: light; }
 
 type Tone = "blue" | "white" | "yellow" | "line";
 const services: { no: string; name: string; body: string; price: string; href: string; tone: Tone; span: string }[] = [
-  { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 기준 6일 완성. 반응형 화면, 네이버와 구글 검색엔진 등록까지 포함합니다", price: `${manwon(plans[0].price)}부터`, href: "/homepage", tone: "blue", span: "md:col-span-4" },
+  { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/homepage", tone: "blue", span: "md:col-span-4" },
   { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/program", tone: "white", span: "md:col-span-2" },
   { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지. 예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터`, href: "/app", tone: "yellow", span: "md:col-span-2" },
   { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받습니다. 요청하면 영업일 24시간 안에 원인과 금액을 회신합니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
@@ -48,12 +48,12 @@ const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string 
   line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white hover:border-[#7aa7ff]", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", arrow: "bg-white text-[#0b0d12]" },
 };
 
-// 회사소개(data/classic/about.ts)의 원칙과 같은 약속. 사람 수, 사업자 형태처럼 작아 보이는 말 대신 고객이 받는 것으로 쓴다
+// 누구나 하는 것(소스 제공, 문서 납품, 계약서 발행)은 쓰지 않는다. 다른 곳과 실제로 다른 것만, 비용 페이지와 유지보수 페이지에 있는 숫자로
 const reasons = [
-  { name: "소스와 계정은 처음부터 고객 명의", body: "원본 소스를 드리고, 도메인과 호스팅은 고객 명의로 계약합니다. 운영 권한이 처음부터 고객에게 있습니다.", c: "#7aa7ff" },
-  { name: "점검 결과표와 인계 문서까지 납품", body: "화면, 웹 접근성, 검색 등록을 점검한 결과표와 계정, 수정 방법 문서를 함께 드립니다.", c: "#ffd84d" },
-  { name: "업종별 법정 고지를 제작 전에 검토", body: "비급여 진료비, 교습비, 사업자 정보, 개인정보처리방침처럼 업종마다 지켜야 하는 표기를 먼저 반영합니다.", c: "#ffffff" },
-  { name: "보안서약 후 재위탁 없이 직접 작업", body: "작업 전에 보안서약서를 작성하고 하도급 없이 직접 만듭니다. 결과물은 동의 없이 포트폴리오에 쓰지 않습니다.", c: "#7aa7ff" },
+  { name: "가격과 기간을 먼저 공개합니다", body: `소개 홈페이지 ${manwon(plans[0].price)}에 ${plans[0].days}일, 랜딩페이지 ${manwon(landingPlans[0].price)}에 ${landingPlans[0].days}일. 견적을 기다리지 않아도 비용 페이지에서 바로 확인할 수 있습니다.`, c: "#7aa7ff" },
+  { name: "수정은 한 건부터 받습니다", body: "월 계약 없이 문구, 이미지 수정을 건별 10,000원부터 맡습니다. 요청하면 영업일 24시간 안에 금액을 알려 드립니다.", c: "#ffd84d" },
+  { name: "다른 곳에서 만든 사이트도 이어받습니다", body: "만든 업체와 연락이 끊겼거나 수정이 막힌 사이트를 넘겨받아 고치고 운영합니다. 아임웹, 카페24, 워드프레스, 그누보드 모두 맡습니다.", c: "#ffffff" },
+  { name: "서비스를 직접 운영하고 있습니다", body: "사이트 지킴이와 거래장부를 만들어 운영합니다. 오픈한 뒤에 생기는 문제를 직접 겪고 고쳐 온 방식 그대로 만듭니다.", c: "#7aa7ff" },
 ];
 
 // 직접 기획하고 만들어 운영하는 서비스. 문구는 각 서비스 사이트의 소개 문장에서 가져온다
@@ -77,23 +77,20 @@ const products = [
 ];
 
 const steps = [
-  { name: "요구사항 정의", body: "만들 범위와 우선순위를 문서로 정리합니다." },
-  { name: "견적과 일정", body: "범위, 금액, 일정을 견적서로 확정하고 시작합니다." },
-  { name: "설계와 개발", body: "화면 설계를 확인받은 뒤 개발하고 중간 결과를 공유합니다." },
-  { name: "테스트와 배포", body: "점검 결과표로 확인한 뒤 운영 서버에 배포합니다." },
-  { name: "인계와 운영", body: "원본 소스와 인계 문서를 드리고, 오픈 뒤 운영과 유지보수를 이어서 맡습니다." },
+  { name: "상담", body: "필요한 기능과 예산을 듣고 범위를 제안합니다." },
+  { name: "견적", body: "범위, 일정, 비용을 견적서 한 장으로 확정합니다." },
+  { name: "제작", body: "만드는 화면을 단계마다 보여 드리고 확인을 받습니다." },
+  { name: "오픈", body: "도메인 연결과 검색 등록까지 마치고 엽니다." },
+  { name: "운영", body: "오픈 뒤 수정은 건별로, 운영은 월 단위로 이어서 맡습니다." },
 ];
 // 원 다섯 개의 가운데를 지나는 물결 선(가로 1000 기준, 원 가운데 x는 100, 300, 500, 700, 900)
 const flowPath = "M100 70 C 200 70, 200 130, 300 130 S 400 70, 500 70 S 600 130, 700 130 S 800 70, 900 70";
 
-const deliver = ["원본 소스 제공", "점검 결과표", "인계 문서", "무상 하자보수", "계약서와 세금계산서"];
-
 const faqs = [
   { q: "얼마나 걸리나요?", a: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 랜딩페이지 4일, 설치형 웹앱 10일입니다. 업무 시스템은 요구사항을 확인한 뒤 견적서에 일정을 적어 드립니다." },
-  { q: "금액은 언제 정해지나요?", a: "계약 전에 확정합니다. 요구사항을 확인한 뒤 범위, 금액, 일정을 견적서로 드리고, 동의하시면 바로 시작합니다." },
-  { q: "다른 업체가 만든 사이트도 맡길 수 있나요?", a: "맡습니다. 아임웹, 카페24, 워드프레스, 그누보드 사이트와 PHP, Next.js로 직접 개발한 사이트를 이어받아 수정하고 운영합니다." },
-  { q: "개발 후 소스와 계정은 누구 것인가요?", a: "모두 고객 것입니다. 원본 소스와 서버, 도메인 계정을 고객 명의로 인계하고 인계 문서를 함께 드립니다." },
-  { q: "계약서와 세금계산서를 받을 수 있나요?", a: "계약서와 세금계산서를 발행하고, 작업 전에 보안서약서도 함께 작성합니다." },
+  { q: "금액은 언제 정해지나요?", a: "계약 전에 확정합니다. 범위, 금액, 일정을 견적서로 드리고, 동의하시면 바로 시작합니다." },
+  { q: "만든 뒤 수정은 어떻게 하나요?", a: "건별 10,000원부터 요청하실 수 있고, 수정이 잦으면 월 유지관리로 묶을 수 있습니다. 오픈 후 1개월 동안 생긴 하자는 무상으로 고칩니다." },
+  { q: "지금 쓰는 사이트를 그대로 두고 고칠 수 있나요?", a: "네. 새로 만들지 않고 지금 사이트에서 필요한 부분만 고칩니다. 다른 업체가 만든 사이트도 넘겨받아 수정합니다." },
 ];
 
 export function ClassicHome() {
@@ -208,9 +205,9 @@ function Why() {
     <section aria-labelledby="c-why" className="border-y border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <Head no="02" en="WHY" title="시작 전에 약속하는 네 가지" id="c-why" />
+          <Head no="02" en="WHY" title="곰파트너가 다른 점" id="c-why" />
           <p data-part className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-            외주를 맡길 때 확인해야 하는 것들입니다. 계약 전에 문서로 약속하고 납품할 때 그대로 드립니다.
+            다른 곳과 비교할 때 보실 것만 적었습니다.
           </p>
         </div>
         <ol role="list">
@@ -302,14 +299,6 @@ function Process() {
             ))}
           </ol>
         </div>
-        <ul data-part className="mt-14 flex flex-wrap gap-2.5 md:mt-20 md:justify-center" role="list">
-          {deliver.map((d) => (
-            <li key={d} className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2.5 text-[15px] font-bold md:text-[17px]">
-              <Check aria-hidden size={17} strokeWidth={3} className="text-[#ffd84d]" />
-              {d}
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

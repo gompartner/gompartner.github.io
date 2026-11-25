@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { TownWindow } from "@/components/classic/TownWindow";
 import { BuildGate } from "@/components/classic/BuildGate";
 
@@ -83,8 +83,13 @@ const at = (d: number): V => ({ "--d": `${d.toFixed(3)}s` });
 // 11-25 밤 문구: 컨셉 문장 대신 맡길 이유가 보이게(사용자 "일을 맡기고 싶다는 부분이 약함, 강점이라고 써 놓은 문구가 약점").
 // 사람 수나 사업자 형태처럼 작아 보이는 말은 쓰지 않고, 사이트에 이미 약속해 둔 숫자(기간, 금액, 회신 시간)와 납품물로 말한다
 const lines = ["제작부터 운영까지", "한 곳에서 끝냅니다"];
-const sub = "홈페이지는 29.9만 원부터, 6일이면 완성합니다. 수정 요청은 건별 10,000원부터, 영업일 24시간 안에 원인과 금액을 회신합니다.";
-const trust = ["점검 결과표 납품", "원본 소스와 계정 인계", "무상 하자보수"];
+const sub = "홈페이지, 업무 시스템, 앱을 만들고 오픈 뒤 운영까지 이어서 맡습니다.";
+// 누구나 하는 것(반응형, 소스 제공, 계약서 발행 등)은 강점처럼 쓰지 않는다(11-25 밤 사용자 "당연한 걸 당연하게 써 놓은 것"). 숫자로 말한다
+const stats = [
+  { n: "29.9만 원", label: "홈페이지 제작 시작가" },
+  { n: "6일", label: "소개 홈페이지 제작 기간" },
+  { n: "24시간", label: "수정 요청 회신(영업일)" },
+];
 // 창틀에 붙는 서비스 이름표. 휘어 날아오는 출발점(x, y)과 기울기
 const chips = [
   { name: "홈페이지", pos: "right-[26%] -top-4", x: "140px", y: "-180px", r: "30deg" },
@@ -169,16 +174,14 @@ export function HeroBuild() {
                 </span>
               </Link>
             </div>
-            <ul className="order-7 mt-8 flex flex-wrap gap-x-6 gap-y-2.5" role="list">
-              {trust.map((t, i) => (
-                <li key={t} className="gp-pop flex items-center gap-2 text-[15px] font-bold text-[#c9ced6] md:text-[16px]" style={{ ...at(1.05 + i * 0.06), "--r": "0deg" } as V}>
-                  <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full bg-[#7aa7ff]/20 text-[#7aa7ff]">
-                    <Check size={13} strokeWidth={3} />
-                  </span>
-                  {t}
-                </li>
+            <dl className="order-7 mt-10 grid max-w-[560px] grid-cols-3 gap-3 border-t border-white/15 pt-6">
+              {stats.map((t, i) => (
+                <div key={t.label} className="gp-pop" style={{ ...at(1.05 + i * 0.06), "--r": "0deg" } as V}>
+                  <dd className="whitespace-nowrap text-[22px] font-[800] leading-none tracking-[-0.04em] text-white md:text-[32px]">{t.n}</dd>
+                  <dt className="mt-2 break-keep text-[13px] leading-[1.4] text-[#aab2bf] md:text-[14px]">{t.label}</dt>
+                </div>
               ))}
-            </ul>
+            </dl>
           </div>
 
           {/* 오른쪽 창: 둥근 창틀이 두 모서리에서 자라 만나고, 안에서 3D 마을이 조립된다 */}
