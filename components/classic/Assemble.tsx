@@ -8,7 +8,7 @@ import { asm } from "@/components/classic/assembleState";
 //    카드가 통째로 나타나면 도장이고, 판 조각이 맞물린 뒤 번호, 제목, 설명, 금액, 화살표, 무늬가 하나씩 제자리에 끼워져야 조립이다.
 //  - 그래서 [data-part] 하나가 차례가 되면: (1) 카드 바탕을 비스듬한 판 세 조각으로 나눠 가까이에서 맞물리고
 //    (2) 그 안의 작은 요소들을 찾아 하나씩, 제각각 방향에서 짧게 다가와 딱 끼워지게 한다(끼워지는 순간 한 번 밝아진다).
-//  - 부품 윗변이 화면 아래에서 4분의 1쯤 올라왔을 때 시작한다(아래 끝에 걸치자마자 시작하면 태블릿, 휴대폰에서는 보기도 전에 끝난다)
+//  - 부품이 화면 가운데 근처까지 올라왔을 때 시작하고(아래 끝에 걸치자마자 시작하면 보기도 전에 끝난다), 칸마다 처음 한 번은 조립이 끝날 때까지 스크롤을 붙잡는다
 //  - 한 번만. 다시 지나갈 때는 아무것도 하지 않고, 새로고침 전에 다른 페이지에 갔다 와도 다시 조립하지 않는다
 //  - 조립할 틈 없이 지나친 부품은 바로 보인다. 움직임 줄이기 설정이면 처음부터 그대로 보인다
 // 부품을 숨기는 표시(data-asm)는 브라우저에서 붙인다. 스크립트가 돌지 않으면 내용이 그대로 보인다.
@@ -127,8 +127,59 @@ export function Assemble({ children }: { children: ReactNode }) {
     // 한 번에 들어온 부품들은 앞 부품이 반쯤 조립됐을 때 다음 부품을 시작한다
     const run = (els: HTMLElement[]) => {
       let t = 0;
-      for (const el of els) t = Math.max(t, build(el, t) - 0.45);
+      let end = 0;
+      for (const el of els) {
+        end = build(el, t);
+        t = Math.max(t, end - 0.45);
+      }
+      return end;
     };
+
+    // 조립이 끝날 때까지 아래로 내려가는 스크롤을 잠깐 붙잡는다(11-26 사용자 "모션이 끝날 때까지 스크롤 대기가 필요, 아니면 뭐가 있는지 모르고 지나간다").
+    // 칸마다 처음 한 번만, 길어도 1.2초. 위로 올라가는 것은 막지 않는다. 머리글 메뉴로 건너뛸 때는 붙잡지 않는다.
+    const held = new WeakSet<Element>();
+    let skipUntil = 0;
+    let release: (() => void) | null = null;
+    const hold = (y: number, ms: number) => {
+      release?.();
+      const wheel = (e: WheelEvent) => {
+        if (e.deltaY > 0) e.preventDefault();
+      };
+      let ty = 0;
+      const tstart = (e: TouchEvent) => {
+        ty = e.touches[0]?.clientY ?? 0;
+      };
+      const tmove = (e: TouchEvent) => {
+        if ((e.touches[0]?.clientY ?? 0) < ty && e.cancelable) e.preventDefault();
+      };
+      const key = (e: KeyboardEvent) => {
+        if (["ArrowDown", "PageDown", "End", " "].includes(e.key) && !(e.target as HTMLElement)?.closest?.("input, textarea, select, button, a, summary")) e.preventDefault();
+      };
+      // 손가락을 뗀 뒤 관성으로 내려가는 것은 위 이벤트로 못 막아서 자리를 되돌려 붙잡는다
+      const clamp = () => {
+        if (window.scrollY > y + 2) window.scrollTo(0, y);
+      };
+      window.addEventListener("wheel", wheel, { passive: false });
+      window.addEventListener("touchstart", tstart, { passive: true });
+      window.addEventListener("touchmove", tmove, { passive: false });
+      window.addEventListener("keydown", key);
+      window.addEventListener("scroll", clamp, { passive: true });
+      const done = () => {
+        window.removeEventListener("wheel", wheel);
+        window.removeEventListener("touchstart", tstart);
+        window.removeEventListener("touchmove", tmove);
+        window.removeEventListener("keydown", key);
+        window.removeEventListener("scroll", clamp);
+        window.clearTimeout(timer);
+        release = null;
+      };
+      const timer = window.setTimeout(done, ms);
+      release = done;
+    };
+    const jump = (e: Event) => {
+      if ((e.target as HTMLElement)?.closest?.('a[href*="#"]')) skipUntil = performance.now() + 1600;
+    };
+    document.addEventListener("click", jump, true);
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -144,10 +195,39 @@ export function Assemble({ children }: { children: ReactNode }) {
           } else continue;
           io.unobserve(el);
         }
-        run(fresh.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0)));
+        if (fresh.length === 0) return;
+        const sorted = () => fresh.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0));
+        const sec = fresh[0].closest("section");
+        if (!sec || held.has(sec) || performance.now() < skipUntil) {
+          if (sec) held.add(sec);
+          run(sorted());
+          return;
+        }
+        // 그 칸에서 처음이면: 칸 머리를 머리글 바로 아래로 올려 화면에 가득 들어오게 한 뒤, 보이는 부품을 함께 조립하고 끝날 때까지 스크롤을 붙잡는다
+        held.add(sec);
+        const headH = document.querySelector("header")?.getBoundingClientRect().height ?? 72;
+        // 칸 위 여백의 절반쯤은 머리글 뒤로 넘겨, 붙잡힌 동안 카드가 더 많이 보이게 한다
+        const delta = Math.max(0, sec.getBoundingClientRect().top - headH + (window.innerWidth >= 768 ? 64 : 36));
+        const y = window.scrollY + delta;
+        for (const el of parts) {
+          if (!("go" in el.dataset) && !fresh.includes(el) && el.closest("section") === sec && el.getBoundingClientRect().top - delta < window.innerHeight * 0.94) {
+            fresh.push(el);
+            io.unobserve(el);
+          }
+        }
+        const list = sorted();
+        if (delta > 4) window.scrollTo({ top: y, behavior: "smooth" });
+        const wait = delta > 4 ? 380 : 0;
+        hold(y, wait + 200);
+        timers.push(
+          window.setTimeout(() => {
+            const end = run(list);
+            hold(y, Math.min(end, 1.2) * 1000);
+          }, wait),
+        );
       },
-      // 부품 윗변이 화면 아래에서 26% 올라온 선을 넘을 때
-      { rootMargin: "0px 0px -26% 0px" },
+      // 부품 윗변이 화면 가운데 조금 아래(위에서 58%)까지 올라왔을 때. 그래야 붙잡힌 동안 조립되는 부품이 화면 안에 다 보인다
+      { rootMargin: "0px 0px -42% 0px" },
     );
     parts.forEach((el) => io.observe(el));
     // 페이지 맨 아래에 닿으면 조립선까지 올라오지 못한 나머지도 조립한다
@@ -161,6 +241,8 @@ export function Assemble({ children }: { children: ReactNode }) {
     return () => {
       io.disconnect();
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("click", jump, true);
+      release?.();
       timers.forEach((x) => window.clearTimeout(x));
       delete root.dataset.asm;
     };
