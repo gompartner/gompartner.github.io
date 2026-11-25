@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { appPlans, kioskPlans, landingPlans, manwon, plans, type Plan } from "@/data/classic/pricing";
@@ -11,14 +12,15 @@ import { threePlans } from "@/data/classic/three";
 // (1)은 여전히 따로 노는 긴 문서, (3)은 메인이 길어져서 (2)로 했다. 메인과 같은 바탕, 같은 글자, 같은 색 판.
 // 금액과 구성은 비용 데이터(data/classic/pricing, three)를 그대로 읽는다. 자세한 조건은 각 상세 페이지로 잇는다.
 
-type Kind = { id: string; name: string; en: string; line: string; who: string[]; plans: Plan[]; href: string; c: string };
+type Shot = { img: string; name: string };
+type Kind = { id: string; name: string; en: string; line: string; who: string[]; plans: Plan[]; href: string; c: string; shots: Shot[] };
 const kinds: Kind[] = [
-  { id: "homepage", name: "홈페이지", en: "Website", line: "병원, 매장, 전문직, 기업, 학원의 얼굴이 되는 사이트", who: ["처음 홈페이지를 만드는 사업장", "오래된 사이트를 새로 바꾸려는 곳", "문의와 예약을 홈페이지로 받고 싶은 곳"], plans, href: "/homepage", c: "#7aa7ff" },
-  { id: "landing", name: "랜딩페이지", en: "Landing", line: "광고로 들어온 손님을 신청으로 잇는 한 장", who: ["광고를 돌리는데 신청이 적은 곳", "행사, 모집, 분양처럼 기간이 정해진 일", "신청 내역을 한곳에 모으고 싶은 곳"], plans: landingPlans, href: "/landing-page", c: "#ffd84d" },
-  { id: "program", name: "업무 시스템", en: "System", line: "엑셀로 하던 정산, 재고, 접수, 견적을 웹 화면 하나로", who: ["엑셀 파일이 사람마다 다른 곳", "같은 내용을 여러 번 옮겨 적는 곳", "담당자가 바뀌면 일이 멈추는 곳"], plans: [], href: "/program", c: "#ffffff" },
-  { id: "app", name: "앱", en: "App", line: "예약, 주문, 적립, 현장 보고를 손안에서", who: ["단골이 자주 쓰는 예약, 주문이 있는 곳", "현장에서 바로 기록해야 하는 일", "스토어에 내 앱을 올리고 싶은 곳"], plans: appPlans, href: "/app", c: "#7aa7ff" },
-  { id: "kiosk", name: "키오스크", en: "Kiosk", line: "접수, 출결, 안내를 터치 화면으로", who: ["접수 창구가 붐비는 병원, 학원", "안내 인력이 부족한 시설", "출결과 방문 기록을 남겨야 하는 곳"], plans: kioskPlans, href: "/kiosk", c: "#ffd84d" },
-  { id: "3d", name: "3D 웹", en: "3D Web", line: "제품과 공간을 고객이 직접 돌려 보고 고르게", who: ["옵션이 많아 설명이 긴 제품", "직접 와 봐야 아는 공간", "견적 문의를 미리 걸러 받고 싶은 곳"], plans: threePlans, href: "/3d", c: "#ffffff" },
+  { id: "homepage", name: "홈페이지", en: "Website", line: "병원, 매장, 전문직, 기업, 학원의 얼굴이 되는 사이트", who: ["처음 홈페이지를 만드는 사업장", "오래된 사이트를 새로 바꾸려는 곳", "문의와 예약을 홈페이지로 받고 싶은 곳"], plans, href: "/homepage", c: "#7aa7ff", shots: [{ img: "/images/demos/dental-homepage.jpg", name: "치과" }, { img: "/images/demos/bakery-cafe.jpg", name: "베이커리 카페" }, { img: "/images/demos/tax-office.jpg", name: "세무사무소" }] },
+  { id: "landing", name: "랜딩페이지", en: "Landing", line: "광고로 들어온 손님을 신청으로 잇는 한 장", who: ["광고를 돌리는데 신청이 적은 곳", "행사, 모집, 분양처럼 기간이 정해진 일", "신청 내역을 한곳에 모으고 싶은 곳"], plans: landingPlans, href: "/landing-page", c: "#ffd84d", shots: [{ img: "/images/demos/landing-move-clean.jpg", name: "입주 청소 상담 신청" }, { img: "/images/demos/landing-water-rental.jpg", name: "정수기 렌탈 상담" }, { img: "/images/demos/landing-coding-camp.jpg", name: "코딩 캠프 모집" }] },
+  { id: "program", name: "업무 시스템", en: "System", line: "엑셀로 하던 정산, 재고, 접수, 견적을 웹 화면 하나로", who: ["엑셀 파일이 사람마다 다른 곳", "같은 내용을 여러 번 옮겨 적는 곳", "담당자가 바뀌면 일이 멈추는 곳"], plans: [], href: "/program", c: "#ffffff", shots: [{ img: "/images/demos/shop-admin.jpg", name: "쇼핑몰 옵션과 주문 관리" }, { img: "/images/demos/lms.jpg", name: "온라인 강의와 수료 관리" }, { img: "/images/demos/excel-automation.jpg", name: "엑셀 반복 업무 자동화" }] },
+  { id: "app", name: "앱", en: "App", line: "예약, 주문, 적립, 현장 보고를 손안에서", who: ["단골이 자주 쓰는 예약, 주문이 있는 곳", "현장에서 바로 기록해야 하는 일", "스토어에 내 앱을 올리고 싶은 곳"], plans: appPlans, href: "/app", c: "#7aa7ff", shots: [{ img: "/images/demos/app-pilates.jpg", name: "필라테스 예약과 회원권" }, { img: "/images/demos/app-academy.jpg", name: "학원 출결과 알림" }] },
+  { id: "kiosk", name: "키오스크", en: "Kiosk", line: "접수, 출결, 안내를 터치 화면으로", who: ["접수 창구가 붐비는 병원, 학원", "안내 인력이 부족한 시설", "출결과 방문 기록을 남겨야 하는 곳"], plans: kioskPlans, href: "/kiosk", c: "#ffd84d", shots: [{ img: "/images/demos/kiosk-clinic.jpg", name: "병원 접수" }, { img: "/images/demos/kiosk-academy.jpg", name: "학원 출결" }] },
+  { id: "3d", name: "3D 웹", en: "3D Web", line: "제품과 공간을 고객이 직접 돌려 보고 고르게", who: ["옵션이 많아 설명이 긴 제품", "직접 와 봐야 아는 공간", "견적 문의를 미리 걸러 받고 싶은 곳"], plans: threePlans, href: "/3d", c: "#ffffff", shots: [{ img: "/3d/assets/og/configurator.jpg", name: "옵션을 고르는 3D 견적" }, { img: "/3d/assets/og/space.jpg", name: "공간 둘러보기" }, { img: "/3d/assets/og/sofa.jpg", name: "모듈 소파 구성" }] },
 ];
 
 const css = `
@@ -50,7 +52,7 @@ export function MakeBoard() {
             <h1 className="text-[40px] font-[800] leading-[1.1] tracking-[-0.05em] md:text-[68px]">
               <span className="mk-ice">무엇을</span> 만들까요
             </h1>
-            <p className="max-w-[420px] break-keep pb-2 text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">종류를 고르면 구성과 금액, 기간이 바로 나옵니다.</p>
+            <p className="max-w-[420px] break-keep pb-2 text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">종류를 고르면 만든 화면과 금액, 기간이 바로 나옵니다.</p>
           </div>
 
           <div className="mt-10 grid gap-6 md:mt-14 lg:grid-cols-[300px_1fr] lg:gap-10">
@@ -99,6 +101,18 @@ export function MakeBoard() {
                   ))}
                 </ul>
               </div>
+
+              {/* 만든 화면: 눌러 들어가는 데모가 아니라 그림으로 보여 준다(데모, 샘플 주소는 내린다) */}
+              <ul className={`mt-4 grid gap-4 ${k.shots.length === 2 ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3"}`} role="list">
+                {k.shots.map((sh, i) => (
+                  <li key={sh.img} className={`mk-in overflow-hidden rounded-[20px] border border-white/12 bg-[#121722] ${k.shots.length === 3 && i === 0 ? "col-span-2 md:col-span-1" : ""}`} style={{ "--d": `${0.04 + i * 0.05}s` } as React.CSSProperties}>
+                    <span className="relative block aspect-[16/10]">
+                      <Image src={sh.img} alt={`${sh.name} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top" />
+                    </span>
+                    <span className="block px-4 py-3 text-[14px] font-bold text-[#c9ced6] md:text-[15px]">{sh.name}</span>
+                  </li>
+                ))}
+              </ul>
 
               {k.plans.length > 0 ? (
                 <ul className="mt-4 grid gap-4 md:grid-cols-3" role="list">
