@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { TownWindow } from "@/components/classic/TownWindow";
 
 // 11-25 조립형 첫 화면(사용자 "면과 선이 조합되며 완성, 합체 로봇처럼 조립되는 메인"). 시안, ?v=build
 // 1차(파란 덮개)는 "틀이 이미 나와 있어 로딩 느낌"이라 바꿈: 빈 틀을 먼저 보여 주지 않는다.
@@ -101,14 +102,7 @@ export function HeroBuild() {
             </Part>
             {/* 11-25 사용자 "상품은 3D 타운으로": 창 안에 3D 미니어처 마을(public/3d/island). 건물 이름표를 누르면 그 상품 화면이 열린다 */}
             <Part dx="900px" dy="-120px" ry="75deg" rot="8deg" d={1.65}>
-              <span className="relative block aspect-[4/3] w-full overflow-hidden bg-[#0f1b3d]">
-                <iframe
-                  src={process.env.NODE_ENV === "development" ? "/3d/island.html" : "/3d/island"}
-                  title="3D 마을. 건물 이름표를 누르면 해당 상품 화면을 엽니다."
-                  loading="eager"
-                  className="absolute inset-0 h-full w-full border-0"
-                />
-              </span>
+              <TownWindow />
             </Part>
             {/* 다 맞물리면 빛이 한 번 훑는다 */}
             <span className="gp-scan pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-[linear-gradient(90deg,transparent,rgba(122,167,255,.35),transparent)]" style={at(2.7)} />
