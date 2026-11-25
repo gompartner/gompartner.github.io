@@ -232,6 +232,8 @@ input[type="time"]::-webkit-date-and-time-value {
 /* 카탈로그 데모 선택상자(11-01): 휴대폰 기본 모양 대신 입력칸과 같은 높이, 오른쪽 화살표 하나.
    데모마다 inline background를 쓰는 곳이 있어 화살표 관련 값만 !important로 덮는다. */
 .demo-root { display: contents; }
+/* 주소의 다른 시안으로 바뀌기 전까지 첫 시안을 가린다(데모 layout의 v-wait) */
+.v-wait .demo-root { visibility: hidden; }
 .demo-root select:not([multiple]):not([size]) {
   -webkit-appearance: none;
   appearance: none;

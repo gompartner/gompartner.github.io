@@ -1,6 +1,7 @@
 import { DemoTopBar } from "@/components/demos/DemoTopBar";
 import { HideInFrame } from "@/components/demos/HideInFrame";
 import { liveProjects as projects } from "@/data/projects";
+import { VARIANTS } from "@/lib/variants";
 
 export default async function DemoLayout({
   children,
@@ -11,9 +12,14 @@ export default async function DemoLayout({
 }>) {
   const { slug } = await params;
   const project = projects.find((p) => p.demoUrl === `/work/${slug}`);
+  const first = (project && VARIANTS[project.id]?.[0]?.id) || "";
+  // 정적 페이지는 첫 시안으로 그려져 있다. 주소에 다른 시안(?v=)이 있으면 바뀔 때까지 본문을 가려
+  // 새로고침할 때 첫 시안이 잠깐 비치지 않게 한다. useVariant가 시안을 고른 뒤 v-wait를 지운다(늦어도 3초 뒤 풀림).
+  const guard = `(function(){try{var q=new URLSearchParams(location.search).get("v");if(q&&q!==${JSON.stringify(first)}){var h=document.documentElement;h.classList.add("v-wait");setTimeout(function(){h.classList.remove("v-wait")},3000)}}catch(e){}})()`;
 
   return (
     <>
+      {first && <script dangerouslySetInnerHTML={{ __html: guard }} />}
       {project && (
         <HideInFrame>
           <DemoTopBar projectId={project.id} />

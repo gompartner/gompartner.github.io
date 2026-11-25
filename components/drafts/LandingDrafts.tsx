@@ -2,12 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useVariant } from "@/lib/useVariant";
-import { LdWaterB } from "./LdWaterB";
-import { LdCodeB } from "./LdCodeB";
-import { LdCleanB } from "./LdCleanB";
-import { LdPopupB } from "./LdPopupB";
-import { LdZineB } from "./LdZineB";
-import { LdLeatherB } from "./LdLeatherB";
+const LdWaterB = dynamic(() => import("./LdWaterB").then((m) => m.LdWaterB));
+const LdCodeB = dynamic(() => import("./LdCodeB").then((m) => m.LdCodeB));
+const LdCleanB = dynamic(() => import("./LdCleanB").then((m) => m.LdCleanB));
+const LdPopupB = dynamic(() => import("./LdPopupB").then((m) => m.LdPopupB));
+const LdZineB = dynamic(() => import("./LdZineB").then((m) => m.LdZineB));
+const LdLeatherB = dynamic(() => import("./LdLeatherB").then((m) => m.LdLeatherB));
 
 // 11-22 랜딩 시안 A, B. A는 신청, 계산, 결제가 실제로 도는 기존 랜딩, B는 새 디자인 메인 한 장(폼은 모양만).
 const WaterA = dynamic(() => import("@/components/demos/LandingWaterRentalDemo").then((m) => m.LandingWaterRentalDemo));

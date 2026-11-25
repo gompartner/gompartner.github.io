@@ -22,6 +22,8 @@ export function useVariant(projectId: string) {
     const read = () => {
       const q = new URLSearchParams(window.location.search).get("v");
       setV(q && list?.some((x) => x.id === q) ? q : first);
+      // 고른 시안이 그려진 다음 장에 가림(v-wait, 데모 layout)을 푼다
+      requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.remove("v-wait")));
     };
     read();
     window.addEventListener("demo:variant", read);
