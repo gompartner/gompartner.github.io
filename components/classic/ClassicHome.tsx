@@ -11,11 +11,12 @@ import { profile } from "@/data/classic/profile";
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
 // 11-25 밤 다시 짬: 흰 바탕용 칸에 색만 뒤집어 덧칠하던 것을 버리고 어두운 바탕 기준으로 처음부터.
-//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 약속(큰 숫자 줄) > 기술(흐르는 띠) > 운영 서비스(사이트 지킴이, 거래장부)
+//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 약속(큰 숫자 줄) > 운영 서비스(사이트 지킴이, 거래장부)
 //    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 자주 묻는 질문 > 프로젝트 문의(흰 신청서)
 //  - 색: 바탕 #0b0d12, 파랑 #256ef4, 하늘 #7aa7ff, 흰색, 포인트 노랑 #ffd84d
 // 비교용이던 한국형, 일본형, 미국형 첫 화면과 ?v= 장치는 지웠다. 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
 // 11-25 밤 사용자 결정: 샘플(카탈로그) 포트폴리오는 실적이 아니라 메인에서 내리고, 직접 만들어 운영하는 사이트 지킴이와 거래장부를 보여 준다.
+// 기술 이름을 늘어놓은 띠는 뺐다(사용자 "고객이 봐도 모르는 기술 스택").
 // 문의 버튼은 머리글과 첫 화면에 하나씩, 그리고 맨 아래 신청서뿐(칸마다 달던 문의하기는 "남발"이라 뺌).
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -54,8 +55,6 @@ const reasons = [
   { name: "업종별 법정 고지를 제작 전에 검토", body: "비급여 진료비, 교습비, 사업자 정보, 개인정보처리방침처럼 업종마다 지켜야 하는 표기를 먼저 반영합니다.", c: "#ffffff" },
   { name: "보안서약 후 재위탁 없이 직접 작업", body: "작업 전에 보안서약서를 작성하고 하도급 없이 직접 만듭니다. 결과물은 동의 없이 포트폴리오에 쓰지 않습니다.", c: "#7aa7ff" },
 ];
-
-const stack = ["Next.js", "React", "TypeScript", "Node.js", "PHP", "PostgreSQL", "MySQL", "Cloudflare", "AWS", "워드프레스", "그누보드", "아임웹", "카페24"];
 
 // 직접 기획하고 만들어 운영하는 서비스. 문구는 각 서비스 사이트의 소개 문장에서 가져온다
 const products = [
@@ -107,7 +106,6 @@ export function ClassicHome() {
         <Assemble>
           <Services />
           <Why />
-          <Stack />
           <Products />
           <Process />
           <Faq />
@@ -229,24 +227,6 @@ function Why() {
           ))}
         </ol>
       </div>
-    </section>
-  );
-}
-
-function Stack() {
-  return (
-    <section aria-labelledby="c-stack" className="overflow-hidden border-b border-white/10 py-8 md:py-11">
-      <h2 id="c-stack" className="sr-only">
-        다루는 기술과 플랫폼
-      </h2>
-      <ul className="gp-marquee flex w-max items-center" role="list">
-        {[...stack, ...stack].map((t, i) => (
-          <li key={i} aria-hidden={i >= stack.length} className={`flex items-center gap-8 whitespace-nowrap pr-8 text-[30px] font-[800] tracking-[-0.04em] md:gap-12 md:pr-12 md:text-[46px] ${i % 3 === 0 ? "text-[#7aa7ff]" : "text-white/30"}`}>
-            {t}
-            <i aria-hidden className={`h-2.5 w-2.5 rounded-full ${i % 4 === 1 ? "bg-[#ffd84d]" : "bg-[#256ef4]"}`} />
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
