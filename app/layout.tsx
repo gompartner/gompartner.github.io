@@ -72,8 +72,9 @@ export const metadata: Metadata = {
 // 11-26 사이트 색을 하나로: 메인과 안쪽 판이 어두운 화면이라 나머지 페이지(자주 묻는 질문, 공지, 웹 지식 문서)도 같은 어두운 색으로 본다.
 // 방법 셋을 견줬다. (a) 이미 있는 다크모드 색표(app/classic-dark.css)를 늘 켠다 (b) 페이지마다 색을 다시 쓴다 (c) 어두운 틀 안에 밝은 종이를 둔다.
 // (a)로 했다: 내 손이 닿지 않는 부품(검색 결과, 자료 미리보기, 차트)까지 한 번에 같은 색이 되고 11-22에 대비를 재 둔 색표다. 머리와 웹 지식 틀만 판 모양으로 다시 썼고,
-// 흰 바탕이어야 하는 것(상담 신청서)은 메인처럼 keep-light 흰 카드에 둔다((c)는 그 카드에만 썼다). 기기 설정과 gp-theme 저장값은 더 보지 않는다(밝은 화면은 없음).
+// 흰 바탕이어야 하는 것(상담 신청서)은 메인처럼 keep-light 흰 카드에 둔다((c)는 그 카드에만 썼다). 기기 설정은 보지 않는다(기본은 어두운 화면).
 const THEME_CLASS = "gp-dark";
+const themeScript = `try{if(localStorage.getItem('gp-theme')==='light'){var c=document.documentElement.classList;c.remove('gp-dark');c.add('gp-light')}}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -88,6 +89,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        {/* 11-26 화면 색 선택(사용자 "다크모드 화이트모드 선택도 필요"): 기본은 어두운 화면, 머리글에서 밝은 화면을 고르면 gp-theme에 기억한다.
+            그리기 전에 html의 gp-dark를 gp-light로 바꾼다. 밝은 화면 색은 app/classic-light.css, 바꾸는 버튼은 components/classic/ThemeSwitch.tsx */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}
         <script dangerouslySetInnerHTML={{ __html: lookRedirectScript }} />
         {/* 처음 들어온 곳(utm, 바깥 이전 페이지)을 기억해 상담 신청서에 함께 보낸다 */}
