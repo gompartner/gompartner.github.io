@@ -8,7 +8,8 @@ import { KakaoChatButton } from "@/components/layout/KakaoChat";
 // 모든 클래식 페이지 바닥글 위 상담 띠(11-01 보편 구성). 상담 신청과 카카오톡 상담. 상담 신청 페이지에서는 숨긴다.
 export function CtaBand() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/contact")) return null;
+  // 11-25 메인은 신청서가 바로 위에 있어 띠를 숨긴다
+  if (pathname?.startsWith("/contact") || pathname === "/") return null;
   return (
     <section aria-label="상담 신청" className="bg-[#256ef4] text-white">
       <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-6 px-4 py-12 md:flex-row md:items-center md:justify-between md:px-6 md:py-14">

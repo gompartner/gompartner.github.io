@@ -1,6 +1,7 @@
 import { NavLink } from "@/components/classic/NavLink";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
-import { OnepageFreePromo } from "@/components/classic/OnepageFreePromo";
+import { Suspense } from "react";
+import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 랜딩 수준 메인(사용자 "랜딩 수준으로 심플하게, 카탈로그, 웹 지식 별도 서비스로 분리"): 건별 수정 띠, 한 줄 소개와 상담 버튼, 파는 것과 시작 금액, 납품 기준, 원페이지 무료 제작 (마지막 상담 띠는 공통 바닥글 위에 이미 있다).
@@ -35,7 +36,7 @@ export function ClassicHome() {
       <Hero />
       <Products />
       <Promise />
-      <OnepageFreePromo />
+      <Apply />
     </div>
   );
 }
@@ -51,9 +52,9 @@ function Hero() {
             <span className="text-[#c9ced6]">아임웹, 카페24, 워드프레스, AI로 만든 사이트까지 금액을 먼저 안내합니다.</span>
           </p>
           <div className="flex shrink-0 gap-2">
-            <NavLink href="/contact?promo=fix" className="inline-flex min-h-[44px] items-center rounded-md bg-white px-4 text-[15px] font-bold text-[#15171c] hover:bg-[#e8ecf2]">
+            <a href="#apply" className="inline-flex min-h-[44px] items-center rounded-md bg-white px-4 text-[15px] font-bold text-[#15171c] hover:bg-[#e8ecf2]">
               수정 요청하기
-            </NavLink>
+            </a>
             <NavLink href="/maintenance/fix" className="inline-flex min-h-[44px] items-center rounded-md border border-[#5b6370] px-4 text-[15px] font-bold text-white hover:border-white">
               금액 보기
             </NavLink>
@@ -68,9 +69,9 @@ function Hero() {
           새로 만들 때도, 이미 있는 사이트를 고칠 때도 금액과 일정을 먼저 안내하고 시작합니다. 원본 소스와 인계 문서까지 드립니다.
         </p>
         <div className="mt-7 flex flex-wrap gap-2.5 md:mt-9">
-          <NavLink href="/contact" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[52px] items-center rounded-md bg-[#256ef4] px-6 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
+          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[52px] items-center rounded-md bg-[#256ef4] px-6 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
             상담 신청
-          </NavLink>
+          </a>
           <NavLink href="/works" data-gtm-cta="classic_hero_catalog" className="inline-flex min-h-[52px] items-center gap-1 rounded-md border-2 border-[#15171c] px-6 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
             카탈로그 보기 <ArrowUpRight size={19} aria-hidden />
           </NavLink>
@@ -144,6 +145,29 @@ function Promise() {
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+function Apply() {
+  return (
+    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 bg-[#f4f6fa]">
+      <div className={`${wrap} grid gap-8 py-14 md:grid-cols-[1fr_1.4fr] md:gap-12 md:py-24`}>
+        <div>
+          <h2 id="c-apply" className={h2c}>
+            상담 신청
+          </h2>
+          <p className="mt-3 break-keep text-[17px] leading-[1.6] text-[#3d4450]">
+            이름과 연락처, 어떤 일인지 한 줄만 남겨 주세요. 확인 후 금액과 일정을 먼저 안내합니다.
+          </p>
+        </div>
+        <div className="min-w-0 rounded-[10px] border border-[#e6e9ee] bg-white p-5 md:p-8">
+          {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
+          <Suspense fallback={null}>
+            <ContactForm />
+          </Suspense>
+        </div>
+      </div>
     </section>
   );
 }

@@ -267,7 +267,7 @@ export function ClassicHeader() {
             <ThemeToggle className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] lg:grid" />
             {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
-              href="/contact"
+              href={pathname === "/" ? "#apply" : "/contact"}
               data-gtm-cta="classic_header_contact"
               aria-current={pathname === "/contact" ? "page" : undefined}
               className={cn(
