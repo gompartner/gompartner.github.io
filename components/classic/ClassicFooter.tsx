@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
-import { Mail, Phone, Printer, MessageCircle } from "lucide-react";
+import { Mail, Phone, Printer } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
 
@@ -126,7 +126,7 @@ export function ClassicFooter() {
               네이버 블로그
             </a>
             <a href={KAKAO_CHANNEL_HOME} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
-              <MessageCircle size={16} strokeWidth={2} aria-hidden />
+              <ChannelIcon name="kakao" />
               카카오톡
             </a>
           </div>

@@ -23,7 +23,7 @@ const channels = [
 ] as const;
 
 // 클래식 바닥글(ClassicFooter)도 같은 아이콘을 쓴다
-export type ChannelIconName = "naverBlog" | "tistory" | "instagram" | "youtube" | "naverClip";
+export type ChannelIconName = "naverBlog" | "tistory" | "instagram" | "youtube" | "naverClip" | "kakao";
 
 export function ChannelIcon({ name }: { name: ChannelIconName }) {
   const box = "h-5 w-5 shrink-0";
@@ -33,6 +33,16 @@ export function ChannelIcon({ name }: { name: ChannelIconName }) {
         <svg viewBox="0 0 20 20" className={box} aria-hidden>
           <rect width="20" height="20" rx="5" fill="#03c75a" />
           <path d="M6.5 5v10h3.2c2 0 3.3-1.1 3.3-2.8 0-1.2-.7-2-1.7-2.3.8-.4 1.3-1.1 1.3-2 0-1.6-1.2-2.9-3.1-2.9H6.5Zm2 1.8h.9c.8 0 1.2.4 1.2 1.1s-.4 1.2-1.2 1.2h-.9V6.8Zm0 3.9h1.1c.9 0 1.4.5 1.4 1.2s-.5 1.3-1.4 1.3H8.5v-2.5Z" fill="#fff" />
+        </svg>
+      );
+    case "kakao":
+      // 11-25 카카오톡 채널: 다른 채널 아이콘과 같은 둥근 네모에 카카오 노랑(#FEE500)과 검은 말풍선(KakaoChat의 심볼과 같은 모양)
+      return (
+        <svg viewBox="0 0 20 20" className={box} aria-hidden>
+          <rect width="20" height="20" rx="5" fill="#FEE500" />
+          <g transform="translate(3.6 4) scale(0.533)">
+            <path transform="translate(0 -1.9)" fill="#191919" d="M12 3.375c-5.3848 0-9.75 3.4418-9.75 7.6875 0 2.7449 1.8249 5.1535 4.5701 6.5135-.1494.515-.9598 3.3135-.992 3.5333 0 0-.0194.1652.0876.2282s.2328.0141.2328.0141c.3068-.0428 3.5572-2.326 4.1198-2.7225.562.0796 1.1407.1209 1.7317.1209 5.3848 0 9.75-3.4418 9.75-7.6875S17.3848 3.375 12 3.375z" />
+          </g>
         </svg>
       );
     case "tistory":
