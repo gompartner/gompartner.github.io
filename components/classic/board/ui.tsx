@@ -15,9 +15,7 @@ export const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 //  - 부품(.bd-in): 그 자리에서 선이 그어지고 면이 차오른다(assembleCss). 날아오거나 끌려오지 않는다
 //  - 새로고침 전까지 판마다 한 번만(BoardGate가 data-built를 붙인다). 움직임 줄이기 설정이면 처음부터 완성된 화면
 const css = `${assembleCss}${longShotCss}
-/* 팝업(크게 보기, 필터)이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다(11-26 사용자 "뒤쪽이 스크롤되는 버그"). 스크롤 막대 자리는 남겨 화면이 옆으로 밀리지 않게 */
-html { scrollbar-gutter: stable; }
-html:has(dialog[open]) { overflow: hidden; }
+/* 팝업(크게 보기, 필터)이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다(11-26 사용자 "뒤쪽이 스크롤되는 버그"). 잠그는 규칙과 화면이 밀리지 않게 하는 보정은 머리글(ClassicHeader)에 있다 */
 dialog, dialog * { overscroll-behavior: contain; }
 @keyframes bd-ray { 0% { opacity: 1; stroke-dashoffset: 1; } 34% { opacity: 1; stroke-dashoffset: 0; } 78% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
 @keyframes bd-shard { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)); filter: brightness(2.6); } 55% { opacity: 1; transform: none; filter: brightness(2.2); } 100% { opacity: 1; transform: none; filter: brightness(1); } }

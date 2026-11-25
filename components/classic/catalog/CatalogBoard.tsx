@@ -219,27 +219,28 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
         {open && (
           // 제목과 닫기는 위에 붙여 두고 그림만 스크롤한다(11-26 사용자 "제목이 고정이 아니라서 모바일에서 닫기 불편")
           <div className="flex max-h-[calc(100dvh-24px)] flex-col">
-            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/12 px-5 py-4 md:px-8 md:py-5">
-              <div>
-                <p className="text-[14px] font-bold text-[#7aa7ff]">{open.cat}</p>
-                <h2 id="ct-dlg-title" className="mt-1 break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[28px]">
+            {/* 휴대폰을 가로로 눕힌 낮은 화면(높이 520 아래)에서는 제목, 화면 종류, 닫기를 한 줄에 둔다. 두 줄이면 그림 볼 자리가 절반도 안 남는다 */}
+            <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 border-b border-white/12 [@media(max-height:520px)]:grid-cols-[minmax(0,1fr)_auto_auto] [@media(max-height:520px)]:items-center">
+              <div className="order-1 px-5 py-4 md:px-8 md:py-5 [@media(max-height:520px)]:flex [@media(max-height:520px)]:items-baseline [@media(max-height:520px)]:gap-2 [@media(max-height:520px)]:py-1.5 [@media(max-height:520px)]:pl-4 [@media(max-height:520px)]:pr-0">
+                <p className="shrink-0 text-[14px] font-bold text-[#7aa7ff]">{open.cat}</p>
+                <h2 id="ct-dlg-title" className="mt-1 break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[28px] [@media(max-height:520px)]:mt-0 [@media(max-height:520px)]:truncate [@media(max-height:520px)]:text-[18px]">
                   {open.title}
                 </h2>
               </div>
-              <button type="button" onClick={() => setOpen(null)} aria-label="닫기" className="-mr-2 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-white hover:bg-white/10">
+              <button type="button" onClick={() => setOpen(null)} aria-label="닫기" className="order-2 mr-3 mt-3 grid h-11 w-11 shrink-0 place-items-center rounded-full text-white hover:bg-white/10 md:mr-6 md:mt-4 [@media(max-height:520px)]:order-3 [@media(max-height:520px)]:mr-2 [@media(max-height:520px)]:mt-0">
                 <X size={22} aria-hidden />
               </button>
+              {open.side && (
+                <div className="order-3 col-span-2 flex gap-2 border-t border-white/12 px-5 py-3 md:px-8 [@media(max-height:520px)]:order-2 [@media(max-height:520px)]:col-span-1 [@media(max-height:520px)]:border-t-0 [@media(max-height:520px)]:p-0" role="tablist" aria-label="화면 종류">
+                  {([["main", open.main.frame === "browser" ? "PC" : "전체"], ["side", open.side.frame === "screen" ? "키오스크" : "모바일"]] as const).map(([k, label]) => (
+                    <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={`min-h-11 rounded-full px-5 text-[15px] font-bold transition-colors [@media(max-height:520px)]:px-4 ${view === k ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white hover:border-white"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            {open.side && (
-              <div className="flex shrink-0 gap-2 border-b border-white/12 px-5 py-3 md:px-8" role="tablist" aria-label="화면 종류">
-                {([["main", open.main.frame === "browser" ? "PC" : "전체"], ["side", open.side.frame === "screen" ? "키오스크" : "모바일"]] as const).map(([k, label]) => (
-                  <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={`min-h-11 rounded-full px-5 text-[15px] font-bold transition-colors ${view === k ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white hover:border-white"}`}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div key={view} className="min-h-0 overflow-y-auto p-5 md:p-8">
+            <div key={view} className="min-h-0 overflow-y-auto p-5 md:p-8 [@media(max-height:520px)]:p-3">
             {view === "side" && open.side ? (
               <span className="mx-auto block w-full max-w-[420px]">
                 <Frame shot={open.side} sizes="(min-width: 768px) 420px, 94vw" full />

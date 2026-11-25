@@ -36,8 +36,8 @@ const MORE = [
 ];
 
 const css = `
-/* 메뉴가 열려 있는 동안 뒤 페이지는 스크롤되지 않는다 */
-html:has(dialog[open]) { overflow: hidden; }
+/* 메뉴와 팝업이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다. 스크롤 막대가 사라진 폭(--sbw)만큼 오른쪽을 채워 화면이 옆으로 밀리지 않게 한다 */
+html:has(dialog[open]) { overflow: hidden; padding-right: var(--sbw, 0px); }
 /* 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로) */
 dialog:focus, dialog:focus-visible { outline: none; }
 .gp-menu { opacity: 0; transition: opacity .18s ease, overlay .18s allow-discrete, display .18s allow-discrete; }
@@ -65,6 +65,19 @@ export function ClassicHeader() {
     on();
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
+  }, []);
+
+  // 스크롤 막대 폭을 재 둔다(PC에서 팝업을 열 때 막대가 사라지며 화면이 6px쯤 흔들리던 것을 막는다). 팝업이 열려 있을 때는 재지 않는다
+  useEffect(() => {
+    const root = document.documentElement;
+    const measure = () => {
+      if (document.querySelector("dialog[open]")) return;
+      root.style.setProperty("--sbw", `${Math.max(0, window.innerWidth - root.clientWidth)}px`);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    return () => ro.disconnect();
   }, []);
 
   useEffect(() => {
