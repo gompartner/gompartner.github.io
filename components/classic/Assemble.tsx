@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { asm } from "@/components/classic/assembleState";
 
 // 11-25 조립형 메인(?v=build)의 스크롤 조립. 첫 화면 아래 칸의 [data-part] 요소가 화면에 들어올 때
-// 화면 밖에서 비스듬히 날아와 맞물린다(테두리가 한 번 빛나고, 그 칸이 살짝 쿵). 다른 시안과 움직임 줄이기에서는 그대로 보인다.
+// 제자리에서 살짝 떠오르며 나타나고 테두리가 한 번 빛난다(11-25 날아오는 연출은 첫 화면만). 다른 시안과 움직임 줄이기에서는 그대로 보인다.
 
 const css = `
 
@@ -40,22 +40,17 @@ const css = `
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="text-[#5b6370]"], [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="text-[#3d4450]"] { color: #5b6370 !important; }
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="border-[#d9dee5]"], [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="border-[#e6e9ee]"] { border-color: #d9dee5 !important; }
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="bg-[#f6f7f9]"] { background-color: #f6f7f9 !important; }
-@keyframes gp-dock2 {
-  0% { opacity: 0; transform: perspective(1000px) translate3d(var(--dx), var(--dy), 0) rotateY(var(--ry)) rotate(var(--rot)) scale(0.85); }
-  60% { opacity: 1; }
-  82% { transform: perspective(1000px) translate3d(calc(var(--dx) * -0.015), calc(var(--dy) * -0.015), 0) scale(1.012); }
-  100% { opacity: 1; transform: none; }
+/* 11-25 "계속 날아다녀": 아래 칸은 날아오지 않고 제자리에서 살짝 떠오르며 나타난다(합체 연출은 첫 화면만) */
+@keyframes gp-dock2 { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 }
 @keyframes gp-glow { 0%, 100% { outline-color: rgba(122, 167, 255, 0); } 35% { outline-color: rgba(122, 167, 255, 0.95); } }
-@keyframes gp-clunk2 { 0%, 100% { transform: none; } 35% { transform: translateY(3px); } 65% { transform: translateY(-1px); } }
 [data-asm], [data-asm-built] { overflow-x: clip; }
 [data-asm] [data-part]:not([data-go]) { opacity: 0; }
 [data-asm] [data-part][data-go] {
   outline: 1.5px solid transparent; outline-offset: 5px;
-  animation: gp-dock2 0.55s cubic-bezier(0.16, 0.84, 0.3, 1) both, gp-glow 0.5s ease-out none;
-  animation-delay: var(--delay), calc(var(--delay) + 0.44s);
+  animation: gp-dock2 0.4s ease-out both, gp-glow 0.6s ease-out none;
+  animation-delay: var(--delay), calc(var(--delay) + 0.25s);
 }
-[data-asm] [data-clunk] { animation: gp-clunk2 0.3s ease-out both; }
 /* 이미 조립한 부품이 다시 보일 때: 테두리 반짝과 광택만 */
 @keyframes gp-sheen { from { background-position: 160% 0; } to { background-position: -60% 0; } }
 [data-asm] [data-part][data-go][data-shine], [data-asm-built] [data-part][data-shine] {
@@ -66,7 +61,7 @@ const css = `
 }
 @media (prefers-reduced-motion: reduce) {
   [data-asm] [data-part]:not([data-go]) { opacity: 1; }
-  [data-asm] [data-part][data-go], [data-asm] [data-clunk], [data-shine] { animation: none !important; }
+  [data-asm] [data-part][data-go], [data-shine] { animation: none !important; }
 }
 `;
 
@@ -91,18 +86,6 @@ export function Assemble({ children }: { children: ReactNode }) {
     if (!on || !root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     asm.sections = true;
     const parts = [...root.querySelectorAll<HTMLElement>("[data-part]")];
-    if (!built) {
-      // 부품마다 날아올 방향을 정한다(왼쪽, 오른쪽, 아래를 번갈아)
-      parts.forEach((el, i) => {
-        const side = i % 3;
-        const dx = side === 0 ? -700 : side === 1 ? 700 : (i % 2 ? 240 : -240);
-        const dy = side === 2 ? 420 : 120 + (i % 4) * 40;
-        el.style.setProperty("--dx", `${dx}px`);
-        el.style.setProperty("--dy", `${dy}px`);
-        el.style.setProperty("--ry", `${dx > 0 ? 55 : -55}deg`);
-        el.style.setProperty("--rot", `${(i % 2 ? 1 : -1) * (8 + (i % 5) * 4)}deg`);
-      });
-    }
     const timers: number[] = [];
     const shine = (el: HTMLElement, delay: number) => {
       timers.push(window.setTimeout(() => {
@@ -117,16 +100,9 @@ export function Assemble({ children }: { children: ReactNode }) {
         const fresh = hits.filter((el) => !built && !("go" in el.dataset));
         // 처음 보는 부품은 조립
         fresh.forEach((el, k) => {
-          el.style.setProperty("--delay", `${k * 0.06}s`);
+          el.style.setProperty("--delay", `${k * 0.05}s`);
           el.dataset.go = "";
         });
-        const sec = fresh[0]?.closest("section");
-        if (sec) {
-          timers.push(window.setTimeout(() => {
-            sec.dataset.clunk = "";
-            timers.push(window.setTimeout(() => delete sec.dataset.clunk, 320));
-          }, (fresh.length - 1) * 60 + 460));
-        }
         // 이미 조립한 부품이 다시 들어오면 반짝과 광택만
         hits.filter((el) => !fresh.includes(el) && seen.has(el)).forEach((el, k) => shine(el, k * 80));
         hits.forEach((el) => seen.add(el));
@@ -136,7 +112,7 @@ export function Assemble({ children }: { children: ReactNode }) {
           shine(el, k * 80);
         });
       },
-      { rootMargin: "0px 0px -12% 0px" },
+      { rootMargin: "0px 0px -4% 0px" },
     );
     parts.forEach((el) => io.observe(el));
     return () => {
