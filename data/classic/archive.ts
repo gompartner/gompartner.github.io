@@ -352,7 +352,7 @@ function rawTopics(): Topic[] {
     { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
       { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
       { title: "디자인 용어", items: ["g33", "g34", "g35", "g36"].map(term) },
-      { title: "화면과 시안", items: [{ label: "화면 예시", href: "/knowledge/screens" }, { label: "시안 작업", href: "/knowledge/drafts" }] },
+      { title: "화면", items: [{ label: "화면 예시", href: "/knowledge/screens" }] },
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
     ] },
     { id: "dev", label: "개발", desc: "만드는 도구(CMS), 서버 언어와 버전, 브라우저 호환, 화면 기술(플래시, jQuery), 페이지 무게, 앱, AI로 만든 서비스", groups: [
@@ -428,7 +428,6 @@ export const manualLog: { date: string; kind: string; title: string; href: strin
   { date: "2026-11-21", kind: "디자인", title: "화면 크기: 1024에서 1920으로", href: "/knowledge/screen-size" },
   { date: "2026-11-21", kind: "개발", title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유", href: "/knowledge/browser" },
   { date: "2026-11-21", kind: "개발", title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress", href: "/knowledge/cms" },
-  { date: "2026-11-21", kind: "디자인", title: "시안 작업: 업종 7곳, 시안 두 장씩", href: "/knowledge/drafts" },
   { date: "2026-11-21", kind: "디자인", title: "화면 예시: 페이지 종류별 와이어프레임", href: "/knowledge/screens" },
   { date: "2026-11-21", kind: "참고", title: "데이터 차트와 원본 CSV", href: "/knowledge/data" },
 ];

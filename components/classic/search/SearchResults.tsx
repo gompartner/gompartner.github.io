@@ -22,7 +22,7 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
           {g.k === "포트폴리오" ? (
             <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4" role="list">
               {g.list.map((i) => (
-                <li key={i.href} className="min-w-0">
+                <li key={`${i.href}-${i.title}`} className="min-w-0">
                   <Link href={i.href} className="group block">
                     <span className="block overflow-hidden rounded-md border border-[#e1e5eb] bg-white">
                       {i.thumb ? <Image src={i.thumb} alt={`${i.title} 화면`} width={720} height={450} sizes="(min-width: 1024px) 290px, 45vw" className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" /> : null}

@@ -62,7 +62,6 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 
 ${topics().map((t) => `- [${plain(t.label)}](${url(`/knowledge/${t.id}`)}): ${plain(t.desc)}`).join("\n")}
 - [화면 예시](${url("/knowledge/screens")}): 페이지 종류별 와이어프레임
-- [시안 작업](${url("/knowledge/drafts")}): 업종별 시안 두 장 비교
 - [운영 노트](${url("/knowledge/notes")}): 실제 사례와 점검 글 목록
 
 웹 지식 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
