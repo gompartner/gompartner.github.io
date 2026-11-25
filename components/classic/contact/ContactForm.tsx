@@ -35,7 +35,8 @@ const label = "block text-[16px] font-bold";
 const opt = "font-normal text-[#5b6370]";
 const err = "mt-1.5 text-[15px] text-[#d63d4a]";
 
-export function ContactForm() {
+/** compact: 메인 랜딩 첫 화면용(11-25). 이메일과 마케팅 동의 칸을 빼고 이름, 휴대폰, 주소, 문의 내용만 받는다 */
+export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -215,7 +216,7 @@ export function ContactForm() {
           aria-required="true"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          rows={4}
+          rows={compact ? 3 : 4}
           placeholder="맡기고 싶은 일"
           className={`${field} h-auto py-3 leading-[1.6]`}
           aria-invalid={!!errors.message}
@@ -224,6 +225,7 @@ export function ContactForm() {
         {errors.message && <p id="cc-message-err" className={err}>{errors.message}</p>}
       </div>
 
+      {!compact && (
       <div>
         <label htmlFor="cc-email" className={label}>
           회사소개서 받을 이메일 <span className={opt}>(선택)</span>
@@ -231,6 +233,7 @@ export function ContactForm() {
         <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
         {errors.email && <p id="cc-email-err" className={err}>{errors.email}</p>}
       </div>
+      )}
 
       {/* 사람 눈에는 보이지 않는 칸. 채워져 있으면 자동 입력으로 보고 버린다. */}
       <div aria-hidden className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
@@ -268,6 +271,8 @@ export function ContactForm() {
         </details>
         {errors.agree && <p id="cc-agree-err" className={err}>{errors.agree}</p>}
 
+        {!compact && (
+        <>
         <div className="mt-6 flex items-start gap-3">
           <input id="cc-marketing" type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" />
           <label htmlFor="cc-marketing" className="text-[16px] font-bold leading-[1.6]">
@@ -286,6 +291,8 @@ export function ContactForm() {
             <li>안내 메일 아래의 수신 거부 링크를 누르면 바로 철회됩니다. 동의하지 않아도 상담 신청은 할 수 있습니다.</li>
           </ul>
         </details>
+        </>
+        )}
       </div>
 
       {status.kind === "error" && (

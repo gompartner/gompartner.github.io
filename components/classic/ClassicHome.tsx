@@ -78,12 +78,14 @@ function Hero() {
               </li>
             ))}
           </ul>
+          <p className="mt-7 text-[14px] leading-[1.6] text-[#5b6370]">사업자등록번호 725-40-01614, 곰파트너(개인 일반과세)</p>
         </div>
         <div id="apply" className="min-w-0 scroll-mt-20 rounded-[10px] border border-[#e6e9ee] bg-white p-5 shadow-[0_8px_24px_rgba(21,23,28,.06)] md:p-7">
           <h2 className="text-[21px] font-[800] tracking-[-0.03em]">상담 신청</h2>
+          <p className="mt-1 text-[15px] text-[#5b6370]">1분이면 됩니다. 신청 후 금액을 먼저 안내합니다.</p>
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
-            <ContactForm />
+            <ContactForm compact />
           </Suspense>
         </div>
       </div>
