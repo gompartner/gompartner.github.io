@@ -1,10 +1,12 @@
-import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { NavLink } from "@/components/classic/NavLink";
+import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Suspense } from "react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 랜딩페이지(사용자 "랜딩페이지로 구성"). 한 페이지 안에서 신청까지 끝낸다.
-// 순서: 첫 화면(제목, 약속 3가지, 신청서) > 맡기는 일과 금액 > 진행 순서 > 자주 묻는 질문 > 마지막 신청 버튼.
+// 순서: 첫 화면(방문자 문제로 시작하는 제목, 약속 3가지, 신청서) > 맡기는 일과 금액 > 만든 화면 4장(카탈로그 샘플) > 진행 순서 > 자주 묻는 질문 > 마지막 신청 버튼.
 // 머리글은 로고와 상담 신청만(ClassicHeader의 landing). 서비스 상세, 카탈로그, 웹 지식은 바닥글 링크로 남는다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -17,6 +19,14 @@ const jobs = [
   { name: "오류 해결", body: "화면 깨짐, 신청서 미접수, 결제 오류, 접속 장애의 원인 확인과 수정", price: "원인 확인 후 견적" },
   { name: "새 홈페이지 제작", body: "병원, 매장, 학원, 기업 홈페이지. 반응형, 상담 신청서 포함", price: `${manwon(plans[0].price)}부터` },
   { name: "AI로 만든 사이트 마무리", body: "직접 만든 사이트의 서버 이전, 결제 연동, 오류 수정, 오픈 준비", price: "범위 확인 후 견적" },
+];
+
+// 카탈로그 샘플(실제로 만든 화면). 누르면 그 샘플로 간다
+const works = [
+  { href: "/sample/dental-homepage", img: "/images/demos/dental-homepage.jpg", kind: "홈페이지", name: "치과 홈페이지" },
+  { href: "/sample/bakery-cafe", img: "/images/demos/bakery-cafe.jpg", kind: "홈페이지", name: "베이커리 홈페이지" },
+  { href: "/sample/landing-move-clean", img: "/images/demos/landing-move-clean.jpg", kind: "랜딩페이지", name: "입주 청소 상담 신청" },
+  { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약 앱" },
 ];
 
 const steps = [
@@ -38,6 +48,7 @@ export function ClassicHome() {
     <div className="bg-white text-[#15171c]">
       <Hero />
       <Jobs />
+      <Works />
       <Steps />
       <Faq />
       <Closing />
@@ -52,12 +63,12 @@ function Hero() {
         <div className="lg:pt-6">
           <p className="text-[16px] font-bold text-[#256ef4] md:text-[18px]">홈페이지 제작과 유지보수, 곰파트너</p>
           <h1 id="c-hero" className="mt-3 break-keep text-[34px] font-[800] leading-[1.2] tracking-[-0.05em] md:text-[52px]">
-            홈페이지 수정
+            고칠 곳이 보이는데
             <br />
-            1건 10,000원부터
+            맡길 곳이 없을 때
           </h1>
           <p className="mt-4 max-w-[560px] break-keep text-[17px] leading-[1.65] text-[#3d4450] md:text-[19px]">
-            고칠 것을 한 줄만 남겨 주세요. 사이트를 확인하고 금액과 일정을 먼저 안내합니다. 새 홈페이지 제작도 같은 신청서로 받습니다.
+            <b className="text-[#15171c]">수정 1건 10,000원부터.</b> 고칠 것을 한 줄만 남겨 주세요. 사이트를 확인하고 금액과 일정을 먼저 안내합니다. 새 홈페이지 제작도 같은 신청서로 받습니다.
           </p>
           <ul className="mt-7 space-y-3" role="list">
             {promises.map((p) => (
@@ -96,6 +107,34 @@ function Jobs() {
         ))}
       </ul>
       <p className="mt-4 text-[15px] text-[#5b6370]">금액은 부가세 별도입니다.</p>
+    </section>
+  );
+}
+
+function Works() {
+  return (
+    <section aria-labelledby="c-works" className={`${wrap} pb-14 md:pb-24`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="c-works" className={h2c}>
+          만든 화면
+        </h2>
+        <NavLink href="/works" className="flex min-h-11 items-center gap-1 text-[16px] font-bold text-[#5b6370] hover:text-[#256ef4]">
+          카탈로그 전체 <ArrowUpRight size={18} aria-hidden />
+        </NavLink>
+      </div>
+      <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 md:mt-10 md:grid-cols-4 md:gap-x-5" role="list">
+        {works.map((w) => (
+          <li key={w.href}>
+            <NavLink href={w.href} className="group block">
+              <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] border border-[#e6e9ee] bg-[#f4f6fa]">
+                <Image src={w.img} alt={`${w.name} 화면`} fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
+              </span>
+              <span className="mt-2.5 block text-[13px] font-bold text-[#256ef4] md:text-[14px]">{w.kind}</span>
+              <span className="block break-keep text-[16px] font-[800] tracking-[-0.03em] md:text-[18px]">{w.name}</span>
+            </NavLink>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
