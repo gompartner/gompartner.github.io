@@ -232,6 +232,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "a", label: "시안 A 미니멀" },
     { id: "b", label: "시안 B 파스텔" },
     { id: "2026", label: "시안 C 2026 터치 인터랙션" },
+    { id: "2027", label: "시안 D 2027 리퀴드 글래스" },
   ],
 };
 
