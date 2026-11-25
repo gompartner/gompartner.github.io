@@ -3,11 +3,9 @@ import { ArrowUpRight, Check } from "lucide-react";
 import { DeliverBlock } from "@/components/classic/DeliverBlock";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { Hero3D } from "@/components/classic/Hero3D";
-import { OtherServices } from "@/components/classic/OtherServices";
 import { PlanTable } from "@/components/classic/pricing/PlanTable";
 import { StepList } from "@/components/classic/pricing/StepList";
-import { serviceTabs } from "@/components/classic/pricing/tabs";
-import { SubTabs, h2, h3, wrap } from "@/components/classic/ui";
+import { h2, h3, wrap } from "@/components/classic/ui";
 import { LdScript } from "@/components/seo/JsonLd";
 import { replyTerm } from "@/data/classic/maintenance";
 import {
@@ -45,8 +43,7 @@ const td = "px-4 py-4 align-top text-[16px] leading-[1.6] md:px-6";
 export default function Page() {
   return (
     <>
-      <LdScript data={[serviceLd(s.title, s.metaDescription, path), breadcrumbLd([{ name: "제작", path: "/homepage" }, { name: s.title, path }])]} />
-      <SubTabs items={serviceTabs} current={path} />
+      <LdScript data={[serviceLd(s.title, s.metaDescription, path), breadcrumbLd([{ name: "제작", path: "/make" }, { name: s.title, path }])]} />
       <Hero3D title={s.heroTitle} />
 
       <section aria-labelledby="t3d-lead" className={`${wrap} py-12 md:py-16`}>
@@ -234,7 +231,6 @@ export default function Page() {
 
       <FaqBlock items={threeFaq} id="t3d-faq" />
 
-      <OtherServices current={path} />
     </>
   );
 }

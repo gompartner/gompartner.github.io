@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const pages = [
   { href: "/", label: "첫 화면" },
-  { href: "/homepage", label: "홈페이지 제작" },
+  { href: "/make", label: "제작" },
   { href: "/maintenance", label: "유지보수" },
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/contact", label: "상담 신청" },

@@ -4,7 +4,6 @@ import { execFileSync } from "node:child_process";
 import type { MetadataRoute } from "next";
 import { notices } from "@/data/classic/notices";
 import { insights } from "@/data/classic/insights";
-import { maintenanceServices } from "@/data/classic/maintenance";
 import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -40,18 +39,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const maintenanceData = "data/classic/maintenance.ts";
   const entries: Entry[] = [
     { path: "/", priority: 1.0, files: ["app/(home)/page.tsx", "components/classic/ClassicHome.tsx", "data/seo.ts"] },
+    // 11-26 안쪽 한 판: 제작, 유지보수, 비용, 카탈로그
+    { path: "/make", priority: 0.9, files: ["app/(classic)/make/page.tsx", "components/classic/make/MakeBoard.tsx", "data/classic/pricing.ts"] },
+    { path: "/works", priority: 0.7, files: ["app/(classic)/works/page.tsx", "components/classic/catalog/CatalogBoard.tsx"] },
 
-    { path: "/homepage", priority: 0.9, files: ["app/(classic)/homepage/page.tsx"] },
-    { path: "/landing-page", priority: 0.8, files: ["app/(classic)/landing/page.tsx", "data/classic/pricing.ts"] },
-    { path: "/program", priority: 0.8, files: ["app/(classic)/program/page.tsx"] },
-    { path: "/app", priority: 0.8, files: ["app/(classic)/app/page.tsx", "data/classic/makeExtra.ts"] },
-    { path: "/kiosk", priority: 0.8, files: ["app/(classic)/kiosk/page.tsx", "data/classic/makeExtra.ts"] },
     // 11-03 3D 웹 제작. 본문은 사이트 페이지, 섬 화면과 데모 6종은 public/3d 정적 페이지(원본 모션-카탈로그)
     { path: "/3d", priority: 0.8, files: ["app/(classic)/3d/page.tsx", "data/classic/three.ts"] },
     ...["sofa", "configurator", "space", "door", "sign", "hanok"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
-    ...maintenanceServices.map((m) => ({ path: `/maintenance/${m.id}`, priority: 0.9, files: ["app/(classic)/maintenance/[id]/page.tsx", maintenanceData] })),
-    { path: "/maintenance/standard", priority: 0.6, files: ["app/(classic)/maintenance/standard/page.tsx"] },
 
     { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
@@ -63,7 +58,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...insights.map((n) => ({ path: `/insight/${n.slug}`, priority: 0.6, date: new Date(`${n.updated ?? n.date}T00:00:00+09:00`) })),
     // 11-21 아카이브(문서 사이트형). /jaryo 첫 화면은 /archive/checklists 로 넘긴다
     { path: "/knowledge", priority: 0.7, files: ["app/(classic)/knowledge/page.tsx", "data/classic/archive.ts"] },
-    ...["terms", "screens", "drafts", "data", "notes", "checklists"].map((s) => ({ path: `/knowledge/${s}`, priority: 0.6, files: [`app/(classic)/knowledge/${s}/page.tsx`, "data/classic/archive.ts"] })),
+    ...["terms", "screens", "data", "notes", "checklists"].map((s) => ({ path: `/knowledge/${s}`, priority: 0.6, files: [`app/(classic)/knowledge/${s}/page.tsx`, "data/classic/archive.ts"] })),
     ...topics().map((t) => ({ path: `/knowledge/${t.id}`, priority: 0.6, files: ["data/classic/archive.ts"] })),
     ...trendDocs.map((d) => ({ path: d.href, priority: 0.6, files: [`app/(classic)${d.href}/page.tsx`, "data/classic/trendData.ts"] })),
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/knowledge/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),

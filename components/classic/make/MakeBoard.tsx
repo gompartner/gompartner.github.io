@@ -88,9 +88,11 @@ export function MakeBoard() {
                     </p>
                     <h2 className="mt-2 break-keep text-[26px] font-[800] leading-[1.25] tracking-[-0.045em] md:text-[36px]">{k.line}</h2>
                   </div>
-                  <Link href={k.href} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-white/25 px-4 text-[15px] font-bold text-white hover:border-white">
-                    자세한 구성 <ArrowUpRight size={16} aria-hidden />
-                  </Link>
+                  {k.id === "3d" && (
+                    <Link href={k.href} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-white/25 px-4 text-[15px] font-bold text-white hover:border-white">
+                      자세한 구성 <ArrowUpRight size={16} aria-hidden />
+                    </Link>
+                  )}
                 </div>
                 <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2" role="list">
                   {k.who.map((w) => (

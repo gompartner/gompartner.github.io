@@ -11,27 +11,17 @@ import { profile } from "@/data/classic/profile";
 const KAKAO_CHANNEL_HOME = "https://pf.kakao.com/_JxntWX";
 
 const groups = [
+  // 11-26 안쪽을 판 네 개로 다시 만들면서 링크도 판 기준으로 정리
   {
-    title: "유지보수",
+    title: "서비스",
     items: [
-      { href: "/maintenance/fix", label: "유지보수" },
-      { href: "/maintenance/monthly", label: "유지관리" },
-      { href: "/maintenance/perf", label: "성능 개선" },
-      { href: "/maintenance/ai-site", label: "고도화" },
+      { href: "/make", label: "제작" },
+      { href: "/maintenance", label: "유지보수" },
+      { href: "/pricing", label: "비용" },
+      { href: "/works", label: "카탈로그" },
+      { href: "/3d", label: "3D 웹" },
     ],
   },
-  {
-    title: "제작",
-    items: [
-      { href: "/homepage", label: "홈페이지 제작" },
-      { href: "/landing-page", label: "랜딩페이지 제작" },
-      { href: "/program", label: "업무 프로그램 제작" },
-      { href: "/app", label: "앱 제작" },
-      { href: "/kiosk", label: "키오스크 화면 제작" },
-      { href: "/3d", label: "3D 웹 제작" },
-    ],
-  },
-  // 11-25 별도 서비스(머리글 오른쪽과 같게)
   {
     title: "운영 서비스",
     items: [
@@ -42,12 +32,11 @@ const groups = [
   {
     title: "곰파트너",
     items: [
-      { href: "/pricing", label: "비용" },
       { href: "/story", label: "회사소개" },
       { href: "/history", label: "연혁" },
       { href: "/notice", label: "공지사항" },
       { href: "/faq", label: "자주 묻는 질문" },
-      { href: "/contact", label: "상담 신청" },
+      { href: "/knowledge", label: "웹 지식" },
     ],
   },
 ];
@@ -67,7 +56,7 @@ const contactIcon = "shrink-0 text-[#7d8594]";
 export function ClassicFooter() {
   return (
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
-      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
         <div className="col-span-2 md:col-span-3 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />

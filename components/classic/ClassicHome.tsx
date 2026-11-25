@@ -39,9 +39,9 @@ html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none;
 
 type Tone = "blue" | "white" | "yellow" | "line";
 const services: { no: string; name: string; body: string; price: string; href: string; tone: Tone; span: string }[] = [
-  { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/homepage", tone: "blue", span: "md:col-span-4" },
-  { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/program", tone: "white", span: "md:col-span-2" },
-  { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지. 예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터`, href: "/app", tone: "yellow", span: "md:col-span-2" },
+  { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
+  { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
+  { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지. 예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
   { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {

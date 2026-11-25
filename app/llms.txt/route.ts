@@ -37,20 +37,20 @@ ${maintenanceServices.map((s) => `- [${plain(s.h1)}](${url(`/maintenance/${s.id}
 
 ## 홈페이지 제작
 
-${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페이지를 만듭니다. 자세히: [홈페이지 제작](${url("/homepage")})
+${plain(industries.map((i) => i.label).join(", "))} 업종의 반응형 홈페이지를 만듭니다. 자세히: [홈페이지 제작](${url("/make")})
 
 ${plans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
 - 모든 구성 공통: ${plain(planCommon.join(", "))}. 도메인과 호스팅은 고객 명의로 계약합니다.
 
 ## 랜딩페이지 제작
 
-광고로 들어온 고객의 상담, 예약 신청을 받는 홍보용 페이지를 만듭니다. 신청이 들어오면 담당자 메일과 구글 시트에 바로 기록됩니다. 자세히: [랜딩페이지 제작](${url("/landing-page")})
+광고로 들어온 고객의 상담, 예약 신청을 받는 홍보용 페이지를 만듭니다. 신청이 들어오면 담당자 메일과 구글 시트에 바로 기록됩니다. 자세히: [랜딩페이지 제작](${url("/make")})
 
 ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.includes.join(", "))}.`).join("\n")}
 
 ## 업무 프로그램 제작
 
-엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/program")})
+엑셀로 하던 주문 취합, 관리자 화면, 결과지 출력 같은 반복 업무를 웹 프로그램으로 만듭니다. 자세히: [업무 프로그램 제작](${url("/make")})
 
 금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
 
