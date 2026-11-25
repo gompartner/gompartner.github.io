@@ -10,7 +10,7 @@ import { designDocs, shortTitle, takeover, techDocs, termHref } from "@/data/cla
 import { datasets } from "@/data/classic/trendData";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "카탈로그" | "위키" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "바로가기" | "서비스" | "카탈로그" | "위키" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -45,7 +45,8 @@ export function buildSearchIndex(): SearchItem[] {
     kind: "카탈로그",
     title: plain(p.title),
     desc: plain(p.features.join(", ")),
-    href: "/works",
+    // 카탈로그 한 판에서 그 화면을 바로 크게 연다(CatalogBoard가 #id를 읽는다)
+    href: `/works#${p.id}`,
     hay: [p.category, p.layout, industryOf(p)?.label ?? "", plain(p.description)].join(" "),
     thumb: thumbOf(p),
   }));
@@ -75,7 +76,23 @@ export function buildSearchIndex(): SearchItem[] {
     ...termGroups.map((g) => ({ kind: "위키" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
     ...datasets.map((d) => ({ kind: "위키" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
   ];
-  return [...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
+  // 11-26 페이지 이름으로 찾을 수 있게(검수: "비용", "회사소개", "거래장부"로 검색하면 그 페이지가 안 나왔다)
+  const pages: SearchItem[] = [
+    { kind: "바로가기", title: "제작", desc: "홈페이지, 랜딩페이지, 업무 시스템, 앱, 키오스크, 3D 웹 가운데 무엇을 만들지 고릅니다", href: "/make", hay: "Build 빌드 만들기 제작 종류 금액 기간" },
+    { kind: "바로가기", title: "유지보수", desc: "지금 상황을 고르면 해 드리는 일과 금액이 나옵니다", href: "/maintenance", hay: "Care 케어 관리 유지관리 수정 업체 변경" },
+    { kind: "바로가기", title: "비용", desc: "종류와 구성을 고르면 합계와 기간이 나옵니다", href: "/pricing", hay: "Price 가격 견적 금액 요금 얼마 계산" },
+    { kind: "바로가기", title: "카탈로그", desc: "업종별로 만든 홈페이지, 랜딩페이지, 앱, 키오스크, 3D 화면", href: "/works", hay: "Catalog 화면 사례 만든 화면 디자인" },
+    { kind: "바로가기", title: "위키", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수 문서", href: "/knowledge", hay: "Wiki 문서 자료 용어 지식" },
+    { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 사이트 변천사", href: "/story", hay: "About 소개 연혁 변천사 곰파트너 회사" },
+    { kind: "바로가기", title: "자주 묻는 질문", desc: "제작, 비용, 일정, 유지보수에 대해 자주 받는 질문", href: "/faq", hay: "FAQ 질문 답변 궁금" },
+    { kind: "바로가기", title: "공지사항", desc: "서비스와 사이트 변경 안내", href: "/notice", hay: "공지 안내 소식 알림" },
+    { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/#apply", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
+    { kind: "바로가기", title: "개인정보처리방침", desc: "상담에서 처리하는 개인정보의 항목, 목적, 보유 기간", href: "/privacy", hay: "개인정보 처리방침 약관 보호" },
+    { kind: "바로가기", title: "사이트 지킴이", desc: "운영 중인 서비스. 웹사이트가 멈추거나 인증서가 끝나기 전에 알려 줍니다", href: "https://jikimi.gompartner.co.kr/", hay: "Run 운영 서비스 모니터링 점검 지킴이 알림" },
+    { kind: "바로가기", title: "거래장부", desc: "운영 중인 서비스. 거래명세서와 미수금을 관리합니다", href: "https://jangbu.gompartner.co.kr/", hay: "Run 운영 서비스 명세서 미수 장부 납품 도매" },
+    { kind: "바로가기", title: "3D 거실 상담 화면", desc: "34평 거실에 거실장, TV, 선반, 붙박이장, 중문을 넣어 보고 견적을 받는 인테리어 업체용 화면", href: "/3d/room/", hay: "3D 인테리어 가구 배치 평면도 치수 견적" },
+  ];
+  return [...pages, ...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */

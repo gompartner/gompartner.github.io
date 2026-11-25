@@ -79,6 +79,19 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
   const others = cat === "전체" ? rest : rest.filter((i) => i.cat === cat);
   const shown = more ? others : others.slice(0, 8);
 
+  // 통합검색 결과(/works#id)로 들어오면 그 화면을 바로 크게 연다
+  useEffect(() => {
+    const byHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const it = id ? [...stories, ...rest].find((i) => i.id === id) : undefined;
+      if (it) show(it);
+    };
+    byHash();
+    window.addEventListener("hashchange", byHash);
+    return () => window.removeEventListener("hashchange", byHash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
