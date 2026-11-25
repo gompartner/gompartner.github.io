@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronUp, Search, SlidersHorizontal, X } from "lucide-react";
 import { BoardShell } from "@/components/classic/board/ui";
+import { BoxCheck, PickItem } from "@/components/classic/FilterParts";
 
 // 11-26 위키(위키) 찾기 판. 사용자 "찾을 때 편의성이 개판, 양이 많아지면 불편, 분류가 많아지면 필터 버튼 팝업에서 여러 개 선택까지".
 // 방향 셋: (1) 지금처럼 주제별 나무 목록 (2) 서버 DB와 검색 API (3) 문서 목록을 한 표로 모으고 검색과 여러 개 고르는 필터.
@@ -162,38 +163,35 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
               })}
             </ul>
             <div className="overflow-y-auto p-3 md:p-4" role="tabpanel">
-              <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg px-3 text-[16px] font-bold hover:bg-[#f4f6fa]">
-                <input
-                  type="checkbox"
-                  checked={allOn}
-                  onChange={() =>
-                    setDraft((d) => {
-                      const ks = t.groups.map((g) => key(t.label, g));
-                      return { ...d, groups: allOn ? d.groups.filter((x) => !ks.includes(x)) : [...new Set([...d.groups, ...ks])] };
-                    })
-                  }
-                  className="h-5 w-5 accent-[#256ef4]"
-                />
+              <PickItem
+                checked={allOn}
+                onChange={() =>
+                  setDraft((d) => {
+                    const ks = t.groups.map((g) => key(t.label, g));
+                    return { ...d, groups: allOn ? d.groups.filter((x) => !ks.includes(x)) : [...new Set([...d.groups, ...ks])] };
+                  })
+                }
+              >
                 전체
-              </label>
-              {t.groups.map((g) => {
-                const k = key(t.label, g);
-                return (
-                  <label key={k} className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg px-3 text-[16px] hover:bg-[#f4f6fa]">
-                    <input type="checkbox" checked={draft.groups.includes(k)} onChange={() => setDraft((d) => ({ ...d, groups: toggle(d.groups, k) }))} className="h-5 w-5 accent-[#256ef4]" />
-                    <span className={`break-keep ${draft.groups.includes(k) ? "font-bold text-[#256ef4]" : ""}`}>{g}</span>
-                  </label>
-                );
-              })}
+              </PickItem>
+              <div className="mt-1 grid border-t border-[#eef0f3] pt-1 sm:grid-cols-2">
+                {t.groups.map((g) => {
+                  const k = key(t.label, g);
+                  return (
+                    <PickItem key={k} checked={draft.groups.includes(k)} onChange={() => setDraft((d) => ({ ...d, groups: toggle(d.groups, k) }))}>
+                      {g}
+                    </PickItem>
+                  );
+                })}
+              </div>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-[#e6e9ee] px-5 py-3 md:px-6">
             <span className="text-[14px] text-[#5b6370]">종류</span>
             {kinds.map((k) => (
-              <label key={k} className="flex min-h-11 cursor-pointer items-center gap-2 text-[16px]">
-                <input type="checkbox" checked={draft.kinds.includes(k)} onChange={() => setDraft((d) => ({ ...d, kinds: toggle(d.kinds, k) }))} className="h-5 w-5 accent-[#256ef4]" />
+              <BoxCheck key={k} checked={draft.kinds.includes(k)} onChange={() => setDraft((d) => ({ ...d, kinds: toggle(d.kinds, k) }))}>
                 {k}
-              </label>
+              </BoxCheck>
             ))}
           </div>
           <div className="grid grid-cols-[1fr_2fr] gap-2 border-t border-[#e6e9ee] p-4 md:p-5">

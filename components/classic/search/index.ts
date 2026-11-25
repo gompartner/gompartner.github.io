@@ -22,6 +22,8 @@ export interface SearchItem {
   /** 검색에만 쓰는 낱말(화면에 안 보임) */
   hay: string;
   thumb?: string;
+  /** 종류 안의 하위 분류(필터의 둘째 단계). 카탈로그는 홈페이지, 랜딩페이지 등, 운영 노트는 연재 이름, 용어는 묶음 */
+  sub?: string;
   /** 카탈로그 화면: 검색 결과에서 그 자리에서 크게 볼 그림(11-26 사용자 "검색에서 레이어팝업을 닫으면 통합검색이 유지되도록") */
   view?: CatalogItem;
 }
@@ -63,7 +65,10 @@ export function buildSearchIndex(): SearchItem[] {
   // 카탈로그 결과마다 크게 볼 그림을 붙인다(카탈로그 판과 같은 목록에서)
   const cat = buildCatalog();
   const views = new Map<string, CatalogItem>([...cat.stories, ...cat.trends, ...cat.rest].map((v) => [`/works#${v.id}`, { id: v.id, cat: v.cat, title: v.title, tag: v.tag, thumb: v.thumb, main: v.main, side: v.side, features: v.features }]));
-  for (const c of catalogs) c.view = views.get(c.href);
+  for (const c of catalogs) {
+    c.view = views.get(c.href);
+    c.sub = c.view?.cat;
+  }
   // 11-04 키오스크 3D 체험(/work/<slug>/3d). 목록은 app/work/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
   // 11-26 데모, 샘플 주소를 내려 화면은 카탈로그 한 판(/works)으로만 잇는다
   const kiosk3d: SearchItem[] = [];
@@ -74,21 +79,22 @@ export function buildSearchIndex(): SearchItem[] {
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
     kind: "운영 노트",
+    sub: n.series,
     title: n.title,
     desc: n.summary,
     href: `/insight/${n.slug}`,
     hay: [n.series, ...n.blocks.flatMap((b) => [b.h ?? "", ...(b.p ?? []), ...(b.steps ?? []).flatMap((s) => [s.b, s.t]), ...(b.table?.rows.flat() ?? [])])].join(" "),
   }));
   // 11-15 용어: 용어 하나가 결과 한 줄, 누르면 그 용어 자리로 간다(11-21부터 아카이브 용어 문서)
-  const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
+  const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어" as const, sub: g.sec, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
   // 11-21 아카이브 문서: 트렌드, 용어 묶음 문서, 데이터
   const archive: SearchItem[] = [
     { kind: "위키", title: "화면 예시: 페이지 종류별 와이어프레임", desc: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 접수, 검색, 관리자", href: "/knowledge/screens", hay: "화면 예시 와이어프레임 시안 레이아웃 페이지 구성 디자인" },
     { kind: "위키", title: "위키 홈", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수, 법과 규정", href: "/knowledge", hay: "위키 아카이브 자료 자료실 문서 허브 위키" },
-    ...designDocs.map((d) => ({ kind: "위키" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 디자인 화면 기기 한국 일본 미국 비교 차트 연도별 역사 변화" })),
-    ...techDocs.map((d) => ({ kind: "위키" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 기술 한국 일본 미국 비교 차트 연도별 역사 변화" })),
-    ...termGroups.map((g) => ({ kind: "위키" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
-    ...datasets.map((d) => ({ kind: "위키" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
+    ...designDocs.map((d) => ({ kind: "위키" as const, sub: "디자인", title: d.title, desc: d.desc, href: d.href, hay: "트렌드 디자인 화면 기기 한국 일본 미국 비교 차트 연도별 역사 변화" })),
+    ...techDocs.map((d) => ({ kind: "위키" as const, sub: "개발", title: d.title, desc: d.desc, href: d.href, hay: "트렌드 기술 한국 일본 미국 비교 차트 연도별 역사 변화" })),
+    ...termGroups.map((g) => ({ kind: "위키" as const, sub: "용어 문서", title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
+    ...datasets.map((d) => ({ kind: "위키" as const, sub: "데이터", title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
   ];
   // 11-26 페이지 이름으로 찾을 수 있게(검수: "비용", "회사소개", "거래장부"로 검색하면 그 페이지가 안 나왔다)
   const pages: SearchItem[] = [
@@ -106,6 +112,8 @@ export function buildSearchIndex(): SearchItem[] {
     { kind: "바로가기", title: "거래장부", desc: "운영 중인 서비스. 거래명세서와 미수금을 관리합니다", href: "https://jangbu.gompartner.co.kr/", hay: "Run 운영 서비스 명세서 미수 장부 납품 도매" },
     { kind: "바로가기", title: "3D 거실 상담 화면", desc: "34평 거실에 거실장, TV, 선반, 붙박이장, 중문을 넣어 보고 견적을 받는 인테리어 업체용 화면", href: "/3d/room/", hay: "3D 인테리어 가구 배치 평면도 치수 견적" },
   ];
+  const byHref = (h: string) => (h.startsWith("/make") ? "제작" : h.startsWith("/maintenance") ? "유지보수" : h.startsWith("/3d") ? "3D 웹" : "일반");
+  for (const i of [...services, ...faqs]) i.sub = byHref(i.href);
   return [...pages, ...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
 }
 

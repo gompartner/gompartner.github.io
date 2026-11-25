@@ -6,17 +6,21 @@ import { ChevronUp, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 import { matches, norm } from "./match";
 import { SearchBox } from "./SearchBox";
+import { PickItem } from "@/components/classic/FilterParts";
 import { ORDER, SearchResults } from "./SearchResults";
 
 const SUGGEST = ["홈페이지 제작", "오류 수정", "업체 변경", "워드프레스", "PHP", "예약", "견적 계산", "치과", "학원"];
 
 // 통합검색. 주소의 ?q= 와 ?kind= 를 읽고, 바뀔 때마다 주소도 바꿔 둔다(뒤로 가기, 공유)
-// 11-26 종류 필터(사용자 "통합검색 필요합니다 필터 기능 포함"): 결과가 있는 종류만 버튼으로 나오고 여러 개를 함께 고를 수 있다. 아무것도 안 고르면 전체.
+// 11-26 필터(사용자 "통합검색 필요합니다 필터 기능 포함", "필터도 하위 뎁스 체크하게"): 왼쪽에서 종류, 오른쪽에서 그 종류의 하위 분류를 여러 개 고른다.
+// 고른 것은 "종류" 또는 "종류:하위" 꼴로 적는다(주소의 ?kind= 도 같은 꼴, 쉼표로 잇는다). 아무것도 안 고르면 전체.
+const kindOf = (token: string) => token.split(":")[0] as SearchKind;
+const hit = (sel: string[], i: SearchItem) => sel.includes(i.kind) || (!!i.sub && sel.includes(`${i.kind}:${i.sub}`));
 export function SiteSearch({ index }: { index: SearchItem[] }) {
   const params = useSearchParams();
   const router = useRouter();
   const [q, setQ] = useState(params.get("q") ?? "");
-  const [kinds, setKinds] = useState<SearchKind[]>(() => (params.get("kind") ?? "").split(",").filter((k): k is SearchKind => (ORDER as string[]).includes(k)));
+  const [kinds, setKinds] = useState<string[]>(() => (params.get("kind") ?? "").split(",").filter((k) => (ORDER as string[]).includes(kindOf(k))));
   useEffect(() => {
     const t = setTimeout(() => {
       const sp = new URLSearchParams();
@@ -39,16 +43,27 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
     const inTitle = (i: SearchItem) => words.every((w) => norm(i.title).includes(w));
     return [...list.filter(inTitle), ...list.filter((i) => !inTitle(i))];
   }, [index, term]);
-  const counts = useMemo(() => ORDER.map((k) => ({ k, n: found.filter((i) => i.kind === k).length })).filter((c) => c.n > 0), [found]);
-  // 검색어가 바뀌어 결과가 없어진 종류는 선택에서 뺀 것으로 본다
-  const active = term ? kinds.filter((k) => counts.some((c) => c.k === k)) : kinds;
-  const shown = active.length ? found.filter((i) => active.includes(i.kind)) : found;
-  const toggle = (k: SearchKind) => setKinds((v) => (v.includes(k) ? v.filter((x) => x !== k) : [...v, k]));
-  // 필터 팝업: 검색어가 있으면 결과가 있는 종류와 건수, 없으면 고를 수 있는 모든 종류
+  // 검색어가 바뀌어 결과가 없어진 것은 선택에서 뺀 것으로 본다
+  const active = term ? kinds.filter((k) => found.some((i) => hit([k], i))) : kinds;
+  const shown = active.length ? found.filter((i) => hit(active, i)) : found;
+  const toggle = (k: string) => setKinds((v) => (v.includes(k) ? v.filter((x) => x !== k) : [...v, k]));
+  // 필터 팝업: 검색어가 있으면 결과가 있는 종류와 하위 분류(건수와 함께), 없으면 고를 수 있는 모든 것
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<SearchKind[]>([]);
+  const [draft, setDraft] = useState<string[]>([]);
+  const [tab, setTab] = useState(0);
   const dlg = useRef<HTMLDialogElement>(null);
-  const options = useMemo(() => (term ? counts : ORDER.filter((k) => index.some((i) => i.kind === k)).map((k) => ({ k, n: 0 }))), [term, counts, index]);
+  const options = useMemo(() => {
+    const pool = term ? found : index;
+    return ORDER.map((k) => {
+      const list = pool.filter((i) => i.kind === k);
+      const subs = [...new Set(list.map((i) => i.sub).filter((x): x is string => !!x))].map((name) => ({ name, n: list.filter((i) => i.sub === name).length }));
+      return { k, n: list.length, subs };
+    }).filter((o) => o.n > 0);
+  }, [term, found, index]);
+  const cur = options[Math.min(tab, options.length - 1)];
+  // 종류 전체를 고르면 그 종류의 하위 선택은 지우고, 하위를 고르면 종류 전체 선택을 지운다
+  const pickAll = (k: SearchKind) => setDraft((d) => (d.includes(k) ? d.filter((x) => x !== k) : [...d.filter((x) => kindOf(x) !== k), k]));
+  const pickSub = (k: SearchKind, name: string) => setDraft((d) => (d.includes(`${k}:${name}`) ? d.filter((x) => x !== `${k}:${name}`) : [...d.filter((x) => x !== k), `${k}:${name}`]));
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
@@ -72,6 +87,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
             type="button"
             onClick={() => {
               setDraft(active);
+              setTab(Math.max(0, options.findIndex((o) => active.some((x) => kindOf(x) === o.k))));
               setOpen(true);
             }}
             aria-haspopup="dialog"
@@ -88,7 +104,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
           {active.map((k) => (
             <li key={k}>
               <button type="button" onClick={() => toggle(k)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[#256ef4] bg-[#256ef4] px-4 text-[15px] font-bold text-white">
-                {k} <X size={15} aria-hidden />
+                {k.replace(":", " / ")} <X size={15} aria-hidden />
                 <span className="sr-only">빼기</span>
               </button>
             </li>
@@ -103,8 +119,8 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
 
       {/* 필터 팝업(위키 판과 같은 방식): 종류를 여러 개 고르고 선택 완료를 눌러야 적용된다. 흰 팝업 그대로 두려고 keep-light로 감싼다 */}
       <div className="keep-light">
-        <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} aria-labelledby="sf-title" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] outline-none backdrop:bg-black/70 focus:outline-none">
-          <div className="flex max-h-[calc(100dvh-24px)] flex-col">
+        <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} aria-labelledby="sf-title" className="m-auto w-[min(760px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] outline-none backdrop:bg-black/70 focus:outline-none">
+          <div className="flex h-[min(560px,calc(100dvh-24px))] flex-col">
             <div className="flex shrink-0 items-center justify-between border-b border-[#e6e9ee] px-5 py-4 md:px-6">
               <h2 id="sf-title" className="text-[20px] font-[800] tracking-[-0.03em]">
                 필터
@@ -113,15 +129,39 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                 <ChevronUp size={22} aria-hidden />
               </button>
             </div>
-            <div className="min-h-0 overflow-y-auto p-3 md:p-4">
-              <p className="px-3 pb-1 pt-2 text-[14px] text-[#5b6370]">종류</p>
-              {options.map((o) => (
-                <label key={o.k} className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg px-3 text-[16px] hover:bg-[#f4f6fa]">
-                  <input type="checkbox" checked={draft.includes(o.k)} onChange={() => setDraft((d) => (d.includes(o.k) ? d.filter((x) => x !== o.k) : [...d, o.k]))} className="h-5 w-5 accent-[#256ef4]" />
-                  <span className={`break-keep ${draft.includes(o.k) ? "font-bold text-[#256ef4]" : ""}`}>{o.k}</span>
-                  {term ? <span className="ml-auto text-[15px] tabular-nums text-[#5b6370]">{o.n}건</span> : null}
-                </label>
-              ))}
+            {/* 왼쪽 종류, 오른쪽 그 종류의 하위 분류 */}
+            <div className="grid min-h-0 flex-1 grid-cols-[minmax(124px,38%)_1fr]">
+              <ul className="overflow-y-auto border-r border-[#e6e9ee]" role="tablist" aria-label="종류">
+                {options.map((o, i) => {
+                  const n = draft.filter((x) => kindOf(x) === o.k).length;
+                  return (
+                    <li key={o.k} role="presentation">
+                      <button type="button" role="tab" aria-selected={cur?.k === o.k} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${cur?.k === o.k ? "bg-[#256ef4] font-[800] text-white" : "hover:bg-[#f4f6fa]"}`}>
+                        <span className="break-keep">{o.k}</span>
+                        {n > 0 ? <span className="tabular-nums">{draft.includes(o.k) ? "전체" : n}</span> : null}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="overflow-y-auto p-3 md:p-4" role="tabpanel">
+                {cur ? (
+                  <>
+                    <PickItem checked={draft.includes(cur.k)} onChange={() => pickAll(cur.k)} note={term ? `${cur.n}건` : undefined}>
+                      전체
+                    </PickItem>
+                    {cur.subs.length > 1 ? (
+                      <div className="mt-1 grid border-t border-[#eef0f3] pt-1 sm:grid-cols-2">
+                        {cur.subs.map((sub) => (
+                          <PickItem key={sub.name} checked={draft.includes(`${cur.k}:${sub.name}`)} onChange={() => pickSub(cur.k, sub.name)} note={term ? `${sub.n}건` : undefined}>
+                            {sub.name}
+                          </PickItem>
+                        ))}
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
             </div>
             <div className="grid shrink-0 grid-cols-[1fr_2fr] gap-2 border-t border-[#e6e9ee] p-4 md:p-5">
               <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-[#15171c] text-[16px] font-bold">
@@ -145,7 +185,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
       <div role="status">
         {term && found.length > 0 ? (
           <p className="mt-7 text-[16px] text-[#3d4450]">
-            <b className="break-all text-[#256ef4]">&apos;{term}&apos;</b> 검색결과 <b className="tabular-nums text-[#15171c]">{shown.length}</b>건{active.length ? <span className="text-[#5b6370]"> ({active.join(", ")})</span> : null}
+            <b className="break-all text-[#256ef4]">&apos;{term}&apos;</b> 검색결과 <b className="tabular-nums text-[#15171c]">{shown.length}</b>건
           </p>
         ) : null}
         {!term ? (

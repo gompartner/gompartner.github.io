@@ -91,6 +91,7 @@ html.gp-dark .cl .border-\[\#c9cfd8\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .border-\[\#d63d4a\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .hover\:border-\[\#1d5fd6\]:hover:not(.keep-light *):not(.cl > footer *) { border-color: #4a5361; }
 html.gp-dark .cl .border-\[\#aeb7c4\]:not(.keep-light *):not(.cl > footer *) { border-color: #505357; }
+html.gp-dark .cl .border-\[\#b6bdc8\]:not(.keep-light *):not(.cl > footer *) { border-color: #4d5054; }
 html.gp-dark .cl .border-\[\#c9d0da\]:not(.keep-light *):not(.cl > footer *) { border-color: #43464b; }
 html.gp-dark .cl .border-\[\#cdd1d5\]:not(.keep-light *):not(.cl > footer *) { border-color: #464749; }
 html.gp-dark .cl .border-\[\#cfd6e2\]:not(.keep-light *):not(.cl > footer *) { border-color: #3f4249; }

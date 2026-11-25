@@ -149,6 +149,7 @@ html.gp-light .cl .focus\:text-white:focus { color: var(--gl-t-ffffff, #ffffff);
 html.gp-light .cl .focus-visible\:outline-\[\#256ef4\]:focus-visible { outline-color: #256ef4; }
 html.gp-light .cl .focus-visible\:outline-\[\#15171c\]:focus-visible { outline-color: #15171c; }
 html.gp-light .cl .disabled\:text-\[\#8a94a6\]:disabled { color: var(--gl-t-8a94a6, #8a94a6); }
+html.gp-light .cl .has-\[\:focus-visible\]\:outline-\[\#256ef4\]:has(*:is(:focus-visible)) { outline-color: #256ef4; }
 html.gp-light .cl .aria-\[current\=page\]\:text-white[aria-current="page"] { color: var(--gl-t-ffffff, #ffffff); }
 html.gp-light .cl .aria-\[invalid\=true\]\:border-\[\#d63d4a\][aria-invalid="true"] { border-color: #d63d4a; }
 @media (width >= 64rem) { html.gp-light .cl .lg\:border-l-\[\#7aa7ff\] { border-left-color: var(--gl-l-7aa7ff, #7aa7ff); } }
