@@ -10,6 +10,7 @@ const DentalA = dynamic(() => import("./DentalA").then((m) => m.DentalA));
 const DentalB = dynamic(() => import("./DentalB").then((m) => m.DentalB));
 const Dental2026 = dynamic(() => import("./Dental2026").then((m) => m.Dental2026));
 const Dental2027Window = dynamic(() => import("./Dental2027Window").then((m) => m.Dental2027Window));
+const SkinC2026 = dynamic(() => import("./SkinC2026").then((m) => m.SkinC2026));
 const Dental2027Stage = dynamic(() => import("./Dental2027Stage").then((m) => m.Dental2027Stage));
 const AcademyA = dynamic(() => import("./AcademyA").then((m) => m.AcademyA));
 const AcademyB = dynamic(() => import("./AcademyB").then((m) => m.AcademyB));
@@ -167,7 +168,9 @@ export function InteriorDrafts() {
   );
 }
 export function SkinDrafts() {
-  return useVariant("clinic-homepage") === "b" ? (
+  const v = useVariant("clinic-homepage");
+  if (v === "2026") return <SkinC2026 />;
+  return v === "b" ? (
     <>
       <SkinB />
       <QuickMenu accent="#d14d6a" cta="예약 문의" />
