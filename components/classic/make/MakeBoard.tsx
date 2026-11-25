@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
+import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { appPlans, kioskPlans, landingPlans, manwon, plans, type Plan } from "@/data/classic/pricing";
 import { threePlans } from "@/data/classic/three";
 
@@ -23,38 +24,12 @@ const kinds: Kind[] = [
   { id: "3d", name: "3D 웹", en: "3D Web", line: "제품과 공간을 고객이 직접 돌려 보고 고르게", who: ["옵션이 많아 설명이 긴 제품", "직접 와 봐야 아는 공간", "견적 문의를 미리 걸러 받고 싶은 곳"], plans: threePlans, href: "/3d", c: "#ffffff", shots: [{ img: "/3d/assets/og/configurator.jpg", name: "옵션을 고르는 3D 견적" }, { img: "/3d/assets/og/space.jpg", name: "공간 둘러보기" }, { img: "/3d/assets/og/sofa.jpg", name: "모듈 소파 구성" }] },
 ];
 
-const css = `
-@keyframes mk-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-.mk-in { animation: mk-in 0.38s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d, 0s); }
-@media (prefers-reduced-motion: reduce) { .mk-in { animation: none; } }
-/* 메인과 같게: 휴대폰 아래에 떠 있는 전화, 카카오톡 상담 바와 그 높이만큼의 바닥글 여백을 뺀다 */
-html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }
-@media (max-width: 767px) { html:has(.gp-home) footer { padding-bottom: 0; } }
-.mk-ice { background-image: linear-gradient(112deg, #ffffff 0%, #d5e4ff 30%, #8db4ff 52%, #e8f1ff 74%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-`;
-
-const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 
 export function MakeBoard() {
   const [on, setOn] = useState(0);
   const k = kinds[on];
   return (
-    <div className="keep-light gp-home">
-      <style>{css}</style>
-      <div className="bg-[#0b0d12] bg-[linear-gradient(rgba(122,167,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.05)_1px,transparent_1px)] bg-[size:48px_48px] text-white">
-        <div className={`${wrap} pb-20 pt-10 md:pb-28 md:pt-16`}>
-          <p className="flex items-center gap-3 text-[13px] font-bold tracking-[0.18em] text-[#7aa7ff] md:text-[14px]">
-            <span>01</span>
-            <span aria-hidden className="h-px w-10 bg-current" />
-            BUILD
-          </p>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-            <h1 className="text-[40px] font-[800] leading-[1.1] tracking-[-0.05em] md:text-[68px]">
-              <span className="mk-ice">무엇을</span> 만들까요
-            </h1>
-            <p className="max-w-[420px] break-keep pb-2 text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">종류를 고르면 만든 화면과 금액, 기간이 바로 나옵니다.</p>
-          </div>
-
+    <BoardShell no="01" en="BUILD" ice="무엇을" title=" 만들까요" lead="종류를 고르면 만든 화면과 금액, 기간이 바로 나옵니다.">
           <div className="mt-10 grid gap-6 md:mt-14 lg:grid-cols-[300px_1fr] lg:gap-10">
             {/* 종류 고르기: 넓은 화면은 세로 목록, 좁은 화면은 옆으로 넘기는 줄 */}
             <div role="tablist" aria-label="제작 종류" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
@@ -80,7 +55,7 @@ export function MakeBoard() {
 
             {/* 고른 종류의 판. key로 다시 그려 들어오는 움직임을 준다 */}
             <div id="mk-panel" role="tabpanel" aria-labelledby={`mk-tab-${k.id}`} key={k.id} className="min-w-0">
-              <div className="mk-in rounded-[28px] border border-white/12 bg-[#121722] p-6 md:p-9">
+              <div className="bd-in rounded-[28px] border border-white/12 bg-[#121722] p-6 md:p-9">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-[14px] font-bold tracking-[0.1em]" style={{ color: k.c }}>
@@ -107,7 +82,7 @@ export function MakeBoard() {
               {/* 만든 화면: 눌러 들어가는 데모가 아니라 그림으로 보여 준다(데모, 샘플 주소는 내린다) */}
               <ul className={`mt-4 grid gap-4 ${k.shots.length === 2 ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3"}`} role="list">
                 {k.shots.map((sh, i) => (
-                  <li key={sh.img} className={`mk-in overflow-hidden rounded-[20px] border border-white/12 bg-[#121722] ${k.shots.length === 3 && i === 0 ? "col-span-2 md:col-span-1" : ""}`} style={{ "--d": `${0.04 + i * 0.05}s` } as React.CSSProperties}>
+                  <li key={sh.img} className={`bd-in overflow-hidden rounded-[20px] border border-white/12 bg-[#121722] ${k.shots.length === 3 && i === 0 ? "col-span-2 md:col-span-1" : ""}`} style={{ "--d": `${0.04 + i * 0.05}s` } as React.CSSProperties}>
                     <span className="relative block aspect-[16/10]">
                       <Image src={sh.img} alt={`${sh.name} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top" />
                     </span>
@@ -119,7 +94,7 @@ export function MakeBoard() {
               {k.plans.length > 0 ? (
                 <ul className="mt-4 grid gap-4 md:grid-cols-3" role="list">
                   {k.plans.map((p, i) => (
-                    <li key={p.id} className={`mk-in flex flex-col rounded-[24px] p-6 md:p-7 ${i === 1 ? "bg-[#256ef4] text-white" : "border border-white/12 bg-[#121722]"}`} style={{ "--d": `${0.06 + i * 0.06}s` } as React.CSSProperties}>
+                    <li key={p.id} className={`bd-in flex flex-col rounded-[24px] p-6 md:p-7 ${i === 1 ? "bg-[#256ef4] text-white" : "border border-white/12 bg-[#121722]"}`} style={{ "--d": `${0.06 + i * 0.06}s` } as React.CSSProperties}>
                       <h3 className="text-[19px] font-[800] tracking-[-0.03em] md:text-[21px]">{p.name}</h3>
                       <p className={`mt-1 break-keep text-[15px] leading-[1.6] ${i === 1 ? "text-white" : "text-[#aab2bf]"}`}>{p.summary}</p>
                       <p className="mt-6 text-[34px] font-[800] leading-none tracking-[-0.05em] md:text-[40px]">{manwon(p.price)}</p>
@@ -136,7 +111,7 @@ export function MakeBoard() {
                   ))}
                 </ul>
               ) : (
-                <div className="mk-in mt-4 rounded-[24px] bg-[#256ef4] p-6 md:p-9" style={{ "--d": "0.06s" } as React.CSSProperties}>
+                <div className="bd-in mt-4 rounded-[24px] bg-[#256ef4] p-6 md:p-9" style={{ "--d": "0.06s" } as React.CSSProperties}>
                   <p className="text-[34px] font-[800] leading-none tracking-[-0.05em] md:text-[40px]">요구사항 확인 후 견적</p>
                   <p className="mt-4 max-w-[560px] break-keep text-[16px] leading-[1.7] text-white md:text-[17px]">
                     업무마다 화면과 계산 방식이 달라 정해진 패키지가 없습니다. 지금 쓰는 엑셀이나 양식을 보여 주시면 범위와 금액, 일정을 견적서로 드립니다.
@@ -147,14 +122,7 @@ export function MakeBoard() {
             </div>
           </div>
 
-          <div className="mt-16 flex flex-col gap-5 border-t border-white/12 pt-10 md:mt-24 md:flex-row md:items-center md:justify-between">
-            <p className="break-keep text-[22px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[30px]">어떤 것이 맞는지 모르겠다면 한 줄만 남겨 주세요.</p>
-            <Link href="/#apply" className="inline-flex min-h-[52px] shrink-0 items-center gap-2 self-start rounded-full bg-white px-6 text-[16px] font-bold text-[#0b0d12] hover:bg-[#dfe9ff]">
-              Contact <ArrowUpRight size={18} aria-hidden />
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+          <BoardClose text="어떤 것이 맞는지 모르겠다면 한 줄만 남겨 주세요." />
+    </BoardShell>
   );
 }
