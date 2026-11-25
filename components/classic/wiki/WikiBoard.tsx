@@ -51,7 +51,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
   const allOn = t.groups.every((g) => draft.groups.includes(key(t.label, g)));
 
   return (
-    <BoardShell no="05" en="WIKI" ice="무엇을 " title="찾으세요" lead="검색어로 찾거나 필터에서 주제와 종류를 여러 개 고를 수 있습니다.">
+    <BoardShell no="05" en="WIKI" ice="무엇을 " title="찾으세요" lead="홈페이지 기획, 제작, 운영에 필요한 문서를 모았습니다.">
       <div className="mt-10 flex flex-wrap gap-3 md:mt-14">
         <label className="flex h-14 min-w-0 flex-1 basis-[280px] items-center gap-3 overflow-hidden rounded-full bg-white px-5 text-[#0b0d12]">
           <Search size={20} aria-hidden className="shrink-0 text-[#5b6370]" />

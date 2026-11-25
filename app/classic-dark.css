@@ -40,10 +40,11 @@ html.gp-dark .cl .bg-\[\#eef0f3\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .bg-\[\#eef1f3\]:not(.keep-light *):not(.cl > footer *) { background-color: #171d2b; }
 html.gp-dark .cl .bg-\[\#eef1f5\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .hover\:bg-\[\#eef1f5\]:hover:not(.keep-light *):not(.cl > footer *) { background-color: #171d2a; }
-html.gp-dark .cl .bg-\[\#eef3ff\]:not(.keep-light *):not(.cl > footer *) { background-color: #0f1728; }
-html.gp-dark .cl .bg-\[\#eef4ff\]:not(.keep-light *):not(.cl > footer *) { background-color: #0f1828; }
+html.gp-dark .cl .bg-\[\#eef2f7\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .bg-\[\#f1f3f6\]:not(.keep-light *):not(.cl > footer *),
 html.gp-dark .cl .hover\:bg-\[\#f1f3f6\]:hover:not(.keep-light *):not(.cl > footer *) { background-color: #161c29; }
+html.gp-dark .cl .bg-\[\#eef3ff\]:not(.keep-light *):not(.cl > footer *) { background-color: #0f1728; }
+html.gp-dark .cl .bg-\[\#eef4ff\]:not(.keep-light *):not(.cl > footer *) { background-color: #0f1828; }
 html.gp-dark .cl .bg-\[\#f1f4f9\]:not(.keep-light *):not(.cl > footer *) { background-color: #151b28; }
 html.gp-dark .cl .bg-\[\#f3effc\]:not(.keep-light *):not(.cl > footer *) { background-color: #191425; }
 html.gp-dark .cl .bg-\[\#f4f6f9\]:not(.keep-light *):not(.cl > footer *) { background-color: #151a27; }

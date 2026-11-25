@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronUp, SlidersHorizontal, X } from "lucide-react";
+import { ChevronUp, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 import { matches, norm } from "./match";
 import { SearchBox } from "./SearchBox";
@@ -65,7 +65,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
         id="site-search"
         value={q}
         onChange={setQ}
-        placeholder="서비스, 카탈로그, 위키, 자주 묻는 질문 검색"
+        placeholder="검색어를 입력하세요"
         suggestions={SUGGEST}
         aside={
           <button
@@ -141,21 +141,41 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
           </div>
         </dialog>
       </div>
-      <p className="mt-7 text-[15px] text-[#5b6370]" role="status">
-        {term ? (
-          <>
-            <b className="break-all text-[#15171c]">{term}</b> 검색 결과 <b className="tabular-nums text-[#15171c]">{shown.length}</b>건{active.length ? <span> ({active.join(", ")})</span> : null}
-          </>
-        ) : (
-          "검색어를 입력해 주십시오."
-        )}
-      </p>
+      {/* 11-26 사용자 "텍스트만 나오고 보편적이지 않아": 국내 검색 화면에서 흔히 쓰는 꼴로. 결과 줄은 '검색어' 검색결과 N건, 빈 화면과 결과 없음은 아이콘과 안내로 */}
+      <div role="status">
+        {term && found.length > 0 ? (
+          <p className="mt-7 text-[16px] text-[#3d4450]">
+            <b className="break-all text-[#256ef4]">&apos;{term}&apos;</b> 검색결과 <b className="tabular-nums text-[#15171c]">{shown.length}</b>건{active.length ? <span className="text-[#5b6370]"> ({active.join(", ")})</span> : null}
+          </p>
+        ) : null}
+        {!term ? (
+          <div className="mt-12 flex flex-col items-center px-4 py-10 text-center md:mt-16">
+            <span aria-hidden className="grid h-16 w-16 place-items-center rounded-full bg-[#eef2f7] text-[#5b6370]">
+              <Search size={28} />
+            </span>
+            <p className="mt-5 text-[18px] font-bold text-[#15171c]">검색어를 입력해 주세요.</p>
+          </div>
+        ) : null}
+        {term && found.length === 0 ? (
+          <div className="mt-12 flex flex-col items-center px-4 py-10 text-center md:mt-16">
+            <span aria-hidden className="grid h-16 w-16 place-items-center rounded-full bg-[#eef2f7] text-[#5b6370]">
+              <SearchX size={28} />
+            </span>
+            <p className="mt-5 break-keep text-[18px] font-bold text-[#15171c]">
+              <span className="break-all text-[#256ef4]">&apos;{term}&apos;</span>에 대한 검색결과가 없습니다.
+            </p>
+            <ul className="mt-4 space-y-1 text-left text-[15px] leading-[1.7] text-[#5b6370]">
+              <li>- 검색어의 철자가 정확한지 확인해 주세요.</li>
+              <li>- 검색어의 단어 수를 줄이거나 다른 검색어로 검색해 보세요.</li>
+            </ul>
+          </div>
+        ) : null}
+      </div>
       {term && shown.length > 0 ? (
         <div className="mt-8">
           <SearchResults items={shown} />
         </div>
       ) : null}
-      {term && found.length === 0 ? <p className="mt-6 text-[16px]">다른 검색어로 찾아보시거나 Contact로 문의해 주십시오.</p> : null}
     </div>
   );
 }

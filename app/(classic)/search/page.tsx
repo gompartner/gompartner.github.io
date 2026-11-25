@@ -14,7 +14,7 @@ export default function ClassicSearchPage() {
   const index = buildSearchIndex();
   return (
     <>
-      <PageHead en="SEARCH" ice="통합" title="통합검색" lead="서비스, 카탈로그, 위키, 용어, 자주 묻는 질문, 공지사항을 한 번에 검색합니다." trail={[{ href: "/search", label: "통합검색" }]} />
+      <PageHead en="SEARCH" ice="통합" title="통합검색" trail={[{ href: "/search", label: "통합검색" }]} />
       <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         {/* 주소의 ?q= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
         <Suspense fallback={null}>
