@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
-import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
+import { coarsePointer } from "@/components/classic/scrollHold";
 import { SLICES, clear, pieceCss, pieces, rnd } from "@/components/classic/assembleParts";
 
 // 11-25 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
@@ -10,7 +10,7 @@ import { SLICES, clear, pieceCss, pieces, rnd } from "@/components/classic/assem
 //    카드가 통째로 나타나면 도장이고, 판 조각이 맞물린 뒤 번호, 제목, 설명, 금액, 화살표, 무늬가 하나씩 제자리에 끼워져야 조립이다.
 //  - 그래서 [data-part] 하나가 차례가 되면: (1) 카드 바탕을 비스듬한 판 세 조각으로 나눠 가까이에서 맞물리고
 //    (2) 그 안의 작은 요소들을 찾아 하나씩, 제각각 방향에서 짧게 다가와 딱 끼워지게 한다(끼워지는 순간 한 번 밝아진다).
-//  - 부품이 화면 가운데 근처까지 올라왔을 때 시작하고(아래 끝에 걸치자마자 시작하면 보기도 전에 끝난다), 칸마다 처음 한 번은 조립이 끝날 때까지 스크롤을 붙잡는다
+//  - 부품이 화면 아래에서 조금 올라왔을 때 시작한다. 스크롤은 붙잡지 않는다(11-26 "스크롤 블럭은 하지 말자. 잘 안 되는 듯. 자연스럽게 냅두자")
 //  - 한 번만. 다시 지나갈 때는 아무것도 하지 않고, 새로고침 전에 다른 페이지에 갔다 와도 다시 조립하지 않는다
 //  - 조립할 틈 없이 지나친 부품은 바로 보인다. 움직임 줄이기 설정이면 처음부터 그대로 보인다
 // 부품을 숨기는 표시(data-asm)는 브라우저에서 붙인다. 스크립트가 돌지 않으면 내용이 그대로 보인다.
@@ -104,18 +104,6 @@ export function Assemble({ children }: { children: ReactNode }) {
       return end;
     };
 
-    // 칸마다 처음 한 번, 조립이 끝날 때까지 스크롤을 붙잡는다(scrollHold). 길어도 1.2초. 머리글 메뉴로 건너뛸 때는 붙잡지 않는다.
-    const held = new WeakSet<Element>();
-    let skipUntil = 0;
-    let release: (() => void) | null = null;
-    const hold = (y: number, ms: number) => {
-      release = holdScroll(y, ms);
-    };
-    const jump = (e: Event) => {
-      if ((e.target as HTMLElement)?.closest?.('a[href*="#"]')) skipUntil = performance.now() + 1600;
-    };
-    document.addEventListener("click", jump, true);
-
     const io = new IntersectionObserver(
       (entries) => {
         const fresh: HTMLElement[] = [];
@@ -131,39 +119,11 @@ export function Assemble({ children }: { children: ReactNode }) {
           io.unobserve(el);
         }
         if (fresh.length === 0) return;
-        const sorted = () => fresh.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0));
-        const sec = fresh[0].closest("section");
-        if (!sec || held.has(sec) || performance.now() < skipUntil) {
-          if (sec) held.add(sec);
-          run(sorted());
-          return;
-        }
-        // 그 칸에서 처음이면: 칸 머리를 머리글 바로 아래로 올려 화면에 가득 들어오게 한 뒤, 보이는 부품을 함께 조립하고 끝날 때까지 스크롤을 붙잡는다
-        held.add(sec);
-        const headH = document.querySelector("header")?.getBoundingClientRect().height ?? 72;
-        // 칸 위 여백의 절반쯤은 머리글 뒤로 넘겨, 붙잡힌 동안 카드가 더 많이 보이게 한다
-        // 손가락으로 넘기는 기기는 자리를 옮기지 않고 그 자리에서 붙잡는다(scrollHold 설명)
-        const delta = coarsePointer() ? 0 : Math.max(0, sec.getBoundingClientRect().top - headH + (window.innerWidth >= 768 ? 64 : 36));
-        const y = window.scrollY + delta;
-        for (const el of parts) {
-          if (!("go" in el.dataset) && !fresh.includes(el) && el.closest("section") === sec && el.getBoundingClientRect().top - delta < window.innerHeight * 0.94) {
-            fresh.push(el);
-            io.unobserve(el);
-          }
-        }
-        const list = sorted();
-        if (delta > 4) window.scrollTo({ top: y, behavior: "smooth" });
-        const wait = delta > 4 ? 380 : 0;
-        hold(y, wait + 200);
-        timers.push(
-          window.setTimeout(() => {
-            const end = run(list);
-            hold(y, Math.min(end, 1.2) * 1000);
-          }, wait),
-        );
+        // 스크롤은 붙잡지 않는다(11-26 사용자 "스크롤 블럭은 하지 말자, 자연스럽게 냅두자"). 들어온 부품을 차례대로 조립만 한다
+        run(fresh.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0)));
       },
-      // 부품 윗변이 화면 가운데 조금 아래(위에서 58%)까지 올라왔을 때. 그래야 붙잡힌 동안 조립되는 부품이 화면 안에 다 보인다
-      { rootMargin: coarsePointer() ? "0px 0px -55% 0px" : "0px 0px -42% 0px" },
+      // 부품 윗변이 화면 아래에서 4분의 1쯤 올라왔을 때. 붙잡지 않으니 조금 일찍 시작해야 내려가는 동안 조립되는 것이 보인다
+      { rootMargin: coarsePointer() ? "0px 0px -18% 0px" : "0px 0px -24% 0px" },
     );
     parts.forEach((el) => io.observe(el));
     // 페이지 맨 아래에 닿으면 조립선까지 올라오지 못한 나머지도 조립한다
@@ -177,8 +137,6 @@ export function Assemble({ children }: { children: ReactNode }) {
     return () => {
       io.disconnect();
       window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("click", jump, true);
-      release?.();
       timers.forEach((x) => window.clearTimeout(x));
       delete root.dataset.asm;
     };

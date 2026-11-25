@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { asm } from "@/components/classic/assembleState";
-import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
 
 // 11-25 조립형 첫 화면 창 안의 3D 마을.
 // 순서: 설계선(등각 바닥과 건물 윤곽)이 그려진다 > 3D가 나타나고 건물이 하나씩 내려앉는다(island ?build=1).
@@ -40,10 +39,8 @@ export function TownWindow() {
   const [src, setSrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false); // 3D 첫 장면이 그려졌다
   const [lines, setLines] = useState(false); // 창이 보인 뒤 설계선이 그려질 시간이 지났다
-  const [seen, setSeen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
-  const state = useRef({ loaded: false, done: false, stop: () => {} });
   // 설계선에서 3D로 바꾸는 때: 3D가 준비됐고, 설계선도 보여 줬을 때
   const ready = loaded && (built || lines);
 
@@ -76,7 +73,6 @@ export function TownWindow() {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      setSeen(true);
       timer = window.setTimeout(() => setLines(true), 900);
     }, { threshold: 0.5 });
     io.observe(el);
@@ -99,7 +95,6 @@ export function TownWindow() {
       }
       if (on || Date.now() - started > 8000) {
         window.clearInterval(id);
-        state.current.loaded = true;
         setLoaded(true);
       }
     }, 100);
@@ -110,70 +105,7 @@ export function TownWindow() {
   useEffect(() => {
     if (!ready || built) return;
     frame.current?.contentWindow?.postMessage("gp-build", window.location.origin);
-    const st = state.current;
-    const timer = window.setTimeout(() => {
-      st.done = true;
-      st.stop();
-    }, 1400);
-    return () => window.clearTimeout(timer);
   }, [ready, built]);
-
-  // 마을이 다 조립되기 전에 아래로 내리려 하면, 창이 화면에 다 들어오는 자리에서 조립이 끝날 때까지 붙잡는다.
-  // 보통 2초 안팎, 길어도 3.2초. 내리려 한 지 1.3초가 지나도 3D가 준비되지 않으면(느린 통신) 그냥 보낸다. 머리글 메뉴로 건너뛸 때는 붙잡지 않는다.
-  useEffect(() => {
-    const el = root.current;
-    const st = state.current;
-    if (!el || !seen || built || st.done || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let release: (() => void) | null = null;
-    let giveUp = 0;
-    let last = window.scrollY;
-    const start = () => {
-      if (release || st.done) return;
-      const r = el.getBoundingClientRect();
-      if (r.bottom < 120) return stop(); // 이미 지나갔다
-      const headH = document.querySelector("header")?.getBoundingClientRect().height ?? 72;
-      let y = window.scrollY;
-      // 창 아래가 잘렸으면 다 보일 만큼만 내리고, 창 위가 머리글에 가렸으면(화면이 뜨기 전에 이미 내린 경우) 그만큼 올린다
-      if (coarsePointer()) y = window.scrollY; // 손가락 기기는 자리를 옮기지 않는다
-      else if (r.top < headH + 12) y = Math.max(0, y + r.top - headH - 12);
-      else if (r.bottom > window.innerHeight - 16) y += Math.max(0, Math.min(r.top - headH - 12, r.bottom - window.innerHeight + 24));
-      if (Math.abs(y - window.scrollY) > 4) window.scrollTo({ top: y, behavior: "smooth" });
-      release = holdScroll(y, 3200);
-      giveUp = window.setTimeout(() => {
-        if (!st.loaded) stop();
-      }, 1300);
-    };
-    const wheel = (e: WheelEvent) => {
-      if (e.deltaY <= 0 || release || st.done) return;
-      e.preventDefault();
-      start();
-    };
-    const scroll = () => {
-      if (window.scrollY > last + 1) start();
-      last = window.scrollY;
-    };
-    const jump = (e: Event) => {
-      if ((e.target as HTMLElement)?.closest?.('a[href*="#"]')) stop();
-    };
-    function stop() {
-      st.done = true;
-      release?.();
-      window.clearTimeout(giveUp);
-      window.removeEventListener("wheel", wheel);
-      window.removeEventListener("scroll", scroll);
-      document.removeEventListener("click", jump, true);
-    }
-    st.stop = stop;
-    window.addEventListener("wheel", wheel, { passive: false });
-    window.addEventListener("scroll", scroll, { passive: true });
-    document.addEventListener("click", jump, true);
-    return () => {
-      const was = st.done;
-      stop();
-      st.done = was;
-      st.stop = () => {};
-    };
-  }, [seen, built]);
 
   return (
     <div ref={root}>
