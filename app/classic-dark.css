@@ -35,6 +35,7 @@ html.gp-dark .cl .bg-\[\#e8f5e9\]:not(.keep-light *) { background-color: #1a261b
 html.gp-dark .cl .bg-\[\#e8f5eb\]:not(.keep-light *) { background-color: #1a261d; }
 html.gp-dark .cl .bg-\[\#e9edf3\]:not(.keep-light *) { background-color: #1c1f25; }
 html.gp-dark .cl .bg-\[\#e9f6ef\]:not(.keep-light *) { background-color: #1a251f; }
+html.gp-dark .cl .bg-\[\#eee\]:not(.keep-light *) { background-color: #202020; }
 html.gp-dark .cl .bg-\[\#eef0f3\]:not(.keep-light *) { background-color: #1d1e21; }
 html.gp-dark .cl .bg-\[\#eef1f5\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#eef1f5\]:hover:not(.keep-light *) { background-color: #1b1e22; }
@@ -45,6 +46,7 @@ html.gp-dark .cl .bg-\[\#f1f4f9\]:not(.keep-light *),
 html.gp-dark .cl .hover\:bg-\[\#f1f4f9\]:hover:not(.keep-light *) { background-color: #171b22; }
 html.gp-dark .cl .bg-\[\#f3effc\]:not(.keep-light *) { background-color: #191425; }
 html.gp-dark .cl .bg-\[\#f4f6f9\]:not(.keep-light *) { background-color: #181b1f; }
+html.gp-dark .cl .bg-\[\#f4f6fa\]:not(.keep-light *) { background-color: #171a20; }
 html.gp-dark .cl .bg-\[\#f5f7fa\]:not(.keep-light *) { background-color: #171a1f; }
 html.gp-dark .cl .bg-\[\#f6f7f9\]:not(.keep-light *) { background-color: #191a1e; }
 html.gp-dark .cl .bg-\[\#f6f8fb\]:not(.keep-light *) { background-color: #161a1f; }
@@ -80,6 +82,7 @@ html.gp-dark .cl .border-\[\#b42318\]:not(.keep-light *),
 html.gp-dark .cl .border-\[\#c9cfd8\]:not(.keep-light *),
 html.gp-dark .cl .border-\[\#d63d4a\]:not(.keep-light *) { border-color: #4a5361; }
 html.gp-dark .cl .border-\[\#aeb7c4\]:not(.keep-light *) { border-color: #505357; }
+html.gp-dark .cl .border-\[\#c9d0da\]:not(.keep-light *) { border-color: #43464b; }
 html.gp-dark .cl .border-\[\#cdd1d5\]:not(.keep-light *) { border-color: #464749; }
 html.gp-dark .cl .border-\[\#cfd6e2\]:not(.keep-light *) { border-color: #3f4249; }
 html.gp-dark .cl .border-\[\#d9dee5\]:not(.keep-light *),
@@ -104,6 +107,7 @@ html.gp-dark .cl .text-\[\#6b7380\]:not(.keep-light *) { color: #a3adbb; }
 html.gp-dark .cl .text-\[\#0000ee\]:not(.keep-light *) { color: #7e7eed; }
 html.gp-dark .cl .text-\[\#0c43b7\]:not(.keep-light *) { color: #5a87e7; }
 html.gp-dark .cl .text-\[\#0d652d\]:not(.keep-light *) { color: #36e275; }
+html.gp-dark .cl .text-\[\#1552cc\]:not(.keep-light *) { color: #5a89e7; }
 html.gp-dark .cl .text-\[\#17734a\]:not(.keep-light *) { color: #40d995; }
 html.gp-dark .cl .text-\[\#188038\]:not(.keep-light *) { color: #3edb6e; }
 html.gp-dark .cl .text-\[\#1a0dab\]:not(.keep-light *) { color: #877eed; }

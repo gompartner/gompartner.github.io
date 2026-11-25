@@ -1,0 +1,15 @@
+/* 유지보수 첫 화면: 작업 내역의 단계 표시(접수 > 변경 대상 백업 > 반영 > 결과 보고) */
+.step{display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700;color:#5b6370;white-space:nowrap}
+.step i{flex:none;width:9px;height:9px;border-radius:50%;border:2px solid #b4bcc8;background:#fff}
+.now{color:#15171c}
+.now i{border-color:#256ef4;animation:pulse .8s ease-in-out infinite}
+.ok{color:#1552cc}
+.ok i{border-color:#256ef4;background:#256ef4}
+@keyframes pulse{50%{box-shadow:0 0 0 5px rgba(37,110,244,.22)}}
+@media (prefers-reduced-motion:reduce){.now i{animation:none}}
+:global(.gp-dark) .step{color:#8f99a8}
+:global(.gp-dark) .step i{background:transparent;border-color:#5b6573}
+:global(.gp-dark) .now{color:#f1f3f6}
+:global(.gp-dark) .ok{color:#8fb4ff}
+:global(.gp-dark) .ok i{background:#5b93ff;border-color:#5b93ff}
+:global(.gp-dark) .now i{border-color:#5b93ff}

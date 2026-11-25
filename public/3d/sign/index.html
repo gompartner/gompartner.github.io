@@ -370,6 +370,22 @@
   @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
   .gp-bar { position: fixed; top: 0; left: 0; right: 0; }
   :root { --top: calc(env(safe-area-inset-top, 0px) + 40px) !important; }
+
+  /* 11-24 버튼 순서: 견적 요청 다음에 메뉴 버튼(맨 오른쪽). 좁은 화면에서 폭, 금액 칸이 넘치지 않게 */
+  .top .cta { order: 2; }
+  .top .ibtn { order: 3; }
+  @media (max-width: 420px) {
+    .info button { padding: 6px 10px; gap: 6px; }
+    .wbtn svg { display: none; }
+    .wbtn b { font-size: 15px; }
+    .wbtn small { font-size: 12px; }
+    .pbtn b { font-size: 16px; }
+  }
+  @media (max-width: 335px) {
+    .wbtn small { display: none; }
+    .tile span { font-size: 12px; letter-spacing: -0.03em; }
+    .tile svg { width: 30px; height: 30px; }
+  }
 </style>
 <script type="importmap">
 { "imports": {
@@ -379,14 +395,14 @@
 </script>
 </head>
 <body>
-<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">‹ 곰파트너 바로가기</a></div></div>
+<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">곰파트너 바로가기</a></div></div>
 <main style="display:contents">
 <h1 class="sr">채널 간판 견적</h1>
 <canvas id="scene" aria-label="가게 외벽에 단 채널 간판 3D 화면. 글자를 누르면 빼거나 글꼴을 바꿀 수 있고, 줄자 끝을 끌면 간판 자리 폭이 바뀝니다." tabindex="-1"></canvas>
 <div class="nogl" id="nogl">이 브라우저에서는 3D 화면을 열 수 없습니다. 아래 버튼으로 구성하고 견적을 요청할 수 있습니다.</div>
 
 <div class="top">
-  <a class="brand" href="./"><b>간판 제작</b><small>곰파트너 카탈로그</small></a>
+  <a class="brand" href="./"><b>간판 제작</b></a>
   <button class="ibtn" type="button" id="menu-btn" aria-label="메뉴" aria-expanded="false" aria-controls="menu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
@@ -394,8 +410,7 @@
 </div>
 <nav class="menu" id="menu" aria-label="주요 메뉴" hidden>
   <a href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>카탈로그 목록</a>
-  <button type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>링크 복사</button>
-  <p>간판 제작 | 곰파트너 카탈로그</p>
+  <button type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg>구성 링크 복사</button>
 </nav>
 
 <div class="info">
@@ -472,7 +487,6 @@
       <dl id="done-list"></dl>
       <button class="line-btn" type="button" id="again">구성 다시 고치기</button>
     </div>
-    <p class="foot">간판 제작 | 곰파트너 카탈로그</p>
   </div>
 </dialog>
 

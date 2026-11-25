@@ -16,6 +16,9 @@ import { industries } from "@/data/classic/industries";
 import { plans, runningCostNote } from "@/data/classic/pricing";
 import { projects } from "@/data/classic/projects";
 import { pageMeta } from "@/lib/seo";
+import { NavLink } from "@/components/classic/NavLink";
+import { CatalogShelf } from "@/components/classic/works/CatalogShelf";
+import { samplesIn, shelfItems } from "@/components/classic/works/samples";
 import { siteUrl } from "@/lib/site";
 
 // 홈페이지 제작 서비스 상세. 패키지 데이터(data/classic/pricing)를 쓴다.
@@ -94,6 +97,9 @@ export default function ClassicHomepagePage() {
         </div>
       </section>
 
+      {/* 11-25 업종별 시안은 포트폴리오 슬라이드로 본다(업종마다 썸네일 세 장은 뺌) */}
+      <CatalogShelf items={shelfItems().filter((x) => industries.some((i) => i.label === x.group))} />
+
       <section aria-labelledby="hp-whom" className={section}>
         <div className={`${wrap} py-16 md:py-24`}>
           <h2 id="hp-whom" className={h2}>
@@ -116,6 +122,11 @@ export default function ClassicHomepagePage() {
                   </span>
                   <span className="min-w-0 flex-1 text-[16px] leading-[1.6] text-[#5b6370]">{i.needs.join(", ")}</span>
                 </div>
+                <p className="pb-5 md:pb-7 md:pl-[292px]">
+                  <NavLink href={`/works/${i.slug}`} className="inline-flex min-h-11 items-center text-[15px] font-bold text-[#256ef4] hover:underline">
+                    {i.label} 시안 {samplesIn(i.slug).length}개 보기
+                  </NavLink>
+                </p>
               </li>
             ))}
           </ul>
@@ -141,7 +152,7 @@ export default function ClassicHomepagePage() {
       <DeliverBlock
         id="hp-deliver"
         name="홈페이지와 인계 자료"
-        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 관리"]}
+        items={["홈페이지(PC, 모바일)", "원본 소스", "화면과 웹 접근성 점검 결과표", "계정 목록과 수정 방법을 정리한 인계 문서", "오픈 후 1개월 무상 하자보수"]}
         photo="/images/site/scene-make.jpg"
       />
 

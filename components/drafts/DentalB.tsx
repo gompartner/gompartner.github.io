@@ -12,7 +12,7 @@ const TEL = "02-000-0000";
 
 const CARE = [
   { t: "어린이 치과", d: "웃음가스와 짧은 진료로 아이가 겁먹지 않게 진행합니다.", tag: "만 12세 이하" },
-  { t: "충치, 신경치료", d: "현미경으로 신경관을 확인하며 치료합니다.", tag: "보험 적용" },
+  { t: "충치와 신경치료", d: "현미경으로 신경관을 확인하며 한 번에 정확하게 치료합니다.", tag: "보험 적용" },
   { t: "임플란트", d: "부분 틀니와 임플란트 중 나이와 잇몸 상태에 맞는 방법을 권해 드립니다.", tag: "65세 이상 보험" },
   { t: "스케일링, 잇몸", d: "1년에 한 번 건강보험 스케일링과 잇몸 상태 점검을 진행합니다.", tag: "연 1회 보험" },
 ];
@@ -33,7 +33,7 @@ export function DentalB() {
           </nav>
           <span className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.orange }}>
             <Phone size={16} aria-hidden />
-            전화 예약
+            전화 상담
           </span>
         </div>
       </header>
@@ -56,7 +56,7 @@ export function DentalB() {
         <div className="mx-auto mt-6 grid max-w-[1200px] gap-3 sm:grid-cols-3">
           {[
             [Clock, "오늘 진료", "09:30 ~ 20:00"],
-            [Phone, "전화 예약", TEL],
+            [Phone, "전화 상담", TEL],
             [MapPin, "오시는 길", "지하철역 2번 출구 1분"],
           ].map(([Icon, k, v]) => {
             const I = Icon as typeof Clock;
@@ -137,7 +137,7 @@ export function DentalB() {
               ))}
             </dl>
             <span className="mt-8 inline-flex h-[56px] items-center gap-2 rounded-full px-8 text-[17px] font-bold text-white" style={{ background: C.orange }}>
-              {TEL} 전화 예약
+              {TEL} 전화 상담
               <ArrowRight size={18} aria-hidden />
             </span>
           </div>

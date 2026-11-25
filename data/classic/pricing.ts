@@ -36,13 +36,13 @@ export const plans: Plan[] = [
   },
   {
     id: "standard",
-    name: "문의, 예약 홈페이지",
-    title: "문의, 예약 홈페이지",
+    name: "문의와 예약 홈페이지",
+    title: "문의와 예약 홈페이지",
     price: 490_000,
     days: 9,
     revisions: 3,
     summary: "문의, 예약 접수와 게시물 직접 관리",
-    includes: ["기본 10페이지 구성", "소개 홈페이지 구성 전부", "문의, 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
+    includes: ["기본 10페이지 구성", "소개 홈페이지 구성 전부", "문의와 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
   },
   {
     id: "premium",
@@ -75,7 +75,7 @@ export const landingPlans: Plan[] = [
     days: 5,
     revisions: 2,
     summary: "상담 진행 상태 관리",
-    includes: ["기본 7개 섹션 구성", "신청 접수 구성 전부", "문자, 알림톡 알림", "시트 상담 상태 관리", "중복 신청 자동 표시"],
+    includes: ["기본 7개 섹션 구성", "신청 접수 구성 전부", "문자와 알림톡 알림", "시트 상담 상태 관리", "중복 신청 자동 표시"],
   },
   {
     id: "landing-premium",
@@ -98,7 +98,7 @@ export const appPlans: Plan[] = [
     days: 10,
     revisions: 2,
     summary: "스토어 심사 없이 휴대폰 홈 화면에 설치",
-    includes: ["기본 5개 화면 구성", "아이폰, 안드로이드 홈 화면 설치", "문의, 예약 신청 접수", "관리자 웹(공지, 접수 내역)"],
+    includes: ["기본 5개 화면 구성", "아이폰, 안드로이드 홈 화면 설치", "문의와 예약 신청 접수", "관리자 웹(공지, 접수 내역)"],
   },
   {
     id: "app-standard",
@@ -108,7 +108,7 @@ export const appPlans: Plan[] = [
     days: 20,
     revisions: 3,
     summary: "앱스토어, 플레이스토어에 출시하는 앱",
-    includes: ["기본 10개 화면 구성", "설치형 웹앱 구성 전부", "회원가입, 로그인", "푸시 알림", "스토어 등록 자료와 심사 제출"],
+    includes: ["기본 10개 화면 구성", "설치형 웹앱 구성 전부", "회원가입과 로그인", "푸시 알림", "스토어 등록 자료와 심사 제출"],
   },
   {
     id: "app-premium",
@@ -118,7 +118,7 @@ export const appPlans: Plan[] = [
     days: 30,
     revisions: 4,
     summary: "예약, 주문, 결제와 적립까지 운영하는 앱",
-    includes: ["기본 15개 화면 구성", "스토어 출시 앱 구성 전부", "예약, 주문 접수", "온라인 결제 연동", "적립, 쿠폰", "관리자 웹(회원, 주문, 통계)"],
+    includes: ["기본 15개 화면 구성", "스토어 출시 앱 구성 전부", "예약과 주문 접수", "온라인 결제 연동", "적립과 쿠폰", "관리자 웹(회원, 주문, 통계)"],
   },
 ];
 
@@ -131,34 +131,34 @@ export const kioskPlans: Plan[] = [
     days: 10,
     revisions: 2,
     summary: "시설, 매장 이용 안내 터치 화면",
-    includes: ["기본 5개 화면 구성", "큰 글씨, 높은 대비 화면", "관리자 웹(문구, 운영시간 변경)", "전체 화면 고정 모드"],
+    includes: ["기본 5개 화면 구성", "큰 글씨와 높은 대비 화면", "관리자 웹(문구, 운영시간 변경)", "전체 화면 고정 모드"],
   },
   {
     id: "kiosk-standard",
-    name: "접수, 출결",
-    title: "접수, 출결",
+    name: "접수와 출결",
+    title: "접수와 출결",
     price: 1_990_000,
     days: 15,
     revisions: 3,
     summary: "병원 접수, 학원 출결, 체크인",
-    includes: ["기본 10개 화면 구성", "안내 화면 구성 전부", "대기번호 발급, 번호표 출력", "바코드, QR 스캔", "접수, 출결 내역과 통계"],
+    includes: ["기본 10개 화면 구성", "안내 화면 구성 전부", "대기번호 발급과 번호표 출력", "바코드와 QR 스캔", "접수와 출결 내역과 통계"],
   },
   {
     id: "kiosk-premium",
-    name: "결제, 연동",
-    title: "결제, 연동",
+    name: "결제와 연동",
+    title: "결제와 연동",
     price: 3_900_000,
     days: 25,
     revisions: 4,
     summary: "결제 단말과 외부 시스템 연동",
-    includes: ["기본 15개 화면 구성", "접수, 출결 구성 전부", "카드 결제 단말 연동", "외부 시스템 연동(예약, 회원)", "원격 업데이트, 자동 재시작"],
+    includes: ["기본 15개 화면 구성", "접수와 출결 구성 전부", "카드 결제 단말 연동", "외부 시스템 연동(예약, 회원)", "원격 업데이트와 자동 재시작"],
   },
 ];
 
-export const appCommon = ["원본 소스 제공", "점검 결과표, 인계 문서", "출시 후 1개월 무상 관리"];
-export const kioskCommon = ["원본 소스 제공", "현장 장비 설치와 연결 설정", "점검 결과표, 인계 문서", "설치 후 1개월 무상 관리"];
+export const appCommon = ["원본 소스 제공", "점검 결과표와 인계 문서", "스토어 출시 후 3개월 무상 하자보수"];
+export const kioskCommon = ["원본 소스 제공", "현장 장비 설치와 연결 설정", "점검 결과표와 인계 문서", "설치 후 3개월 무상 하자보수"];
 
-export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표, 인계 문서", "오픈 후 1개월 무상 관리"];
+export const planCommon = ["업종별 법정 고지 검토", "원본 소스 제공", "점검 결과표와 인계 문서", "오픈 후 1개월 무상 하자보수"];
 
 /** 패키지 금액 밖에서 드는 돈. 숫자는 /tools/hosting-cost(data/hostingPrices.ts) 조사값에서 나온 범위다. */
 export const runningCostNote =
@@ -187,10 +187,10 @@ export interface Addon {
 export const addons: Addon[] = [
   { id: "page", name: "추가 페이지", price: 30_000, unit: "쪽", days: 0.2 },
   { id: "board", name: "게시판 추가", price: 100_000, unit: "개", days: 1 },
-  { id: "tool", name: "조회, 계산 도구", price: 100_000, unit: "개", days: 1 },
+  { id: "tool", name: "조회와 계산 도구", price: 100_000, unit: "개", days: 1 },
   { id: "print", name: "인쇄용 출력 화면", price: 100_000, unit: "개", days: 1 },
   { id: "lang", name: "영문 화면", price: 200_000, unit: "식", days: 2 },
-  { id: "member", name: "회원가입, 로그인", price: 200_000, unit: "식", days: 2 },
+  { id: "member", name: "회원가입과 로그인", price: 200_000, unit: "식", days: 2 },
   { id: "live", name: "실시간 예약 현황", price: 300_000, unit: "식", days: 3 },
   { id: "map", name: "지도 검색", price: 300_000, unit: "식", days: 3 },
   { id: "pay", name: "온라인 결제 연동", price: 300_000, unit: "식", days: 2 },

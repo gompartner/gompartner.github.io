@@ -854,10 +854,12 @@ if (document.createElement('canvas').getContext('webgl2')) {
   try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
 }
 if (!renderer) { document.body.classList.add('no-gl'); await new Promise(() => {}); }
-const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.75); // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
+const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.5); // 11-24 PC 1.75에서 1.5로(끌 때 프레임이 떨어짐) // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
 renderer.setPixelRatio(DPR);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.autoUpdate = false; // 11-24 그림자는 두 프레임에 한 번만 다시 그린다
+let shadowTick = 0;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
@@ -872,7 +874,7 @@ const skyU = { uTop: { value: new THREE.Color() }, uHor: { value: new THREE.Colo
 const sky = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.ShaderMaterial({
   uniforms: skyU, side: THREE.BackSide, depthWrite: false, fog: false,
   vertexShader: 'varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-  fragmentShader: 'uniform vec3 uTop, uHor; uniform float uH; varying vec3 vD; void main(){ float h = clamp(gl_FragCoord.y / uH, 0.0, 1.0); gl_FragColor = vec4(mix(uHor, uTop, smoothstep(0.15, 1.0, h)), 1.0); }'
+  fragmentShader: 'uniform vec3 uTop, uHor; uniform float uH; varying vec3 vD; void main(){ float h = clamp(gl_FragCoord.y / uH, 0.0, 1.0); float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5; gl_FragColor = vec4(mix(uHor, uTop, smoothstep(0.15, 1.0, h)) + n * 0.012, 1.0); }'
 }));
 scene.add(sky);
 
@@ -966,6 +968,8 @@ const mat = {
   win2: M(0x39424c, { roughness: 0.15, metalness: 0.3, emissive: new THREE.Color(0xffd7a0), emissiveIntensity: 0 }),
   lamp: M(0xfff3dc, { emissive: new THREE.Color(0xffd9a0), emissiveIntensity: 0 }),
   paper: M(0xf6e7c8, { emissive: new THREE.Color(0xffa860), emissiveIntensity: 0 }),
+  lampR: M(0xe0483c, { emissive: new THREE.Color(0xff5a3c), emissiveIntensity: 0 }), lampY: M(0xf2c14e, { emissive: new THREE.Color(0xffc23c), emissiveIntensity: 0 }), lampB: M(0x4f86d9, { emissive: new THREE.Color(0x4f9bff), emissiveIntensity: 0 }), lampP: M(0xee8fb0, { emissive: new THREE.Color(0xff7fb0), emissiveIntensity: 0 }), lampG: M(0x6fbf7a, { emissive: new THREE.Color(0x5fe08a), emissiveIntensity: 0 }),
+  silkRed: M(0xc8322d, { roughness: 0.6 }), silkBlue: M(0x2c5aa8, { roughness: 0.6 }), jar: M(0x4a2f24, { roughness: 0.45 }), maple: M(0xc8472b, { roughness: 0.9 }), blossom: M(0xf0a8b8, { roughness: 0.9 }),
   lattice: M(0xffffff, { map: latticeTex, emissive: new THREE.Color(0xffb870), emissiveMap: latticeTex, emissiveIntensity: 0 }),
   head: M(0xfff4dc, { emissive: new THREE.Color(0xfff0d0), emissiveIntensity: 0 }),
   tail: M(0x9a1f1a, { emissive: new THREE.Color(0xff3020), emissiveIntensity: 0 }),
@@ -1109,7 +1113,7 @@ function tree(x, z, s = 1, kind = 0) {
   if (kind === 1) {
     for (let i = 0; i < 3; i++) k.add(new THREE.ConeGeometry((0.75 - i * 0.18) * s, 0.8 * s, 7), mat.pine, 0, (0.25 + i * 0.42) * s, 0, i);
   } else {
-    const m = [mat.leaf, mat.leaf2, mat.leaf3][(Math.abs(Math.round(x * 3 + z)) % 3)];
+    const m = kind === 2 ? mat.maple : [mat.leaf, mat.leaf2, mat.leaf3][(Math.abs(Math.round(x * 3 + z)) % 3)];
     k.add(ico1, m, 0, 0.45 * s, 0, 0, 0, 0, 0.62 * s, 0.6 * s, 0.62 * s);
     k.add(ico1, m, 0.32 * s, 0.25 * s, 0.1 * s, 1, 0, 0, 0.42 * s, 0.4 * s, 0.42 * s);
     k.add(ico1, m, -0.28 * s, 0.3 * s, -0.12 * s, 2, 0, 0, 0.45 * s, 0.42 * s, 0.45 * s);
@@ -1337,12 +1341,37 @@ let chimneyTop;
   k.box(1.4, 0.08, 1.0, mat.wood2, 2.7, 0.38, 1.8); for (const [dx, dz] of [[-0.6, -0.4], [0.6, -0.4], [-0.6, 0.4], [0.6, 0.4]]) k.box(0.07, 0.38, 0.07, mat.woodD, 2.7 + dx, 0, 1.8 + dz);
   k.box(0.5, 0.04, 0.34, mat.woodD, 0.9, 0.46, 1.1);
   for (let i = 0; i < 7; i++) k.cyl(0.22, 0.26, 0.06, mat.stone, -0.9 + i * 0.5, 0, -0.1 + Math.sin(i) * 0.12, 9);
+  // 11-24 장독대: 돌 단 위에 크고 작은 항아리
+  k.box(0.9, 0.12, 1.5, mat.stone, 3.4, 0, 0.1);
+  { const jarG = new THREE.SphereGeometry(1, 14, 10);
+    for (const [jx, jz, r] of [[3.55, -0.42, 0.21], [3.55, 0.08, 0.26], [3.55, 0.6, 0.2], [3.14, -0.3, 0.15], [3.12, 0.12, 0.17], [3.14, 0.52, 0.13]]) {
+      k.add(jarG, mat.jar, jx, 0.12 + r * 1.05, jz, 0, 0, 0, r, r * 1.15, r);
+      k.cyl(r * 0.62, r * 0.7, 0.05, mat.jar, jx, 0.12 + r * 2.12, jz, 12);
+    } }
+  // 석등: 대문 안쪽
+  k.box(0.34, 0.1, 0.34, mat.stone, 1.0, 0, -2.35); k.cyl(0.07, 0.09, 0.5, mat.stone, 1.0, 0.1, -2.35, 8);
+  k.box(0.3, 0.06, 0.3, mat.stone, 1.0, 0.6, -2.35); k.box(0.22, 0.2, 0.22, mat.paper, 1.0, 0.66, -2.35);
+  k.add(new THREE.ConeGeometry(0.27, 0.18, 4), mat.stone, 1.0, 0.95, -2.35, Math.PI / 4);
+  // 담 밑 꽃
+  { const fl = new THREE.IcosahedronGeometry(1, 0);
+    for (let i = 0; i < 9; i++) k.add(fl, i % 3 === 1 ? mat.white : mat.blossom, -0.9 + i * 0.36, 0.14, -1.05 + Math.sin(i * 2.1) * 0.07, i, 0, 0, 0.11, 0.1, 0.11);
+    for (let i = 0; i < 9; i++) k.add(fl, mat.leaf, -0.9 + i * 0.36, 0.05, -1.03, i, 0, 0, 0.16, 0.07, 0.14); }
+  // 11-24 연등 줄: 마당 위로 두 줄, 밤에 켜진다
+  { const lg = new THREE.SphereGeometry(0.105, 10, 8), cols = [mat.lampR, mat.lampY, mat.lampB, mat.lampP, mat.lampG];
+    const strings = [[V(-0.35, 2.28, -1.9), V(3.8, 1.25, -2.9)], [V(-0.35, 2.28, 1.9), V(3.8, 1.25, 2.9)], [V(-0.35, 2.28, 0), V(3.85, 1.25, 0.1)]];
+    strings.forEach(([a, b], si) => {
+      const n = 8, pts = [];
+      for (let i = 0; i <= n; i++) { const u = i / n, pnt = a.clone().lerp(b, u); pnt.y -= Math.sin(u * Math.PI) * 0.32; pts.push(pnt); }
+      k.add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 0.008, 4, false), mat.dark);
+      for (let i = 1; i < n; i++) k.add(lg, cols[(i + si * 2) % 5], pts[i].x, pts[i].y - 0.12, pts[i].z, 0, 0, 0, 1, 1.2, 1);
+    }); }
   // 굴뚝
   k.box(0.45, 2.3, 0.45, mat.stone2, -3.3, 0, 2.6);
   k.box(0.6, 0.08, 0.6, mat.roof, -3.3, 2.3, 2.6);
   k.flush(g);
   chimneyTop = V(-8.3 - 3.3, 2.5, 6.05 + 2.6);
   const pine = tree(-8.3 + 2.6, 6.05 - 1.6, 1.25, 1);
+  tree(-8.3 - 0.1, 6.05 + 2.25, 1.25, 2);
   // 본채: 앞이 +x를 보도록 돌려 둡니다
   const hall = new THREE.Group(); hall.rotation.y = Math.PI / 2; hall.position.set(-1.25, 0, 0.0); g.add(hall);
   const h = Kit(), W = 5.2, D = 2.4;
@@ -1374,11 +1403,15 @@ let chimneyTop;
     const L2 = W + 1.6;
     for (const [a0, c, b0] of slopes) {
       const pts = []; for (let i = 0; i <= 8; i++) { const [zz, yy] = q(a0, c, b0, i / 8); pts.push(V(0, yy, zz)); }
-      const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 10, 0.035, 4, false);
-      for (let x = -L2 / 2 + 0.12; x < L2 / 2 - 0.05; x += 0.2) h.add(tube, mat.roofLine, x, 0, 0);
+      // 11-24 수키와 줄을 굵고 성기게(0.035, 0.2 간격은 움직일 때 반짝였다), 처마 끝에 막새
+      const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 10, 0.055, 6, false);
+      const cap = new THREE.CylinderGeometry(0.075, 0.075, 0.05, 12).rotateX(Math.PI / 2);
+      for (let x = -L2 / 2 + 0.16; x < L2 / 2 - 0.08; x += 0.32) { h.add(tube, mat.roofLine, x, 0, 0); h.add(cap, mat.roofLine, x, a0[1] + 0.005, a0[0] + (a0[0] > 0 ? 0.02 : -0.02)); }
       h.add(new THREE.CylinderGeometry(0.05, 0.05, L2, 6).rotateZ(Math.PI / 2), mat.roofLine, 0, a0[1] + 0.02, a0[0]);
     }
   }
+  { const raf = new THREE.CylinderGeometry(0.04, 0.04, 0.62, 6).rotateX(Math.PI / 2);
+    for (let x = -(W + 1.6) / 2 + 0.2; x < (W + 1.6) / 2 - 0.1; x += 0.3) { h.add(raf, mat.wood2, x, 2.37, 0.68); h.add(raf, mat.wood2, x, 2.37, -3.08); } }
   h.box(W + 1.2, 0.2, 0.22, mat.roof, 0, 3.5, -1.2);
   h.box(W + 1.2, 0.04, 0.24, mat.white, 0, 3.46, -1.2);
   for (const s of [-1, 1]) h.add(new THREE.ConeGeometry(0.12, 0.3, 6), mat.roof, s * (W / 2 + 0.6), 3.72, -1.2, 0, 0, s * -0.5);
@@ -1387,6 +1420,8 @@ let chimneyTop;
     const l = new THREE.Group();
     const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.25, 4), mat.dark); cord.position.y = 0.12; l.add(cord);
     const b = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.24, 12), mat.paper); l.add(b);
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.116, 0.116, 0.09, 12), mat.silkRed); top.position.y = 0.08; l.add(top);
+    const bot = new THREE.Mesh(new THREE.CylinderGeometry(0.116, 0.116, 0.09, 12), mat.silkBlue); bot.position.y = -0.08; l.add(bot);
     l.position.set(cx, 2.05, 0.35); hall.add(l); lanterns.push(l);
   }
   { const hb = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.34), signMat(signTex('찻집', '#6a4630', '#f4ecd8', 256, 96, 0.62), 0xffd9a8)); hb.position.set(0, 2.08, 0.1); hall.add(hb); nightMats.push(hb.material);
@@ -2018,7 +2053,7 @@ function dayUI() {
 }
 
 // ---------- 끌어서 돌리기, 고르기 ----------
-const user = { az: 0, el: 0, idle: 99 };
+const user = { az: 0, el: 0, idle: 99, zoom: 1, zs: 1 };
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e) {
   const r = canvas.getBoundingClientRect();
@@ -2028,8 +2063,12 @@ function pick(e) {
   return h ? h.object.userData.id : null;
 }
 let drag = null;
-canvas.addEventListener('pointerdown', e => { drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, type: e.pointerType }; });
+const pts = new Map(); let pinch = 0;
+const setZoom = z => { user.zoom = clamp(z, 0.55, 1.5); user.idle = 0; dirty = true; };
+canvas.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); setZoom(user.zoom * Math.exp(e.deltaY * 0.0022)); }, { passive: false });
+canvas.addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a[0] - b[0], a[1] - b[1]); drag = null; canvas.classList.remove('drag'); return; } } drag = { id: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false, type: e.pointerType }; });
 addEventListener('pointermove', e => {
+  if (pts.has(e.pointerId)) { pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size === 2 && pinch) { const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (d > 0) { setZoom(user.zoom * pinch / d); pinch = d; } return; } }
   if (drag && e.pointerId === drag.id) {
     if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 7) {
       // 휴대폰은 가로로 끌 때만 돌립니다. 세로는 페이지 스크롤에 맡깁니다
@@ -2040,19 +2079,20 @@ addEventListener('pointermove', e => {
     if (drag.moved) {
       user.az -= (e.clientX - drag.lx) * 0.0055;
       if (drag.type === 'mouse') user.el += (e.clientY - drag.ly) * 0.003;
-      user.az = clamp(user.az, -1.0, 1.0); user.el = clamp(user.el, -0.3, 0.3);
+      user.el = clamp(user.el, -0.42, 0.42); // 11-24 좌우는 한 바퀴 자유롭게, 위아래만 제한
       user.idle = 0; dirty = true;
     }
     drag.lx = e.clientX; drag.ly = e.clientY;
   } else if (e.pointerType === 'mouse' && e.target === canvas) setHover(pick(e));
 }, { passive: true });
 addEventListener('pointerup', e => {
+  if (pts.delete(e.pointerId)) pinch = 0;
   if (!drag || e.pointerId !== drag.id) return;
   if (!drag.moved) { const id = pick(e); if (id) select(id, false); else deselect(); }
   canvas.classList.remove('drag');
   drag = null;
 });
-addEventListener('pointercancel', () => { drag = null; canvas.classList.remove('drag'); });
+addEventListener('pointercancel', e => { pts.delete(e.pointerId); pinch = 0; drag = null; canvas.classList.remove('drag'); });
 canvas.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !drag) setHover(null); });
 
 // ---------- 카메라 ----------
@@ -2081,7 +2121,7 @@ function placeCamera(dt) {
     des.t.set(wide ? -0.9 : 0, wide ? 0.2 : 1.2, wide ? 0.4 : 0.5); des.az = (wide ? 0.3 : PH.az) + user.az; des.el = (wide ? 0.74 : PH.el) + user.el;
     des.fw = wide ? 32.5 : 18.5; des.fh = wide ? 18 : 17;
     des.ox = 0; des.oy = wide ? 0.035 : PH.oy; des.aw = wide ? 1.0 : PH.aw; des.ah = wide ? 0.84 : PH.ah;
-    if (focus && !reduce && wide) { des.t.lerp(B[focus].view.t, 0.08); des.az += (B[focus].view.az - 0.3) * 0.12; }
+    // 11-24 이야기 순서에 따라 카메라가 조금씩 따라가던 것 없앰(가만히 있어도 윤곽이 계속 흔들림)
   }
   const rate = selected ? 2.4 : user.idle < 4 ? 6 : 0.55;
   const k = camInit && !reduce ? 1 - Math.exp(-dt * rate) : 1;
@@ -2106,7 +2146,7 @@ function placeCamera(dt) {
   if (!cam.dist || !camInit2) { cam.dist = distDes; camInit2 = true; }
   cam.dist += (distDes - cam.dist) * k;
   if (Math.abs(distDes - cam.dist) < 1e-4) cam.dist = distDes;
-  const dist = cam.dist;
+  const dist = cam.dist * (selected ? 1 : user.zs);
   camera.position.set(cam.t.x + Math.sin(cam.az) * Math.cos(cam.el) * dist, cam.t.y + Math.sin(cam.el) * dist, cam.t.z + Math.cos(cam.az) * Math.cos(cam.el) * dist);
   camera.lookAt(cam.t);
   camera.aspect = asp;
@@ -2298,6 +2338,7 @@ function story(t, dt, time) {
   // 5. 저녁: 찻집 마당에 사람들이 모이고 등이 켜집니다
   const eve = sm(range(t, 0.64, 0.7)) * (1 - sm(range(t, 0.96, 0.99)));
   mat.paper.emissiveIntensity = eve * 2.6; mat.lattice.emissiveIntensity = eve * 0.9;
+  for (const n of ['lampR', 'lampY', 'lampB', 'lampP', 'lampG']) mat[n].emissiveIntensity = 0.12 + eve * 2.2;
   teaLight.intensity = eve * 6;
   guests.forEach((p, i) => {
     const t0 = 0.655 + i * 0.022;
@@ -2501,7 +2542,8 @@ function loop(now) {
   if (now - fpsT > 1000) { window.__fps = Math.round(frames * 1000 / (now - fpsT)); frames = 0; fpsT = now; }
   const time = now / 1000;
   user.idle += dt;
-  if (user.idle > 4 && !selected && !drag) { const k = 1 - Math.exp(-dt * 0.5); user.az -= user.az * k; user.el -= user.el * k; if (Math.abs(user.az) < 1e-5) user.az = 0; if (Math.abs(user.el) < 1e-5) user.el = 0; }
+  // 11-24 돌려 둔 방향은 그대로 둔다(4초 뒤 제자리로 돌아가던 것 없앰)
+  if (Math.abs(user.zoom - user.zs) > 1e-4) { user.zs += (user.zoom - user.zs) * (1 - Math.exp(-dt * 10)); dirty = true; } else user.zs = user.zoom;
   if (reduce && !dirty && !drag) return;
   if (window.__freeze) { composer.render(); placePins(); return; }
   if (day.playing) day.t = (day.t + dt / CYCLE) % 1;
@@ -2520,6 +2562,7 @@ function loop(now) {
   placeCamera(dt);
   sky.position.copy(camera.position);
   finalPass.uniforms.uTime.value = time;
+  if ((shadowTick++ & 1) === 0) renderer.shadowMap.needsUpdate = true;
   composer.render();
   placePins();
   dayUI();

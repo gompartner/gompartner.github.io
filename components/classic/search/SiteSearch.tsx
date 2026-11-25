@@ -21,7 +21,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
   const found = useMemo(() => index.filter((i) => matches(`${i.title} ${i.desc} ${i.hay} ${i.kind}`, q)), [index, q]);
   return (
     <div>
-      <SearchBox id="site-search" value={q} onChange={setQ} placeholder="서비스, 카탈로그, 자주 묻는 질문 검색" suggestions={SUGGEST} />
+      <SearchBox id="site-search" value={q} onChange={setQ} placeholder="서비스, 포트폴리오, 자주 묻는 질문 검색" suggestions={SUGGEST} />
       <p className="mt-8 text-[15px] text-[#5b6370]" role="status">
         {q ? (
           <>

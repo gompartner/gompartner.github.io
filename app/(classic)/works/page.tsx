@@ -3,16 +3,17 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHead, SubTabs, h2, more, wrap } from "@/components/classic/ui";
 import { serviceTabs } from "@/components/classic/pricing/tabs";
+import { CatalogShelf } from "@/components/classic/works/CatalogShelf";
 import { SampleGrid } from "@/components/classic/works/SampleGrid";
-import { catalogGroups, catalogProjects, homepageProjects, samplesIn, worksTabs } from "@/components/classic/works/samples";
+import { catalogGroups, catalogProjects, homepageProjects, samplesIn, shelfItems, worksTabs } from "@/components/classic/works/samples";
 import { industries } from "@/data/classic/industries";
 import { pageMeta } from "@/lib/seo";
 import { buildCatalogIndex } from "@/components/classic/search/index";
 import { CatalogSearch } from "@/components/classic/search/CatalogSearch";
 
 export const metadata: Metadata = pageMeta({
-  title: "홈페이지 제작 카탈로그",
-  description: `병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작 카탈로그 ${catalogProjects.length}개. 화면 구성과 주요 기능을 직접 사용해 볼 수 있습니다.`,
+  title: "홈페이지 제작 포트폴리오",
+  description: `병원, 매장, 전문직, 기업, 학원 업종별 홈페이지 제작 포트폴리오 ${catalogProjects.length}개. 화면 구성과 주요 기능을 직접 사용해 볼 수 있습니다.`,
   path: "/works",
   noindex: true,
 });
@@ -31,9 +32,7 @@ export default function ClassicWorksPage() {
       />
       <SubTabs items={serviceTabs} current="/works" />
       <SubTabs items={worksTabs} current="/works" level={3} />
-      <p className={`${wrap} pt-10 text-[17px] font-bold leading-[1.6] md:pt-12 md:text-[19px]`}>
-        업종마다 시안 두 가지를 준비했습니다. 화면을 누르면 그 시안이 바로 열립니다.
-      </p>
+      <CatalogShelf items={shelfItems()} />
       <CatalogSearch index={buildCatalogIndex()}>
       {[
         // 11-22 업종 홈페이지는 업종별로 묶는다(한 목록에 50개를 섞지 않는다)

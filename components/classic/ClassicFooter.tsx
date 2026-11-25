@@ -11,17 +11,16 @@ const groups = [
   {
     title: "유지보수",
     items: [
-      { href: "/maintenance/takeover", label: "업체 변경" },
-      { href: "/maintenance/ai-site", label: "AI 사이트" },
-      { href: "/maintenance/fix", label: "오류 수정" },
-      { href: "/maintenance/update", label: "보안 업데이트" },
-      { href: "/maintenance/monthly", label: "월 유지보수" },
-      { href: "/maintenance/standard", label: "운영 기준" },
+      { href: "/maintenance/fix", label: "유지보수" },
+      { href: "/maintenance/monthly", label: "유지관리" },
+      { href: "/maintenance/perf", label: "성능 개선" },
+      { href: "/maintenance/ai-site", label: "고도화" },
     ],
   },
   {
     title: "제작",
     items: [
+      { href: "/works", label: "포트폴리오" },
       { href: "/homepage", label: "홈페이지 제작" },
       { href: "/landing-page", label: "랜딩페이지 제작" },
       { href: "/program", label: "업무 프로그램 제작" },
@@ -36,6 +35,7 @@ const groups = [
     items: [
       { href: "/pricing", label: "비용" },
       { href: "/story", label: "회사소개" },
+      { href: "/history", label: "연혁" },
       { href: "/notice", label: "공지사항" },
       { href: "/faq", label: "자주 묻는 질문" },
       { href: "/contact", label: "상담 신청" },

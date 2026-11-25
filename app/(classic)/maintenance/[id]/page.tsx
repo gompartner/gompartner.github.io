@@ -7,6 +7,7 @@ import { ArrowUpRight, Check, FileText } from "lucide-react";
 import { FaqBlock } from "@/components/classic/FaqBlock";
 import { StepList } from "@/components/classic/pricing/StepList";
 import { PageHead, SubTabs, h2, h3, wrap } from "@/components/classic/ui";
+import { ReviewRequest } from "@/components/classic/ReviewRequest";
 import { maintenanceFaq, maintenanceServices, replyTerm } from "@/data/classic/maintenance";
 import { pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
@@ -94,6 +95,12 @@ export default async function MaintenanceDetailPage({ params }: Props) {
         </dl>
       </section>
 
+      {/* 11-25 유지관리: 계약 전 사전 검토 신청 */}
+      {s.id === "monthly" ? (
+        <section aria-label="사전 검토 신청" className={`${wrap} pb-14 md:pb-20`}>
+          <ReviewRequest />
+        </section>
+      ) : null}
 
       <section aria-labelledby="md-cases" className="border-t border-[#e6e9ee] bg-[#f6f8fb]">
         <div className={`${wrap} py-16 md:py-24`}>
@@ -141,7 +148,7 @@ export default async function MaintenanceDetailPage({ params }: Props) {
           </div>
           {/* 11-01 문서 그림은 밖에 보이지 않는다(지어낸 기록처럼 읽힘). 작업 장면 사진으로 */}
           <div className="relative aspect-[16/10] overflow-hidden rounded-lg">
-            <Image src={`/images/site/scene-${s.id}.jpg`} alt={`${s.title} 작업 장면`} fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
+            <Image src={`/images/site/scene-${s.id === "perf" ? "update" : s.id}.jpg`} alt={`${s.title} 작업 장면`} fill sizes="(min-width: 768px) 560px, 92vw" className="object-cover" />
           </div>
         </div>
       </section>
