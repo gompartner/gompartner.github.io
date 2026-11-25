@@ -54,6 +54,23 @@ export function ClassicHome() {
 function Hero() {
   return (
     <section aria-labelledby="c-hero" className="border-b border-[#e6e9ee]">
+      {/* 11-25 첫 주문 입구: 건별 수정(유지보수 페이지와 같은 금액) */}
+      <div className="bg-[#15171c] text-white">
+        <div className={`${wrap} flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between`}>
+          <p className="break-keep text-[16px] leading-[1.5] md:text-[18px]">
+            <b className="font-[800]">홈페이지 수정 1건 10,000원부터.</b>{" "}
+            <span className="text-[#c9ced6]">아임웹, 카페24, 워드프레스, AI로 만든 사이트까지 금액을 먼저 안내합니다.</span>
+          </p>
+          <div className="flex shrink-0 gap-2">
+            <NavLink href="/contact?promo=fix" className="inline-flex min-h-[44px] items-center rounded-md bg-white px-4 text-[15px] font-bold text-[#15171c] hover:bg-[#e8ecf2]">
+              수정 요청하기
+            </NavLink>
+            <NavLink href="/maintenance/fix" className="inline-flex min-h-[44px] items-center rounded-md border border-[#5b6370] px-4 text-[15px] font-bold text-white hover:border-white">
+              금액 보기
+            </NavLink>
+          </div>
+        </div>
+      </div>
       <div className={`${wrap} pb-10 pt-8 md:pb-16 md:pt-12`}>
         <h1 id="c-hero" className="mb-6 break-keep text-[17px] font-bold tracking-[-0.02em] text-[#3d4450] md:mb-8 md:text-[19px]">
           홈페이지, 앱 제작과 유지보수
