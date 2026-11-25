@@ -2054,6 +2054,13 @@ function dayUI() {
 
 // ---------- 끌어서 돌리기, 고르기 ----------
 const user = { az: 0, el: 0, idle: 99, zoom: 1, zs: 1 };
+// 11-25 끼워 쓰는 쪽(메인 첫 화면)에서 처음 보이는 각도와 거리를 정할 수 있다: ?az=(좌우 회전, 라디안)&el=(위아래)&zoom=(0.55 가까이 ~ 1.5 멀리)
+{
+  const q = new URLSearchParams(location.search), n = k => parseFloat(q.get(k));
+  if (isFinite(n('az'))) user.az = n('az');
+  if (isFinite(n('el'))) user.el = clamp(n('el'), -0.42, 0.42);
+  if (isFinite(n('zoom'))) user.zoom = user.zs = clamp(n('zoom'), 0.55, 1.5);
+}
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 function pick(e) {
   const r = canvas.getBoundingClientRect();
@@ -2498,7 +2505,8 @@ function placePins() {
     const x = (pv.x * 0.5 + 0.5) * W, y = (-pv.y * 0.5 + 0.5) * H;
     const el = b.pinEl;
     if (!b.pw) b.pw = el.offsetWidth;
-    const cx = clamp(x - b.pw / 2, 6, W - b.pw - 6), cy = clamp(y - 30, 54, H - 120);
+    // 11-25 작은 창(메인 첫 화면에 끼운 휴대폰 화면)에서는 위아래 여백을 줄인다. 넓게 잡으면 이름표가 가운데에 몰려 겹친다
+    const cx = clamp(x - b.pw / 2, 6, W - b.pw - 6), cy = clamp(y - 30, H < 420 ? 6 : 54, H - (H < 420 ? 66 : 120));
     // 제목과 겹치는 이름표는 잠시 숨깁니다
     const cy2 = cy < h1Box.bottom + 6 && cx < h1Box.right ? h1Box.bottom + 6 : cy;
     el.classList.toggle('off', !!selected && id !== selected);
@@ -2519,6 +2527,8 @@ function size() {
   ORDER.forEach(id => { B[id].pw = 0; });
   const hb = hero.querySelector('h1').getBoundingClientRect(), r0 = hero.getBoundingClientRect();
   h1Box = { bottom: hb.bottom - r0.top, right: hb.right - r0.left };
+  // 11-25 끼워 쓸 때는 제목이 보이지 않으니(visibility: hidden) 이름표가 제목 자리를 피하지 않게 한다. 좁은 창에서 이름표가 한 줄로 몰렸다
+  if (document.documentElement.classList.contains('embed')) h1Box = { bottom: -1e3, right: 0 };
   dirty = true;
 }
 let dirty = true;

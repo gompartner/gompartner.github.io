@@ -8,7 +8,8 @@ import { asm } from "@/components/classic/assembleState";
 // 휴대폰에서 완성된 마을 사진을 먼저 보여 주고 버튼을 눌러야 3D가 나오던 것은 뺐다(사용자 "이미 다 그려져 있어, 눌러야 하는 게 불편").
 // 대신 3D는 창이 화면에 들어오고 창 조립이 끝난 뒤에 불러온다. 첫 화면 글자 조립과 겹치지 않아 처음 열 때 덜 버벅인다.
 // 새로고침 전에 이미 조립했으면 건물 연출 없이 바로 불러온다.
-const BASE = process.env.NODE_ENV === "development" ? "/3d/island.html" : "/3d/island";
+// 처음 보이는 각도(11-25 사용자가 아이패드에서 돌려 보여 준 화면): 길이 가로로 놓이고 건물 다섯 채가 정면으로 보인다
+const BASE = `${process.env.NODE_ENV === "development" ? "/3d/island.html" : "/3d/island"}?az=-0.8&zoom=1`;
 
 type V = CSSProperties & Record<`--${string}`, string>;
 const at = (d: number): V => ({ "--d": `${d.toFixed(2)}s` });
@@ -40,7 +41,7 @@ export function TownWindow() {
       if (!e.isIntersecting) return;
       io.disconnect();
       timer = window.setTimeout(() => {
-        const go = () => setSrc(built ? BASE : `${BASE}?build=1`);
+        const go = () => setSrc(built ? BASE : `${BASE}&build=1`);
         if ("requestIdleCallback" in window) idle = window.requestIdleCallback(go, { timeout: 1200 });
         else go();
       }, built ? 200 : 1300);
