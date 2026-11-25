@@ -7,6 +7,9 @@ import s from "./SiteBuilder.module.css";
 
 // 11-25 메인 첫 화면: 홈페이지가 만들어지는 과정을 손님이 직접 본다.
 // 장면 순서(사용자 확인): 1 빈 브라우저 창 > 2 뼈대가 선으로 그려짐 > 3 사진과 색이 위에서 아래로 입혀짐 > 4 상호가 한 자씩 써짐 > 5 모바일 화면이 옆에 섬 > 6 오픈 표시.
+/** 시안 글자(A, B, C...). 이름표가 "시안 C 2026 ..."이면 C, 아니면 id를 대문자로 */
+const letterOf = (v: { id: string; label: string }) => v.label.match(/^시안 ([A-Z])/)?.[1] ?? v.id.toUpperCase();
+
 export type BuilderItem = { group: string; id: string; slug: string; name: string; variants: { id: string; label: string }[] };
 
 const STEPS = ["업종과 시안 선택", "상호와 자료 반영", "견적", "제작과 수정", "오픈과 납품", "하자보수와 유지관리"];
@@ -83,7 +86,7 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
   const mw = Math.max(92, w * 0.24), sm = mw / MW;
   const done = phase >= 3 ? (name.trim() ? 2 : 1) : 0;
   const shown = typed || item.name;
-  const msg = `${item.name} 홈페이지, 시안 ${variant.id.toUpperCase()}${name.trim() ? `, 상호 ${name.trim()}` : ""}`;
+  const msg = `${item.name} 홈페이지, 시안 ${letterOf(variant)}${name.trim() ? `, 상호 ${name.trim()}` : ""}`;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-x-12 lg:gap-y-8">
@@ -106,7 +109,7 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
             <span>시안</span>
             {item.variants.map((x) => (
               <button key={x.id} type="button" aria-pressed={x.id === variant.id} onClick={() => setV(x.id)} className={`h-12 rounded-md border-2 px-3.5 text-[17px] font-[800] md:h-14 md:text-[21px] ${x.id === variant.id ? "border-[#256ef4] bg-[#256ef4] text-white" : "border-[#c9d0da] bg-white text-[#15171c]"}`}>
-                {x.id.toUpperCase()}
+                {letterOf(x)}
               </button>
             ))}
           </div>
@@ -133,17 +136,17 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
               <span className={s.wCard} style={{ left: "5%" }} /><span className={s.wCard} style={{ left: "36.5%" }} /><span className={s.wCard} style={{ left: "68%" }} />
             </div>
             <div className={s.paint}>
-              <iframe ref={pc} key={src} src={src} title={`${item.name} 홈페이지 시안 ${variant.id.toUpperCase()} PC 미리보기`} onLoad={() => { setLoaded(true); apply(pc.current); }} style={{ width: PCW, height: PCH, transform: `scale(${sp})` }} />
+              <iframe ref={pc} key={src} src={src} title={`${item.name} 홈페이지 시안 ${letterOf(variant)} PC 미리보기`} onLoad={() => { setLoaded(true); apply(pc.current); }} style={{ width: PCW, height: PCH, transform: `scale(${sp})` }} />
             </div>
             <div className={s.phone} style={{ width: mw, height: MH * sm }}>
               {phase >= 1 ? (
-                <iframe ref={mo} key={`m-${src}`} src={src} title={`${item.name} 홈페이지 시안 ${variant.id.toUpperCase()} 모바일 미리보기`} onLoad={() => apply(mo.current)} style={{ width: MW, height: MH, transform: `scale(${sm})` }} />
+                <iframe ref={mo} key={`m-${src}`} src={src} title={`${item.name} 홈페이지 시안 ${letterOf(variant)} 모바일 미리보기`} onLoad={() => apply(mo.current)} style={{ width: MW, height: MH, transform: `scale(${sm})` }} />
               ) : null}
             </div>
           </div>
         </div>
         <p className="mt-2.5 text-[15px] font-bold text-[#3d4450] md:text-[16px]" aria-live="polite">
-          {phase === 0 ? "화면 구성 중" : phase === 1 ? "디자인 적용 중" : phase === 2 ? "모바일 화면 확인 중" : `${shown} 홈페이지, 시안 ${variant.id.toUpperCase()}`}
+          {phase === 0 ? "화면 구성 중" : phase === 1 ? "디자인 적용 중" : phase === 2 ? "모바일 화면 확인 중" : `${shown} 홈페이지, 시안 ${letterOf(variant)}`}
         </p>
       </div>
 
