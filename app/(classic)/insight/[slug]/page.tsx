@@ -121,13 +121,13 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                     <>
                       {/* 휴대폰은 줄마다 카드로, md부터 표로 */}
                       <ul className="space-y-2 md:hidden" role="list">
-                        {b.table.rows.map((r) => {
+                        {b.table.rows.map((r, ri) => {
                           // 첫 칸이 순번 숫자뿐이면 둘째 칸과 합쳐 제목으로 ("1. 장애")
                           const num = /^\d+$/.test(r[0]) && r.length > 2;
                           const start = num ? 2 : 1;
                           return (
                           <li
-                            key={r[0]}
+                            key={ri}
                             className="rounded-md bg-[#f6f7f9] p-4"
                           >
                             <b className="block text-[17px] font-[800]">
@@ -151,9 +151,9 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                         <table className="w-full border-collapse border-t-2 border-[#15171c] text-left text-[15px] md:text-[16px]">
                           <thead>
                             <tr className="border-b border-[#e6e9ee] bg-[#f6f7f9]">
-                              {b.table.head.map((h) => (
+                              {b.table.head.map((h, hi) => (
                                 <th
-                                  key={h}
+                                  key={hi}
                                   scope="col"
                                   className="px-3 py-3 font-bold text-[#3d4450] xl:px-4"
                                 >
@@ -163,9 +163,9 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                             </tr>
                           </thead>
                           <tbody>
-                            {b.table.rows.map((r) => (
+                            {b.table.rows.map((r, ri) => (
                               <tr
-                                key={r[0]}
+                                key={ri}
                                 className="border-b border-[#e6e9ee] align-top"
                               >
                                 {r.map((c, ci) =>
