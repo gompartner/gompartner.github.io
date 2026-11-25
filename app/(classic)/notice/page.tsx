@@ -15,9 +15,9 @@ export const metadata: Metadata = pageMeta({
 export default function ClassicNoticePage() {
   return (
     <>
-      <PageHead title="공지사항" trail={[{ href: "/story", label: "곰파트너" }, { href: "/notice", label: "공지사항" }]} />
+      <PageHead en="NOTICE" ice="공지" title="공지사항" lead="서비스 운영 안내와 정책 변경, 이벤트 소식을 알려 드립니다." trail={[{ href: "/notice", label: "공지사항" }]} />
       <SupportTabs current="/notice" />
-      <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
+      <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         <NoticeList rows={notices.map((n) => ({ id: n.id, title: n.title, date: n.date, status: eventStatus(n) }))} />
       </div>
     </>

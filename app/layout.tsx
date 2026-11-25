@@ -69,7 +69,11 @@ export const metadata: Metadata = {
   },
 };
 
-const themeScript = `(function(){try{var m=matchMedia("(prefers-color-scheme: dark)"),t=localStorage.getItem("gp-theme");document.documentElement.classList.toggle("gp-dark",t?t==="dark":m.matches);m.addEventListener("change",function(e){if(!localStorage.getItem("gp-theme"))document.documentElement.classList.toggle("gp-dark",e.matches)})}catch(e){}})();`;
+// 11-26 사이트 색을 하나로: 메인과 안쪽 판이 어두운 화면이라 나머지 페이지(자주 묻는 질문, 공지, 웹 지식 문서)도 같은 어두운 색으로 본다.
+// 방법 셋을 견줬다. (a) 이미 있는 다크모드 색표(app/classic-dark.css)를 늘 켠다 (b) 페이지마다 색을 다시 쓴다 (c) 어두운 틀 안에 밝은 종이를 둔다.
+// (a)로 했다: 내 손이 닿지 않는 부품(검색 결과, 자료 미리보기, 차트)까지 한 번에 같은 색이 되고 11-22에 대비를 재 둔 색표다. 머리와 웹 지식 틀만 판 모양으로 다시 썼고,
+// 흰 바탕이어야 하는 것(상담 신청서)은 메인처럼 keep-light 흰 카드에 둔다((c)는 그 카드에만 썼다). 기기 설정과 gp-theme 저장값은 더 보지 않는다(밝은 화면은 없음).
+const THEME_CLASS = "gp-dark";
 
 export default function RootLayout({
   children,
@@ -80,12 +84,10 @@ export default function RootLayout({
     <html
       lang="ko"
       data-scroll-behavior="smooth"
-      className={pretendard.variable}
+      className={`${pretendard.variable} ${THEME_CLASS}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
-        {/* 11-22 다크모드: 저장한 선택(gp-theme)이 없으면 기기 설정을 따른다. 그리기 전에 html에 dark를 붙인다 */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}
         <script dangerouslySetInnerHTML={{ __html: lookRedirectScript }} />
         {/* 처음 들어온 곳(utm, 바깥 이전 페이지)을 기억해 상담 신청서에 함께 보낸다 */}

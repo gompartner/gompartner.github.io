@@ -10,13 +10,16 @@ const labelIcons: Record<LabelIcon, string> = {
   contact: "/privacy-labels/img_cpo.png",
 };
 
+// 11-26 공식 아이콘은 남색 선 그림(바탕 투명)이라 어두운 바탕에서 안 보인다. 어두운 화면(html.gp-dark)일 때만 흰색으로 뒤집는다: filter: brightness(0) invert(1)
+const onDark = "[html.gp-dark_&]:brightness-0 [html.gp-dark_&]:invert";
+
 function LabelBadge({ icon }: { icon: LabelIcon }) {
   // 고충처리(img_cpo)는 원본이 31px이라 키우지 않는다
   const h = icon === "contact" ? 31 : 48;
   return (
     <span aria-hidden className="inline-flex h-12 shrink-0 items-center justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={labelIcons[icon]} alt="" style={{ height: h, width: "auto" }} />
+      <img src={labelIcons[icon]} alt="" className={onDark} style={{ height: h, width: "auto" }} />
     </span>
   );
 }
@@ -27,7 +30,7 @@ function SectionIcon({ name }: { name: string }) {
     // 원본마다 폭이 31~36px로 달라 같은 폭 상자에 넣어 글자 시작점을 맞춘다
     <span aria-hidden className="inline-flex h-9 w-9 shrink-0 items-center justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`/privacy-labels/${name}.png`} alt="" className="max-h-9 w-auto" />
+      <img src={`/privacy-labels/${name}.png`} alt="" className={`max-h-9 w-auto ${onDark}`} />
     </span>
   );
 }
@@ -71,8 +74,8 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
   const isLatest = version.id === privacyVersions[0].id;
   return (
     <>
-      <PageHead title="개인정보처리방침" trail={[{ href: hrefOf(version.id), label: "개인정보처리방침" }]} />
-      <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
+      <PageHead en="PRIVACY" ice="개인정보" title="개인정보처리방침" lead="상담에서 처리하는 개인정보의 항목, 목적, 보유 기간, 파기 절차를 안내합니다." trail={[{ href: hrefOf(version.id), label: "개인정보처리방침" }]} />
+      <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         <div className="max-w-[860px]">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#e6e9ee] pb-5 text-[16px] text-[#5b6370]">
             <span>시행일 {version.date}</span>

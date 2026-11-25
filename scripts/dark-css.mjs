@@ -2,19 +2,23 @@
 // 화면 코드의 색 클래스(bg-[#..], text-[#..], border-[#..])를 모두 모아, 어두운 화면에서 쓸 색으로 바꾸는 규칙을 만든다.
 // 손으로 정한 대응표(MAP)가 먼저, 나머지는 밝기와 대비(4.5:1 이상)로 자동 계산. 클래식 사이트(.cl) 안에서만, .keep-light 안은 그대로.
 // 화면에 새 색을 쓰면 이 스크립트를 다시 돌린다(package.json prebuild가 돌린다).
+// 11-26 메인과 안쪽 판이 모두 어두운 화면이 되어, 이 CSS가 사이트의 기본 색이 됐다(app/layout.tsx가 html에 gp-dark를 늘 붙인다).
+//  - 바탕과 면, 선, 글자 색을 판(components/classic/board/ui.tsx)과 같은 값으로 맞췄다. 회색 면은 판의 남색 면 계열로 바꾼다.
+//  - 바닥글은 판에서 보이던 색(#15171c) 그대로 둔다. keep-light 안의 입력 칸은 건드리지 않는다(흰 신청서 카드).
+//  - 클래식 사이트(.cl)가 없는 화면(샘플 데모)은 브라우저 기본 색을 어둡게 바꾸지 않는다.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const BG = "#0f1218", SURF = "#161a22", SURF2 = "#1c212b", LINE = "#2a303b", LINE2 = "#4a5361";
-const TXT = "#e8ebf0", TXT2 = "#c9d0da", MUTED = "#a3adbb", BLUE = "#7aa7ff";
+const BG = "#0b0d12", SURF = "#121722", SURF2 = "#171d2a", LINE = "#262c38", LINE2 = "#4a5361";
+const TXT = "#f2f4f8", TXT2 = "#c9ced6", MUTED = "#aab2bf", BLUE = "#7aa7ff";
 
 // 손으로 정한 대응(사이트 기본 팔레트)
 const MAP = {
-  bg: { white: SURF, "#ffffff": SURF, "#fff": SURF, "#15171c": "#2a303b", "#0f1b3d": "#0f1b3d", "#256ef4": "#256ef4", "#0b50d0": "#0b50d0" },
+  bg: { "#7aa7ff": BLUE, white: SURF, "#ffffff": SURF, "#fff": SURF, "#15171c": "#2a303b", "#0f1b3d": "#0f1b3d", "#256ef4": "#256ef4", "#0b50d0": "#0b50d0" },
   text: { "#15171c": TXT, "#2b313b": TXT2, "#3d4450": TXT2, "#5b6370": MUTED, "#6b7280": MUTED, "#6b7380": MUTED, "#256ef4": BLUE, "#1d5fd6": BLUE, white: "#ffffff" },
-  border: { "#15171c": TXT2, "#256ef4": BLUE, "#e6e9ee": LINE, "#d9dee5": LINE, "#c9cfd8": LINE2, white: LINE },
+  border: { "#15171c": TXT2, "#256ef4": BLUE, "#7aa7ff": BLUE, "#e6e9ee": LINE, "#d9dee5": LINE, "#c9cfd8": LINE2, white: LINE },
 };
 
 // 색 계산
@@ -35,8 +39,11 @@ function autoText(c) {
 }
 function autoBg(c) {
   c = named(c);
-  const [h, s, l] = toHsl(hex(c));
+  const rgb = hex(c);
+  const [h, s, l] = toHsl(rgb);
   if (l < 0.6) return null; // 진한 바탕(버튼, 띠)은 그대로
+  // 색이 거의 없는 회색 면은 판의 남색 면(#121722) 계열로, 색이 있는 면(파랑, 노랑, 초록, 빨강 안내)은 그 색을 남긴다
+  if (Math.max(...rgb) - Math.min(...rgb) < 0.05) return toHex(fromHsl([221 / 360, 0.3, 0.1 + (1 - l) * 0.5]));
   return toHex(fromHsl([h, s * 0.45, 0.09 + (1 - l) * 0.55]));
 }
 function autoBorder(c) {
@@ -62,7 +69,8 @@ for (const f of files) {
 
 const esc = (s) => s.replace(/[#\[\]:./]/g, (c) => "\\" + c);
 const S = "html.gp-dark .cl";
-const NOT = ":not(.keep-light *)";
+// keep-light 안과 바닥글 안은 자기 색을 그대로 쓴다(바닥글은 원래 어두운 띠)
+const NOT = ":not(.keep-light *):not(.cl > footer *)";
 const rules = new Map(); // css 값 -> 선택자 목록
 const add = (sel, decl) => { if (!rules.has(decl)) rules.set(decl, []); rules.get(decl).push(sel); };
 for (const full of [...found].sort()) {
@@ -73,7 +81,7 @@ for (const full of [...found].sort()) {
   if (!v || v.toLowerCase() === named(c).toLowerCase()) continue;
   const prop = base === "bg" ? "background-color" : base === "text" ? "color" : "border-color";
   let sel;
-  if (pre === "placeholder:") sel = `${S} .${esc(full)}::placeholder`;
+  if (pre === "placeholder:") sel = `${S} .${esc(full)}${NOT}::placeholder`;
   else if (pre === "hover:" || pre === "group-hover:") sel = pre === "hover:" ? `${S} .${esc(full)}:hover${NOT}` : `${S} .group:hover .${esc(full)}${NOT}`;
   else if (pre === "focus:" || pre === "focus-visible:") sel = `${S} .${esc(full)}:${pre.slice(0, -1)}${NOT}`;
   else sel = `${S} .${esc(full)}${NOT}`;
@@ -86,17 +94,19 @@ for (const c of [...inline].sort()) {
 }
 
 let css = `/* 생성 파일: node scripts/dark-css.mjs > app/classic-dark.css (직접 고치지 않는다) */
-html.gp-dark { color-scheme: dark !important; }
+html.gp-dark:has(.cl) { color-scheme: dark !important; }
+${S} .keep-light { color-scheme: light; }
+${S} > footer.bg-\\[\\#15171c\\]${NOT} { background-color: #15171c; }
 html.gp-dark body:has(.cl) { background: ${BG}; }
 ${S}, html.gp-dark .cl { --background: ${BG}; --foreground: ${TXT}; --foreground-secondary: ${TXT2}; --foreground-tertiary: ${MUTED}; --surface: ${SURF2}; --surface-secondary: ${LINE}; --border: ${LINE}; --accent: #256ef4; --accent-hover: #0b50d0; --accent-surface: #1a2a4a; --teal: #5cc2ad; --coral: #ff8a70; --yellow: #f3c26b; --green: #7ad192; --success: #7ad192; --warning: #f3c26b; --destructive: #ff8a70; }
 html.gp-dark .cl.flex.min-h-screen { background: ${BG}; color: ${TXT}; }
 ${S} .text-accent${NOT}, ${S} .text-accent-hover${NOT}, ${S} .hover\\:text-accent:hover${NOT}, ${S} .hover\\:text-accent-hover:hover${NOT} { color: ${BLUE}; }
 ${S} .border-accent${NOT} { border-color: ${BLUE}; }
-${S} svg [stroke="#e6e9ee"], ${S} svg [stroke="#eef0f3"], ${S} svg [stroke="#d9dee5"] { stroke: ${LINE}; }
-${S} svg [fill="#6b7380"], ${S} svg [fill="#5b6370"], ${S} svg [fill="#8a93a1"] { fill: ${MUTED}; }
-${S} svg [fill="#15171c"], ${S} svg [fill="#3d4450"] { fill: ${TXT}; }
+${S} svg [stroke="#e6e9ee"]${NOT}, ${S} svg [stroke="#eef0f3"]${NOT}, ${S} svg [stroke="#d9dee5"]${NOT} { stroke: ${LINE}; }
+${S} svg [fill="#6b7380"]${NOT}, ${S} svg [fill="#5b6370"]${NOT}, ${S} svg [fill="#8a93a1"]${NOT} { fill: ${MUTED}; }
+${S} svg [fill="#15171c"]${NOT}, ${S} svg [fill="#3d4450"]${NOT} { fill: ${TXT}; }
 ${S} svg [fill="#fff"]${NOT}, ${S} svg [fill="white"]${NOT}, ${S} svg [fill="#ffffff"]${NOT} { fill: ${SURF}; }
-${S} input:not([type=checkbox]):not([type=radio]):not([class*="bg-transparent"]), ${S} textarea, ${S} select { background-color: ${SURF2}; color: ${TXT}; }
+${S} input:not([type=checkbox]):not([type=radio]):not([class*="bg-transparent"])${NOT}, ${S} textarea${NOT}, ${S} select${NOT} { background-color: ${SURF2}; color: ${TXT}; }
 `;
 for (const [decl, sels] of rules) css += `${sels.join(",\n")} { ${decl}; }\n`;
 process.stdout.write(css);

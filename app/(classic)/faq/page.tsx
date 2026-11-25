@@ -16,9 +16,9 @@ export default function ClassicFaqPage() {
   return (
     <>
       <LdScript data={breadcrumbLd([{ name: "자주 묻는 질문", path: "/faq" }])} />
-      <PageHead title="자주 묻는 질문" trail={[{ href: "/story", label: "곰파트너" }, { href: "/faq", label: "자주 묻는 질문" }]} />
+      <PageHead en="FAQ" title="자주 묻는 질문" lead="견적과 일정, 수정, 결제와 환불, 오픈 뒤 유지보수에 대한 답변입니다." trail={[{ href: "/faq", label: "자주 묻는 질문" }]} />
       <SupportTabs current="/faq" />
-      <div className={`${wrap} pb-16 pt-10 md:pb-24 md:pt-14`}>
+      <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         <FaqBlock items={faq} bare />
       </div>
     </>

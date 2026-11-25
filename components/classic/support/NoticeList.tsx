@@ -25,6 +25,8 @@ export function NoticeList({ rows }: { rows: NoticeRow[] }) {
 
   useEffect(() => {
     const c = new URLSearchParams(window.location.search).get("c");
+    // 주소의 ?c= 는 브라우저에서만 읽을 수 있어(정적 내보내기) 화면이 뜬 뒤 한 번 맞춘다
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (c === "event" || c === "info") setTab(c);
   }, []);
 
@@ -43,7 +45,7 @@ export function NoticeList({ rows }: { rows: NoticeRow[] }) {
   return (
     <>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        {/* 인사이트 출처 버튼과 같은 모양(11-08) */}
+        {/* 11-26 판의 필터 버튼과 같은 알약 모양 */}
         <div role="group" aria-label="공지 분류" className="flex flex-wrap gap-2">
           {TABS.map((t) => (
             <button
@@ -51,58 +53,58 @@ export function NoticeList({ rows }: { rows: NoticeRow[] }) {
               type="button"
               aria-pressed={tab === t.key}
               onClick={() => pick(t.key)}
-              className={`min-h-10 rounded-md border px-4 text-[15px] font-bold transition-colors ${tab === t.key ? "border-[#15171c] bg-[#15171c] text-white" : "border-[#d9dee5] bg-white text-[#464c53] hover:border-[#15171c]"}`}
+              className={`min-h-11 rounded-full border px-5 text-[15px] font-bold transition-colors ${tab === t.key ? "border-transparent bg-[#256ef4] text-white" : "border-white/30 text-white hover:border-white/90"}`}
             >
               {t.label}
             </button>
           ))}
         </div>
-        <p className="text-[15px] text-[#5b6370]">
-          <span className="font-bold tabular-nums text-[#15171c]">{found.length}</span>건
+        <p className="text-[15px] text-[#aab2bf]">
+          <span className="font-[800] tabular-nums text-white">{found.length}</span>건
         </p>
       </div>
-      <table className="w-full border-collapse border-t-2 border-[#15171c]">
+      <table className="w-full border-collapse border-t border-white/15">
         <caption className="sr-only">공지사항 목록</caption>
         <thead className="hidden md:table-header-group">
-          <tr className="border-b border-[#e6e9ee] bg-[#f6f7f9] text-[15px] text-[#3d4450]">
-            <th scope="col" className="w-20 py-4 font-bold">
+          <tr className="border-b border-white/10 text-[14px] text-[#aab2bf]">
+            <th scope="col" className="w-20 py-3 font-bold">
               번호
             </th>
-            <th scope="col" className="py-4 text-left font-bold">
+            <th scope="col" className="py-3 text-left font-bold">
               제목
             </th>
-            <th scope="col" className="w-32 py-4 font-bold">
+            <th scope="col" className="w-32 py-3 font-bold">
               날짜
             </th>
           </tr>
         </thead>
         <tbody>
           {shown.map((n, i) => (
-            <tr key={n.id} className="border-b border-[#e6e9ee]">
-              <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#6b7280] md:table-cell">{found.length - (cur - 1) * PER - i}</td>
+            <tr key={n.id} className="border-b border-white/10">
+              <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#8a94a6] md:table-cell">{found.length - (cur - 1) * PER - i}</td>
               <td className="py-5 pr-4 md:pr-6">
                 {/* 이벤트 말머리: 이벤트 글만 제목 위에 "이벤트"와 진행 상태 */}
                 {n.status && (
                   <p className="mb-1 flex gap-2 text-[14px] font-bold">
-                    <span className="text-[#256ef4]">이벤트</span>
-                    <span className={n.status === "마감" ? "text-[#8a94a6]" : "text-[#15171c]"}>{n.status}</span>
+                    <span className="text-[#7aa7ff]">이벤트</span>
+                    <span className={n.status === "마감" ? "text-[#8a94a6]" : "text-[#ffd84d]"}>{n.status}</span>
                   </p>
                 )}
-                <Link href={`/notice/${n.id}`} className="text-[17px] font-bold leading-[1.5] tracking-[-0.02em] hover:text-[#256ef4] hover:underline md:text-[18px]">
+                <Link href={`/notice/${n.id}`} className="break-keep text-[17px] font-[800] leading-[1.45] tracking-[-0.03em] text-white hover:text-[#7aa7ff] md:text-[19px]">
                   {n.title}
                 </Link>
-                <time dateTime={n.date} className="mt-1 block text-[14px] tabular-nums text-[#6b7280] md:hidden">
+                <time dateTime={n.date} className="mt-1 block text-[14px] tabular-nums text-[#8a94a6] md:hidden">
                   {dot(n.date)}
                 </time>
               </td>
-              <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#6b7280] md:table-cell">
+              <td className="hidden py-5 text-center text-[15px] tabular-nums text-[#8a94a6] md:table-cell">
                 <time dateTime={n.date}>{dot(n.date)}</time>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {found.length === 0 && <p className="border-b border-[#e6e9ee] py-12 text-center text-[16px] text-[#5b6370]">등록된 공지가 없습니다.</p>}
+      {found.length === 0 && <p className="border-b border-white/10 py-12 text-center text-[16px] text-[#aab2bf]">등록된 공지가 없습니다.</p>}
       {pages > 1 && (
         <nav aria-label="공지 목록 쪽" className="mt-8 flex justify-center gap-1">
           {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
@@ -114,7 +116,7 @@ export function NoticeList({ rows }: { rows: NoticeRow[] }) {
                 setPage(n);
                 window.scrollTo({ top: 0 });
               }}
-              className={`h-10 min-w-10 rounded-md px-3 text-[15px] font-bold tabular-nums ${n === cur ? "bg-[#15171c] text-white" : "text-[#3d4450] hover:bg-[#f1f4f9]"}`}
+              className={`h-11 min-w-11 rounded-full px-3 text-[15px] font-bold tabular-nums ${n === cur ? "bg-[#256ef4] text-white" : "text-[#aab2bf] hover:text-white"}`}
             >
               {n}
             </button>
