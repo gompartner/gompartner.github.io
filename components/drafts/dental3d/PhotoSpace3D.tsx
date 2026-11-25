@@ -40,12 +40,14 @@ const FRAG = /* glsl */ `
   }
 `;
 
-type Opt = { still: boolean; small: boolean };
+type Opt = { still: boolean; small: boolean; tall: boolean };
 
 function Layer({ scene, index, last, smoothRef, opt }: { scene: Scene; index: number; last: boolean; smoothRef: React.RefObject<number>; opt: Opt }) {
-  const { still, small } = opt;
-  // 휴대폰은 작은 사진(1000px)과 작은 깊이 지도, 적은 격자로 그린다
-  const sfx = small ? "-sm" : "";
+  const { still, small, tall } = opt;
+  // 세로 화면(휴대폰, 세운 태블릿)은 원본에서 세로로 잘라 둔 사진(-m, 720x1200)을 쓴다. 가로 사진을 받아 양옆을 버리지 않게.
+  // 가로로 든 작은 화면은 작은 사진(-sm), 나머지는 원본 크기
+  const sfx = tall ? "-m" : small ? "-sm" : "";
+  const focus = tall ? 0.5 : scene.focus;
   const [map, depth] = useLoader(THREE.TextureLoader, [`${IMG}/${scene.k}${sfx}.jpg`, `${IMG}/${scene.k}-depth${sfx}.png`]);
   const mesh = useRef<THREE.Mesh>(null);
   const { viewport, camera } = useThree();
@@ -80,7 +82,7 @@ function Layer({ scene, index, last, smoothRef, opt }: { scene: Scene; index: nu
     m.scale.set(cover * aspect, cover, 1);
     // 좁은 화면은 사진의 중요한 부분(focus, 0~1)을 가운데로
     const extra = Math.max(0, cover * aspect - vw) / 2;
-    m.position.x = THREE.MathUtils.clamp((0.5 - scene.focus) * cover * aspect, -extra, extra);
+    m.position.x = THREE.MathUtils.clamp((0.5 - focus) * cover * aspect, -extra, extra);
     const out = 1 - fadeOut;
     m.position.z = still ? 0 : ease(local) * scene.push + out * 0.9;
     const u = (m.material as THREE.ShaderMaterial).uniforms;
@@ -133,7 +135,11 @@ function Ready({ onReady }: { onReady?: () => void }) {
 }
 
 function PhotoSpace3D({ progress, scenes, still, low, onReady }: { progress: React.RefObject<number>; scenes: Scene[]; still: boolean; low: boolean; onReady?: () => void }) {
-  const opt = useMemo(() => ({ still, small: typeof window !== "undefined" && innerWidth < 768 }), [still]);
+  const opt = useMemo(() => {
+    const w = typeof window !== "undefined" ? innerWidth : 1280;
+    const h = typeof window !== "undefined" ? innerHeight : 800;
+    return { still, small: w < 768, tall: h > w * 1.1 };
+  }, [still]);
   const smoothRef = useRef<number>(progress.current ?? 0);
   const light = low || opt.small;
   return (

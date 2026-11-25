@@ -98,8 +98,10 @@ export function Dental2027() {
           {/* 첫 그림은 사진으로 먼저 깔아 3D가 늦게 떠도 빈 화면이 없게 한다 */}
           {/* 3D가 사진을 다 받기 전까지만 정지 사진을 보여 주고, 준비되면 치운다(뒤에 겹쳐 비치지 않게) */}
           {!ready && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={`${IMG}/wait-sm.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <picture>
+              <source media="(orientation: portrait)" srcSet={`${IMG}/wait-m.jpg`} />
+              <img src={`${IMG}/wait-sm.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            </picture>
           )}
           <div className="absolute inset-0 transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }}>
             {env && <PhotoSpace3D progress={progress} scenes={SCENES} still={env.still} low={env.low} onReady={onReady} />}
