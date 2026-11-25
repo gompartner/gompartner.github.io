@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { BoardGate } from "@/components/classic/board/BoardGate";
+import { assembleCss } from "@/components/classic/board/assembleCss";
 
 // 11-26 안쪽 "한 판" 페이지들이 함께 쓰는 틀. 메인(ClassicHome)과 같은 바탕, 같은 머리 모양, 같은 글자를 쓴다.
 // 판마다 따로 만들어 한 사이트로 보이지 않던 것을 여기서 하나로 맞춘다(사용자 "각자 유닛으로 만들어 일원화가 안 됨").
@@ -10,26 +11,15 @@ export const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 
 // 메인의 컨셉은 "조립"이다(사용자: 면과 선이 조합되면서 완성되는, 합체 로봇처럼 조립되는 화면). 안쪽 판도 같은 방식으로 조립된다.
 //  - 큰 제목: 빛줄기가 그어지고 그 사이 면(비스듬한 조각)이 차오르며 글자가 된다(메인 HeroBuild와 같은 방식, 더 짧게)
-//  - 부품(.bd-in): 가까이에서 머뭇거리다 끌려와 딱 붙고 한 번 밝아진다(자석). 방향은 놓인 차례에 따라 왼쪽, 오른쪽, 아래로 갈린다
+//  - 부품(.bd-in): 그 자리에서 선이 그어지고 면이 차오른다(assembleCss). 날아오거나 끌려오지 않는다
 //  - 새로고침 전까지 판마다 한 번만(BoardGate가 data-built를 붙인다). 움직임 줄이기 설정이면 처음부터 완성된 화면
-const css = `
-@keyframes bd-snap {
-  0% { opacity: 0; transform: translate(var(--bx), var(--by)) rotate(var(--br)); filter: brightness(1); animation-timing-function: ease-out; }
-  38% { opacity: 1; transform: translate(calc(var(--bx) * 0.8), calc(var(--by) * 0.8)) rotate(calc(var(--br) * 0.8)); filter: brightness(1); animation-timing-function: cubic-bezier(0.85, 0, 1, 0.45); }
-  76% { opacity: 1; transform: translate(0px, 0px) rotate(0deg); filter: brightness(1.6); animation-timing-function: ease-out; }
-  86% { transform: translate(calc(var(--bx) * -0.03), calc(var(--by) * -0.03)) rotate(0deg); filter: brightness(1.1); }
-  100% { opacity: 1; transform: none; filter: none; }
-}
-.bd-in { --bx: -90px; --by: 36px; --br: -3deg; animation: bd-snap 0.55s linear both; animation-delay: var(--d, 0s); }
-.bd-in:nth-child(2n) { --bx: 96px; --by: 28px; --br: 3deg; }
-.bd-in:nth-child(3n) { --bx: 0px; --by: 110px; --br: -2deg; }
-.bd-in:nth-child(5n) { --bx: -60px; --by: -70px; --br: 2deg; }
+const css = `${assembleCss}
 @keyframes bd-ray { 0% { opacity: 1; stroke-dashoffset: 1; } 34% { opacity: 1; stroke-dashoffset: 0; } 78% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
 @keyframes bd-shard { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)); filter: brightness(2.6); } 55% { opacity: 1; transform: none; filter: brightness(2.2); } 100% { opacity: 1; transform: none; filter: brightness(1); } }
 .bd-ray { opacity: 0; stroke-dasharray: 1; animation: bd-ray 1.2s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d, 0s); }
 .bd-shard { animation: bd-shard 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d, 0s); }
-[data-built] :is(.bd-in, .bd-ray, .bd-shard) { animation: none; }
-@media (prefers-reduced-motion: reduce) { .bd-in, .bd-ray, .bd-shard { animation: none; } }
+[data-built] :is(.bd-ray, .bd-shard) { animation: none; }
+@media (prefers-reduced-motion: reduce) { .bd-ray, .bd-shard { animation: none; } }
 .bd-ice { background-image: linear-gradient(112deg, #ffffff 0%, #d5e4ff 30%, #8db4ff 52%, #e8f1ff 74%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 /* 메인과 같게: 휴대폰 아래에 떠 있는 전화, 카카오톡 상담 바와 그 높이만큼의 바닥글 여백을 뺀다 */
 html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }

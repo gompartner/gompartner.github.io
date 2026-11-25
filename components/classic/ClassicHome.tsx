@@ -119,7 +119,7 @@ export function ClassicHome() {
 /** 칸 머리: 번호, 가는 선, 영어 이름, 큰 제목 */
 function Head({ no, en, title, id, onBlue = false }: { no: string; en: string; title: string; id: string; onBlue?: boolean }) {
   return (
-    <div data-part>
+    <div data-part="text">
       <p className={`flex items-center gap-3 text-[13px] font-bold tracking-[0.18em] md:text-[14px] ${onBlue ? "text-white" : "text-[#7aa7ff]"}`}>
         <span className="tabular-nums">{no}</span>
         <span aria-hidden className="h-px w-10 bg-current" />
@@ -182,7 +182,7 @@ function Services() {
         {services.map((s) => {
           const t = tones[s.tone];
           return (
-            <li key={s.name} data-part className={s.span}>
+            <li key={s.name} data-part className={`rounded-[28px] ${s.span}`}>
               {/* 판 전체가 상세 페이지로 가는 링크. 문의 버튼은 두지 않는다(맨 아래 신청서와 머리글에 있다) */}
               <NavLink href={s.href} className={`group relative isolate flex h-full min-h-[250px] flex-col overflow-hidden rounded-[28px] p-7 transition-colors md:min-h-[310px] md:p-9 ${t.box}`}>
                 <Motif tone={s.tone} />
@@ -205,17 +205,17 @@ function Services() {
 
 function Why() {
   return (
-    <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b]">
+    <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b] [--asm-bg:#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Head no="03" en="CARE" title="관리합니다" id="c-why" />
-          <p data-part className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+          <p data-part="text" className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
             이럴 때 맡기세요.
           </p>
         </div>
         <ol role="list">
           {reasons.map((r, i) => (
-            <li key={r.name} data-part className="grid grid-cols-[64px_1fr] gap-4 border-t border-white/15 py-8 first:border-t-0 first:pt-0 md:grid-cols-[120px_1fr] md:gap-6 md:py-10">
+            <li key={r.name} data-part="text" className="grid grid-cols-[64px_1fr] gap-4 border-t border-white/15 py-8 first:border-t-0 first:pt-0 md:grid-cols-[120px_1fr] md:gap-6 md:py-10">
               <span aria-hidden className="text-[56px] font-[800] leading-[0.9] tracking-[-0.06em] text-transparent md:text-[92px]" style={{ WebkitTextStroke: `1.5px ${r.c}` }}>
                 {i + 1}
               </span>
@@ -235,7 +235,7 @@ function Products() {
   return (
     <section id="products" aria-labelledby="c-products" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
       <Head no="02" en="RUN" title="운영합니다" id="c-products" />
-      <p data-part className="mt-6 max-w-[560px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+      <p data-part="text" className="mt-6 max-w-[560px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
         직접 만들어 지금도 운영하고 있는 서비스입니다.
       </p>
       <ul className="mt-10 grid gap-4 md:mt-14 lg:grid-cols-2" role="list">
@@ -272,7 +272,7 @@ function Products() {
 
 function Process() {
   return (
-    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white">
+    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white [--asm-bg:#1f5fe0]">
       <div className={`${wrap} py-20 md:py-32`}>
         <Head no="04" en="PROCESS" title="진행 방식" id="c-process" onBlue />
         <div className="relative mt-12 md:mt-20">
@@ -287,7 +287,7 @@ function Process() {
           <span aria-hidden className="gp-flow-y absolute bottom-10 left-[43px] top-2 w-0.5 md:hidden" />
           <ol className="relative grid gap-9 md:grid-cols-5 md:gap-4" role="list">
             {steps.map((s, i) => (
-              <li key={s.name} data-part className={`flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${i % 2 ? "md:pt-[60px]" : ""}`}>
+              <li key={s.name} data-part="text" className={`flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${i % 2 ? "md:pt-[60px]" : ""}`}>
                 <span className="grid h-[88px] w-[88px] shrink-0 place-items-center rounded-full bg-white text-[#1f5fe0] shadow-[0_10px_30px_rgba(8,26,74,.35)] md:h-[140px] md:w-[140px]">
                   <span>
                     <span className="block text-center text-[11px] font-bold tracking-[0.14em] md:text-[13px]">STEP</span>
@@ -312,7 +312,7 @@ function Faq() {
     <section id="faq" aria-labelledby="c-faq" className={`${wrap} grid scroll-mt-20 gap-10 py-20 md:py-32 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16`}>
       <div>
         <Head no="05" en="FAQ" title="자주 묻는 질문" id="c-faq" />
-        <p data-part className="mt-6 max-w-[380px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+        <p data-part="text" className="mt-6 max-w-[380px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
           더 궁금한 점은 견적 문의에 함께 적어 주세요. 견적과 같이 답변드립니다.
         </p>
       </div>
@@ -335,14 +335,14 @@ function Faq() {
 
 function Apply() {
   return (
-    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b]">
+    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b] [--asm-bg:#0f131b]">
       <div className={`${wrap} grid gap-10 py-20 md:py-32 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
           <Head no="06" en="CONTACT" title="무료 견적 받기" id="c-apply" />
-          <p data-part className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+          <p data-part="text" className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
             만들거나 고칠 것을 한 줄만 남겨 주세요. 바로 답하고, 범위와 금액, 일정을 정리해 드립니다.
           </p>
-          <ul data-part className="mt-9 space-y-3" role="list">
+          <ul data-part="text" className="mt-9 space-y-3" role="list">
             <li>
               <a href={`mailto:${profile.email}`} className="inline-flex min-h-11 items-center gap-3 text-[17px] font-bold text-white hover:text-[#7aa7ff]">
                 <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white/10">
