@@ -291,7 +291,9 @@ export function ClassicHeader() {
               data-gtm-cta="classic_header_contact"
               aria-current={pathname === "/contact" ? "page" : undefined}
               className={cn(
-                "inline-flex h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
+                "h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
+                // 메인의 휴대폰 화면은 아래쪽에 전화, 카카오톡 상담 바가 늘 떠 있어 머리글 버튼을 뺀다(11-25 사용자). 그 바는 md 미만에서만 나온다
+                landing ? "hidden md:inline-flex" : "inline-flex",
                 pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
