@@ -266,3 +266,14 @@ input[type="time"]::-webkit-date-and-time-value {
 /* 11-23 문서 본문 앵커 여백. Safari 읽기 모드가 이름에 scroll이 든 요소를 본문에서 버려서 scroll-mt 대신 이 이름을 쓴다 */
 .anchor-24 { scroll-margin-top: 6rem; }
 .anchor-40 { scroll-margin-top: 10rem; }
+
+/* 11-25 메인 첫 화면 결과물 띠: 같은 목록을 두 번 이어 붙여 왼쪽으로 끝없이 흐른다. 움직임 줄이기 설정이면 멈춘다 */
+@keyframes gp-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.gp-marquee { animation: gp-marquee 60s linear infinite; }
+.gp-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .gp-marquee { animation: none; }
+}
