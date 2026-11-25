@@ -49,7 +49,12 @@ export const classicMenu = [
 
 // 카탈로그(/works)와 웹 지식(/knowledge)은 독립 사이트로 분리할 예정이라 머리글 메뉴에 두지 않는다(11-25 밤 사용자). 페이지 주소는 분리할 때까지 그대로 살아 있다
 // 메인과 같은 얼굴로 다시 만든 안쪽 판. 다시 만든 것만 여기에 넣는다(한꺼번에 찍어 내지 않고 하나씩)
-const BOARDS = [{ href: "/make", label: "Build" }];
+const BOARDS = [
+  { href: "/make", label: "Build" },
+  { href: "/maintenance", label: "Care" },
+  { href: "/pricing", label: "Price" },
+  { href: "/works", label: "Catalog" },
+];
 
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
 const subMenu = [
