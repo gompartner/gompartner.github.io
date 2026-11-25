@@ -1,0 +1,52 @@
+{
+  "01-portfolio": {
+    "src": "/images/history/long/01-portfolio.jpg",
+    "w": 1200,
+    "h": 4096
+  },
+  "02-brand": {
+    "src": "/images/history/long/02-brand.jpg",
+    "w": 1200,
+    "h": 2562
+  },
+  "03-webtoon": {
+    "src": "/images/history/long/03-webtoon.jpg",
+    "w": 1200,
+    "h": 2082
+  },
+  "04-classic": {
+    "src": "/images/history/long/04-classic.jpg",
+    "w": 1200,
+    "h": 3451
+  },
+  "05-catalog": {
+    "src": "/images/history/long/05-catalog.jpg",
+    "w": 1200,
+    "h": 4499
+  },
+  "05-catalog-main": {
+    "src": "/images/history/long/05-catalog-main.jpg",
+    "w": 1200,
+    "h": 3460
+  },
+  "06-care": {
+    "src": "/images/history/long/06-care.jpg",
+    "w": 1200,
+    "h": 4646
+  },
+  "07-drafts": {
+    "src": "/images/history/long/07-drafts.jpg",
+    "w": 1200,
+    "h": 5833
+  },
+  "07-drafts-main": {
+    "src": "/images/history/long/07-drafts-main.jpg",
+    "w": 1200,
+    "h": 1820
+  },
+  "08-main": {
+    "src": "/images/history/long/08-main.jpg",
+    "w": 1200,
+    "h": 5652
+  }
+}
