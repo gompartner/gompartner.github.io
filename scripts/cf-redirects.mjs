@@ -27,7 +27,10 @@ for (const t of ["site-check", "php-check"]) lines.push(`/tools/${t} https://jik
 for (const t of ["accessibility-check", "cron", "estimate-questions", "hosting-cost", "image-compress", "jwt-parser", "privacy-policy", "qr-code", "search-preview", "terms", "unix-time"]) lines.push(`/tools/${t} /knowledge/checklists 301`);
 // 11-26 안쪽을 판 네 개로 다시 만들며 내린 주소. 제작 상세 5종은 제작 판, 유지보수 하위는 유지보수 판, 데모와 샘플과 업종별 목록은 카탈로그 판으로
 for (const p of ["homepage", "landing-page", "program", "app", "kiosk"]) lines.push(`/${p} /make 301`);
-lines.push("/maintenance/* /maintenance 301", "/works/* /works 301", "/sample/* /works 301", "/demo/* /works 301", "/work/* /works 301", "/knowledge/drafts /knowledge 301", "/history /story 301");
+// 유지보수, 카탈로그 하위는 옛 주소를 하나씩 적는다. /maintenance/*, /works/* 로 통째로 넘기면 지금 페이지가 화면 전환 때 읽는 내부 파일(/works/__next.*.txt)까지 넘어가 버린다
+for (const id of ["takeover", "ai-site", "fix", "perf", "update", "monthly", "standard"]) lines.push(`/maintenance/${id} /maintenance 301`);
+for (const slug of ["hospital", "store", "stay", "professional", "company", "academy", "program", "landing", "app", "kiosk", "3d", "maintenance"]) lines.push(`/works/${slug} /works 301`);
+lines.push("/sample/* /works 301", "/demo/* /works 301", "/work/* /works 301", "/knowledge/drafts /knowledge 301", "/history /story 301");
 // 11-25 영문 페이지(/en)를 내림(사용자: 영문 유입이 없음). 옛 주소는 메인으로
 lines.push("/en / 301", "/en/* / 301");
 // 11-21 아카이브(/archive)를 위키(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
@@ -37,7 +40,9 @@ const moved = [
   ["/archive/tech/ie", "/knowledge/browser"], ["/archive/tech/flash", "/knowledge/flash-jquery"], ["/archive/trends/korea-ie", "/knowledge/browser"],
   ["/archive/trends/mobile", "/knowledge/mobile-screen"], ["/archive/trends/design", "/knowledge/design-styles"], ["/archive/trends/flash", "/knowledge/flash-jquery"],
   ...["https", "cms", "page-weight", "app", "php"].flatMap((d) => [[`/archive/tech/${d}`, `/knowledge/${d}`], [`/archive/trends/${d}`, `/knowledge/${d}`]]),
-  ...["terms", "screens", "drafts", "data", "notes", "checklists"].map((d) => [`/archive/${d}`, `/knowledge/${d}`]),
+  ...["terms", "screens", "data", "notes", "checklists"].map((d) => [`/archive/${d}`, `/knowledge/${d}`]),
+  // 시안 목록(/knowledge/drafts)은 11-26에 내렸다. 두 번 넘기지 않게 바로 위키 첫 화면으로
+  ["/archive/drafts", "/knowledge"],
   ["/archive/terms/*", "/knowledge/terms/:splat"],
 ];
 for (const [from, to] of moved) lines.push(`${from} ${to} 301`);
