@@ -49,15 +49,16 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
     if (loaded) return;
     const t = setInterval(() => {
       const d = pc.current?.contentDocument;
-      if (d && d.readyState === "complete" && d.querySelector("header")) { setLoaded(true); apply(pc.current); }
-    }, 200);
+      // 머리글이 없는 시안(2027형 등)도 있어 시안 본문이 그려졌는지로 본다. 사진까지 다 받을 때를 기다리지 않는다(11-25 대표: 선 부분은 빠르게)
+      if (d && d.readyState !== "loading" && d.querySelector(".demo-root *")) { setLoaded(true); apply(pc.current); }
+    }, 100);
     return () => clearInterval(t);
   }, [loaded, src]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (phase === 0 && loaded) { const t = setTimeout(() => setPhase(1), reduce ? 0 : 1500); return () => clearTimeout(t); }
-    if (phase === 1) { const t = setTimeout(() => setPhase(2), reduce ? 0 : 900); return () => clearTimeout(t); }
-    if (phase === 2) { const t = setTimeout(() => setPhase(3), reduce ? 0 : 700); return () => clearTimeout(t); }
+    if (phase === 0 && loaded) { const t = setTimeout(() => setPhase(1), reduce ? 0 : 500); return () => clearTimeout(t); }
+    if (phase === 1) { const t = setTimeout(() => setPhase(2), reduce ? 0 : 650); return () => clearTimeout(t); }
+    if (phase === 2) { const t = setTimeout(() => setPhase(3), reduce ? 0 : 500); return () => clearTimeout(t); }
   }, [phase, loaded]);
 
   // 상호는 한 자씩 써진다
