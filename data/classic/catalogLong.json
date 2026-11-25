@@ -677,5 +677,65 @@
    "w": 390,
    "h": 5064
   }
+ },
+ "dental-homepage-2026": {
+  "pc": {
+   "src": "/images/catalog/long/dental-homepage-2026-pc.jpg",
+   "w": 1200,
+   "h": 4202
+  },
+  "m": {
+   "src": "/images/catalog/long/dental-homepage-2026-m.jpg",
+   "w": 390,
+   "h": 5058
+  }
+ },
+ "dental-homepage-2027-window": {
+  "pc": {
+   "src": "/images/catalog/long/dental-homepage-2027-window-pc.jpg",
+   "w": 1200,
+   "h": 5402
+  },
+  "m": {
+   "src": "/images/catalog/long/dental-homepage-2027-window-m.jpg",
+   "w": 390,
+   "h": 6113
+  }
+ },
+ "dental-homepage-2027-stage": {
+  "pc": {
+   "src": "/images/catalog/long/dental-homepage-2027-stage-pc.jpg",
+   "w": 1200,
+   "h": 5250
+  },
+  "m": {
+   "src": "/images/catalog/long/dental-homepage-2027-stage-m.jpg",
+   "w": 390,
+   "h": 5908
+  }
+ },
+ "clinic-homepage-2026": {
+  "pc": {
+   "src": "/images/catalog/long/clinic-homepage-2026-pc.jpg",
+   "w": 1200,
+   "h": 4952
+  },
+  "m": {
+   "src": "/images/catalog/long/clinic-homepage-2026-m.jpg",
+   "w": 390,
+   "h": 5902
+  }
+ },
+ "clinic-homepage-2027": {
+  "pc": {
+   "src": "/images/catalog/long/clinic-homepage-2027-pc.jpg",
+   "w": 1200,
+   "h": 5250
+  },
+  "m": {
+   "src": "/images/catalog/long/clinic-homepage-2027-m.jpg",
+   "w": 390,
+   "h": 5944
+  }
  }
 }

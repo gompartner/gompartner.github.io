@@ -1,4 +1,5 @@
 import { catalogProjects, demoProjects, industryOf, isProgram, threeProjects, thumbOf } from "@/components/classic/works/samples";
+import { catalogTrends } from "@/data/classic/catalogStories";
 import { threeFaq, threeForWhom, threeMeta, threeScope } from "@/data/classic/three";
 import { faq } from "@/data/classic/faq";
 import { maintenanceFaq, maintenanceServices } from "@/data/classic/maintenance";
@@ -50,6 +51,11 @@ export function buildSearchIndex(): SearchItem[] {
     hay: [p.category, p.layout, industryOf(p)?.label ?? "", plain(p.description)].join(" "),
     thumb: thumbOf(p),
   }));
+  // 그 해의 연출 기법으로 만든 화면도 카탈로그 결과로 찾는다(이름표의 연도, 기법으로)
+  for (const t of catalogTrends) {
+    const base = catalogProjects.find((p) => p.id === t.of);
+    if (base) catalogs.push({ kind: "카탈로그", title: `${plain(base.title)} ${t.tag}`, desc: t.made, href: `/works#${t.id}`, hay: [base.category, t.headline, t.want, t.think, "연출 트렌드 3D 인터랙션"].join(" "), thumb: `/images/demos/var/${t.id}.jpg` });
+  }
   // 11-04 키오스크 3D 체험(/work/<slug>/3d). 목록은 app/work/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
   // 11-26 데모, 샘플 주소를 내려 화면은 카탈로그 한 판(/works)으로만 잇는다
   const kiosk3d: SearchItem[] = [];

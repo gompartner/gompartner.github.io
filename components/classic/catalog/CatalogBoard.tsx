@@ -16,7 +16,8 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 
 /** long: 페이지 전체를 찍은 긴 캡처(있으면 창 안에서 저절로 내려가며 보여 주고, 크게 보기에서는 통째로 편다) */
 export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number } };
-export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[] };
+/** tag: 연도와 기법처럼 제목 옆에 붙는 이름표(그 해의 연출로 만든 화면) */
+export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[]; tag?: string };
 export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
 
 const css = `
@@ -64,7 +65,7 @@ function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?
   return <span className="block overflow-hidden rounded-[10px] border border-white/15 shadow-[0_30px_70px_-24px_rgba(0,0,0,.85)] sm:rounded-[14px]">{img}</span>;
 }
 
-export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogStoryView[]; rest: CatalogItem[]; cats: { name: string; count: number }[]; total: number }) {
+export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: CatalogStoryView[]; trends: CatalogStoryView[]; rest: CatalogItem[]; cats: { name: string; count: number }[]; total: number }) {
   const [cat, setCat] = useState("전체");
   const [more, setMore] = useState(false);
   const [open, setOpen] = useState<CatalogItem | null>(null);
@@ -76,6 +77,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
   };
   const dlg = useRef<HTMLDialogElement>(null);
   const told = cat === "전체" ? stories : stories.filter((s) => s.cat === cat);
+  const byYear = cat === "전체" ? trends : trends.filter((s) => s.cat === cat);
   const others = cat === "전체" ? rest : rest.filter((i) => i.cat === cat);
   const shown = more ? others : others.slice(0, 8);
 
@@ -83,7 +85,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
   useEffect(() => {
     const byHash = () => {
       const id = decodeURIComponent(window.location.hash.slice(1));
-      const it = id ? [...stories, ...rest].find((i) => i.id === id) : undefined;
+      const it = id ? [...stories, ...trends, ...rest].find((i) => i.id === id) : undefined;
       if (it) show(it);
     };
     byHash();
@@ -103,31 +105,8 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
     if (!open && d.open) d.close();
   }, [open]);
 
-  // 제목 뒷부분은 줄바꿈 없는 공백으로 묶었다. 휴대폰에서 "찾는 것을 / 첫 화면에 둡니다" 두 줄로 나뉜다
-  return (
-    <BoardShell no="04" en="CATALOG" ice="찾는 것을 " title={"첫\u00a0화면에\u00a0둡니다"} lead="업종마다 방문자가 무엇을 찾는지 조사하고, 그 답이 먼저 보이게 만든 화면입니다.">
-      <style>{css}</style>
-
-      <div className="-mx-4 mt-10 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:mt-14 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden" role="group" aria-label="종류">
-        {[{ name: "전체", count: total }, ...cats].map((c) => (
-          <button
-            key={c.name}
-            type="button"
-            aria-pressed={cat === c.name}
-            onClick={() => {
-              setCat(c.name);
-              setMore(false);
-            }}
-            className={`min-h-12 shrink-0 whitespace-nowrap rounded-full border px-5 text-[16px] font-[800] tracking-[-0.03em] transition-colors md:text-[17px] ${cat === c.name ? "border-white bg-white text-[#0b0d12]" : "border-white/20 text-white/70 hover:border-white/60 hover:text-white"}`}
-          >
-            {c.name} <span className={`ml-1 text-[14px] font-bold tabular-nums ${cat === c.name ? "text-[#256ef4]" : "text-white/55"}`}>{c.count}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* 이야기와 함께 보는 화면: 화면 하나에 판 하나 */}
-      <div key={cat} className="mt-6 space-y-4 md:space-y-5">
-        {told.map((s, i) => {
+  // 이야기와 함께 보는 판 하나(대표 화면, 그 해의 연출로 만든 화면이 함께 쓴다)
+  const board = (s: CatalogStoryView, i: number) => {
           const steps = [
             { label: s.wantLabel, text: s.want, c: "#ffd84d" },
             { label: "고민한 것", text: s.think, c: "#7aa7ff" },
@@ -141,11 +120,12 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
                   <span className="text-[#7aa7ff]">{s.cat}</span>
                   <span aria-hidden className="h-3 w-px bg-white/25" />
                   <span className="text-[#c9ced6]">{s.title}</span>
+                  {s.tag ? <span className="rounded-full bg-[#ffd84d] px-2.5 py-0.5 text-[13px] font-[800] text-[#0b0d12]">{s.tag}</span> : null}
                 </p>
                 <h2 className="mt-3 break-keep text-[25px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[34px]">{s.headline}</h2>
               </header>
 
-              <button type="button" onClick={() => show(s)} aria-label={`${s.title} 화면 크게 보기`} className="group block w-full self-center text-left lg:col-start-2 lg:row-span-2 lg:row-start-1">
+              <button type="button" onClick={() => show(s)} aria-label={`${s.title}${s.tag ? ` ${s.tag}` : ""} 화면 크게 보기`} className="group block w-full self-center text-left lg:col-start-2 lg:row-span-2 lg:row-start-1">
                 <span className={`relative block ${s.side ? "pb-[20%] pr-[4%] sm:pb-[9%] sm:pr-[7%]" : ""}`}>
                   <span className="ct-main block">
                     <Frame shot={s.main} sizes="(min-width: 1024px) 640px, 92vw" />
@@ -181,8 +161,47 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
               </ol>
             </article>
           );
-        })}
+  };
+
+  // 제목 뒷부분은 줄바꿈 없는 공백으로 묶었다. 휴대폰에서 "찾는 것을 / 첫 화면에 둡니다" 두 줄로 나뉜다
+  return (
+    <BoardShell no="04" en="CATALOG" ice="찾는 것을 " title={"첫\u00a0화면에\u00a0둡니다"} lead="업종마다 방문자가 무엇을 찾는지 조사하고, 그 답이 먼저 보이게 만든 화면입니다.">
+      <style>{css}</style>
+
+      <div className="-mx-4 mt-10 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:mt-14 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden" role="group" aria-label="종류">
+        {[{ name: "전체", count: total }, ...cats].map((c) => (
+          <button
+            key={c.name}
+            type="button"
+            aria-pressed={cat === c.name}
+            onClick={() => {
+              setCat(c.name);
+              setMore(false);
+            }}
+            className={`min-h-12 shrink-0 whitespace-nowrap rounded-full border px-5 text-[16px] font-[800] tracking-[-0.03em] transition-colors md:text-[17px] ${cat === c.name ? "border-white bg-white text-[#0b0d12]" : "border-white/20 text-white/70 hover:border-white/60 hover:text-white"}`}
+          >
+            {c.name} <span className={`ml-1 text-[14px] font-bold tabular-nums ${cat === c.name ? "text-[#256ef4]" : "text-white/55"}`}>{c.count}</span>
+          </button>
+        ))}
       </div>
+
+      {/* 이야기와 함께 보는 화면: 화면 하나에 판 하나 */}
+      <div key={cat} className="mt-6 space-y-4 md:space-y-5">
+        {told.map((s, i) => board(s, i))}
+      </div>
+
+      {/* 그 해의 연출 기법으로 만든 화면: 같은 업종 홈페이지를 연도별 연출로 */}
+      {byYear.length > 0 && (
+        <section className="mt-14 md:mt-20" aria-labelledby="ct-year">
+          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+            <h2 id="ct-year" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
+              그 해의 연출로 만든 화면 <span className="ml-1 text-[18px] tabular-nums text-[#7aa7ff] md:text-[22px]">{byYear.length}</span>
+            </h2>
+            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">같은 병원 홈페이지를 2026년, 2027년의 연출 기법으로 만들었습니다.</p>
+          </div>
+          <div className="mt-5 space-y-4 md:mt-6 md:space-y-5">{byYear.map((s, i) => board(s, i))}</div>
+        </section>
+      )}
 
       {/* 나머지 화면: 작은 그림으로 두고 누르면 크게 */}
       {others.length > 0 && (
@@ -222,7 +241,10 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
             {/* 휴대폰을 가로로 눕힌 낮은 화면(높이 520 아래)에서는 제목, 화면 종류, 닫기를 한 줄에 둔다. 두 줄이면 그림 볼 자리가 절반도 안 남는다 */}
             <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 border-b border-white/12 [@media(max-height:520px)]:grid-cols-[minmax(0,1fr)_auto_auto] [@media(max-height:520px)]:items-center">
               <div className="order-1 px-5 py-4 md:px-8 md:py-5 [@media(max-height:520px)]:flex [@media(max-height:520px)]:items-baseline [@media(max-height:520px)]:gap-2 [@media(max-height:520px)]:py-1.5 [@media(max-height:520px)]:pl-4 [@media(max-height:520px)]:pr-0">
-                <p className="shrink-0 text-[14px] font-bold text-[#7aa7ff]">{open.cat}</p>
+                <p className="shrink-0 text-[14px] font-bold text-[#7aa7ff]">
+                  {open.cat}
+                  {open.tag ? ` | ${open.tag}` : ""}
+                </p>
                 <h2 id="ct-dlg-title" className="mt-1 break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[28px] [@media(max-height:520px)]:mt-0 [@media(max-height:520px)]:truncate [@media(max-height:520px)]:text-[18px]">
                   {open.title}
                 </h2>

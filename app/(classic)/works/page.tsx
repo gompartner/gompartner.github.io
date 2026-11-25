@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Metadata } from "next";
 import { CatalogBoard, type CatalogItem, type CatalogStoryView, type Shot } from "@/components/classic/catalog/CatalogBoard";
 import { demoProjects, isLanding, isMaintenance, isProgram, mobileShotOf, thumbOf, threeProjects } from "@/components/classic/works/samples";
-import { catalogStories } from "@/data/classic/catalogStories";
+import { catalogStories, catalogTrends } from "@/data/classic/catalogStories";
 import { pageMeta } from "@/lib/seo";
 import catalogLong from "@/data/classic/catalogLong.json";
 
@@ -70,8 +70,22 @@ export default function WorksPage() {
   }
   stories.sort((a, b) => CATS.indexOf(a.cat) - CATS.indexOf(b.cat));
 
+  // 그 해의 연출 기법으로 만든 화면(data/classic/catalogStories 의 catalogTrends). 바탕이 된 화면과 따로 한 장씩 센다
+  const trends: CatalogStoryView[] = [];
+  for (const t of catalogTrends) {
+    const base = all.find((i) => i.id === t.of);
+    const lg = LONGS[t.id];
+    const pc = `/images/demos/var/${t.id}.jpg`;
+    const m = `/images/catalog/${t.id}-m.jpg`;
+    if (!base || !exists(pc)) continue;
+    const main: Shot = { src: pc, frame: "browser", ratio: "16/10", alt: `${base.title} ${t.tag} PC 화면`, ...(lg?.pc && exists(lg.pc.src) ? { long: lg.pc } : {}) };
+    const side: Shot | undefined = exists(m) ? { src: m, frame: "phone", ratio: "780/1472", alt: `${base.title} ${t.tag} 휴대폰 화면`, ...(lg?.m && exists(lg.m.src) ? { long: lg.m } : {}) } : undefined;
+    trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "잡은 방향", want: t.want, think: t.think, made: t.made });
+  }
+
   const told = new Set(stories.map((s) => s.id));
   const rest = all.filter((i) => !told.has(i.id));
-  const cats = CATS.filter((c) => all.some((i) => i.cat === c)).map((c) => ({ name: c, count: all.filter((i) => i.cat === c).length }));
-  return <CatalogBoard stories={stories} rest={rest} cats={cats} total={all.length} />;
+  const shown = [...all, ...trends];
+  const cats = CATS.filter((c) => shown.some((i) => i.cat === c)).map((c) => ({ name: c, count: shown.filter((i) => i.cat === c).length }));
+  return <CatalogBoard stories={stories} trends={trends} rest={rest} cats={cats} total={shown.length} />;
 }
