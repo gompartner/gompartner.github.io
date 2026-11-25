@@ -7,7 +7,7 @@ import { JobApply } from "@/components/classic/JobApply";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
-// 순서: 첫 화면(개발사 소개, 문의 버튼, 결과물 띠) > 서비스 4가지와 시작 금액 > 기술 > 포트폴리오 > 진행 방식 > 납품 기준 > 자주 묻는 질문 > 프로젝트 문의 신청서.
+// 순서: 첫 화면(개발사 소개, 문의 버튼, 결과물 띠) > 서비스 4가지와 시작 금액 > 맡기는 이유 4가지 > 기술 > 포트폴리오 > 진행 방식 > 납품 기준 > 자주 묻는 질문 > 프로젝트 문의 신청서.
 // 머리글은 로고와 상담 신청만(ClassicHeader의 landing). 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -31,6 +31,14 @@ const services = [
   { name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면으로", price: "요구사항 확인 후 견적", href: "/program", big: false },
   { name: "앱 개발", body: "예약, 주문, 적립, 현장 보고 앱", price: `${manwon(appPlans[0].price)}부터`, href: "/app", big: false },
   { name: "유지보수와 고도화", body: "수정 건별 처리, 오류 해결, 서버 이전, AI 도구로 만든 서비스의 운영 준비", price: "건별 10,000원부터", href: "/maintenance", big: true },
+];
+
+// 11-25 개발사 고르는 기준(운영 중인 포트폴리오, 실제 참여 인력, 투입 구조)에 맞춘 이유 4가지. 숫자, 고객사 로고는 실제 실적이 생기면 넣는다
+const reasons = [
+  { name: "상담한 사람이 직접 개발합니다", body: "중간 관리자 없이 개발 책임자가 요구사항 정의부터 배포까지 맡습니다. 전달 과정에서 빠지는 내용이 없습니다." },
+  { name: "견적을 작업 항목별로 나눕니다", body: "화면, 기능, 데이터 정리, 유지보수를 항목별 금액으로 보여 드립니다. 무엇에 비용이 드는지 계약 전에 확인할 수 있습니다." },
+  { name: "운영을 기준으로 설계합니다", body: "오픈 뒤 수정, 백업, 서버 이전까지 고려해 구조를 잡습니다. 유지보수 비용이 덜 드는 방식으로 만듭니다." },
+  { name: "소스와 계정은 고객 것입니다", body: "원본 소스, 서버, 도메인 계정을 고객 명의로 인계합니다. 다른 업체로 옮겨도 그대로 이어서 쓸 수 있습니다." },
 ];
 
 const stack = ["Next.js", "React", "TypeScript", "Node.js", "PHP", "PostgreSQL", "MySQL", "Cloudflare", "AWS", "워드프레스", "그누보드", "아임웹", "카페24"];
@@ -57,6 +65,7 @@ export function ClassicHome() {
     <div className="bg-white text-[#15171c]">
       <Hero />
       <Services />
+      <Why />
       <Stack />
       <Portfolio />
       <Process />
@@ -69,7 +78,7 @@ export function ClassicHome() {
 function Hero() {
   const strip = [...works, ...works];
   return (
-    <section aria-labelledby="c-hero" className="overflow-hidden bg-[#0f1115] text-white">
+    <section aria-labelledby="c-hero" className="overflow-hidden bg-white">
       <div className={`${wrap} pb-12 pt-14 md:pb-16 md:pt-24`}>
         <p className={eyebrow}>Web, App Development</p>
         <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.055em] md:text-[72px]">
@@ -77,14 +86,14 @@ function Hero() {
           <br />
           운영까지 맡습니다
         </h1>
-        <p className="mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#c9ced6] md:text-[20px]">
+        <p className="mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#3d4450] md:text-[20px]">
           홈페이지, 업무 시스템, 앱 개발과 유지보수. 개발 책임자가 상담부터 배포, 운영까지 직접 맡고 원본 소스와 인계 문서까지 드립니다.
         </p>
         <div className="mt-8 flex flex-wrap gap-2.5 md:mt-10">
           <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
             프로젝트 문의
           </a>
-          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-md border border-[#3d4450] px-7 text-[17px] font-bold text-white hover:border-white">
+          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-md border-2 border-[#15171c] px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
             포트폴리오 보기
           </a>
         </div>
@@ -92,7 +101,7 @@ function Hero() {
       <div aria-hidden className="pb-14 md:pb-20">
         <ul className="gp-marquee flex w-max gap-4 md:gap-6" role="list">
           {strip.map((w, i) => (
-            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[10px] border border-white/10 md:w-[400px]">
+            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[10px] border border-[#e6e9ee] shadow-[0_6px_18px_rgba(21,23,28,.08)] md:w-[400px]">
               <Image src={w.img} alt="" fill sizes="400px" className="object-cover" />
             </li>
           ))}
@@ -104,7 +113,7 @@ function Hero() {
 
 function Services() {
   return (
-    <section aria-labelledby="c-services" className={`${wrap} py-16 md:py-28`}>
+    <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
       <p className={eyebrow}>Services</p>
       <h2 id="c-services" className={`${h2c} mt-3`}>
         하는 일
@@ -131,9 +140,31 @@ function Services() {
   );
 }
 
+function Why() {
+  return (
+    <section aria-labelledby="c-why" className="bg-[#f4f6fa]">
+      <div className={`${wrap} py-16 md:py-28`}>
+        <p className={eyebrow}>Why Gompartner</p>
+        <h2 id="c-why" className={`${h2c} mt-3`}>
+          곰파트너에 맡기는 이유
+        </h2>
+        <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-2" role="list">
+          {reasons.map((r, i) => (
+            <li key={r.name} className="rounded-[14px] bg-white p-6 md:p-8">
+              <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{String(i + 1).padStart(2, "0")}</span>
+              <span className="mt-2 block break-keep text-[21px] font-[800] tracking-[-0.04em] md:text-[25px]">{r.name}</span>
+              <span className="mt-3 block break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">{r.body}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function Stack() {
   return (
-    <section aria-labelledby="c-stack" className="border-y border-[#e6e9ee] bg-[#f4f6fa]">
+    <section aria-labelledby="c-stack" className="border-b border-[#e6e9ee] bg-white">
       <div className={`${wrap} flex flex-col gap-5 py-10 md:flex-row md:items-center md:gap-10 md:py-12`}>
         <h2 id="c-stack" className="shrink-0 text-[17px] font-[800] tracking-[-0.02em] md:text-[19px]">
           다루는 기술과 플랫폼
@@ -183,7 +214,7 @@ function Portfolio() {
 
 function Process() {
   return (
-    <section aria-labelledby="c-process" className="bg-[#0f1115] text-white">
+    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#0f1115] text-white">
       <div className={`${wrap} py-16 md:py-28`}>
         <p className={eyebrow}>Process</p>
         <h2 id="c-process" className={`${h2c} mt-3`}>
@@ -213,7 +244,7 @@ function Process() {
 
 function Faq() {
   return (
-    <section aria-labelledby="c-faq" className={`${wrap} py-16 md:py-28`}>
+    <section id="faq" aria-labelledby="c-faq" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
       <p className={eyebrow}>FAQ</p>
       <h2 id="c-faq" className={`${h2c} mt-3`}>
         자주 묻는 질문

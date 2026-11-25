@@ -244,6 +244,23 @@ export function ClassicHeader() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+            {/* 11-25 메인 랜딩은 페이지 안 이동 메뉴(개발사 홈페이지 형식) */}
+            {landing && (
+              <ul aria-label="이 페이지" className="mr-2 hidden items-center gap-1 lg:flex" role="list">
+                {[
+                  { href: "#services", label: "서비스" },
+                  { href: "#portfolio", label: "포트폴리오" },
+                  { href: "#process", label: "진행 방식" },
+                  { href: "#faq", label: "자주 묻는 질문" },
+                ].map((a) => (
+                  <li key={a.href}>
+                    <a href={a.href} className="inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold text-[#3d4450] hover:text-[#256ef4]">
+                      {a.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
             {/* 11-25 별도 서비스: 카탈로그, 웹 지식 */}
             <ul aria-label="다른 서비스" className={cn("mr-1 hidden items-center gap-1 border-r border-[#e6e9ee] pr-3", !landing && "lg:flex")} role="list">
               {sideServices.map((s) => (
@@ -277,7 +294,7 @@ export function ClassicHeader() {
                 pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
-              상담 신청
+              {landing ? "프로젝트 문의" : "상담 신청"}
             </Link>
             <button
               ref={menuBtn}
