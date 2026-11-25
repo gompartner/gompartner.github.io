@@ -134,7 +134,7 @@ export function KmB() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
           <p>바른숨 한의원, 경기도 고양시 일산동구 일대</p>
-          <p>상담 예약 031-000-0000</p>
+          <p>대표전화 031-000-0000</p>
         </div>
       </footer>
     </div>

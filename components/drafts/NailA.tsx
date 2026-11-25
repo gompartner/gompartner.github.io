@@ -37,7 +37,7 @@ export function NailA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="text-[15px] font-bold">예약 문의</span>
+          <span className="text-[15px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -106,7 +106,7 @@ export function NailA() {
             <p className="mt-2 text-white/70">가능 여부와 가격, 걸리는 시간을 미리 알려 드립니다.</p>
           </div>
           <span className="inline-flex h-[56px] shrink-0 items-center gap-2 self-start bg-white px-7 text-[16px] font-bold md:self-auto" style={{ color: C.ink }}>
-            예약 문의
+            네이버 예약
             <ArrowRight size={18} aria-hidden />
           </span>
         </div>
@@ -115,7 +115,7 @@ export function NailA() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
           <p>손끝네일, 서울특별시 마포구 연남동 일대, 매일 11:00 ~ 21:00</p>
-          <p>예약 문의 02-000-0000</p>
+          <p>대표전화 02-000-0000</p>
         </div>
       </footer>
     </div>

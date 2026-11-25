@@ -29,7 +29,7 @@ export function OrthoA() {
             ))}
           </nav>
           <span className="inline-flex h-11 items-center px-5 text-[15px] font-bold text-white" style={{ background: C.navy }}>
-            진료 예약
+            네이버 예약
           </span>
         </div>
       </header>
@@ -49,7 +49,7 @@ export function OrthoA() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <span className="inline-flex h-[54px] items-center gap-2 bg-white px-7 text-[16px] font-bold" style={{ color: C.navy }}>
-              진료 예약 <ArrowRight size={18} aria-hidden />
+              네이버 예약 <ArrowRight size={18} aria-hidden />
             </span>
             <span className="inline-flex h-[54px] items-center border border-white/60 px-7 text-[16px] font-bold">02-000-0000</span>
           </div>

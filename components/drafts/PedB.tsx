@@ -140,7 +140,7 @@ export function PedB() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
           <p>튼튼 소아청소년과의원, 경기도 화성시 동탄 일대, 상가 4층 (수유실 있음)</p>
-          <p>예약 문의 031-000-0000</p>
+          <p>대표전화 031-000-0000</p>
         </div>
       </footer>
     </div>

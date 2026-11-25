@@ -26,7 +26,7 @@ export function HairA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">예약 문의</span>
+          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -93,7 +93,7 @@ export function HairA() {
               상담이 빨라집니다
             </h2>
             <span className="mt-10 inline-flex h-[56px] items-center gap-2 px-8 text-[16px] font-bold text-white" style={{ background: C.ink }}>
-              예약 문의
+              네이버 예약
               <ArrowRight size={18} aria-hidden />
             </span>
           </div>
@@ -116,7 +116,7 @@ export function HairA() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1320px] flex-col gap-2 md:flex-row md:justify-between">
           <p>헤어담, 서울특별시 강남구 신사동 일대</p>
-          <p>예약 문의 02-000-0000</p>
+          <p>대표전화 02-000-0000</p>
         </div>
       </footer>
     </div>

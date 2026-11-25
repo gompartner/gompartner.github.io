@@ -47,7 +47,7 @@ export function SkinA() {
               같은 기미도 깊이에 따라 치료가 다릅니다. 피부 측정 결과를 보여 드리고, 필요한 시술만 권합니다.
             </p>
             <span className="mt-10 inline-flex h-[54px] items-center gap-2 px-7 font-bold text-white" style={{ background: C.ink }}>
-              진료 예약
+              네이버 예약
               <ArrowRight size={18} aria-hidden />
             </span>
           </div>
@@ -121,7 +121,7 @@ export function SkinA() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
           <p>맑은결피부과의원, 서울특별시 강남구 신사동 일대, 피부과 전문의 진료</p>
-          <p>예약 문의 02-000-0000</p>
+          <p>대표전화 02-000-0000</p>
         </div>
       </footer>
     </div>

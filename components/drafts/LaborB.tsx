@@ -124,7 +124,7 @@ export function LaborB() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
           <p>바로 노무사사무소, 경기도 수원시 영통구 일대. 공인노무사, 사업자등록번호 000-00-00000</p>
-          <p>상담 예약 031-000-0000</p>
+          <p>대표전화 031-000-0000</p>
         </div>
       </footer>
     </div>

@@ -27,7 +27,7 @@ export function CpB() {
             ))}
           </nav>
           <span className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.tan }}>
-            예약 문의
+            네이버 예약
           </span>
         </div>
       </header>
@@ -93,10 +93,10 @@ export function CpB() {
           </div>
           <div className="flex flex-col justify-between rounded-[28px] p-8 text-white md:p-10" style={{ background: C.tan }}>
             <div>
-              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">예약 문의</h2>
-              <p className="mt-3 text-white/85">날짜와 인원, 원하시는 텐트를 알려 주시면 남은 자리를 바로 알려 드립니다.</p>
+              <h2 className="text-[24px] font-bold tracking-[-0.04em] md:text-[30px]">예약</h2>
+              <p className="mt-3 text-white/85">남은 자리와 텐트 종류는 네이버 예약에서 날짜별로 바로 보실 수 있습니다.</p>
             </div>
-            <p className="mt-8 text-[30px] font-bold tabular-nums tracking-[-0.02em]">041-000-0000</p>
+            <div className="mt-8"><span className="inline-flex h-14 shrink-0 items-center rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>네이버 예약</span></div>
           </div>
         </div>
       </section>

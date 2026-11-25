@@ -28,7 +28,7 @@ export function OptA() {
             ))}
           </nav>
           <span className="inline-flex h-11 items-center px-5 text-[15px] font-bold text-white" style={{ background: C.navy }}>
-            검사 예약
+            네이버 예약
           </span>
         </div>
       </header>
@@ -108,7 +108,7 @@ export function OptA() {
               ))}
             </ul>
             <p className="mt-8 inline-flex items-center gap-1.5 font-bold" style={{ color: C.navy }}>
-              검사 예약하기 <ArrowRight size={18} aria-hidden />
+              네이버 예약 <ArrowRight size={18} aria-hidden />
             </p>
           </div>
           <div className="relative aspect-[4/3] overflow-hidden">

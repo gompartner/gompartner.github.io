@@ -139,7 +139,7 @@ export function FoodA() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
           <p>석교옥, 서울특별시 종로구 일대, 원산지 표시는 매장 메뉴판에 있습니다</p>
-          <p>예약 문의 02-000-0000</p>
+          <p>대표전화 02-000-0000</p>
         </div>
       </footer>
     </div>

@@ -30,7 +30,7 @@ export function VetB() {
             ))}
           </nav>
           <span className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-bold text-white" style={{ background: C.green }}>
-            진료 예약
+            네이버 예약
           </span>
         </div>
       </header>
@@ -129,7 +129,7 @@ export function VetB() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-8" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 md:flex-row md:justify-between">
           <p>초록 동물병원, 경기도 용인시 수지구 일대, 1층 (건물 앞 주차)</p>
-          <p>진료 예약 031-000-0000</p>
+          <p>대표전화 031-000-0000</p>
         </div>
       </footer>
     </div>

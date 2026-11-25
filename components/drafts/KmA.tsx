@@ -26,7 +26,7 @@ export function KmA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">진료 예약</span>
+          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -117,7 +117,7 @@ export function KmA() {
       <footer className="px-5 py-10 text-[14px] md:px-10" style={{ background: C.soft, color: C.sub }}>
         <div className="mx-auto flex max-w-[1320px] flex-col gap-2 md:flex-row md:justify-between">
           <p>솔뫼 한의원, 서울특별시 종로구 일대</p>
-          <p>진료 예약 02-000-0000</p>
+          <p>대표전화 02-000-0000</p>
         </div>
       </footer>
     </div>

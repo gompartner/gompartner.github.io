@@ -25,7 +25,7 @@ export function EyeA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">검사 예약</span>
+          <span className="inline-flex h-10 items-center border border-white/70 px-5 text-[14px] font-bold">네이버 예약</span>
         </div>
       </header>
 
@@ -124,7 +124,7 @@ export function EyeA() {
       <footer className="border-t px-5 py-10 text-[14px] md:px-10" style={{ borderColor: C.line, color: C.sub }}>
         <div className="mx-auto flex max-w-[1320px] flex-col gap-2 md:flex-row md:justify-between">
           <p>맑은눈 안과의원, 부산광역시 부산진구 일대</p>
-          <p>검사 예약 051-000-0000</p>
+          <p>대표전화 051-000-0000</p>
         </div>
       </footer>
     </div>

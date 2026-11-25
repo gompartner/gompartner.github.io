@@ -28,7 +28,7 @@ export function CpA() {
               <span key={m}>{m}</span>
             ))}
           </nav>
-          <span className="hidden h-10 items-center border border-white/70 px-5 text-[14px] font-bold sm:inline-flex">예약 문의</span>
+          <span className="hidden h-10 items-center border border-white/70 px-5 text-[14px] font-bold sm:inline-flex">네이버 예약</span>
         </div>
       </header>
 
@@ -113,10 +113,10 @@ export function CpA() {
           </div>
           <div className="flex flex-col justify-between gap-8 p-8 text-white md:p-10" style={{ background: C.green }}>
             <div>
-              <h3 className="text-[24px] font-bold tracking-[-0.03em]">예약 문의</h3>
-              <p className="mt-3 text-white/80">매달 1일 10시에 다음 달 예약을 받습니다. 가평 IC에서 20분, 마지막 2km는 포장된 산길입니다.</p>
+              <h3 className="text-[24px] font-bold tracking-[-0.03em]">예약</h3>
+              <p className="mt-3 text-white/80">매달 1일 10시에 다음 달 자리가 열립니다. 남은 사이트는 네이버 예약에서 바로 보고 고르실 수 있습니다. 가평 IC에서 20분.</p>
             </div>
-            <p className="text-[28px] font-bold tabular-nums">031-000-0000</p>
+            <span className="inline-flex h-14 shrink-0 items-center rounded-full px-7 text-[17px] font-bold text-white" style={{ background: "#03c75a" }}>네이버 예약</span>
           </div>
         </div>
       </section>

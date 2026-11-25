@@ -50,7 +50,7 @@ export function DentalA() {
               당장 필요한 치료와 나중에 해도 되는 치료를 나눠서 말씀드립니다. 진료 전에 비용과 횟수를 먼저 확인하실 수 있습니다.
             </p>
             <span className="mt-10 inline-flex h-[54px] items-center gap-2 px-7 font-bold text-white" style={{ background: C.ink }}>
-              진료 예약
+              네이버 예약
               <ArrowRight size={18} aria-hidden />
             </span>
           </div>
@@ -164,7 +164,7 @@ export function DentalA() {
           <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.03em] md:text-[40px]">첫 진료는 검진과 상담부터</h2>
           <div className="flex flex-wrap items-center gap-5">
             <span className="inline-flex h-[56px] items-center gap-2 bg-white px-8 text-[17px] font-bold" style={{ color: C.ink }}>
-              진료 예약
+              네이버 예약
               <ArrowRight size={18} aria-hidden />
             </span>
             <span className="text-[22px] font-bold tabular-nums">{TEL}</span>
@@ -175,7 +175,7 @@ export function DentalA() {
       <footer className="px-5 py-10 text-[14px] md:px-10" style={{ color: C.sub }}>
         <div className="mx-auto flex max-w-[1280px] flex-col gap-2 md:flex-row md:justify-between">
           <p>서로치과의원, 서울특별시 송파구 일대, 지하철역 2번 출구 앞</p>
-          <p>예약 문의 {TEL}</p>
+          <p>대표전화 {TEL}</p>
         </div>
       </footer>
     </div>
