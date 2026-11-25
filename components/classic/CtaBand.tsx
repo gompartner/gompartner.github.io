@@ -9,7 +9,7 @@ import { KakaoChatButton } from "@/components/layout/KakaoChat";
 export function CtaBand() {
   const pathname = usePathname();
   // 11-25 메인은 신청서가 바로 위에 있어 띠를 숨긴다
-  if (pathname?.startsWith("/contact") || pathname === "/") return null;
+  if (pathname?.startsWith("/contact") || pathname === "/" || pathname === "/make") return null;
   return (
     <section aria-label="상담 신청" className="bg-[#256ef4] text-white">
       <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-6 px-4 py-12 md:flex-row md:items-center md:justify-between md:px-6 md:py-14">

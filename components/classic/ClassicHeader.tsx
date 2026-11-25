@@ -48,6 +48,9 @@ export const classicMenu = [
 ];
 
 // 카탈로그(/works)와 웹 지식(/knowledge)은 독립 사이트로 분리할 예정이라 머리글 메뉴에 두지 않는다(11-25 밤 사용자). 페이지 주소는 분리할 때까지 그대로 살아 있다
+// 메인과 같은 얼굴로 다시 만든 안쪽 판. 다시 만든 것만 여기에 넣는다(한꺼번에 찍어 내지 않고 하나씩)
+const BOARDS = [{ href: "/make", label: "Build" }];
+
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
 const subMenu = [
   { href: "/story", label: "회사소개" },
@@ -64,7 +67,9 @@ const toggle = "inline-flex h-11 w-11 items-center justify-center rounded-md bor
 export function ClassicHeader() {
   const pathname = usePathname();
   // 11-25 메인은 랜딩페이지: 머리글은 로고와 상담 신청만
-  const landing = pathname === "/";
+  // board: 메인과 같은 얼굴로 다시 만든 안쪽 "한 판" 페이지(11-26 제작부터 하나씩). 머리글은 메인과 같은 어두운 띠에 판끼리 오가는 메뉴만 둔다
+  const board = BOARDS.some((b) => pathname === b.href);
+  const landing = pathname === "/" || board;
   // 메인은 어두운 조립형 화면이라 머리글도 어둡게
   const dark = landing;
   const [open, setOpen] = useState(false);
@@ -243,15 +248,18 @@ export function ClassicHeader() {
             {/* 11-25 메인 랜딩은 페이지 안 이동 메뉴(개발사 홈페이지 형식) */}
             {landing && (
               <ul aria-label="이 페이지" className="mr-2 hidden items-center gap-1 lg:flex" role="list">
-                {[
-                  { href: "#services", label: "Build" },
-                  { href: "#products", label: "Run" },
-                  { href: "#care", label: "Care" },
-                  { href: "#process", label: "Process" },
-                  { href: "#apply", label: "Contact" },
-                ].map((a) => (
+                {(board
+                  ? [...BOARDS, { href: "/#apply", label: "Contact" }]
+                  : [
+                      { href: "#services", label: "Build" },
+                      { href: "#products", label: "Run" },
+                      { href: "#care", label: "Care" },
+                      { href: "#process", label: "Process" },
+                      { href: "#apply", label: "Contact" },
+                    ]
+                ).map((a) => (
                   <li key={a.href}>
-                    <Link href={a.href} className={cn("inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold", dark ? "text-[#c9ced6] hover:text-white" : "text-[#3d4450] hover:text-[#256ef4]")}>
+                    <Link href={a.href} aria-current={pathname === a.href ? "page" : undefined} className={cn("inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold aria-[current=page]:text-white", dark ? "text-[#c9ced6] hover:text-white" : "text-[#3d4450] hover:text-[#256ef4]")}>
                       {a.label}
                     </Link>
                   </li>
