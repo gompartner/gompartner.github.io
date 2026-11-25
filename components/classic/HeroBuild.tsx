@@ -126,14 +126,16 @@ export function HeroBuild() {
           <path className="gp-draw" pathLength={1} d="M0 520 C 260 420, 420 560, 640 660" stroke="rgba(122,167,255,.12)" strokeWidth="1" style={at(0.3)} />
         </svg>
 
-        <div className="gp-clunk mx-auto grid w-full max-w-[1248px] items-center gap-14 px-4 pb-20 pt-14 md:px-6 md:pb-28 md:pt-20 lg:grid-cols-[1fr_1.05fr] lg:gap-12">
-          <div>
-            <p className="gp-pill inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.04] px-4 py-1.5 text-[14px] font-bold text-[#c9ced6] md:text-[15px]" style={at(0.2)}>
+        {/* 휴대폰, 태블릿(한 줄 배치)에서는 제목 바로 아래에 3D 창을 둔다. 설명과 버튼 아래에 있으면 첫 화면에 안 보여 스크롤하다 지나쳤다(11-25 사용자).
+            왼쪽 묶음을 contents로 풀어 order로 순서만 바꾸고, 넓은 화면(lg)에서는 원래대로 왼쪽 글, 오른쪽 창 */}
+        <div className="gp-clunk mx-auto grid w-full max-w-[1248px] items-center px-4 pb-20 pt-8 md:px-6 md:pb-28 md:pt-16 lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:pt-20">
+          <div className="contents lg:block">
+            <p className="gp-pill order-1 inline-flex items-center gap-2 justify-self-start rounded-full border border-white/20 bg-white/[0.04] px-4 py-1.5 text-[14px] font-bold text-[#c9ced6] md:text-[15px]" style={at(0.2)}>
               <i aria-hidden className="h-2 w-2 rounded-full bg-[#7aa7ff]" />
               홈페이지, 업무 시스템, 앱 개발
             </p>
             {/* 제목: 글자가 흩어져 있다가 모인다 */}
-            <h1 id="c-hero" aria-label={lines.join(" ")} className="mt-6 text-[40px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[68px] xl:text-[76px]">
+            <h1 id="c-hero" aria-label={lines.join(" ")} className="order-2 mt-6 text-[40px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[68px] xl:text-[76px]">
               {title.map((words, li) => (
                 <span key={li} aria-hidden className="block">
                   {words.map((chars, wi) => (
@@ -149,8 +151,8 @@ export function HeroBuild() {
                 </span>
               ))}
             </h1>
-            <span aria-hidden className="gp-line mt-5 block h-1.5 w-24 rounded-full bg-[#256ef4] md:w-32" style={at(0.75)} />
-            <p className="mt-6 max-w-[540px] break-keep text-[17px] leading-[1.7] text-[#aab2bf] md:text-[19px]">
+            <span aria-hidden className="gp-line order-3 mt-5 block h-1.5 w-24 rounded-full bg-[#256ef4] md:w-32" style={at(0.75)} />
+            <p className="order-5 mt-9 max-w-[540px] break-keep text-[17px] leading-[1.7] text-[#aab2bf] md:text-[19px] lg:mt-6">
               {sub.split(" ").map((w, i) => (
                 <span key={i}>
                   <span className="gp-word" style={at(0.7 + i * 0.015)}>
@@ -159,7 +161,7 @@ export function HeroBuild() {
                 </span>
               ))}
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="order-6 mt-9 flex flex-wrap gap-3">
               <Link href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(0.9), "--r": "-14deg" } as V}>
                 무료 견적 받기
                 <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#0b0d12]">
@@ -170,7 +172,7 @@ export function HeroBuild() {
                 포트폴리오 보기
               </Link>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2.5" role="list">
+            <ul className="order-7 mt-8 flex flex-wrap gap-x-6 gap-y-2.5" role="list">
               {trust.map((t, i) => (
                 <li key={t} className="gp-pop flex items-center gap-2 text-[15px] font-bold text-[#c9ced6] md:text-[16px]" style={{ ...at(1.05 + i * 0.06), "--r": "0deg" } as V}>
                   <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full bg-[#7aa7ff]/20 text-[#7aa7ff]">
@@ -183,7 +185,7 @@ export function HeroBuild() {
           </div>
 
           {/* 오른쪽 창: 둥근 창틀이 두 모서리에서 자라 만나고, 안에서 3D 마을이 조립된다 */}
-          <div data-win className="relative">
+          <div data-win className="relative order-4 mt-9 lg:order-none lg:mt-0">
             <span aria-hidden className="gp-frame pointer-events-none absolute -inset-px z-20 rounded-[22px]" style={at(0.05)} />
             <div className="gp-body relative overflow-hidden rounded-[22px] bg-[#10141d]" style={at(0.1)}>
               <div aria-hidden className="flex h-11 items-center gap-2 border-b border-white/10 px-4">
