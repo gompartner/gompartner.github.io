@@ -4,19 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { LongShot } from "@/components/classic/board/LongShot";
+import { MotionShot } from "@/components/classic/board/MotionShot";
 
 // 카탈로그 화면 한 장을 크게 보는 팝업과 그림 틀. 카탈로그 판(CatalogBoard)과 통합검색 결과(SearchResults)가 함께 쓴다.
 // 11-26 사용자 "검색에서 레이어팝업을 닫으면 통합검색이 유지되도록": 검색 결과에서는 카탈로그로 옮겨 가지 않고 그 자리에서 이 팝업을 연다.
 
 /** long: 페이지 전체를 찍은 긴 캡처(있으면 창 안에서 저절로 내려가며 보여 주고, 크게 보기에서는 통째로 편다) */
-export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number } };
+/** video: 화면을 내려 보며 녹화한 영상(있으면 그림 대신 영상이 돈다) */
+export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number }; video?: { src: string; w: number; h: number } };
 /** tag: 연도와 기법처럼 제목 옆에 붙는 이름표(그 해의 연출로 만든 화면) */
 export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[]; tag?: string };
 export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
 
 /** 그림 한 장을 브라우저, 휴대폰, 키오스크 틀에 넣는다. scene은 기기를 이미 담은 그림이라 테두리만 둔다 */
 export function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?: boolean }) {
-  const img = shot.long ? (
+  const img = shot.video ? (
+    <MotionShot src={shot.video.src} poster={shot.src} alt={shot.alt} w={shot.video.w} h={shot.video.h} full={full} />
+  ) : shot.long ? (
     full ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={shot.long.src} alt={shot.alt} width={shot.long.w} height={shot.long.h} loading="lazy" decoding="async" className="block h-auto w-full" />

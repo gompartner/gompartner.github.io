@@ -71,8 +71,11 @@ export function buildCatalog() {
     const pc = `/images/demos/var/${t.id}.jpg`;
     const m = `/images/catalog/${t.id}-m.jpg`;
     if (!base || !exists(pc)) continue;
-    const main: Shot = { src: pc, frame: "browser", ratio: "16/10", alt: `${base.title} ${t.tag} PC 화면`, ...(lg?.pc && exists(lg.pc.src) ? { long: lg.pc } : {}) };
-    const side: Shot | undefined = exists(m) ? { src: m, frame: "phone", ratio: "780/1472", alt: `${base.title} ${t.tag} 휴대폰 화면`, ...(lg?.m && exists(lg.m.src) ? { long: lg.m } : {}) } : undefined;
+    // 내려 보며 녹화한 영상(public/videos/catalog). PC는 960x600, 휴대폰은 390x844
+    const vpc = `/videos/catalog/${t.id}-pc.mp4`;
+    const vm = `/videos/catalog/${t.id}-m.mp4`;
+    const main: Shot = { src: pc, frame: "browser", ratio: "16/10", alt: `${base.title} ${t.tag} PC 화면`, ...(lg?.pc && exists(lg.pc.src) ? { long: lg.pc } : {}), ...(exists(vpc) ? { video: { src: vpc, w: 960, h: 600 } } : {}) };
+    const side: Shot | undefined = exists(m) ? { src: m, frame: "phone", ratio: "780/1472", alt: `${base.title} ${t.tag} 휴대폰 화면`, ...(lg?.m && exists(lg.m.src) ? { long: lg.m } : {}), ...(exists(vm) ? { video: { src: vm, w: 390, h: 844 } } : {}) } : undefined;
     trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "잡은 방향", want: t.want, think: t.think, made: t.made });
   }
 

@@ -48,7 +48,7 @@ function Swipe({ s, onOpen }: { s: CatalogStoryView; onOpen: (v: "main" | "side"
     <>
       <div ref={ref} onScroll={onScroll} role="group" aria-label={`${name} PC 화면과 ${sideLabel} 화면`} className="-mx-5 flex snap-x snap-mandatory items-center gap-3 overflow-x-auto overscroll-x-contain px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button type="button" onClick={() => onOpen("main")} aria-label={`${name} PC 화면 크게 보기`} className="block w-[86%] shrink-0 snap-center text-left">
-          <Frame shot={{ ...s.main, ratio: s.main.frame === "browser" ? "4/3" : s.main.ratio }} sizes="86vw" />
+          <Frame shot={{ ...s.main, ratio: s.main.frame === "browser" && !s.main.video ? "4/3" : s.main.ratio }} sizes="86vw" />
         </button>
         <button type="button" onClick={() => onOpen("side")} aria-label={`${name} ${sideLabel} 화면 크게 보기`} className="flex w-[86%] shrink-0 snap-center justify-center">
           <span className="block w-[50%]">
