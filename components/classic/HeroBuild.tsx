@@ -23,7 +23,6 @@ const css = `
 @keyframes gp-chip { 0% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(0.6); } 62% { opacity: 1; transform: translate(calc(var(--x) * -0.06), calc(var(--y) * 0.1)) rotate(calc(var(--r) * -0.12)) scale(1.05); } 100% { opacity: 1; transform: none; } }
 @keyframes gp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes gp-sweep { from { --gp-a: 0deg; } to { --gp-a: 180deg; } }
-@keyframes gp-iris { from { clip-path: circle(0% at 50% 55%); } to { clip-path: circle(85% at 50% 55%); } }
 @keyframes gp-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes gp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes gp-clunk { 0%, 100% { transform: none; } 35% { transform: translateY(3px); } 65% { transform: translateY(-1px); } }
@@ -38,7 +37,6 @@ const css = `
 .gp-draw { stroke-dasharray: 1; animation: gp-draw 0.6s ease-in-out both; animation-delay: var(--d); }
 .gp-line { transform-origin: left; animation: gp-line 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.4s ease-out both; animation-delay: var(--d); }
-.gp-iris { animation: gp-iris 0.5s cubic-bezier(0.5, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-clunk { animation: gp-clunk 0.26s ease-out 1.15s both; }
 /* 창틀: 둥근 테두리를 원뿔 마스크로 가려 두 모서리에서 자라게 한다 */
 .gp-frame {
@@ -51,14 +49,14 @@ const css = `
 .gp-scan { transform: translateX(220%); animation: gp-scan 0.7s ease-in-out both; animation-delay: var(--d); }
 
 /* 창이 화면에 들어오기 전에는 창 쪽 조립을 멈춰 둔다(휴대폰에서는 창이 아래에 있다) */
-[data-win]:not([data-win-on]) :is(.gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-iris, .gp-fade, .gp-scan) { animation-play-state: paused; }
+[data-win]:not([data-win-on]) :is(.gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-fade, .gp-scan) { animation-play-state: paused; }
 /* 이미 조립했으면(새로고침 전) 조립 없이 완성된 화면 */
-[data-built] :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-iris, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
+[data-built] :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
 /* 다시 보일 때: 창틀이 반짝이고 광택이 한 번 훑는다 */
 [data-shine] .gp-frame::before { animation: gp-spark 1s ease-out both; }
 [data-built][data-shine] .gp-scan, [data-shine] .gp-scan { animation: gp-scan 0.7s ease-in-out 0.1s both; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-iris, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
+  :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
   [data-shine] .gp-frame::before { animation: none; }
 }
 `;
@@ -98,7 +96,8 @@ const title = (() => {
 export function HeroBuild() {
   return (
     <BuildGate>
-      <section aria-labelledby="c-hero" className="relative isolate overflow-hidden bg-[#0b0d12] text-white">
+      {/* overflow-clip: hidden이면 날아오는 부품 때문에 구역 안쪽이 스크롤되어 화면이 잠깐 밀린다 */}
+      <section aria-labelledby="c-hero" className="relative isolate overflow-clip bg-[#0b0d12] text-white">
         <style>{css}</style>
         {/* 바탕: 모눈과 큰 원호 */}
         <div aria-hidden className="gp-fade absolute inset-0 -z-10 bg-[linear-gradient(rgba(122,167,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.06)_1px,transparent_1px)] bg-[size:48px_48px]" style={at(0)} />
