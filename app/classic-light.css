@@ -1,1 +1,247 @@
-/* 11-26 밝은 화면(화이트 모드). html.gp-light 일 때만 걸린다. 어둡게 지은 화면(메인, 판, 머리글, 바닥글)을 밝은 색으로 바꾸는 규칙을 여기에 둔다. */
+/* 11-26 밝은 화면(화이트 모드). html.gp-light 일 때만 걸린다(기본은 어두운 화면 html.gp-dark, 고르는 버튼은 components/classic/ThemeSwitch.tsx).
+   사이트는 어두운 화면으로 지었다. 이 파일은 그 색을 밝은 화면용으로 바꾼다. 옛 밝은 페이지(위키 본문, 검색 결과 등)는 gp-dark가 빠지면 원래 밝은 색으로 나온다.
+   - 생성 구간: 색 클래스(bg-, text-, border- 와 hover:, group-open:, aria-, lg: 같은 접두 전부). scripts/light-css.mjs 가 Tailwind 출력에서 만든다.
+     화면에 새 색 클래스를 쓰면 node scripts/light-css.mjs 를 다시 돌린다. 방법과 색표는 그 파일 머리 주석에.
+   - 손으로 쓴 구간: 생성기가 못 잡는 것(인라인 style, 컴포넌트 안 <style> 문자열, SVG 속성 색, 밝은 화면에서 먹색으로 뒤집는 흰 부품).
+   밝은 화면에서도 어둡게 두는 것: 메인 첫 화면의 3D 창(.gp-body), 휴대폰 캡처의 검은 테두리, 바닥글, public/3d 의 독립 화면, 화면 캡처 그림.
+   모든 선택자는 html.gp-light 로 시작한다(어두운 화면에는 닿지 않는다). */
+
+/* ==== 생성 구간 시작: node scripts/light-css.mjs 가 다시 쓴다(직접 고치지 않는다) ==== */
+/* 밝은 값. 어둡게 지은 색 클래스는 아래에서 이 변수를 읽는다 */
+html.gp-light .cl { --gl-b-0b0d12: #ffffff; --gl-b-0f131b: #f6f8fb; --gl-b-121722: #f1f4f9; --gl-b-1b2130: #e9edf3; --gl-b-7aa7ff-10: rgb(37 110 244 / 0.1); --gl-b-7aa7ff-15: rgb(37 110 244 / 0.15); --gl-b-7aa7ff-20: rgb(37 110 244 / 0.2); --gl-b-7aa7ff-25: rgb(37 110 244 / 0.25); --gl-b-ffd84d-15: rgb(232 168 0 / 0.21); --gl-b-ffd84d-25: rgb(232 168 0 / 0.35); --gl-b-ffffff-10: rgb(21 23 28 / 0.1); --gl-b-ffffff-15: rgb(21 23 28 / 0.15); --gl-b-ffffff-20: rgb(21 23 28 / 0.2); --gl-b-ffffff-25: rgb(21 23 28 / 0.25); --gl-b-ffffff-4: rgb(21 23 28 / 0.04); --gl-b-ffffff-5: rgb(21 23 28 / 0.05); --gl-b-ffffff-50: rgb(21 23 28 / 0.5); --gl-b-ffffff-6: rgb(21 23 28 / 0.06); --gl-b-ffffff-8: rgb(21 23 28 / 0.08); --gl-l-7aa7ff: #256ef4; --gl-l-7aa7ff-45: rgb(37 110 244 / 0.45); --gl-l-7aa7ff-50: rgb(37 110 244 / 0.5); --gl-l-7aa7ff-60: rgb(37 110 244 / 0.6); --gl-l-ffffff: #15171c; --gl-l-ffffff-10: rgb(21 23 28 / 0.1); --gl-l-ffffff-12: rgb(21 23 28 / 0.12); --gl-l-ffffff-15: rgb(21 23 28 / 0.15); --gl-l-ffffff-20: rgb(21 23 28 / 0.2); --gl-l-ffffff-25: rgb(21 23 28 / 0.25); --gl-l-ffffff-30: rgb(21 23 28 / 0.3); --gl-l-ffffff-40: rgb(21 23 28 / 0.4); --gl-l-ffffff-50: rgb(21 23 28 / 0.5); --gl-l-ffffff-60: rgb(21 23 28 / 0.6); --gl-l-ffffff-90: rgb(21 23 28 / 0.9); --gl-sh1: 0 4px 14px var(--tw-shadow-color, rgba(16,24,40,0.104)); --gl-sh2: 0 24px 50px -12px var(--tw-shadow-color, rgba(16,24,40,0.234)); --gl-sh3: 0 30px 70px -24px var(--tw-shadow-color, rgba(16,24,40,0.221)); --gl-t-188038: #167433; --gl-t-256ef4: #1d5fd6; --gl-t-6b7280: #5d6574; --gl-t-6b7380: #5d6574; --gl-t-7aa7ff: #1d5fd6; --gl-t-7d8594: #5d6574; --gl-t-8a929e: #5d6574; --gl-t-8a94a6: #5d677a; --gl-t-9aa1ab: #5d6574; --gl-t-a3abb8: #59606e; --gl-t-aab2bf: #5b6370; --gl-t-c9ced6: #3d4450; --gl-t-cfe0ff: #0f4dbd; --gl-t-d63d4a: #c22936; --gl-t-dbe2ee: #363b44; --gl-t-e3e7ee: #32363e; --gl-t-e6e6e6: #32363e; --gl-t-f3ece2: #30343b; --gl-t-ffd84d: #8a5a00; --gl-t-ffe58a: #685308; --gl-t-ffffff: #15171c; --gl-t-ffffff-30: #5d6574; --gl-t-ffffff-40: #5d6574; --gl-t-ffffff-50: #5d6574; --gl-t-ffffff-55: #5d6574; --gl-t-ffffff-70: #4f5663; --gl-t-ffffff-80: #40454f; }
+/* 섬: 밝은 화면에서도 남는 진한 바탕. 그 안에서는 변수를 꺼서 원래 색(흰 글자, 흰 투명 선)이 쓰인다 */
+html.gp-light .cl :where(.bg-\[\#0f1b3d\],
+  .bg-\[\#0f5e5a\],
+  .bg-\[\#1e2127\],
+  .bg-\[\#1f5fe0\],
+  .bg-\[\#2a78d6\],
+  .bg-\[\#7a4dd8\],
+  .bg-\[\#7aa7ff\],
+  .bg-\[\#28c840\],
+  .bg-\[\#111\],
+  .bg-\[\#256ef4\],
+  .bg-\[\#464c53\],
+  .bg-\[\#10141d\],
+  .bg-\[\#15171c\],
+  .bg-\[\#17734a\],
+  .bg-\[\#188038\],
+  .bg-\[\#FEE500\],
+  .bg-\[\#ffd84d\],
+  .from-\[\#3b4a6b\],
+  .group-open\:bg-\[\#256ef4\]:is(:where(.group):is([open], :popover-open, :open) *),
+  .focus\:bg-\[\#256ef4\]:focus,
+  .gp-body,
+  .border-\[\#2b3346\],
+  :where(.bg-\[\#b7d0ff\]:not(.cl), .bg-\[\#d1d5db\]:not(.cl), .bg-\[\#d4edda\]:not(.cl), .bg-\[\#d6e4fd\]:not(.cl), .bg-\[\#d8dde5\]:not(.cl), .bg-\[\#d9dee5\]:not(.cl), .bg-\[\#e6e9ee\]:not(.cl), .bg-\[\#e6eeff\]:not(.cl), .bg-\[\#e8eaed\]:not(.cl), .bg-\[\#e8f0fe\]:not(.cl), .bg-\[\#e9edf3\]:not(.cl), .bg-\[\#e9f6ef\]:not(.cl), .bg-\[\#eef0f3\]:not(.cl), .bg-\[\#eef1f5\]:not(.cl), .bg-\[\#eef3ff\]:not(.cl), .bg-\[\#eef4ff\]:not(.cl), .bg-\[\#f1f3f6\]:not(.cl), .bg-\[\#f1f4f9\]:not(.cl), .bg-\[\#f3effc\]:not(.cl), .bg-\[\#f4f6f9\]:not(.cl), .bg-\[\#f4f6fa\]:not(.cl), .bg-\[\#f5f7fa\]:not(.cl), .bg-\[\#f6f7f9\]:not(.cl), .bg-\[\#f8f9fa\]:not(.cl), .bg-\[\#fde2e1\]:not(.cl), .bg-\[\#fef3c7\]:not(.cl), .bg-\[\#fff4e5\]:not(.cl), .bg-\[\#fffbe6\]:not(.cl), .bg-\[\#fffdf8\]:not(.cl), .bg-white:not(.cl), .bg-white\/70:not(.cl), .bg-white\/80:not(.cl), .bg-white\/85:not(.cl)) :where(a, button, span).bg-\[\#0b0d12\]) { --gl-b-0b0d12: initial; --gl-b-0f131b: initial; --gl-b-121722: initial; --gl-b-1b2130: initial; --gl-b-7aa7ff-10: initial; --gl-b-7aa7ff-15: initial; --gl-b-7aa7ff-20: initial; --gl-b-7aa7ff-25: initial; --gl-b-ffd84d-15: initial; --gl-b-ffd84d-25: initial; --gl-b-ffffff-10: initial; --gl-b-ffffff-15: initial; --gl-b-ffffff-20: initial; --gl-b-ffffff-25: initial; --gl-b-ffffff-4: initial; --gl-b-ffffff-5: initial; --gl-b-ffffff-50: initial; --gl-b-ffffff-6: initial; --gl-b-ffffff-8: initial; --gl-l-7aa7ff: initial; --gl-l-7aa7ff-45: initial; --gl-l-7aa7ff-50: initial; --gl-l-7aa7ff-60: initial; --gl-l-ffffff: initial; --gl-l-ffffff-10: initial; --gl-l-ffffff-12: initial; --gl-l-ffffff-15: initial; --gl-l-ffffff-20: initial; --gl-l-ffffff-25: initial; --gl-l-ffffff-30: initial; --gl-l-ffffff-40: initial; --gl-l-ffffff-50: initial; --gl-l-ffffff-60: initial; --gl-l-ffffff-90: initial; --gl-sh1: initial; --gl-sh2: initial; --gl-sh3: initial; --gl-t-188038: initial; --gl-t-256ef4: initial; --gl-t-6b7280: initial; --gl-t-6b7380: initial; --gl-t-7aa7ff: initial; --gl-t-7d8594: initial; --gl-t-8a929e: initial; --gl-t-8a94a6: initial; --gl-t-9aa1ab: initial; --gl-t-a3abb8: initial; --gl-t-aab2bf: initial; --gl-t-c9ced6: initial; --gl-t-cfe0ff: initial; --gl-t-d63d4a: initial; --gl-t-dbe2ee: initial; --gl-t-e3e7ee: initial; --gl-t-e6e6e6: initial; --gl-t-f3ece2: initial; --gl-t-ffd84d: initial; --gl-t-ffe58a: initial; --gl-t-ffffff: initial; --gl-t-ffffff-30: initial; --gl-t-ffffff-40: initial; --gl-t-ffffff-50: initial; --gl-t-ffffff-55: initial; --gl-t-ffffff-70: initial; --gl-t-ffffff-80: initial; }
+@media (hover: hover) { html.gp-light .cl :where(.hover\:bg-\[\#0b50d0\]:hover, .hover\:bg-\[\#1b5bd1\]:hover, .hover\:bg-\[\#1f63e6\]:hover, .hover\:bg-\[\#256ef4\]:hover, .hover\:bg-\[\#ffcf24\]:hover, .hover\:bg-black:hover) { --gl-b-0b0d12: initial; --gl-b-0f131b: initial; --gl-b-121722: initial; --gl-b-1b2130: initial; --gl-b-7aa7ff-10: initial; --gl-b-7aa7ff-15: initial; --gl-b-7aa7ff-20: initial; --gl-b-7aa7ff-25: initial; --gl-b-ffd84d-15: initial; --gl-b-ffd84d-25: initial; --gl-b-ffffff-10: initial; --gl-b-ffffff-15: initial; --gl-b-ffffff-20: initial; --gl-b-ffffff-25: initial; --gl-b-ffffff-4: initial; --gl-b-ffffff-5: initial; --gl-b-ffffff-50: initial; --gl-b-ffffff-6: initial; --gl-b-ffffff-8: initial; --gl-l-7aa7ff: initial; --gl-l-7aa7ff-45: initial; --gl-l-7aa7ff-50: initial; --gl-l-7aa7ff-60: initial; --gl-l-ffffff: initial; --gl-l-ffffff-10: initial; --gl-l-ffffff-12: initial; --gl-l-ffffff-15: initial; --gl-l-ffffff-20: initial; --gl-l-ffffff-25: initial; --gl-l-ffffff-30: initial; --gl-l-ffffff-40: initial; --gl-l-ffffff-50: initial; --gl-l-ffffff-60: initial; --gl-l-ffffff-90: initial; --gl-sh1: initial; --gl-sh2: initial; --gl-sh3: initial; --gl-t-188038: initial; --gl-t-256ef4: initial; --gl-t-6b7280: initial; --gl-t-6b7380: initial; --gl-t-7aa7ff: initial; --gl-t-7d8594: initial; --gl-t-8a929e: initial; --gl-t-8a94a6: initial; --gl-t-9aa1ab: initial; --gl-t-a3abb8: initial; --gl-t-aab2bf: initial; --gl-t-c9ced6: initial; --gl-t-cfe0ff: initial; --gl-t-d63d4a: initial; --gl-t-dbe2ee: initial; --gl-t-e3e7ee: initial; --gl-t-e6e6e6: initial; --gl-t-f3ece2: initial; --gl-t-ffd84d: initial; --gl-t-ffe58a: initial; --gl-t-ffffff: initial; --gl-t-ffffff-30: initial; --gl-t-ffffff-40: initial; --gl-t-ffffff-50: initial; --gl-t-ffffff-55: initial; --gl-t-ffffff-70: initial; --gl-t-ffffff-80: initial; } }
+/* 섬에 글자색 클래스가 없으면 흰 글자(어두운 화면에서는 바깥의 흰 글자를 물려받던 곳). 낮은 층이라 글자색 클래스가 있으면 그쪽이 이긴다 */
+@layer base { html.gp-light .cl :where(.bg-\[\#0f1b3d\], .bg-\[\#0f5e5a\], .bg-\[\#1e2127\], .bg-\[\#1f5fe0\], .bg-\[\#2a78d6\], .bg-\[\#7a4dd8\], .bg-\[\#111\], .bg-\[\#256ef4\], .bg-\[\#464c53\], .bg-\[\#10141d\], .bg-\[\#15171c\], .bg-\[\#17734a\], .bg-\[\#188038\], .from-\[\#3b4a6b\], :where(.bg-\[\#b7d0ff\]:not(.cl), .bg-\[\#d1d5db\]:not(.cl), .bg-\[\#d4edda\]:not(.cl), .bg-\[\#d6e4fd\]:not(.cl), .bg-\[\#d8dde5\]:not(.cl), .bg-\[\#d9dee5\]:not(.cl), .bg-\[\#e6e9ee\]:not(.cl), .bg-\[\#e6eeff\]:not(.cl), .bg-\[\#e8eaed\]:not(.cl), .bg-\[\#e8f0fe\]:not(.cl), .bg-\[\#e9edf3\]:not(.cl), .bg-\[\#e9f6ef\]:not(.cl), .bg-\[\#eef0f3\]:not(.cl), .bg-\[\#eef1f5\]:not(.cl), .bg-\[\#eef3ff\]:not(.cl), .bg-\[\#eef4ff\]:not(.cl), .bg-\[\#f1f3f6\]:not(.cl), .bg-\[\#f1f4f9\]:not(.cl), .bg-\[\#f3effc\]:not(.cl), .bg-\[\#f4f6f9\]:not(.cl), .bg-\[\#f4f6fa\]:not(.cl), .bg-\[\#f5f7fa\]:not(.cl), .bg-\[\#f6f7f9\]:not(.cl), .bg-\[\#f8f9fa\]:not(.cl), .bg-\[\#fde2e1\]:not(.cl), .bg-\[\#fef3c7\]:not(.cl), .bg-\[\#fff4e5\]:not(.cl), .bg-\[\#fffbe6\]:not(.cl), .bg-\[\#fffdf8\]:not(.cl), .bg-white:not(.cl), .bg-white\/70:not(.cl), .bg-white\/80:not(.cl), .bg-white\/85:not(.cl)) :where(a, button, span).bg-\[\#0b0d12\]) { color: #fff; } }
+/* 팝업 뒤 가림막은 밝은 화면에 맞게 옅게 */
+html.gp-light .cl dialog::backdrop { background-color: rgb(16 24 40 / 0.5); }
+html.gp-light .cl .border-\[\#7aa7ff\] { border-color: var(--gl-l-7aa7ff, #7aa7ff); }
+html.gp-light .cl .border-\[\#7aa7ff\]\/45 { border-color: var(--gl-l-7aa7ff-45, rgb(122 167 255 / 0.45)); }
+html.gp-light .cl .border-\[\#7aa7ff\]\/60 { border-color: var(--gl-l-7aa7ff-60, rgb(122 167 255 / 0.6)); }
+html.gp-light .cl .border-white:not(.bg-white, [class*="bg-[#"]) { border-color: var(--gl-l-ffffff, #ffffff); }
+html.gp-light .cl .border-white\/10 { border-color: var(--gl-l-ffffff-10, rgb(255 255 255 / 0.1)); }
+html.gp-light .cl .border-white\/12 { border-color: var(--gl-l-ffffff-12, rgb(255 255 255 / 0.12)); }
+html.gp-light .cl .border-white\/15 { border-color: var(--gl-l-ffffff-15, rgb(255 255 255 / 0.15)); }
+html.gp-light .cl .border-white\/20 { border-color: var(--gl-l-ffffff-20, rgb(255 255 255 / 0.2)); }
+html.gp-light .cl .border-white\/25 { border-color: var(--gl-l-ffffff-25, rgb(255 255 255 / 0.25)); }
+html.gp-light .cl .border-white\/30 { border-color: var(--gl-l-ffffff-30, rgb(255 255 255 / 0.3)); }
+html.gp-light .cl .border-white\/50 { border-color: var(--gl-l-ffffff-50, rgb(255 255 255 / 0.5)); }
+html.gp-light .cl .bg-\[\#0b0d12\] { background-color: var(--gl-b-0b0d12, #0b0d12); }
+html.gp-light .cl .bg-\[\#0f131b\] { background-color: var(--gl-b-0f131b, #0f131b); }
+html.gp-light .cl .bg-\[\#1b2130\] { background-color: var(--gl-b-1b2130, #1b2130); }
+html.gp-light .cl .bg-\[\#7aa7ff\]\/10 { background-color: var(--gl-b-7aa7ff-10, rgb(122 167 255 / 0.1)); }
+html.gp-light .cl .bg-\[\#7aa7ff\]\/15 { background-color: var(--gl-b-7aa7ff-15, rgb(122 167 255 / 0.15)); }
+html.gp-light .cl .bg-\[\#7aa7ff\]\/20 { background-color: var(--gl-b-7aa7ff-20, rgb(122 167 255 / 0.2)); }
+html.gp-light .cl .bg-\[\#121722\] { background-color: var(--gl-b-121722, #121722); }
+html.gp-light .cl .bg-\[\#ffd84d\]\/15 { background-color: var(--gl-b-ffd84d-15, rgb(255 216 77 / 0.15)); }
+html.gp-light .cl .bg-white\/10 { background-color: var(--gl-b-ffffff-10, rgb(255 255 255 / 0.1)); }
+html.gp-light .cl .bg-white\/15 { background-color: var(--gl-b-ffffff-15, rgb(255 255 255 / 0.15)); }
+html.gp-light .cl .bg-white\/20 { background-color: var(--gl-b-ffffff-20, rgb(255 255 255 / 0.2)); }
+html.gp-light .cl .bg-white\/25 { background-color: var(--gl-b-ffffff-25, rgb(255 255 255 / 0.25)); }
+html.gp-light .cl .bg-white\/\[0\.04\] { background-color: var(--gl-b-ffffff-4, rgb(255 255 255 / 0.04)); }
+html.gp-light .cl .bg-white\/\[0\.08\] { background-color: var(--gl-b-ffffff-8, rgb(255 255 255 / 0.08)); }
+html.gp-light .cl .to-\[\#0b0d12\] { --tw-gradient-to: var(--gl-b-0b0d12, #0b0d12); }
+html.gp-light .cl .text-\[\#6b7280\] { color: var(--gl-t-6b7280, #6b7280); }
+html.gp-light .cl .text-\[\#6b7380\] { color: var(--gl-t-6b7380, #6b7380); }
+html.gp-light .cl .text-\[\#7aa7ff\] { color: var(--gl-t-7aa7ff, #7aa7ff); }
+html.gp-light .cl .text-\[\#7d8594\] { color: var(--gl-t-7d8594, #7d8594); }
+html.gp-light .cl .text-\[\#8a94a6\] { color: var(--gl-t-8a94a6, #8a94a6); }
+html.gp-light .cl .text-\[\#8a929e\] { color: var(--gl-t-8a929e, #8a929e); }
+html.gp-light .cl .text-\[\#256ef4\] { color: var(--gl-t-256ef4, #256ef4); }
+html.gp-light .cl .text-\[\#188038\] { color: var(--gl-t-188038, #188038); }
+html.gp-light .cl .text-\[\#a3abb8\] { color: var(--gl-t-a3abb8, #a3abb8); }
+html.gp-light .cl .text-\[\#aab2bf\] { color: var(--gl-t-aab2bf, #aab2bf); }
+html.gp-light .cl .text-\[\#c9ced6\] { color: var(--gl-t-c9ced6, #c9ced6); }
+html.gp-light .cl .text-\[\#cfe0ff\] { color: var(--gl-t-cfe0ff, #cfe0ff); }
+html.gp-light .cl .text-\[\#d63d4a\] { color: var(--gl-t-d63d4a, #d63d4a); }
+html.gp-light .cl .text-\[\#dbe2ee\] { color: var(--gl-t-dbe2ee, #dbe2ee); }
+html.gp-light .cl .text-\[\#e3e7ee\] { color: var(--gl-t-e3e7ee, #e3e7ee); }
+html.gp-light .cl .text-\[\#e6e6e6\] { color: var(--gl-t-e6e6e6, #e6e6e6); }
+html.gp-light .cl .text-\[\#f3ece2\] { color: var(--gl-t-f3ece2, #f3ece2); }
+html.gp-light .cl .text-\[\#ffd84d\] { color: var(--gl-t-ffd84d, #ffd84d); }
+html.gp-light .cl .text-\[\#ffe58a\] { color: var(--gl-t-ffe58a, #ffe58a); }
+html.gp-light .cl .text-white { color: var(--gl-t-ffffff, #ffffff); }
+html.gp-light .cl .text-white\/30 { color: var(--gl-t-ffffff-30, rgb(255 255 255 / 0.3)); }
+html.gp-light .cl .text-white\/40 { color: var(--gl-t-ffffff-40, rgb(255 255 255 / 0.4)); }
+html.gp-light .cl .text-white\/50 { color: var(--gl-t-ffffff-50, rgb(255 255 255 / 0.5)); }
+html.gp-light .cl .text-white\/55 { color: var(--gl-t-ffffff-55, rgb(255 255 255 / 0.55)); }
+html.gp-light .cl .text-white\/70 { color: var(--gl-t-ffffff-70, rgb(255 255 255 / 0.7)); }
+html.gp-light .cl .text-white\/80 { color: var(--gl-t-ffffff-80, rgb(255 255 255 / 0.8)); }
+html.gp-light .cl .shadow-\[0_4px_14px_rgba\(0\,0\,0\,\.4\)\] { --tw-shadow: var(--gl-sh1, 0 4px 14px var(--tw-shadow-color, rgba(0,0,0,.4))); }
+html.gp-light .cl .shadow-\[0_24px_50px_-12px_rgba\(0\,0\,0\,\.9\)\] { --tw-shadow: var(--gl-sh2, 0 24px 50px -12px var(--tw-shadow-color, rgba(0,0,0,.9))); }
+html.gp-light .cl .shadow-\[0_30px_70px_-24px_rgba\(0\,0\,0\,\.85\)\] { --tw-shadow: var(--gl-sh3, 0 30px 70px -24px var(--tw-shadow-color, rgba(0,0,0,.85))); }
+html.gp-light .cl .ring-white\/25 { --tw-ring-color: var(--gl-l-ffffff-25, rgb(255 255 255 / 0.25)); }
+html.gp-light .cl .\[--asm-bg\:\#0f131b\] { --asm-bg: var(--gl-b-0f131b, #0f131b); }
+html.gp-light .cl .group-open\:bg-\[\#256ef4\]:is(:where(.group):is([open], :popover-open, :open) *) { background-color: #256ef4; }
+html.gp-light .cl .group-open\:text-\[\#7aa7ff\]:is(:where(.group):is([open], :popover-open, :open) *) { color: var(--gl-t-7aa7ff, #7aa7ff); }
+@media (hover: hover) { html.gp-light .cl .group-hover\:border-\[\#256ef4\]:is(:where(.group):hover *) { border-color: #256ef4; } }
+@media (hover: hover) { html.gp-light .cl .group-hover\:border-white:is(:where(.group):hover *):not(.bg-white, [class*="bg-[#"]) { border-color: var(--gl-l-ffffff, #ffffff); } }
+@media (hover: hover) { html.gp-light .cl .group-hover\:bg-white\/50:is(:where(.group):hover *) { background-color: var(--gl-b-ffffff-50, rgb(255 255 255 / 0.5)); } }
+@media (hover: hover) { html.gp-light .cl .group-hover\:text-\[\#7aa7ff\]:is(:where(.group):hover *) { color: var(--gl-t-7aa7ff, #7aa7ff); } }
+@media (hover: hover) { html.gp-light .cl .group-hover\:text-\[\#256ef4\]:is(:where(.group):hover *) { color: var(--gl-t-256ef4, #256ef4); } }
+@media (hover: hover) { html.gp-light .cl .group-hover\:text-white:is(:where(.group):hover *) { color: var(--gl-t-ffffff, #ffffff); } }
+@media (hover: hover) { html.gp-light .cl .group-hover\/s\:text-\[\#1d5fd6\]:is(:where(.group\/s):hover *) { color: #1d5fd6; } }
+html.gp-light .cl .group-aria-\[current\=page\]\:text-\[\#7aa7ff\]:is(:where(.group)[aria-current="page"] *) { color: var(--gl-t-7aa7ff, #7aa7ff); }
+html.gp-light .cl .placeholder\:text-\[\#5b6370\]::placeholder { color: #5b6370; }
+html.gp-light .cl .placeholder\:text-\[\#6b7280\]::placeholder { color: var(--gl-t-6b7280, #6b7280); }
+html.gp-light .cl .placeholder\:text-\[\#8a94a6\]::placeholder { color: var(--gl-t-8a94a6, #8a94a6); }
+html.gp-light .cl .placeholder\:text-\[\#9aa1ab\]::placeholder { color: var(--gl-t-9aa1ab, #9aa1ab); }
+html.gp-light .cl .after\:bg-\[\#c9d6f5\]::after { background-color: #c9d6f5; }
+html.gp-light .cl .open\:border-\[\#7aa7ff\]\/50:is([open], :popover-open, :open) { border-color: var(--gl-l-7aa7ff-50, rgb(122 167 255 / 0.5)); }
+html.gp-light .cl .focus-within\:border-white\/60:focus-within { border-color: var(--gl-l-ffffff-60, rgb(255 255 255 / 0.6)); }
+@media (hover: hover) { html.gp-light .cl .hover\:border-\[\#0b0d12\]:hover { border-color: #0b0d12; } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-\[\#1d5fd6\]:hover { border-color: #1d5fd6; } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-\[\#7aa7ff\]:hover { border-color: var(--gl-l-7aa7ff, #7aa7ff); } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-\[\#256ef4\]:hover { border-color: #256ef4; } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-\[\#15171c\]:hover { border-color: #15171c; } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-white:hover:not(.bg-white, [class*="bg-[#"]) { border-color: var(--gl-l-ffffff, #ffffff); } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-white\/40:hover { border-color: var(--gl-l-ffffff-40, rgb(255 255 255 / 0.4)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-white\/50:hover { border-color: var(--gl-l-ffffff-50, rgb(255 255 255 / 0.5)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-white\/60:hover { border-color: var(--gl-l-ffffff-60, rgb(255 255 255 / 0.6)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:border-white\/90:hover { border-color: var(--gl-l-ffffff-90, rgb(255 255 255 / 0.9)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#0b50d0\]:hover { background-color: #0b50d0; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#1b5bd1\]:hover { background-color: #1b5bd1; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#1f63e6\]:hover { background-color: #1f63e6; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#7aa7ff\]\/25:hover { background-color: var(--gl-b-7aa7ff-25, rgb(122 167 255 / 0.25)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#256ef4\]:hover { background-color: #256ef4; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#dfe9ff\]:hover { background-color: #dfe9ff; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#e8efff\]:hover { background-color: #e8efff; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#eef1f5\]:hover { background-color: #eef1f5; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#f1f3f6\]:hover { background-color: #f1f3f6; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#f1f5ff\]:hover { background-color: #f1f5ff; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#f3f5f8\]:hover { background-color: #f3f5f8; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#f4f6fa\]:hover { background-color: #f4f6fa; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#f6f9ff\]:hover { background-color: #f6f9ff; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#ffcf24\]:hover { background-color: #ffcf24; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-\[\#ffd84d\]\/25:hover { background-color: var(--gl-b-ffd84d-25, rgb(255 216 77 / 0.25)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-black:hover { background-color: #000000; } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-white\/5:hover { background-color: var(--gl-b-ffffff-5, rgb(255 255 255 / 0.05)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:bg-white\/10:hover { background-color: var(--gl-b-ffffff-10, rgb(255 255 255 / 0.1)); } }
+@media (hover: hover) { html.gp-light .cl .hover\:text-\[\#1d5fd6\]:hover { color: #1d5fd6; } }
+@media (hover: hover) { html.gp-light .cl .hover\:text-\[\#7aa7ff\]:hover { color: var(--gl-t-7aa7ff, #7aa7ff); } }
+@media (hover: hover) { html.gp-light .cl .hover\:text-\[\#256ef4\]:hover { color: var(--gl-t-256ef4, #256ef4); } }
+@media (hover: hover) { html.gp-light .cl .hover\:text-\[\#15171c\]:hover { color: #15171c; } }
+@media (hover: hover) { html.gp-light .cl .hover\:text-white:hover { color: var(--gl-t-ffffff, #ffffff); } }
+html.gp-light .cl .focus\:border-\[\#15171c\]:focus { border-color: #15171c; }
+html.gp-light .cl .focus\:bg-\[\#256ef4\]:focus { background-color: #256ef4; }
+html.gp-light .cl .focus\:text-white:focus { color: var(--gl-t-ffffff, #ffffff); }
+html.gp-light .cl .focus-visible\:outline-\[\#256ef4\]:focus-visible { outline-color: #256ef4; }
+html.gp-light .cl .focus-visible\:outline-\[\#15171c\]:focus-visible { outline-color: #15171c; }
+html.gp-light .cl .disabled\:text-\[\#8a94a6\]:disabled { color: var(--gl-t-8a94a6, #8a94a6); }
+html.gp-light .cl .aria-\[current\=page\]\:text-white[aria-current="page"] { color: var(--gl-t-ffffff, #ffffff); }
+html.gp-light .cl .aria-\[invalid\=true\]\:border-\[\#d63d4a\][aria-invalid="true"] { border-color: #d63d4a; }
+@media (width >= 64rem) { html.gp-light .cl .lg\:border-l-\[\#7aa7ff\] { border-left-color: var(--gl-l-7aa7ff, #7aa7ff); } }
+@media (width >= 64rem) { html.gp-light .cl .lg\:border-l-white\/10 { border-left-color: var(--gl-l-ffffff-10, rgb(255 255 255 / 0.1)); } }
+@media (width >= 64rem) { @media (hover: hover) { html.gp-light .cl .lg\:hover\:bg-white\/\[0\.06\]:hover { background-color: var(--gl-b-ffffff-6, rgb(255 255 255 / 0.06)); } } }
+/* ==== 생성 구간 끝 ==== */
+
+/* ==== 손으로 쓴 구간: 생성기가 못 잡는 것(인라인 style, <style> 문자열, SVG 속성 색, 뒤집어 쓰는 흰 부품) ==== */
+/* 밝은 화면 색: 바탕 #ffffff, 띠 #f6f8fb, 카드 #f1f4f9, 글자 #15171c / #3d4450 / #5b6370, 파랑 글자 #1d5fd6, 파랑 면 #256ef4, 선 rgb(21 23 28 / .12) */
+
+/* 1. 기본 */
+html.gp-light:has(.cl) { color-scheme: light; }
+/* 조립 연출의 덮개 색(부품 뒤 바탕). 띠 안은 생성 구간이 띠 색으로 바꾼다 */
+html.gp-light .cl { --asm-bg: #ffffff; }
+html.gp-light .cl :is(.bd-in, [data-asm] [data-part][data-go]:not([data-instant]))::after { border-color: #5a93ff; }
+
+/* 2. 바탕 모눈: 흰 바탕에서 보이는 옅은 파랑 선 */
+html.gp-light .cl [class*="bg-[linear-gradient(rgba(122,167,255"] {
+  background-image: linear-gradient(rgb(37 110 244 / 0.06) 1px, transparent 1px), linear-gradient(90deg, rgb(37 110 244 / 0.06) 1px, transparent 1px);
+}
+html.gp-light .cl svg [stroke^="rgba(122,167,255"] { stroke: rgb(37 110 244 / 0.16); }
+
+/* 3. 큰 제목의 얼음색 글자: 흰 바탕에서는 진한 파랑 결 */
+html.gp-light .cl :is(.gp-ice, .bd-ice, [class*="bg-[linear-gradient(112deg,#ffffff"]) {
+  background-image: linear-gradient(112deg, #0b3aa8 0%, #1d5fd6 30%, #3b7bf6 52%, #1d5fd6 74%, #0b3aa8 100%);
+}
+/* 제목을 긋는 빛줄기와 첫 빛 한 점 */
+html.gp-light .cl :is(.gp-ray, .bd-ray) { stroke: #256ef4; }
+html.gp-light .cl .gp-glint { background-image: radial-gradient(closest-side, rgb(37 110 244 / 0.6), rgb(122 167 255 / 0.35) 40%, transparent); }
+html.gp-light .cl .gp-frame::before { border-color: #256ef4; }
+
+/* 4. 뒤집어 쓰는 흰 부품. 어두운 화면에서 가장 센 면(흰 알약, 흰 타일, 흰 동그라미)은 밝은 화면에서 먹색이 된다.
+      흰 카드(신청서, 견적 합계, 검색 칸, 필터 팝업)는 div, label, dialog라 여기에 걸리지 않고 흰 면 그대로 남는다 */
+html.gp-light .cl :is(a, button, li, span).bg-white.text-\[\#0b0d12\] { background-color: #0b0d12; border-color: #0b0d12; color: #ffffff; }
+@media (hover: hover) {
+  html.gp-light .cl a.bg-white.text-\[\#0b0d12\].hover\:bg-\[\#f1f5ff\]:hover { background-color: #1c2231; }
+  html.gp-light .cl a.bg-white.text-\[\#0b0d12\].hover\:bg-\[\#dfe9ff\]:hover { background-color: #256ef4; }
+}
+/* 먹색이 된 타일 안: 설명 글자, 번호, 화살표 동그라미, 선 버튼 */
+html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .text-\[\#3d4450\] { color: #c9ced6; }
+html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .text-\[\#256ef4\] { color: #7aa7ff; }
+html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .bg-\[\#0b0d12\].text-white { background-color: #ffffff; color: #0b0d12; }
+html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .text-\[\#0b0d12\] { color: #ffffff; }
+html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .border-\[\#0b0d12\]\/30 { border-color: rgb(255 255 255 / 0.4); }
+@media (hover: hover) { html.gp-light .cl :is(a, button, li).bg-white.text-\[\#0b0d12\] .hover\:border-\[\#0b0d12\]:hover { border-color: #ffffff; } }
+/* 단계 이동 막대의 지금 단계(흰 막대) */
+html.gp-light .cl ol[aria-label="단계 이동"] span.bg-white { background-color: #15171c; }
+
+/* 5. 흰 카드는 흰 바탕과 구분되게 가는 선과 옅은 그림자 */
+html.gp-light .cl :is(.gp-home, .keep-light) :is(div, label).bg-white:is(.rounded-\[28px\], .rounded-full) {
+  box-shadow: 0 0 0 1px rgb(21 23 28 / 0.1), 0 18px 40px -22px rgb(16 24 40 / 0.22);
+}
+/* 크게 보기 팝업: 카드 색이 아니라 흰 면 */
+html.gp-light .cl dialog.bg-\[\#121722\] { background-color: #ffffff; box-shadow: 0 0 0 1px rgb(21 23 28 / 0.1), 0 30px 80px -20px rgb(16 24 40 / 0.35); }
+
+/* 6. 서비스 판 구석 무늬(선 판): 하늘색 선과 바탕색 점 */
+html.gp-light .cl .bg-\[\#121722\] > svg[stroke="#7aa7ff"] { stroke: #256ef4; }
+html.gp-light .cl .bg-\[\#121722\] > svg [fill="#7aa7ff"] { fill: #256ef4; }
+html.gp-light .cl .bg-\[\#121722\] > svg [fill="#0b0d12"] { fill: #f1f4f9; }
+
+/* 7. 인라인 색(데이터에 든 점 색, 이름표 색). 서버가 그린 꼴(#hex)과 브라우저가 다시 쓴 꼴(rgb) 둘 다 잡는다.
+      조립 연출의 판 조각(.asm-plate)은 카드의 실제 바탕색을 읽어 만든 것이라 건드리지 않는다 */
+html.gp-light .cl .gp-home :is([style*="color:#ffffff"], [style*="color: rgb(255, 255, 255)"]):not([style*="background"]) { color: #15171c !important; }
+html.gp-light .cl .gp-home :is([style*="color:#7aa7ff"], [style*="color: rgb(122, 167, 255)"]):not([style*="background"]) { color: #1d5fd6 !important; }
+html.gp-light .cl .gp-home :is([style*="color:#ffd84d"], [style*="color: rgb(255, 216, 77)"]):not([style*="background"]) { color: #8a5a00 !important; }
+html.gp-light .cl .gp-home :is([style*="background:#ffffff"], [style*="background: rgb(255, 255, 255)"]):not(.asm-plate) { background: #15171c !important; }
+html.gp-light .cl .gp-home :is([style*="background:#7aa7ff"], [style*="background: rgb(122, 167, 255)"]):not(.asm-plate) { background: #256ef4 !important; }
+html.gp-light .cl .gp-home :is([style*="background:#ffd84d"], [style*="background: rgb(255, 216, 77)"]):not(.asm-plate) { background: #f0b400 !important; }
+/* 메인 "관리합니다"의 윤곽선 숫자 */
+html.gp-light .cl .gp-home :is([style*="text-stroke:1.5px #7aa7ff"], [style*="text-stroke: 1.5px rgb(122, 167, 255)"]) { -webkit-text-stroke-color: #256ef4 !important; }
+html.gp-light .cl .gp-home :is([style*="text-stroke:1.5px #ffd84d"], [style*="text-stroke: 1.5px rgb(255, 216, 77)"]) { -webkit-text-stroke-color: #b27d00 !important; }
+html.gp-light .cl .gp-home :is([style*="text-stroke:1.5px #ffffff"], [style*="text-stroke: 1.5px rgb(255, 255, 255)"]) { -webkit-text-stroke-color: #15171c !important; }
+
+/* 8. 파란 면 위의 옅은 흰 글자, 옅은 흰 알약(대비 4.5:1 미달이던 곳): 글자는 흰색으로, 알약은 흰 겹 대신 짙은 겹으로 */
+html.gp-light .cl :is(.bg-\[\#256ef4\], .bg-\[\#1f5fe0\]) .text-white\/80 { color: #ffffff; }
+html.gp-light .cl :is(.bg-\[\#256ef4\], .bg-\[\#1f5fe0\]) .bg-white\/15 { background-color: rgb(8 26 74 / 0.24); }
+html.gp-light .cl .bg-\[\#256ef4\] .opacity-80 { opacity: 1; }
+
+/* 9. 처리방침 아이콘: 어두운 화면은 흰 선 판(w)을 쓴다. 밝은 화면은 같은 자리에 원본(남색 선)을 깔고 흰 선 판은 상자 밖으로 민다 */
+html.gp-light .cl img[src^="/privacy-labels/w/"] { object-position: -999px -999px; background-repeat: no-repeat; background-position: center; background-size: contain; }
+html.gp-light .cl img[src="/privacy-labels/w/img_change.png"] { background-image: url("/privacy-labels/img_change.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_cookie.png"] { background-image: url("/privacy-labels/img_cookie.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_cpo.png"] { background-image: url("/privacy-labels/img_cpo.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_destruction.png"] { background-image: url("/privacy-labels/img_destruction.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_help.png"] { background-image: url("/privacy-labels/img_help.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_man.png"] { background-image: url("/privacy-labels/img_man.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_object.png"] { background-image: url("/privacy-labels/img_object.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_period.png"] { background-image: url("/privacy-labels/img_period.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_proxy.png"] { background-image: url("/privacy-labels/img_proxy.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_safe.png"] { background-image: url("/privacy-labels/img_safe.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/img_third.png"] { background-image: url("/privacy-labels/img_third.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/pi_collect.png"] { background-image: url("/privacy-labels/pi_collect.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/pi_object.png"] { background-image: url("/privacy-labels/pi_object.png"); }
+html.gp-light .cl img[src="/privacy-labels/w/pi_period.png"] { background-image: url("/privacy-labels/pi_period.png"); }
