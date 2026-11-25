@@ -169,13 +169,13 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
                 <X size={22} aria-hidden />
               </button>
             </div>
-            {/* 좁은 화면에서는 그림을 줄이지 않고 옆으로 밀어 본다 */}
-            <div className="min-h-0 overflow-auto">
+            {/* 그림은 팝업 폭에 맞춘다. 옆으로 밀지 않고 아래로만 내려 본다(11-26 사용자 "폭 맞춰 주고") */}
+            <div className="min-h-0 overflow-y-auto overflow-x-hidden">
               {longOf(zoom) ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={longOf(zoom).src} alt={zoom.alt} width={longOf(zoom).w} height={longOf(zoom).h} className="block h-auto w-full min-w-[900px]" />
+                <img src={longOf(zoom).src} alt={zoom.alt} width={longOf(zoom).w} height={longOf(zoom).h} className="block h-auto w-full" />
               ) : (
-                <Image src={zoom.img} alt={zoom.alt} width={1920} height={1200} sizes="1400px" className="h-auto w-full min-w-[900px]" />
+                <Image src={zoom.img} alt={zoom.alt} width={1920} height={1200} sizes="1400px" className="h-auto w-full" />
               )}
             </div>
           </div>

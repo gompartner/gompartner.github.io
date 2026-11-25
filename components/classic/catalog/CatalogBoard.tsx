@@ -68,6 +68,12 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
   const [cat, setCat] = useState("전체");
   const [more, setMore] = useState(false);
   const [open, setOpen] = useState<CatalogItem | null>(null);
+  // 크게 보기는 PC와 모바일 화면을 골라 한 장씩 본다(11-26 사용자 "선택해서 볼 수 있도록, 지금은 스크롤이 너무 길어요")
+  const [view, setView] = useState<"main" | "side">("main");
+  const show = (it: CatalogItem) => {
+    setView("main");
+    setOpen(it);
+  };
   const dlg = useRef<HTMLDialogElement>(null);
   const told = cat === "전체" ? stories : stories.filter((s) => s.cat === cat);
   const others = cat === "전체" ? rest : rest.filter((i) => i.cat === cat);
@@ -122,7 +128,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
                 <h2 className="mt-3 break-keep text-[25px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[34px]">{s.headline}</h2>
               </header>
 
-              <button type="button" onClick={() => setOpen(s)} aria-label={`${s.title} 화면 크게 보기`} className="group block w-full self-center text-left lg:col-start-2 lg:row-span-2 lg:row-start-1">
+              <button type="button" onClick={() => show(s)} aria-label={`${s.title} 화면 크게 보기`} className="group block w-full self-center text-left lg:col-start-2 lg:row-span-2 lg:row-start-1">
                 <span className={`relative block ${s.side ? "pb-[20%] pr-[4%] sm:pb-[9%] sm:pr-[7%]" : ""}`}>
                   <span className="ct-main block">
                     <Frame shot={s.main} sizes="(min-width: 1024px) 640px, 92vw" />
@@ -170,7 +176,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
           <ul className="mt-5 grid grid-cols-2 gap-3 md:mt-6 md:grid-cols-3 md:gap-4 lg:grid-cols-4" role="list">
             {shown.map((it) => (
               <li key={it.id}>
-                <button type="button" onClick={() => setOpen(it)} className="group block h-full w-full overflow-hidden rounded-[18px] border border-white/12 bg-[#121722] text-left hover:border-[#7aa7ff] md:rounded-[20px]">
+                <button type="button" onClick={() => show(it)} className="group block h-full w-full overflow-hidden rounded-[18px] border border-white/12 bg-[#121722] text-left hover:border-[#7aa7ff] md:rounded-[20px]">
                   <span className="relative block aspect-[16/10] overflow-hidden bg-[#0f131b]">
                     <Image src={it.thumb} alt={`${it.title} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" />
                   </span>
@@ -207,15 +213,23 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
                 <X size={22} aria-hidden />
               </button>
             </div>
-            <div className="min-h-0 overflow-y-auto p-5 md:p-8">
-            <div className={`grid gap-5 md:gap-7 ${open.main.long ? "items-start" : "items-end"} ${open.side ? "md:grid-cols-[minmax(0,1fr)_minmax(0,0.26fr)]" : ""}`}>
-              <Frame shot={open.main} sizes="(min-width: 768px) 860px, 94vw" full />
-              {open.side && (
-                <span className="mx-auto block w-[62%] md:w-full">
-                  <Frame shot={open.side} sizes="(min-width: 768px) 230px, 60vw" full />
-                </span>
-              )}
-            </div>
+            {open.side && (
+              <div className="flex shrink-0 gap-2 border-b border-white/12 px-5 py-3 md:px-8" role="tablist" aria-label="화면 종류">
+                {([["main", open.main.frame === "browser" ? "PC" : "전체"], ["side", open.side.frame === "screen" ? "키오스크" : "모바일"]] as const).map(([k, label]) => (
+                  <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={`min-h-11 rounded-full px-5 text-[15px] font-bold transition-colors ${view === k ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white hover:border-white"}`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div key={view} className="min-h-0 overflow-y-auto p-5 md:p-8">
+            {view === "side" && open.side ? (
+              <span className="mx-auto block w-full max-w-[420px]">
+                <Frame shot={open.side} sizes="(min-width: 768px) 420px, 94vw" full />
+              </span>
+            ) : (
+              <Frame shot={open.main} sizes="(min-width: 768px) 1100px, 94vw" full />
+            )}
             {open.features.length > 0 && (
               <ul className="mt-6 flex flex-wrap gap-2 border-t border-white/12 pt-5" role="list" aria-label="구성">
                 {open.features.map((f) => (
