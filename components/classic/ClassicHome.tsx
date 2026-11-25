@@ -6,6 +6,7 @@ import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { JobApply } from "@/components/classic/JobApply";
 import { HeroSwitch } from "@/components/classic/HeroSwitch";
 import { HeroBuild } from "@/components/classic/HeroBuild";
+import { Assemble } from "@/components/classic/Assemble";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
@@ -68,13 +69,15 @@ export function ClassicHome() {
       <Suspense fallback={<HeroUs />}>
         <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild />} />
       </Suspense>
-      <Services />
-      <Why />
-      <Stack />
-      <Portfolio />
-      <Process />
-      <Faq />
-      <Apply />
+      <Assemble>
+        <Services />
+        <Why />
+        <Stack />
+        <Portfolio />
+        <Process />
+        <Faq />
+        <Apply />
+      </Assemble>
     </div>
   );
 }
@@ -126,7 +129,7 @@ function HeroKr() {
   return (
     <section aria-labelledby="c-hero" className="overflow-hidden bg-white">
       <div className={`${wrap} pb-12 pt-14 md:pb-16 md:pt-24`}>
-        <p className={eyebrow}>Web, App Development</p>
+        <p data-part className={eyebrow}>Web, App Development</p>
         <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.055em] md:text-[72px]">
           웹과 앱을 만들고
           <br />
@@ -199,13 +202,13 @@ function HeroJp() {
 function Services() {
   return (
     <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
-      <p className={eyebrow}>Services</p>
-      <h2 id="c-services" className={`${h2c} mt-3`}>
+      <p data-part className={eyebrow}>Services</p>
+      <h2 data-part id="c-services" className={`${h2c} mt-3`}>
         하는 일
       </h2>
       <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-3" role="list">
         {services.map((s) => (
-          <li key={s.name} className={`flex flex-col gap-4 rounded-[14px] p-6 md:p-8 ${s.big ? "bg-[#0f1115] text-white md:col-span-2" : "border border-[#d9dee5] bg-white"}`}>
+          <li data-part key={s.name} className={`flex flex-col gap-4 rounded-[14px] p-6 md:p-8 ${s.big ? "bg-[#0f1115] text-white md:col-span-2" : "border border-[#d9dee5] bg-white"}`}>
             <span className="text-[22px] font-[800] tracking-[-0.04em] md:text-[28px]">{s.name}</span>
             <span className={`break-keep text-[16px] leading-[1.65] md:text-[17px] ${s.big ? "text-[#c9ced6]" : "text-[#5b6370]"}`}>{s.body}</span>
             <span className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
@@ -229,13 +232,13 @@ function Why() {
   return (
     <section aria-labelledby="c-why" className="bg-[#f4f6fa]">
       <div className={`${wrap} py-16 md:py-28`}>
-        <p className={eyebrow}>Why Gompartner</p>
-        <h2 id="c-why" className={`${h2c} mt-3`}>
+        <p data-part className={eyebrow}>Why Gompartner</p>
+        <h2 data-part id="c-why" className={`${h2c} mt-3`}>
           곰파트너에 맡기는 이유
         </h2>
         <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-2" role="list">
           {reasons.map((r, i) => (
-            <li key={r.name} className="rounded-[14px] bg-white p-6 md:p-8">
+            <li data-part key={r.name} className="rounded-[14px] bg-white p-6 md:p-8">
               <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{String(i + 1).padStart(2, "0")}</span>
               <span className="mt-2 block break-keep text-[21px] font-[800] tracking-[-0.04em] md:text-[25px]">{r.name}</span>
               <span className="mt-3 block break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">{r.body}</span>
@@ -251,12 +254,12 @@ function Stack() {
   return (
     <section aria-labelledby="c-stack" className="border-b border-[#e6e9ee] bg-white">
       <div className={`${wrap} flex flex-col gap-5 py-10 md:flex-row md:items-center md:gap-10 md:py-12`}>
-        <h2 id="c-stack" className="shrink-0 text-[17px] font-[800] tracking-[-0.02em] md:text-[19px]">
+        <h2 data-part id="c-stack" className="shrink-0 text-[17px] font-[800] tracking-[-0.02em] md:text-[19px]">
           다루는 기술과 플랫폼
         </h2>
         <ul className="flex flex-wrap gap-2" role="list">
           {stack.map((t) => (
-            <li key={t} className="rounded-full border border-[#d9dee5] bg-white px-3.5 py-1.5 text-[15px] font-bold text-[#3d4450]">
+            <li data-part key={t} className="rounded-full border border-[#d9dee5] bg-white px-3.5 py-1.5 text-[15px] font-bold text-[#3d4450]">
               {t}
             </li>
           ))}
@@ -271,8 +274,8 @@ function Portfolio() {
     <section id="portfolio" aria-labelledby="c-portfolio" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <p className={eyebrow}>Portfolio</p>
-          <h2 id="c-portfolio" className={`${h2c} mt-3`}>
+          <p data-part className={eyebrow}>Portfolio</p>
+          <h2 data-part id="c-portfolio" className={`${h2c} mt-3`}>
             만든 화면
           </h2>
         </div>
@@ -282,7 +285,7 @@ function Portfolio() {
       </div>
       <ul className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 md:mt-14 md:grid-cols-4 md:gap-x-6" role="list">
         {works.map((w) => (
-          <li key={w.href}>
+          <li data-part key={w.href}>
             <NavLink href={w.href} className="group block">
               <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] border border-[#e6e9ee] bg-[#f4f6fa]">
                 <Image src={w.img} alt={`${w.name} 화면`} fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
@@ -301,13 +304,13 @@ function Process() {
   return (
     <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#0f1115] text-white">
       <div className={`${wrap} py-16 md:py-28`}>
-        <p className={eyebrow}>Process</p>
-        <h2 id="c-process" className={`${h2c} mt-3`}>
+        <p data-part className={eyebrow}>Process</p>
+        <h2 data-part id="c-process" className={`${h2c} mt-3`}>
           진행 방식
         </h2>
-        <ol className="mt-10 grid gap-px overflow-hidden rounded-[14px] bg-white/10 md:mt-14 md:grid-cols-5" role="list">
+        <ol className="mt-10 grid border-t border-white/15 md:mt-14 md:grid-cols-5" role="list">
           {steps.map((s, i) => (
-            <li key={s.name} className="bg-[#0f1115] p-6 md:p-7">
+            <li data-part key={s.name} className="border-b border-white/15 bg-[#0f1115] p-6 md:border-r md:p-7 md:last:border-r-0">
               <span className="text-[15px] font-bold tabular-nums text-[#7aa7ff]">{String(i + 1).padStart(2, "0")}</span>
               <span className="mt-2 block text-[19px] font-[800] tracking-[-0.03em]">{s.name}</span>
               <span className="mt-2 block break-keep text-[15px] leading-[1.65] text-[#c9ced6]">{s.body}</span>
@@ -316,7 +319,7 @@ function Process() {
         </ol>
         <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3" role="list">
           {deliver.map((d) => (
-            <li key={d} className="flex items-center gap-2 text-[16px] font-bold md:text-[18px]">
+            <li data-part key={d} className="flex items-center gap-2 text-[16px] font-bold md:text-[18px]">
               <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#7aa7ff]" />
               {d}
             </li>
@@ -330,13 +333,13 @@ function Process() {
 function Faq() {
   return (
     <section id="faq" aria-labelledby="c-faq" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
-      <p className={eyebrow}>FAQ</p>
-      <h2 id="c-faq" className={`${h2c} mt-3`}>
+      <p data-part className={eyebrow}>FAQ</p>
+      <h2 data-part id="c-faq" className={`${h2c} mt-3`}>
         자주 묻는 질문
       </h2>
       <div className="mt-10 border-t-2 border-[#15171c] md:mt-14">
         {faqs.map((f) => (
-          <details key={f.q} className="group border-b border-[#d9dee5]">
+          <details data-part key={f.q} className="group border-b border-[#d9dee5]">
             <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-5 text-[17px] font-[800] tracking-[-0.02em] md:text-[20px] [&::-webkit-details-marker]:hidden">
               {f.q}
               <span aria-hidden className="text-[24px] font-bold text-[#6b7280] group-open:rotate-45 motion-safe:transition-transform">
@@ -356,8 +359,8 @@ function Apply() {
     <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 bg-[#0b0d12] text-white">
       <div className={`${wrap} grid gap-10 py-16 md:py-28 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
-          <p className={eyebrow}>Contact</p>
-          <h2 id="c-apply" className={`${h2c} mt-3`}>
+          <p data-part className={eyebrow}>Contact</p>
+          <h2 data-part id="c-apply" className={`${h2c} mt-3`}>
             프로젝트 문의
           </h2>
           <p className="mt-5 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
@@ -365,7 +368,7 @@ function Apply() {
           </p>
           <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 725-40-01614(개인 일반과세)</p>
         </div>
-        <div className="min-w-0 rounded-[14px] bg-white p-5 text-[#15171c] md:p-8">
+        <div data-part className="min-w-0 rounded-[14px] bg-white p-5 text-[#15171c] md:p-8">
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
             <ContactForm compact />
