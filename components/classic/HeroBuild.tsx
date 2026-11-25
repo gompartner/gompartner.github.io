@@ -29,6 +29,10 @@ const css = `
   88% { transform: translate(calc(var(--x) * -0.03), calc(var(--y) * -0.03)) rotate(0deg) scale(0.97); }
   100% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); }
 }
+/* 3D를 기다리는 동안 설계선의 지붕이 한 채씩 번갈아 차오른다(조립이 계속되고 있다는 표시) */
+@keyframes gp-roof { 0%, 100% { fill-opacity: 0; } 30%, 60% { fill-opacity: 0.34; } }
+.gp-roof { fill: #7aa7ff; fill-opacity: 0; animation: gp-roof 1.6s ease-in-out infinite; animation-delay: var(--d); }
+@media (prefers-reduced-motion: reduce) { .gp-roof { animation: none; } }
 @keyframes gp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes gp-sweep { from { --gp-a: 0deg; } to { --gp-a: 180deg; } }
 @keyframes gp-body { from { opacity: 0; clip-path: inset(50% 50% 50% 50% round 22px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 22px); } }

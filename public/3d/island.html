@@ -2534,6 +2534,9 @@ function size() {
 let dirty = true;
 const BUILD = new URLSearchParams(location.search).get('build') === '1' && !reduce;
 let buildClock = 0;
+// 11-26 ?wait=1: 3D를 미리 불러 두고, 바깥 화면(메인)이 창이 보일 때 'gp-build'를 보내면 그때 건물을 내린다
+let buildWait = BUILD && new URLSearchParams(location.search).get('wait') === '1';
+addEventListener('message', (e) => { if (e.origin === location.origin && e.data === 'gp-build') { buildWait = false; dirty = true; } });
 addEventListener('resize', size);
 size();
 // 아이패드 회전 뒤 폭이 늦게 바뀌어도 다시 잰다
@@ -2563,7 +2566,7 @@ function loop(now) {
   story(day.t, dt, reduce ? 0 : time);
   if (!reduce) background(dt, time);
   else if (first) background(0.016, 3);
-  if (BUILD && !first) buildClock += dt;
+  if (BUILD && !first && !buildWait) buildClock += dt;
   for (const id of ORDER) {
     const b = B[id];
     const want = (hovered === id || selected === id) ? 0.16 : 0;
@@ -2573,7 +2576,7 @@ function loop(now) {
     if (BUILD && !b.built) {
       if (b.ry0 === undefined) b.ry0 = b.g.rotation.y;
       // 첫 장면을 그리는 데 걸리는 시간에 연출이 지나가 버리지 않게, 실제로 그린 프레임의 시간(dt는 0.05초로 잘림)만 센다
-      const u = clamp((buildClock - 0.45 - ORDER.indexOf(id) * 0.26) / 0.75, 0, 1);
+      const u = clamp((buildClock - 0.1 - ORDER.indexOf(id) * 0.15) / 0.55, 0, 1); // 11-26 기다리는 시간을 줄이려고 빠르게(다섯 채가 1.3초 안에 앉는다)
       const c1 = 1.70158, c3 = c1 + 1, e = 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); // 살짝 넘쳤다 돌아오는 감속
       b.g.visible = u > 0;
       b.g.position.y = b.lift + (1 - e) * 8;

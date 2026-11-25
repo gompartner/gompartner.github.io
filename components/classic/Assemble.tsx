@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
+import { holdScroll } from "@/components/classic/scrollHold";
 
 // 11-25 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
 //  - 조립의 단위는 카드 한 장이 아니라 그 안의 작은 부품이다(11-26 "작은 부품 컴포넌트가 조립되는 느낌, 지금은 도장 찍는 느낌").
@@ -135,46 +136,12 @@ export function Assemble({ children }: { children: ReactNode }) {
       return end;
     };
 
-    // 조립이 끝날 때까지 아래로 내려가는 스크롤을 잠깐 붙잡는다(11-26 사용자 "모션이 끝날 때까지 스크롤 대기가 필요, 아니면 뭐가 있는지 모르고 지나간다").
-    // 칸마다 처음 한 번만, 길어도 1.2초. 위로 올라가는 것은 막지 않는다. 머리글 메뉴로 건너뛸 때는 붙잡지 않는다.
+    // 칸마다 처음 한 번, 조립이 끝날 때까지 스크롤을 붙잡는다(scrollHold). 길어도 1.2초. 머리글 메뉴로 건너뛸 때는 붙잡지 않는다.
     const held = new WeakSet<Element>();
     let skipUntil = 0;
     let release: (() => void) | null = null;
     const hold = (y: number, ms: number) => {
-      release?.();
-      const wheel = (e: WheelEvent) => {
-        if (e.deltaY > 0) e.preventDefault();
-      };
-      let ty = 0;
-      const tstart = (e: TouchEvent) => {
-        ty = e.touches[0]?.clientY ?? 0;
-      };
-      const tmove = (e: TouchEvent) => {
-        if ((e.touches[0]?.clientY ?? 0) < ty && e.cancelable) e.preventDefault();
-      };
-      const key = (e: KeyboardEvent) => {
-        if (["ArrowDown", "PageDown", "End", " "].includes(e.key) && !(e.target as HTMLElement)?.closest?.("input, textarea, select, button, a, summary")) e.preventDefault();
-      };
-      // 손가락을 뗀 뒤 관성으로 내려가는 것은 위 이벤트로 못 막아서 자리를 되돌려 붙잡는다
-      const clamp = () => {
-        if (window.scrollY > y + 2) window.scrollTo(0, y);
-      };
-      window.addEventListener("wheel", wheel, { passive: false });
-      window.addEventListener("touchstart", tstart, { passive: true });
-      window.addEventListener("touchmove", tmove, { passive: false });
-      window.addEventListener("keydown", key);
-      window.addEventListener("scroll", clamp, { passive: true });
-      const done = () => {
-        window.removeEventListener("wheel", wheel);
-        window.removeEventListener("touchstart", tstart);
-        window.removeEventListener("touchmove", tmove);
-        window.removeEventListener("keydown", key);
-        window.removeEventListener("scroll", clamp);
-        window.clearTimeout(timer);
-        release = null;
-      };
-      const timer = window.setTimeout(done, ms);
-      release = done;
+      release = holdScroll(y, ms);
     };
     const jump = (e: Event) => {
       if ((e.target as HTMLElement)?.closest?.('a[href*="#"]')) skipUntil = performance.now() + 1600;
