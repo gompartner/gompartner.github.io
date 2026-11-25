@@ -7,7 +7,7 @@ import { builderItems } from "@/components/classic/works/samples";
 import { manualLog } from "@/data/classic/archive";
 import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 
-// 11-24 원페이지 메인(사용자 "임팩트 있는 원페이지"): 첫 화면 3D 견적, 파는 것(제작, 유지보수와 시작 금액), 100일 무상 유지보수, 포트폴리오, 웹 지식.
+// 11-24 원페이지 메인(사용자 "임팩트 있는 원페이지"): 첫 화면 시안 미리보기, 파는 것(유지보수, 제작과 시작 금액), 약속, 포트폴리오, 웹 지식.
 // 서비스 설명, 비용 상세, 자주 묻는 질문은 각 페이지에 그대로 있고 여기서는 링크로 잇는다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -70,7 +70,27 @@ function Products() {
       <h2 id="c-products" className={h2c}>
         서비스
       </h2>
-      <h3 className="mt-8 text-[16px] font-bold text-[#256ef4] md:mt-10">제작</h3>
+      {/* 11-25 메뉴 순서와 같게 유지보수 먼저(11-06, 11-12 대표 결정) */}
+      <div className="mt-8 grid gap-x-12 md:mt-10 md:grid-cols-[1fr_1.6fr]">
+        <div>
+          <h3 className="text-[16px] font-bold text-[#256ef4]">유지보수</h3>
+          <p className="mt-3 text-[30px] font-[800] leading-none tracking-[-0.04em] tabular-nums md:text-[40px]">
+            건별 10,000원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
+          </p>
+          <p className="mt-2 text-[15px] text-[#5b6370]">부가세 별도</p>
+        </div>
+        <ul className="mt-6 border-t-2 border-[#15171c] md:mt-0" role="list">
+          {care.map((s) => (
+            <li key={s.href} className="border-b border-[#d9dee5]">
+              <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.split(/[/#]/).pop()}`} className="group flex min-h-14 items-center justify-between gap-3 py-3.5">
+                <span className="flex flex-wrap items-baseline gap-x-3"><span className="text-[17px] font-[800] tracking-[-0.03em] transition-colors group-hover:text-[#256ef4] md:text-[19px]">{s.name}</span><span className="text-[15px] text-[#5b6370]">{s.body}</span></span>
+                <ArrowUpRight size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <h3 className="mt-12 text-[16px] font-bold text-[#256ef4] md:mt-16">제작</h3>
       <ul className="mt-3 grid grid-cols-2 border-l border-t border-[#15171c] lg:grid-cols-3" role="list">
         {make.map((s) => (
           <li key={s.href} className="border-b border-r border-[#15171c]">
@@ -90,25 +110,6 @@ function Products() {
           </li>
         ))}
       </ul>
-      <div className="mt-10 grid gap-x-12 md:mt-14 md:grid-cols-[1fr_1.6fr]">
-        <div>
-          <h3 className="text-[16px] font-bold text-[#256ef4]">유지보수</h3>
-          <p className="mt-3 text-[30px] font-[800] leading-none tracking-[-0.04em] tabular-nums md:text-[40px]">
-            건별 10,000원<span className="ml-1.5 text-[18px] font-bold tracking-[-0.02em]">부터</span>
-          </p>
-          <p className="mt-2 text-[15px] text-[#5b6370]">부가세 별도</p>
-        </div>
-        <ul className="mt-6 border-t-2 border-[#15171c] md:mt-0" role="list">
-          {care.map((s) => (
-            <li key={s.href} className="border-b border-[#d9dee5]">
-              <NavLink href={s.href} data-gtm-cta={`classic_service_${s.href.split(/[/#]/).pop()}`} className="group flex min-h-14 items-center justify-between gap-3 py-3.5">
-                <span className="flex flex-wrap items-baseline gap-x-3"><span className="text-[17px] font-[800] tracking-[-0.03em] transition-colors group-hover:text-[#256ef4] md:text-[19px]">{s.name}</span><span className="text-[15px] text-[#5b6370]">{s.body}</span></span>
-                <ArrowUpRight size={20} aria-hidden className="shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }

@@ -6,7 +6,8 @@ import { pdfFor, type Jaryo } from "@/data/classic/jaryo";
 // 1쪽 앞, 2쪽 뒤로 겹친 실물 미리보기. 두 장 모두 틀 안에 다 들어오게 고정 크기로 놓는다
 export function JaryoPreview({ it, size = "sm", priority = false }: { it: Jaryo; size?: "sm" | "lg"; priority?: boolean }) {
   const box = size === "lg" ? "h-[380px] md:h-[520px]" : "h-[330px]";
-  const group = size === "lg" ? "h-[330px] w-[340px] md:h-[470px] md:w-[480px]" : "h-[290px] w-[300px]";
+  // 11-25 폭 320 휴대폰에서 틀 밖으로 나가지 않게 좁은 화면은 290px
+  const group = size === "lg" ? "h-[330px] w-[290px] min-[400px]:w-[340px] md:h-[470px] md:w-[480px]" : "h-[290px] w-[290px] min-[400px]:w-[300px]";
   const front = size === "lg" ? "w-[210px] md:w-[300px]" : "w-[190px]";
   const back = size === "lg" ? "w-[196px] md:w-[280px]" : "w-[176px]";
   const single = it.pages === 1;

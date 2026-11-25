@@ -84,10 +84,10 @@ const ld = [
     description: "홈페이지 유지보수(건별 수정), 유지관리(월 계약), 성능 개선, 고도화, 유지보수 업체 변경, 보안 업데이트.",
     areaServed: "KR",
     url: `${siteUrl}/maintenance`,
-    // 11-08 AI 검색 답변이 업체마다 특징, 비용, 추천 대상을 뽑아 쓴다. 공개 시작 금액(PriceBand와 같은 값)
+    // 11-08 AI 검색 답변이 업체마다 특징, 비용, 추천 대상을 뽑아 쓴다. 공개 시작 금액(11-25: 유지보수 건별 10,000원부터, 비용 페이지와 같은 값)
     offers: {
       "@type": "Offer",
-      priceSpecification: { "@type": "UnitPriceSpecification", price: 90000, priceCurrency: "KRW", unitText: "월", valueAddedTaxIncluded: false, minPrice: 90000 },
+      priceSpecification: { "@type": "UnitPriceSpecification", price: 10000, priceCurrency: "KRW", unitText: "건", valueAddedTaxIncluded: false, minPrice: 10000 },
     },
     provider: { "@id": `${siteUrl}/#org` },
   },

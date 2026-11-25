@@ -12,7 +12,7 @@ import { siteUrl } from "@/lib/site";
 export const dynamic = "force-static";
 
 // AI 검색(ChatGPT, Perplexity, Claude 등)이 읽는 사이트 요약. llmstxt.org 형식.
-// 11-01 서비스: 유지보수, 제작(홈페이지, 랜딩, 업무 프로그램). 유지보수를 앞에 둔다. 유지보수는 공개 시작 금액(월 9만 원부터)만 싣는다(11-08 AI 검색 답변이 업체별 비용을 뽑아 감).
+// 11-01 서비스: 유지보수, 제작(홈페이지, 랜딩, 업무 프로그램). 유지보수를 앞에 둔다. 유지보수는 공개 시작 금액(11-25: 건별 10,000원부터)만 싣는다(11-08 AI 검색 답변이 업체별 비용을 뽑아 감).
 // 데이터 문구에 가운뎃점이 섞여 들어와도 쉼표로 바꿔 내보낸다.
 const plain = (t: string) => t.replaceAll("·", ", ").replace(/\s+/g, " ").trim();
 

@@ -46,8 +46,8 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
     >
       <DocHead title={it.title} meta={[["쓰는 때", it.when], ["분량", `PDF ${it.pages ?? 2}쪽`]]} />
 
-      <div id="inside" className="mt-8 grid scroll-mt-24 overflow-hidden rounded-lg border border-[#d9dee5] bg-white xl:grid-cols-[1fr_1fr]">
-        <div className="border-b border-[#d9dee5] xl:border-b-0 xl:border-r">
+      <div id="inside" className="mt-8 grid scroll-mt-24 grid-cols-[minmax(0,1fr)] overflow-hidden rounded-lg border border-[#d9dee5] bg-white xl:grid-cols-[1fr_1fr]">
+        <div className="min-w-0 border-b border-[#d9dee5] xl:border-b-0 xl:border-r">
           <JaryoPreview it={it} size="lg" priority />
         </div>
         <div className="flex flex-col p-6 md:p-8">

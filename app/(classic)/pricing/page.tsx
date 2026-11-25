@@ -10,7 +10,7 @@ import { breadcrumbLd, pageMeta } from "@/lib/seo";
 import { LdScript } from "@/components/seo/JsonLd";
 
 // 11-12 리뉴얼: 상단 메뉴 "비용". 다른 업체(포크나인 "제작비용")처럼 금액을 한 페이지에 모은다.
-// 금액은 각 서비스 페이지와 같은 데이터(data/classic/pricing, three)를 쓰고, 유지보수 시작 금액은 PriceBand, 유지보수 페이지와 같게 맞춘다.
+// 금액은 각 서비스 페이지와 같은 데이터(data/classic/pricing, three)를 쓰고, 유지보수 시작 금액은 유지보수 페이지, 메인과 같게 맞춘다.
 
 export const metadata: Metadata = pageMeta({
   title: "비용",
