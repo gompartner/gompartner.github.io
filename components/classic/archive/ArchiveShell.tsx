@@ -100,13 +100,13 @@ function WikiBar({ topic, last }: { topic?: Topic; last?: Crumb }) {
               ) : null}
             </ol>
           </nav>
-          {/* 검색은 통합검색 결과 화면으로 보낸다(위키, 운영 노트, 용어 묶음이 따로 나온다). keep-light: 흰 칸 안 글자색을 그대로 둔다 */}
+          {/* 검색은 통합검색 결과 화면으로 보낸다(위키, 운영 노트, 용어 묶음이 따로 나온다). keep-light: 어두운 화면 색표가 이 칸의 색을 다시 바꾸지 않게 한다 */}
           <form action="/search" method="get" role="search" aria-label="문서 검색" className="keep-light w-full sm:w-[340px]">
-            <label className="flex h-12 items-center gap-2.5 rounded-full bg-white pl-4 pr-1 text-[#0b0d12]">
-              <Search size={18} aria-hidden className="shrink-0 text-[#5b6370]" />
+            <label className="flex h-12 items-center gap-2.5 overflow-hidden rounded-full border border-white/30 bg-[#121722] pl-4 pr-1 text-white focus-within:border-white/70">
+              <Search size={18} aria-hidden className="shrink-0 text-[#aab2bf]" />
               <span className="sr-only">검색어</span>
-              <input type="search" name="q" required placeholder="문서 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-[#5b6370] [&::-webkit-search-cancel-button]:hidden" />
-              <button type="submit" className="h-10 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white hover:bg-[#0b50d0]">
+              <input type="search" name="q" required placeholder="문서 검색" autoComplete="off" className="on-dark h-full min-w-0 flex-1 bg-transparent text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
+              <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white hover:bg-[#0b50d0]">
                 검색
               </button>
             </label>

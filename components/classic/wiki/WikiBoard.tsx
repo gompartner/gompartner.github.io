@@ -54,8 +54,8 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
   return (
     <BoardShell no="05" en="WIKI" ice="무엇을 " title="찾으세요" lead="홈페이지 기획, 제작, 운영에 필요한 문서를 모았습니다.">
       <div className="mt-10 flex flex-wrap gap-3 md:mt-14">
-        <label className="flex h-14 min-w-0 flex-1 basis-[280px] items-center gap-3 overflow-hidden rounded-full bg-white px-5 text-[#0b0d12]">
-          <Search size={20} aria-hidden className="shrink-0 text-[#5b6370]" />
+        <label className="flex h-14 min-w-0 flex-1 basis-[200px] items-center gap-3 overflow-hidden rounded-full border border-white/30 bg-[#121722] px-5 text-white focus-within:border-white/70">
+          <Search size={20} aria-hidden className="shrink-0 text-[#aab2bf]" />
           <span className="sr-only">문서 검색</span>
           <input
             type="search"
@@ -65,7 +65,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
               setShown(PAGE);
             }}
             placeholder="예: 인증서, 워드프레스, 접근성"
-            className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden"
+            className="on-dark h-full min-w-0 flex-1 bg-transparent text-[17px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden"
           />
         </label>
         <button
@@ -140,21 +140,21 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
       )}
 
       {/* 필터 팝업: 왼쪽 주제, 오른쪽 그 주제의 묶음(여러 개), 아래 종류. 선택 완료를 눌러야 적용 */}
-      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} className="outline-none focus:outline-none m-auto w-[min(820px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] backdrop:bg-black/70">
+      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} className="outline-none focus:outline-none m-auto w-[min(820px,calc(100vw-24px))] rounded-[20px] border border-white/12 bg-[#121722] p-0 text-white backdrop:bg-black/70">
         <div className="flex max-h-[calc(100dvh-24px)] flex-col">
-          <div className="flex items-center justify-between border-b border-[#e6e9ee] px-5 py-4 md:px-6">
+          <div className="flex items-center justify-between border-b border-white/12 px-5 py-4 md:px-6">
             <h2 className="text-[20px] font-[800] tracking-[-0.03em]">필터</h2>
-            <button type="button" onClick={() => setOpen(false)} aria-label="닫기" className="grid h-11 w-11 place-items-center rounded-full hover:bg-[#f1f3f6]">
+            <button type="button" onClick={() => setOpen(false)} aria-label="닫기" className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10">
               <ChevronUp size={22} aria-hidden />
             </button>
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-[minmax(120px,36%)_1fr]">
-            <ul className="overflow-y-auto border-r border-[#e6e9ee]" role="tablist" aria-label="주제">
+            <ul className="overflow-y-auto border-r border-white/12" role="tablist" aria-label="주제">
               {topics.map((x, i) => {
                 const n = x.groups.filter((g) => draft.groups.includes(key(x.label, g))).length;
                 return (
                   <li key={x.label} role="presentation">
-                    <button type="button" role="tab" aria-selected={tab === i} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${tab === i ? "bg-[#256ef4] font-[800] text-white" : "hover:bg-[#f4f6fa]"}`}>
+                    <button type="button" role="tab" aria-selected={tab === i} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${tab === i ? "bg-[#256ef4] font-[800] text-white" : "text-[#c9ced6] hover:bg-white/5"}`}>
                       <span className="break-keep">{x.label}</span>
                       {n > 0 && <span className="tabular-nums">{n}</span>}
                     </button>
@@ -174,7 +174,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
               >
                 전체
               </PickItem>
-              <div className="mt-1 grid border-t border-[#eef0f3] pt-1 sm:grid-cols-2">
+              <div className="mt-1 grid border-t border-white/10 pt-1 sm:grid-cols-2">
                 {t.groups.map((g) => {
                   const k = key(t.label, g);
                   return (
@@ -186,16 +186,16 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-[#e6e9ee] px-5 py-3 md:px-6">
-            <span className="text-[14px] text-[#5b6370]">종류</span>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/12 px-5 py-3 md:px-6">
+            <span className="text-[14px] text-[#aab2bf]">종류</span>
             {kinds.map((k) => (
               <BoxCheck key={k} checked={draft.kinds.includes(k)} onChange={() => setDraft((d) => ({ ...d, kinds: toggle(d.kinds, k) }))}>
                 {k}
               </BoxCheck>
             ))}
           </div>
-          <div className="grid grid-cols-[1fr_2fr] gap-2 border-t border-[#e6e9ee] p-4 md:p-5">
-            <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-[#15171c] text-[16px] font-bold">
+          <div className="grid grid-cols-[1fr_2fr] gap-2 border-t border-white/12 p-4 md:p-5">
+            <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-white/30 text-[16px] font-bold text-white hover:border-white/70">
               닫기
             </button>
             <button
@@ -205,7 +205,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
                 setShown(PAGE);
                 setOpen(false);
               }}
-              className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#0b50d0]"
+              className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#1f63e6]"
             >
               선택 완료
             </button>

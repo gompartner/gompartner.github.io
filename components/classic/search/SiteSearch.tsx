@@ -119,24 +119,24 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
 
       {/* 필터 팝업(위키 판과 같은 방식): 종류를 여러 개 고르고 선택 완료를 눌러야 적용된다. 흰 팝업 그대로 두려고 keep-light로 감싼다 */}
       <div className="keep-light">
-        <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} aria-labelledby="sf-title" className="m-auto w-[min(760px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] outline-none backdrop:bg-black/70 focus:outline-none">
+        <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} aria-labelledby="sf-title" className="m-auto w-[min(760px,calc(100vw-24px))] rounded-[20px] border border-white/12 bg-[#121722] p-0 text-white outline-none backdrop:bg-black/70 focus:outline-none">
           <div className="flex h-[min(560px,calc(100dvh-24px))] flex-col">
-            <div className="flex shrink-0 items-center justify-between border-b border-[#e6e9ee] px-5 py-4 md:px-6">
+            <div className="flex shrink-0 items-center justify-between border-b border-white/12 px-5 py-4 md:px-6">
               <h2 id="sf-title" className="text-[20px] font-[800] tracking-[-0.03em]">
                 필터
               </h2>
-              <button type="button" onClick={() => setOpen(false)} aria-label="닫기" className="grid h-11 w-11 place-items-center rounded-full hover:bg-[#f1f3f6]">
+              <button type="button" onClick={() => setOpen(false)} aria-label="닫기" className="grid h-11 w-11 place-items-center rounded-full hover:bg-white/10">
                 <ChevronUp size={22} aria-hidden />
               </button>
             </div>
             {/* 왼쪽 종류, 오른쪽 그 종류의 하위 분류 */}
             <div className="grid min-h-0 flex-1 grid-cols-[minmax(124px,38%)_1fr]">
-              <ul className="overflow-y-auto border-r border-[#e6e9ee]" role="tablist" aria-label="종류">
+              <ul className="overflow-y-auto border-r border-white/12" role="tablist" aria-label="종류">
                 {options.map((o, i) => {
                   const n = draft.filter((x) => kindOf(x) === o.k).length;
                   return (
                     <li key={o.k} role="presentation">
-                      <button type="button" role="tab" aria-selected={cur?.k === o.k} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${cur?.k === o.k ? "bg-[#256ef4] font-[800] text-white" : "hover:bg-[#f4f6fa]"}`}>
+                      <button type="button" role="tab" aria-selected={cur?.k === o.k} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${cur?.k === o.k ? "bg-[#256ef4] font-[800] text-white" : "text-[#c9ced6] hover:bg-white/5"}`}>
                         <span className="break-keep">{o.k}</span>
                         {n > 0 ? <span className="tabular-nums">{draft.includes(o.k) ? "전체" : n}</span> : null}
                       </button>
@@ -151,7 +151,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                       전체
                     </PickItem>
                     {cur.subs.length > 1 ? (
-                      <div className="mt-1 grid border-t border-[#eef0f3] pt-1 sm:grid-cols-2">
+                      <div className="mt-1 grid border-t border-white/10 pt-1 sm:grid-cols-2">
                         {cur.subs.map((sub) => (
                           <PickItem key={sub.name} checked={draft.includes(`${cur.k}:${sub.name}`)} onChange={() => pickSub(cur.k, sub.name)} note={term ? `${sub.n}건` : undefined}>
                             {sub.name}
@@ -163,8 +163,8 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                 ) : null}
               </div>
             </div>
-            <div className="grid shrink-0 grid-cols-[1fr_2fr] gap-2 border-t border-[#e6e9ee] p-4 md:p-5">
-              <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-[#15171c] text-[16px] font-bold">
+            <div className="grid shrink-0 grid-cols-[1fr_2fr] gap-2 border-t border-white/12 p-4 md:p-5">
+              <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-white/30 text-[16px] font-bold text-white hover:border-white/70">
                 닫기
               </button>
               <button
@@ -173,7 +173,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                   setKinds(draft);
                   setOpen(false);
                 }}
-                className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#0b50d0]"
+                className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#1f63e6]"
               >
                 선택 완료
               </button>

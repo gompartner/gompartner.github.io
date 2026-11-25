@@ -193,12 +193,12 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
         ))}
       </div>
 
-      <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 overflow-hidden rounded-full bg-white pl-4 pr-1.5 text-[#0b0d12] md:mt-5">
-        <Search size={18} aria-hidden className="shrink-0 text-[#5b6370]" />
+      <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 overflow-hidden rounded-full border border-white/30 bg-[#121722] pl-4 pr-1.5 text-white focus-within:border-white/70 md:mt-5">
+        <Search size={18} aria-hidden className="shrink-0 text-[#aab2bf]" />
         <label htmlFor="ct-q" className="sr-only">
           카탈로그 화면 찾기
         </label>
-        <input id="ct-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="업종이나 화면 이름 (예: 치과, 랜딩)" autoComplete="off" enterKeyHint="search" className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
+        <input id="ct-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="업종이나 화면 이름 (예: 치과, 랜딩)" autoComplete="off" enterKeyHint="search" className="on-dark h-full min-w-0 flex-1 bg-transparent text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
         <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white">
           찾기
         </button>
