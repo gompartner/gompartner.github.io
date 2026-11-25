@@ -7,7 +7,7 @@ import { JobApply } from "@/components/classic/JobApply";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
-// 순서: 첫 화면(개발사 소개, 문의 버튼, 결과물 띠) > 서비스 4가지와 시작 금액 > 맡기는 이유 4가지 > 기술 > 포트폴리오 > 진행 방식 > 납품 기준 > 자주 묻는 질문 > 프로젝트 문의 신청서.
+// 순서: 첫 화면(미국 개발사 형식: 어두운 배경, 결과 중심 한 줄, 15분 상담, 결과물 띠) > 서비스 4가지와 시작 금액 > 맡기는 이유 4가지 > 기술 > 포트폴리오 > 진행 방식 > 납품 기준 > 자주 묻는 질문 > 프로젝트 문의 신청서.
 // 머리글은 로고와 상담 신청만(ClassicHeader의 landing). 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -78,31 +78,36 @@ export function ClassicHome() {
 function Hero() {
   const strip = [...works, ...works];
   return (
-    <section aria-labelledby="c-hero" className="overflow-hidden bg-white">
-      <div className={`${wrap} pb-12 pt-14 md:pb-16 md:pt-24`}>
-        <p className={eyebrow}>Web, App Development</p>
-        <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.055em] md:text-[72px]">
-          웹과 앱을 만들고
-          <br />
-          운영까지 맡습니다
-        </h1>
-        <p className="mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#3d4450] md:text-[20px]">
-          홈페이지, 업무 시스템, 앱 개발과 유지보수. 개발 책임자가 상담부터 배포, 운영까지 직접 맡고 원본 소스와 인계 문서까지 드립니다.
+    // 11-25 미국 개발사 홈페이지 흐름: 어두운 첫 화면, 결과 중심 한 줄, 통화 상담 버튼, 움직이는 결과물 화면
+    <section aria-labelledby="c-hero" className="relative isolate overflow-hidden bg-[#0b0d12] text-white">
+      {/* 위쪽 가운데 은은한 파란 빛(색 하나, 보라 그러데이션 없음) */}
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-[-260px] -z-10 h-[620px] w-[1100px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(37,110,244,.35),transparent)]" />
+      <div className={`${wrap} pb-12 pt-16 text-center md:pb-16 md:pt-28`}>
+        <p className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[14px] font-bold text-[#c9ced6] md:text-[15px]">
+          웹, 앱 개발과 유지보수
         </p>
-        <div className="mt-8 flex flex-wrap gap-2.5 md:mt-10">
-          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
-            프로젝트 문의
+        <h1 id="c-hero" className="mx-auto mt-6 max-w-[900px] break-keep text-[38px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[76px]">
+          아이디어를
+          <br />
+          운영되는 서비스로
+        </h1>
+        <p className="mx-auto mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#aab2bf] md:text-[20px]">
+          홈페이지, 업무 시스템, 앱을 기획부터 오픈, 운영까지 맡습니다. 개발 책임자가 직접 만들고 원본 소스와 인계 문서까지 드립니다.
+        </p>
+        <div className="mt-9 flex flex-wrap justify-center gap-2.5 md:mt-11">
+          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-full bg-white px-7 text-[17px] font-bold text-[#0b0d12] hover:bg-[#e8ecf2]">
+            15분 무료 상담 신청
           </a>
-          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-md border-2 border-[#15171c] px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
+          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-full border border-white/25 px-7 text-[17px] font-bold text-white hover:border-white">
             포트폴리오 보기
           </a>
         </div>
       </div>
-      <div aria-hidden className="pb-14 md:pb-20">
+      <div aria-hidden className="pb-16 md:pb-24 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
         <ul className="gp-marquee flex w-max gap-4 md:gap-6" role="list">
           {strip.map((w, i) => (
-            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[10px] border border-[#e6e9ee] shadow-[0_6px_18px_rgba(21,23,28,.08)] md:w-[400px]">
-              <Image src={w.img} alt="" fill sizes="400px" className="object-cover" />
+            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[12px] border border-white/10 md:w-[420px]">
+              <Image src={w.img} alt="" fill sizes="420px" className="object-cover" />
             </li>
           ))}
         </ul>
@@ -268,19 +273,19 @@ function Faq() {
 
 function Apply() {
   return (
-    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 bg-[#f4f6fa]">
+    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 bg-[#0b0d12] text-white">
       <div className={`${wrap} grid gap-10 py-16 md:py-28 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
           <p className={eyebrow}>Contact</p>
           <h2 id="c-apply" className={`${h2c} mt-3`}>
             프로젝트 문의
           </h2>
-          <p className="mt-5 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#3d4450]">
-            만들거나 고칠 것을 한 줄만 남겨 주세요. 확인 후 금액과 일정을 먼저 안내합니다. 안내 전에는 비용이 생기지 않습니다.
+          <p className="mt-5 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+            만들거나 고칠 것을 한 줄만 남겨 주세요. 15분 통화로 범위를 듣고 금액과 일정을 먼저 안내합니다. 안내 전에는 비용이 생기지 않습니다.
           </p>
-          <p className="mt-8 text-[14px] leading-[1.6] text-[#5b6370]">곰파트너, 사업자등록번호 725-40-01614(개인 일반과세)</p>
+          <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 725-40-01614(개인 일반과세)</p>
         </div>
-        <div className="min-w-0 rounded-[14px] border border-[#e6e9ee] bg-white p-5 shadow-[0_8px_24px_rgba(21,23,28,.06)] md:p-8">
+        <div className="min-w-0 rounded-[14px] bg-white p-5 text-[#15171c] md:p-8">
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
             <ContactForm compact />

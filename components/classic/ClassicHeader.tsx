@@ -154,10 +154,10 @@ export function ClassicHeader() {
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보).
     // sticky는 문서 흐름 안에 있어 맨 위에서는 제목을 덮지 않는다. 본문 위 여백(pt-16, md:pt-[76px])도 같이 뺐다.
-    <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50 bg-white")}>
-      <div className="border-b border-[#e6e9ee]">
+    <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50", landing ? "bg-[#0b0d12]" : "bg-white")}>
+      <div className={cn("border-b", landing ? "border-white/10" : "border-[#e6e9ee]")}>
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-6 md:px-6">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-[#15171c]">
+          <Link href="/" className={cn("flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em]", landing ? "text-white" : "text-[#15171c]")}>
             {/* 11-04 곰 얼굴 다시(11-01에 메뉴가 늘어 뺐던 것). 채널 프로필과 같은 곰 */}
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
@@ -254,7 +254,7 @@ export function ClassicHeader() {
                   { href: "#faq", label: "자주 묻는 질문" },
                 ].map((a) => (
                   <li key={a.href}>
-                    <a href={a.href} className="inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold text-[#3d4450] hover:text-[#256ef4]">
+                    <a href={a.href} className="inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold text-[#c9ced6] hover:text-white">
                       {a.label}
                     </a>
                   </li>
