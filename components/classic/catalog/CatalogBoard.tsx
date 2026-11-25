@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Maximize2, Plus, Search } from "lucide-react";
+import { ChevronDown, Maximize2, Search } from "lucide-react";
 import { CatalogDialog, Frame, type CatalogItem, type CatalogStoryView } from "@/components/classic/catalog/CatalogDialog";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 
@@ -93,7 +93,6 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
   const told = cat === "전체" ? stories : stories.filter((s) => s.cat === cat);
   const byYear = cat === "전체" ? trends : trends.filter((s) => s.cat === cat);
   const others = cat === "전체" ? rest : rest.filter((i) => i.cat === cat);
-  const shown = more ? others : others.slice(0, 8);
 
   // 통합검색 결과(/works#id)로 들어오면 그 화면을 바로 크게 연다
   useEffect(() => {
@@ -186,18 +185,15 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
             key={c.name}
             type="button"
             aria-pressed={cat === c.name}
-            onClick={() => {
-              setCat(c.name);
-              setMore(false);
-            }}
+            onClick={() => setCat(c.name)}
             className={`min-h-12 shrink-0 whitespace-nowrap rounded-full border px-5 text-[16px] font-[800] tracking-[-0.03em] transition-colors md:text-[17px] ${cat === c.name ? "border-white bg-white text-[#0b0d12]" : "border-white/20 text-white/70 hover:border-white/60 hover:text-white"}`}
           >
-            {c.name} <span className={`ml-1 text-[14px] font-bold tabular-nums ${cat === c.name ? "text-[#256ef4]" : "text-white/55"}`}>{c.count}</span>
+            {c.name}
           </button>
         ))}
       </div>
 
-      <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 rounded-full bg-white pl-4 pr-1.5 text-[#0b0d12] md:mt-5">
+      <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 overflow-hidden rounded-full bg-white pl-4 pr-1.5 text-[#0b0d12] md:mt-5">
         <Search size={18} aria-hidden className="shrink-0 text-[#5b6370]" />
         <label htmlFor="ct-q" className="sr-only">
           카탈로그 화면 찾기
@@ -218,7 +214,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
         <section className="mt-14 md:mt-20" aria-labelledby="ct-year">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
             <h2 id="ct-year" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
-              그 해의 연출로 만든 화면 <span className="ml-1 text-[18px] tabular-nums text-[#7aa7ff] md:text-[22px]">{byYear.length}</span>
+              그 해의 연출로 만든 화면
             </h2>
             <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">같은 병원 홈페이지를 2026년, 2027년의 연출 기법으로 만들었습니다.</p>
           </div>
@@ -226,33 +222,35 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
         </section>
       )}
 
-      {/* 나머지 화면: 작은 그림으로 두고 누르면 크게 */}
+      {/* 나머지 화면: 접어 둔다(11-26 사용자 "카탈로그가 많다고 좋은 건 아니니까", "접기 넣고 숫자 빼고"). 펼치면 작은 그림으로 나오고 누르면 크게 */}
       {others.length > 0 && (
         <section className="mt-14 md:mt-20" aria-labelledby="ct-rest">
-          <h2 id="ct-rest" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
-            이 밖에 만든 화면 <span className="ml-1 text-[18px] tabular-nums text-[#7aa7ff] md:text-[22px]">{others.length}</span>
+          <h2 id="ct-rest" className="sr-only">
+            업종별 화면
           </h2>
-          <ul className="mt-5 grid grid-cols-2 gap-3 md:mt-6 md:grid-cols-3 md:gap-4 lg:grid-cols-4" role="list">
-            {shown.map((it) => (
-              <li key={it.id}>
-                <button type="button" onClick={() => show(it)} className="group block h-full w-full overflow-hidden rounded-[18px] border border-white/12 bg-[#121722] text-left hover:border-[#7aa7ff] md:rounded-[20px]">
-                  <span className="relative block aspect-[16/10] overflow-hidden bg-[#0f131b]">
-                    <Image src={it.thumb} alt={`${it.title} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" />
-                  </span>
-                  <span className="block p-3 md:p-4">
-                    <span className="block text-[13px] font-bold text-[#7aa7ff]">{it.cat}</span>
-                    <span className="mt-0.5 block break-keep text-[15px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[17px]">{it.title}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          {!more && others.length > shown.length && (
-            <div className="mt-6 flex justify-center">
-              <button type="button" onClick={() => setMore(true)} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/25 px-6 text-[16px] font-bold text-white hover:border-white">
-                <Plus size={17} aria-hidden /> 더보기 <span className="tabular-nums text-white/50">{others.length - shown.length}</span>
-              </button>
-            </div>
+          <button type="button" aria-expanded={more} aria-controls="ct-rest-list" onClick={() => setMore((v) => !v)} className="flex w-full items-center justify-between gap-4 rounded-[20px] border border-white/15 px-5 py-5 text-left hover:border-white/40 md:rounded-[24px] md:px-8 md:py-6">
+            <span>
+              <span className="block text-[20px] font-[800] tracking-[-0.04em] md:text-[24px]">업종별 화면 {more ? "접기" : "더 보기"}</span>
+              <span className="mt-1 block break-keep text-[15px] leading-[1.6] text-[#aab2bf] md:text-[16px]">병원, 매장, 전문직, 기업, 학원 화면을 업종별로 모았습니다.</span>
+            </span>
+            <ChevronDown size={24} aria-hidden className={`shrink-0 transition-transform motion-reduce:transition-none ${more ? "rotate-180" : ""}`} />
+          </button>
+          {more && (
+            <ul id="ct-rest-list" className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:grid-cols-3 md:gap-4 lg:grid-cols-4" role="list">
+              {others.map((it) => (
+                <li key={it.id}>
+                  <button type="button" onClick={() => show(it)} className="group block h-full w-full overflow-hidden rounded-[18px] border border-white/12 bg-[#121722] text-left hover:border-[#7aa7ff] md:rounded-[20px]">
+                    <span className="relative block aspect-[16/10] overflow-hidden bg-[#0f131b]">
+                      <Image src={it.thumb} alt={`${it.title} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" />
+                    </span>
+                    <span className="block p-3 md:p-4">
+                      <span className="block text-[13px] font-bold text-[#7aa7ff]">{it.cat}</span>
+                      <span className="mt-0.5 block break-keep text-[15px] font-[800] leading-[1.35] tracking-[-0.03em] md:text-[17px]">{it.title}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </section>
       )}

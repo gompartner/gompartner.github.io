@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check } from "lucide-react";
+import { ChevronUp, SlidersHorizontal, X } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 import { matches, norm } from "./match";
 import { SearchBox } from "./SearchBox";
@@ -41,36 +41,106 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
   }, [index, term]);
   const counts = useMemo(() => ORDER.map((k) => ({ k, n: found.filter((i) => i.kind === k).length })).filter((c) => c.n > 0), [found]);
   // 검색어가 바뀌어 결과가 없어진 종류는 선택에서 뺀 것으로 본다
-  const active = kinds.filter((k) => counts.some((c) => c.k === k));
+  const active = term ? kinds.filter((k) => counts.some((c) => c.k === k)) : kinds;
   const shown = active.length ? found.filter((i) => active.includes(i.kind)) : found;
   const toggle = (k: SearchKind) => setKinds((v) => (v.includes(k) ? v.filter((x) => x !== k) : [...v, k]));
-  const chip = (on: boolean) => `inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-4 text-[15px] font-bold transition-colors ${on ? "border-[#256ef4] bg-[#256ef4] text-white" : "border-[#d9dee5] bg-white text-[#3d4450] hover:border-[#256ef4]"}`;
+  // 필터 팝업: 검색어가 있으면 결과가 있는 종류와 건수, 없으면 고를 수 있는 모든 종류
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<SearchKind[]>([]);
+  const dlg = useRef<HTMLDialogElement>(null);
+  const options = useMemo(() => (term ? counts : ORDER.filter((k) => index.some((i) => i.kind === k)).map((k) => ({ k, n: 0 }))), [term, counts, index]);
+  useEffect(() => {
+    const d = dlg.current;
+    if (!d) return;
+    if (open && !d.open) {
+      d.showModal();
+      d.focus();
+    }
+    if (!open && d.open) d.close();
+  }, [open]);
 
   return (
     <div>
-      <SearchBox id="site-search" value={q} onChange={setQ} placeholder="서비스, 카탈로그, 위키, 자주 묻는 질문 검색" suggestions={SUGGEST} />
-      {term && counts.length > 1 ? (
-        <div className="-mx-4 mt-7 overflow-x-auto overscroll-x-contain px-4 [mask-image:linear-gradient(90deg,#000_calc(100%-44px),transparent)] [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 md:[mask-image:none] [&::-webkit-scrollbar]:hidden">
-          <ul className="flex gap-2 pr-10 md:flex-wrap md:pr-0" role="list" aria-label="종류로 거르기">
-            <li>
-              <button type="button" aria-pressed={active.length === 0} onClick={() => setKinds([])} className={chip(active.length === 0)}>
-                전체 <span className={`tabular-nums ${active.length === 0 ? "" : "opacity-80"}`}>{found.length}</span>
+      <SearchBox
+        id="site-search"
+        value={q}
+        onChange={setQ}
+        placeholder="서비스, 카탈로그, 위키, 자주 묻는 질문 검색"
+        suggestions={SUGGEST}
+        aside={
+          <button
+            type="button"
+            onClick={() => {
+              setDraft(active);
+              setOpen(true);
+            }}
+            aria-haspopup="dialog"
+            className="inline-flex h-[60px] shrink-0 items-center gap-2 rounded-full border-2 border-[#15171c] bg-white px-5 text-[16px] md:px-6 md:text-[17px] font-[800] text-[#15171c] hover:bg-[#f4f6fa]"
+          >
+            <SlidersHorizontal size={18} aria-hidden />
+            필터
+            {active.length > 0 ? <span className="grid h-6 min-w-6 place-items-center rounded-full bg-[#256ef4] px-1.5 text-[13px] tabular-nums text-white">{active.length}</span> : null}
+          </button>
+        }
+      />
+      {active.length > 0 ? (
+        <ul className="mt-5 flex flex-wrap gap-2" role="list" aria-label="고른 필터">
+          {active.map((k) => (
+            <li key={k}>
+              <button type="button" onClick={() => toggle(k)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[#256ef4] bg-[#256ef4] px-4 text-[15px] font-bold text-white">
+                {k} <X size={15} aria-hidden />
+                <span className="sr-only">빼기</span>
               </button>
             </li>
-            {counts.map((c) => {
-              const on = active.includes(c.k);
-              return (
-                <li key={c.k}>
-                  <button type="button" aria-pressed={on} onClick={() => toggle(c.k)} className={chip(on)}>
-                    {on ? <Check size={15} aria-hidden /> : null}
-                    {c.k} <span className={`tabular-nums ${on ? "" : "opacity-80"}`}>{c.n}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+          ))}
+          <li>
+            <button type="button" onClick={() => setKinds([])} className="inline-flex min-h-11 items-center px-3 text-[15px] font-bold text-[#5b6370] underline underline-offset-4 hover:text-[#15171c]">
+              모두 지우기
+            </button>
+          </li>
+        </ul>
       ) : null}
+
+      {/* 필터 팝업(위키 판과 같은 방식): 종류를 여러 개 고르고 선택 완료를 눌러야 적용된다. 흰 팝업 그대로 두려고 keep-light로 감싼다 */}
+      <div className="keep-light">
+        <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} aria-labelledby="sf-title" className="m-auto w-[min(520px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] outline-none backdrop:bg-black/70 focus:outline-none">
+          <div className="flex max-h-[calc(100dvh-24px)] flex-col">
+            <div className="flex shrink-0 items-center justify-between border-b border-[#e6e9ee] px-5 py-4 md:px-6">
+              <h2 id="sf-title" className="text-[20px] font-[800] tracking-[-0.03em]">
+                필터
+              </h2>
+              <button type="button" onClick={() => setOpen(false)} aria-label="닫기" className="grid h-11 w-11 place-items-center rounded-full hover:bg-[#f1f3f6]">
+                <ChevronUp size={22} aria-hidden />
+              </button>
+            </div>
+            <div className="min-h-0 overflow-y-auto p-3 md:p-4">
+              <p className="px-3 pb-1 pt-2 text-[14px] text-[#5b6370]">종류</p>
+              {options.map((o) => (
+                <label key={o.k} className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg px-3 text-[16px] hover:bg-[#f4f6fa]">
+                  <input type="checkbox" checked={draft.includes(o.k)} onChange={() => setDraft((d) => (d.includes(o.k) ? d.filter((x) => x !== o.k) : [...d, o.k]))} className="h-5 w-5 accent-[#256ef4]" />
+                  <span className={`break-keep ${draft.includes(o.k) ? "font-bold text-[#256ef4]" : ""}`}>{o.k}</span>
+                  {term ? <span className="ml-auto text-[15px] tabular-nums text-[#5b6370]">{o.n}건</span> : null}
+                </label>
+              ))}
+            </div>
+            <div className="grid shrink-0 grid-cols-[1fr_2fr] gap-2 border-t border-[#e6e9ee] p-4 md:p-5">
+              <button type="button" onClick={() => setOpen(false)} className="min-h-[52px] rounded-lg border border-[#15171c] text-[16px] font-bold">
+                닫기
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setKinds(draft);
+                  setOpen(false);
+                }}
+                className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#0b50d0]"
+              >
+                선택 완료
+              </button>
+            </div>
+          </div>
+        </dialog>
+      </div>
       <p className="mt-7 text-[15px] text-[#5b6370]" role="status">
         {term ? (
           <>
