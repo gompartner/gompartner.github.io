@@ -3,6 +3,7 @@ import { NavLink } from "@/components/classic/NavLink";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Suspense } from "react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
+import { JobApply } from "@/components/classic/JobApply";
 import { manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 랜딩페이지(사용자 "랜딩페이지로 구성"). 한 페이지 안에서 신청까지 끝낸다.
@@ -104,7 +105,10 @@ function Jobs() {
           <li key={j.name} className="flex flex-col gap-3 rounded-[10px] border border-[#d9dee5] p-5 md:p-7">
             <span className="text-[20px] font-[800] tracking-[-0.03em] md:text-[23px]">{j.name}</span>
             <span className="break-keep text-[16px] leading-[1.6] text-[#5b6370]">{j.body}</span>
-            <span className="mt-auto text-[19px] font-[800] tracking-[-0.03em] text-[#256ef4] md:text-[21px]">{j.price}</span>
+            <span className="mt-auto flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[19px] font-[800] tracking-[-0.03em] text-[#256ef4] md:text-[21px]">{j.price}</span>
+              <JobApply job={j.name} />
+            </span>
           </li>
         ))}
       </ul>
