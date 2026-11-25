@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
 import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
+import { SLICES, clear, pieceCss, pieces, rnd } from "@/components/classic/assembleParts";
 
 // 11-25 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
 //  - 조립의 단위는 카드 한 장이 아니라 그 안의 작은 부품이다(11-26 "작은 부품 컴포넌트가 조립되는 느낌, 지금은 도장 찍는 느낌").
@@ -14,43 +15,10 @@ import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
 //  - 조립할 틈 없이 지나친 부품은 바로 보인다. 움직임 줄이기 설정이면 처음부터 그대로 보인다
 // 부품을 숨기는 표시(data-asm)는 브라우저에서 붙인다. 스크립트가 돌지 않으면 내용이 그대로 보인다.
 
-const css = `
-@keyframes asm-piece {
-  0% { opacity: 0; transform: translate(var(--px), var(--py)) rotate(var(--pr)) scale(var(--ps)); animation-timing-function: ease-out; }
-  40% { opacity: 1; transform: translate(calc(var(--px) * 0.75), calc(var(--py) * 0.75)) rotate(calc(var(--pr) * 0.75)) scale(1); filter: brightness(1); animation-timing-function: cubic-bezier(0.85, 0, 1, 0.45); }
-  78% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); filter: brightness(1.9); animation-timing-function: ease-out; }
-  100% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); filter: brightness(1); }
-}
-.asm-piece { animation: asm-piece 0.46s linear both; animation-delay: var(--pd); will-change: transform, opacity; }
-.asm-plate { position: absolute; inset: 0; pointer-events: none; }
+const css = `${pieceCss}
 [data-asm] { overflow-x: clip; }
 [data-asm] [data-part]:not([data-go]) { opacity: 0; }
 `;
-
-const rnd = (a: number, b: number) => a + Math.random() * (b - a);
-const MAX = 14;
-const SLICES = ["polygon(0% 0%, 40% 0%, 28% 100%, 0% 100%)", "polygon(40% 0%, 74% 0%, 62% 100%, 28% 100%)", "polygon(74% 0%, 100% 0%, 100% 100%, 62% 100%)"];
-const clear = (c: string) => c === "transparent" || c === "rgba(0, 0, 0, 0)";
-
-/** 조립할 작은 요소를 고른다: 글자를 직접 품었거나, 작거나(원, 버튼, 아이콘), 안에 블록 요소가 없으면 그 자체가 부품. 아니면 안으로 더 들어간다 */
-function pieces(root: Element, out: HTMLElement[], depth: number) {
-  for (const child of Array.from(root.children) as HTMLElement[]) {
-    if (out.length >= MAX) return;
-    if (child.classList.contains("asm-plate") || child.tagName === "STYLE") continue;
-    const display = getComputedStyle(child).display;
-    if (display === "none" || display === "inline") continue;
-    if (display === "contents") {
-      pieces(child, out, depth);
-      continue;
-    }
-    const r = child.getBoundingClientRect();
-    const text = Array.from(child.childNodes).some((n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0);
-    const blocks = (Array.from(child.children) as HTMLElement[]).filter((c) => !["inline", "none"].includes(getComputedStyle(c).display));
-    const small = r.width < 150 && r.height < 150;
-    if (text || small || blocks.length === 0 || depth >= 3 || child.tagName.toLowerCase() === "svg") out.push(child);
-    else pieces(child, out, depth + 1);
-  }
-}
 
 export function Assemble({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);

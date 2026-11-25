@@ -94,7 +94,6 @@ html.gp-light .cl .shadow-\[0_4px_14px_rgba\(0\,0\,0\,\.4\)\] { --tw-shadow: var
 html.gp-light .cl .shadow-\[0_24px_50px_-12px_rgba\(0\,0\,0\,\.9\)\] { --tw-shadow: var(--gl-sh2, 0 24px 50px -12px var(--tw-shadow-color, rgba(0,0,0,.9))); }
 html.gp-light .cl .shadow-\[0_30px_70px_-24px_rgba\(0\,0\,0\,\.85\)\] { --tw-shadow: var(--gl-sh3, 0 30px 70px -24px var(--tw-shadow-color, rgba(0,0,0,.85))); }
 html.gp-light .cl .ring-white\/25 { --tw-ring-color: var(--gl-l-ffffff-25, rgb(255 255 255 / 0.25)); }
-html.gp-light .cl .\[--asm-bg\:\#0f131b\] { --asm-bg: var(--gl-b-0f131b, #0f131b); }
 html.gp-light .cl .group-open\:bg-\[\#256ef4\]:is(:where(.group):is([open], :popover-open, :open) *) { background-color: #256ef4; }
 html.gp-light .cl .group-open\:text-\[\#7aa7ff\]:is(:where(.group):is([open], :popover-open, :open) *) { color: var(--gl-t-7aa7ff, #7aa7ff); }
 @media (hover: hover) { html.gp-light .cl .group-hover\:border-\[\#256ef4\]:is(:where(.group):hover *) { border-color: #256ef4; } }
@@ -163,9 +162,6 @@ html.gp-light .cl .aria-\[invalid\=true\]\:border-\[\#d63d4a\][aria-invalid="tru
 
 /* 1. 기본 */
 html.gp-light:has(.cl) { color-scheme: light; }
-/* 조립 연출의 덮개 색(부품 뒤 바탕). 띠 안은 생성 구간이 띠 색으로 바꾼다 */
-html.gp-light .cl { --asm-bg: #ffffff; }
-html.gp-light .cl :is(.bd-in, [data-asm] [data-part][data-go]:not([data-instant]))::after { border-color: #5a93ff; }
 
 /* 2. 바탕 모눈: 흰 바탕에서 보이는 옅은 파랑 선 */
 html.gp-light .cl [class*="bg-[linear-gradient(rgba(122,167,255"] {

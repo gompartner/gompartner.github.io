@@ -205,7 +205,7 @@ function Services() {
 
 function Why() {
   return (
-    <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b] [--asm-bg:#0f131b]">
+    <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
           <Head no="03" en="CARE" title="관리합니다" id="c-why" />
@@ -272,7 +272,7 @@ function Products() {
 
 function Process() {
   return (
-    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white [--asm-bg:#1f5fe0]">
+    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white">
       <div className={`${wrap} py-20 md:py-32`}>
         <Head no="04" en="PROCESS" title="진행 방식" id="c-process" onBlue />
         <div className="relative mt-12 md:mt-20">
@@ -335,7 +335,7 @@ function Faq() {
 
 function Apply() {
   return (
-    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b] [--asm-bg:#0f131b]">
+    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-10 py-20 md:py-32 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
           <Head no="06" en="CONTACT" title="무료 견적 받기" id="c-apply" />
