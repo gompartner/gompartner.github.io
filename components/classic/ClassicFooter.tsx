@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
-import { Globe, Mail, Phone, Printer } from "lucide-react";
+import { Globe, Mail, Phone, Printer, MessageCircle } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
+import { KAKAO_CHAT_URL } from "@/components/layout/KakaoChat";
 import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
@@ -122,7 +123,15 @@ export function ClassicFooter() {
               <ChannelIcon name="youtube" />
               유튜브
             </a>
-            {/* 11-21 블로그 링크 뺌(사용자). 사이트 글은 웹 지식에서 */}
+            {/* 11-25 사용자: 유튜브 옆에 네이버 블로그, 카카오톡(11-21에 뺀 블로그 링크를 다시 넣음) */}
+            <a href="https://blog.naver.com/gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_blog" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+              <ChannelIcon name="naverBlog" />
+              네이버 블로그
+            </a>
+            <a href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+              <MessageCircle size={16} strokeWidth={2} aria-hidden />
+              카카오톡
+            </a>
           </div>
           <div className="md:text-right">
             <p>

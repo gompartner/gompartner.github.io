@@ -27,6 +27,9 @@ const homeCss = `
 html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
 html.gp-dark .cl .gp-home { color-scheme: light; }
 /* 스크롤을 칸마다 붙이는 것(scroll snap)은 넣었다가 뺐다(11-25 밤 사용자 "힘들어 보이는 느낌"). 원래 문제는 휴대폰에서 3D 창이 보이기 전에 지나가는 것이었고, 창을 제목 바로 아래로 올려 해결했다(HeroBuild) */
+/* 11-25 사용자: 메인의 휴대폰 화면에서는 아래에 떠 있는 전화, 카카오톡 상담 바도 뺀다(카카오톡은 바닥글에, 견적은 맨 아래 신청서에). 바 높이만큼 비워 두던 바닥글 여백도 없앤다 */
+html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }
+@media (max-width: 767px) { html:has(.gp-home) footer { padding-bottom: 0; } }
 @keyframes gp-flow { to { stroke-dashoffset: -32; } }
 .gp-flow { animation: gp-flow 1.1s linear infinite; }
 @keyframes gp-flow-y { to { background-position: 0 24px; } }
