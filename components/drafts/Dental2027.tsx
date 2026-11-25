@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Phone } from "lucide-react";
 import type { Scene } from "./dental3d/PhotoSpace3D";
 
@@ -42,6 +42,8 @@ export function Dental2027() {
   // 화면 글은 구간(stage)과 밝아짐(white)만 쓰므로 그 값이 바뀔 때만 다시 그린다
   const [view, setView] = useState({ stage: 0, white: 0 });
   const [env, setEnv] = useState<{ still: boolean; low: boolean } | null>(null);
+  const [ready, setReady] = useState(false);
+  const onReady = useCallback(() => setReady(true), []);
 
   useEffect(() => {
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -94,9 +96,14 @@ export function Dental2027() {
       <section ref={box} aria-label="치과 둘러보기" className="relative" style={{ height: "600vh" }}>
         <div className="sticky top-0 h-[100svh] overflow-hidden bg-[#111]">
           {/* 첫 그림은 사진으로 먼저 깔아 3D가 늦게 떠도 빈 화면이 없게 한다 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${IMG}/wait.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0">{env && <PhotoSpace3D progress={progress} scenes={SCENES} still={env.still} low={env.low} />}</div>
+          {/* 3D가 사진을 다 받기 전까지만 정지 사진을 보여 주고, 준비되면 치운다(뒤에 겹쳐 비치지 않게) */}
+          {!ready && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`${IMG}/wait-sm.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          )}
+          <div className="absolute inset-0 transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }}>
+            {env && <PhotoSpace3D progress={progress} scenes={SCENES} still={env.still} low={env.low} onReady={onReady} />}
+          </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-black/30" style={{ opacity: 1 - white }} />
 
           {/* 0 첫 화면 */}
