@@ -5,13 +5,17 @@ import { profile } from "@/data/classic/profile";
 export type Table = { head: string[]; rows: string[][]; caption?: string };
 /** string[] 는 번호 목록 */
 export type Block = string | string[] | Table;
-export type PolicySection = { title: string; body: Block[] };
+export type LabelIcon = "collect" | "purpose" | "period" | "contact";
+export type PolicySection = { title: string; body: Block[]; /** 목차와 조 제목 앞 아이콘. public/privacy-labels/<icon>.png, 개인정보 포털과 같은 그림(11-25) */ icon?: string };
+/** 주요 개인정보 처리 표시(라벨링). 개인정보보호위원회 작성지침 형식, 해당 없는 항목(제공, 위탁)은 넣지 않는다(11-25) */
+export type PolicyLabel = { icon: LabelIcon; name: string; summary: string; section: number };
 export type PolicyVersion = {
   id: string;
   date: string;
   note: string;
   /** 본문 위 머리말 상자 */
   intro?: string;
+  labels?: PolicyLabel[];
   sections: PolicySection[];
 };
 
@@ -27,9 +31,16 @@ export const privacyVersions: PolicyVersion[] = [
     date: "2026년 11월 24일",
     note: "현재 시행본",
     intro: `${profile.name}(이하 "회사")는 개인정보 보호법 등 관련 법령을 준수하며, 홈페이지 이용자와 상담 신청자의 개인정보를 보호하기 위해 다음과 같이 개인정보처리방침을 수립, 공개합니다.`,
+    labels: [
+      { icon: "collect", name: "일반 개인정보 수집", summary: "이름, 휴대폰 번호, 회사 또는 상호, 문의 내용", section: 2 },
+      { icon: "purpose", name: "개인정보 처리목적", summary: "상담 처리, 서비스 개선, 마케팅(선택)", section: 1 },
+      { icon: "period", name: "개인정보의 보유 기간", summary: "상담 종료일로부터 1년", section: 3 },
+      { icon: "contact", name: "고충처리부서", summary: "개인정보 보호책임자(대표)", section: 10 },
+    ],
     sections: [
       {
         title: "제1조 (개인정보의 처리 목적)",
+        icon: "img_object",
         body: [
           "회사는 다음 목적으로 개인정보를 처리합니다. 처리한 개인정보는 다음 목적 외의 용도로는 이용하지 않으며, 목적이 바뀌는 경우 별도 동의를 받습니다.",
           [
@@ -41,6 +52,7 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제2조 (처리하는 개인정보의 항목)",
+        icon: "img_man",
         body: [
           {
             caption: "처리하는 개인정보 항목",
@@ -73,6 +85,7 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제3조 (개인정보의 처리 및 보유 기간)",
+        icon: "img_period",
         body: [
           "회사는 처리 목적이 달성될 때까지 개인정보를 보유하며, 다음 기간이 지나면 지체 없이 파기합니다.",
           {
@@ -89,6 +102,7 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제4조 (개인정보의 파기 절차 및 방법)",
+        icon: "img_destruction",
         body: [
           [
             "파기 절차: 보유 기간이 지났거나 처리 목적이 달성된 개인정보는 지체 없이 파기합니다.",
@@ -98,12 +112,14 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제5조 (개인정보의 제3자 제공)",
+        icon: "img_third",
         body: [
           "회사는 정보주체의 개인정보를 제1조의 목적 범위에서만 처리하며, 정보주체의 동의 또는 법률의 특별한 규정이 있는 경우를 제외하고는 제3자에게 제공하지 않습니다.",
         ],
       },
       {
         title: "제6조 (정보주체의 권리, 의무 및 행사 방법)",
+        icon: "img_proxy",
         body: [
           [
             "정보주체는 언제든지 개인정보의 열람, 정정, 삭제, 처리 정지를 요구할 수 있습니다.",
@@ -114,12 +130,14 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제7조 (만 14세 미만 아동의 개인정보)",
+        icon: "img_proxy",
         body: [
           "홈페이지 상담은 사업자와 기관을 위한 것으로, 회사는 만 14세 미만 아동의 개인정보임을 알고 수집하지 않습니다.",
         ],
       },
       {
         title: "제8조 (개인정보의 안전성 확보 조치)",
+        icon: "img_safe",
         body: [
           [
             "전 구간 HTTPS 암호화 통신",
@@ -129,12 +147,14 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제9조 (개인정보 자동 수집 장치의 설치, 운영 및 거부)",
+        icon: "img_cookie",
         body: [
           "회사는 방문 통계를 위해 쿠키를 사용합니다. 이용자는 브라우저 설정에서 쿠키 저장을 거부할 수 있으며, 거부하더라도 홈페이지 열람과 상담 신청에는 제한이 없습니다. 회사는 광고 목적의 쿠키는 사용하지 않습니다.",
         ],
       },
       {
         title: "제10조 (개인정보 보호책임자)",
+        icon: "img_cpo",
         body: [
           {
             caption: "개인정보 보호책임자",
@@ -148,6 +168,7 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제11조 (권익침해 구제 방법)",
+        icon: "img_help",
         body: [
           "정보주체는 개인정보 침해로 인한 구제를 받기 위해 아래 기관에 분쟁 해결이나 상담을 신청할 수 있습니다.",
           [
@@ -160,6 +181,7 @@ export const privacyVersions: PolicyVersion[] = [
       },
       {
         title: "제12조 (개인정보처리방침의 변경)",
+        icon: "img_change",
         body: [
           "이 개인정보처리방침은 2026년 11월 24일부터 적용됩니다. 내용이 추가, 삭제, 수정되는 경우 시행 7일 전부터 홈페이지를 통해 알립니다.",
         ],
