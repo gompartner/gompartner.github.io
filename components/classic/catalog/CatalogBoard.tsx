@@ -82,7 +82,11 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // 열릴 때 첫 버튼(로고, 닫기)에 파란 초점 테두리가 뜨지 않게 팝업 자신에 초점을 둔다. 키보드는 Tab으로 이어 간다
+      d.focus();
+    }
     if (!open && d.open) d.close();
   }, [open]);
 
@@ -198,7 +202,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
         </section>
       )}
 
-      <dialog ref={dlg} onClose={() => setOpen(null)} onClick={(e) => e.target === dlg.current && setOpen(null)} aria-labelledby="ct-dlg-title" className="m-auto w-[min(1180px,calc(100vw-24px))] max-w-none rounded-[24px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
+      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(null)} onClick={(e) => e.target === dlg.current && setOpen(null)} aria-labelledby="ct-dlg-title" className="outline-none focus:outline-none m-auto w-[min(1180px,calc(100vw-24px))] max-w-none rounded-[24px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
         {open && (
           // 제목과 닫기는 위에 붙여 두고 그림만 스크롤한다(11-26 사용자 "제목이 고정이 아니라서 모바일에서 닫기 불편")
           <div className="flex max-h-[calc(100dvh-24px)] flex-col">

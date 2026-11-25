@@ -55,7 +55,11 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
-    if (zoom && !d.open) d.showModal();
+    if (zoom && !d.open) {
+      d.showModal();
+      // 열릴 때 첫 버튼(로고, 닫기)에 파란 초점 테두리가 뜨지 않게 팝업 자신에 초점을 둔다. 키보드는 Tab으로 이어 간다
+      d.focus();
+    }
     if (!zoom && d.open) d.close();
   }, [zoom]);
 
@@ -160,7 +164,7 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
         ))}
       </ol>
 
-      <dialog ref={dlg} onClose={() => setZoom(null)} onClick={(e) => e.target === dlg.current && setZoom(null)} className="m-auto w-[min(1400px,calc(100vw-24px))] max-w-none rounded-[20px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
+      <dialog ref={dlg} tabIndex={-1} onClose={() => setZoom(null)} onClick={(e) => e.target === dlg.current && setZoom(null)} className="outline-none focus:outline-none m-auto w-[min(1400px,calc(100vw-24px))] max-w-none rounded-[20px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
         {zoom && (
           <div className="flex max-h-[calc(100dvh-24px)] flex-col">
             <div className="flex items-center justify-between gap-3 px-5 py-3 md:px-6">

@@ -38,6 +38,8 @@ const MORE = [
 const css = `
 /* 메뉴가 열려 있는 동안 뒤 페이지는 스크롤되지 않는다 */
 html:has(dialog[open]) { overflow: hidden; }
+/* 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로) */
+dialog:focus, dialog:focus-visible { outline: none; }
 .gp-menu { opacity: 0; transition: opacity .18s ease, overlay .18s allow-discrete, display .18s allow-discrete; }
 .gp-menu[open] { opacity: 1; }
 @starting-style { .gp-menu[open] { opacity: 0; } }
@@ -68,7 +70,11 @@ export function ClassicHeader() {
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // 열릴 때 첫 버튼(로고, 닫기)에 파란 초점 테두리가 뜨지 않게 팝업 자신에 초점을 둔다. 키보드는 Tab으로 이어 간다
+      d.focus();
+    }
     if (!open && d.open) d.close();
   }, [open]);
   // 넓은 화면으로 바뀌면 열려 있던 메뉴를 닫는다
@@ -121,7 +127,7 @@ export function ClassicHeader() {
       </div>
 
       {/* 좁은 화면 메뉴: 화면을 덮는다. 위에 검색, 가운데 페이지 목록, 아래에 화면 색 */}
-      <dialog ref={dlg} onClose={() => setOpen(false)} aria-label="메뉴" className="gp-menu m-0 h-dvh max-h-none w-full max-w-none bg-[#0b0d12] p-0 text-white">
+      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} aria-label="메뉴" className="outline-none focus:outline-none gp-menu m-0 h-dvh max-h-none w-full max-w-none bg-[#0b0d12] p-0 text-white">
         <div className="flex h-full flex-col">
           <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-4">
             <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">

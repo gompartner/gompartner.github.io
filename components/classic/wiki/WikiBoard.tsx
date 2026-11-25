@@ -27,7 +27,11 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
   useEffect(() => {
     const d = dlg.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // 열릴 때 첫 버튼(로고, 닫기)에 파란 초점 테두리가 뜨지 않게 팝업 자신에 초점을 둔다. 키보드는 Tab으로 이어 간다
+      d.focus();
+    }
     if (!open && d.open) d.close();
   }, [open]);
 
@@ -135,7 +139,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
       )}
 
       {/* 필터 팝업: 왼쪽 주제, 오른쪽 그 주제의 묶음(여러 개), 아래 종류. 선택 완료를 눌러야 적용 */}
-      <dialog ref={dlg} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} className="m-auto w-[min(820px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] backdrop:bg-black/70">
+      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(false)} onClick={(e) => e.target === dlg.current && setOpen(false)} className="outline-none focus:outline-none m-auto w-[min(820px,calc(100vw-24px))] rounded-[20px] bg-white p-0 text-[#0b0d12] backdrop:bg-black/70">
         <div className="flex max-h-[calc(100dvh-24px)] flex-col">
           <div className="flex items-center justify-between border-b border-[#e6e9ee] px-5 py-4 md:px-6">
             <h2 className="text-[20px] font-[800] tracking-[-0.03em]">필터</h2>
