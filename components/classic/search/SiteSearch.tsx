@@ -95,7 +95,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
           >
             <SlidersHorizontal size={18} aria-hidden />
             필터
-            {active.length > 0 ? <span className="grid h-6 min-w-6 place-items-center rounded-full bg-[#256ef4] px-1.5 text-[13px] tabular-nums text-white">{active.length}</span> : null}
+            {active.length > 0 ? <span className="gp-primary grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[13px] tabular-nums">{active.length}</span> : null}
           </button>
         }
       />

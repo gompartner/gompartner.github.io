@@ -150,7 +150,6 @@ html.gp-light .cl .focus\:text-white:focus { color: var(--gl-t-ffffff, #ffffff);
 html.gp-light .cl .focus-visible\:outline-\[\#256ef4\]:focus-visible { outline-color: #256ef4; }
 html.gp-light .cl .focus-visible\:outline-\[\#15171c\]:focus-visible { outline-color: #15171c; }
 html.gp-light .cl .disabled\:text-\[\#8a94a6\]:disabled { color: var(--gl-t-8a94a6, #8a94a6); }
-html.gp-light .cl .has-\[\:focus-visible\]\:outline-\[\#7aa7ff\]:has(*:is(:focus-visible)) { outline-color: var(--gl-l-7aa7ff, #7aa7ff); }
 html.gp-light .cl .aria-\[current\=page\]\:text-white[aria-current="page"] { color: var(--gl-t-ffffff, #ffffff); }
 html.gp-light .cl .aria-\[invalid\=true\]\:border-\[\#d63d4a\][aria-invalid="true"] { border-color: #d63d4a; }
 @media (width >= 64rem) { html.gp-light .cl .lg\:border-l-\[\#7aa7ff\] { border-left-color: var(--gl-l-7aa7ff, #7aa7ff); } }
@@ -242,3 +241,9 @@ html.gp-light .cl img[src="/privacy-labels/w/img_third.png"] { background-image:
 html.gp-light .cl img[src="/privacy-labels/w/pi_collect.png"] { background-image: url("/privacy-labels/pi_collect.png"); }
 html.gp-light .cl img[src="/privacy-labels/w/pi_object.png"] { background-image: url("/privacy-labels/pi_object.png"); }
 html.gp-light .cl img[src="/privacy-labels/w/pi_period.png"] { background-image: url("/privacy-labels/pi_period.png"); }
+
+/* 10. 버튼 색(11-26 사용자 "버튼 색상 저 파란색 쓸 거야? 블랙 화이트 투톤"): 누르는 파란 버튼은 검은 버튼으로. 어두운 화면에서는 scripts/dark-css.mjs가 흰 버튼으로 바꾼다.
+   판 안의 파란 타일, 카드(keep-light 안)는 Build를 나타내는 면이라 그대로 둔다 */
+html.gp-light .cl :is(button, a, input[type=submit]).bg-\[\#256ef4\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #15171c; border-color: #15171c; color: #ffffff; }
+html.gp-light .cl :is(button, a, input[type=submit]).bg-\[\#256ef4\]:hover:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #2b2f38; border-color: #2b2f38; }
+

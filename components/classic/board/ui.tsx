@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { BoardGate } from "@/components/classic/board/BoardGate";
-import { assembleCss } from "@/components/classic/board/assembleCss";
 import { longShotCss } from "@/components/classic/board/longShotCss";
 
 // 11-26 안쪽 "한 판" 페이지들이 함께 쓰는 틀. 메인(ClassicHome)과 같은 바탕, 같은 머리 모양, 같은 글자를 쓴다.
@@ -12,9 +11,9 @@ export const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 
 // 메인의 컨셉은 "조립"이다(사용자: 면과 선이 조합되면서 완성되는, 합체 로봇처럼 조립되는 화면). 안쪽 판도 같은 방식으로 조립된다.
 //  - 큰 제목: 빛줄기가 그어지고 그 사이 면(비스듬한 조각)이 차오르며 글자가 된다(메인 HeroBuild와 같은 방식, 더 짧게)
-//  - 부품(.bd-in): 그 자리에서 선이 그어지고 면이 차오른다(assembleCss). 날아오거나 끌려오지 않는다
+//  - 카드, 표, 그림은 조립하지 않는다(11-26 사용자 "효과는 메인에만, 서브는 타이틀만. 누를 때마다 나와서 불편")
 //  - 새로고침 전까지 판마다 한 번만(BoardGate가 data-built를 붙인다). 움직임 줄이기 설정이면 처음부터 완성된 화면
-const css = `${assembleCss}${longShotCss}
+const css = `${longShotCss}
 /* 팝업(크게 보기, 필터)이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다(11-26 사용자 "뒤쪽이 스크롤되는 버그"). 그 규칙들은 어느 페이지에서나 쓰게 머리글(ClassicHeader)에 있다 */
 @keyframes bd-ray { 0% { opacity: 1; stroke-dashoffset: 1; } 34% { opacity: 1; stroke-dashoffset: 0; } 78% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
 @keyframes bd-shard { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)); filter: brightness(2.6); } 55% { opacity: 1; transform: none; filter: brightness(2.2); } 100% { opacity: 1; transform: none; filter: brightness(1); } }

@@ -78,7 +78,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
         >
           <SlidersHorizontal size={18} aria-hidden />
           필터
-          {nSel > 0 && <span className="grid h-6 min-w-6 place-items-center rounded-full bg-[#256ef4] px-1.5 text-[13px] tabular-nums">{nSel}</span>}
+          {nSel > 0 && <span className="gp-primary grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[13px] tabular-nums">{nSel}</span>}
         </button>
       </div>
 

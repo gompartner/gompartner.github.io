@@ -6,14 +6,14 @@ import { Check } from "lucide-react";
 // 브라우저 기본 체크박스를 그대로 보이지 않는다. 체크박스는 화면 밖에 두고(키보드, 화면 읽기 프로그램은 그대로 쓴다) 보이는 모양만 따로 그린다.
 //  - PickItem: 고르면 글자가 파랗게 굵어지고 끝에 체크 표시가 붙는 항목(오른쪽 칸의 하위 분류)
 //  - BoxCheck: 둥근 네모 칸에 체크가 들어가는 항목(아래 줄의 종류)
-const focus = "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[#7aa7ff]";
+const focus = "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-current";
 
 export function PickItem({ checked, onChange, children, note }: { checked: boolean; onChange: () => void; children: ReactNode; note?: ReactNode }) {
   return (
     <label className={`flex min-h-[48px] cursor-pointer items-center gap-1.5 rounded-lg px-3 text-[16px] text-[#c9ced6] hover:bg-white/5 ${focus}`}>
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
-      <span className={`break-keep ${checked ? "font-bold text-[#7aa7ff]" : ""}`}>{children}</span>
-      {checked ? <Check size={17} strokeWidth={2.6} aria-hidden className="shrink-0 text-[#7aa7ff]" /> : null}
+      <span className={`break-keep ${checked ? "font-[800] text-white" : ""}`}>{children}</span>
+      {checked ? <Check size={17} strokeWidth={2.6} aria-hidden className="shrink-0 text-white" /> : null}
       {note != null ? <span className="ml-auto shrink-0 pl-2 text-[14px] tabular-nums text-[#aab2bf]">{note}</span> : null}
     </label>
   );
