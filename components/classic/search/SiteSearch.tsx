@@ -50,8 +50,8 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
     <div>
       <SearchBox id="site-search" value={q} onChange={setQ} placeholder="서비스, 카탈로그, 위키, 자주 묻는 질문 검색" suggestions={SUGGEST} />
       {term && counts.length > 1 ? (
-        <div className="-mx-4 mt-7 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
-          <ul className="flex gap-2 md:flex-wrap" role="list" aria-label="종류로 거르기">
+        <div className="-mx-4 mt-7 overflow-x-auto overscroll-x-contain px-4 [mask-image:linear-gradient(90deg,#000_calc(100%-44px),transparent)] [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 md:[mask-image:none] [&::-webkit-scrollbar]:hidden">
+          <ul className="flex gap-2 pr-10 md:flex-wrap md:pr-0" role="list" aria-label="종류로 거르기">
             <li>
               <button type="button" aria-pressed={active.length === 0} onClick={() => setKinds([])} className={chip(active.length === 0)}>
                 전체 <span className={`tabular-nums ${active.length === 0 ? "" : "opacity-80"}`}>{found.length}</span>

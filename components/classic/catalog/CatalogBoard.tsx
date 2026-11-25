@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Maximize2, Plus, X } from "lucide-react";
-import { LongShot } from "@/components/classic/board/LongShot";
+import { useRouter } from "next/navigation";
+import { Maximize2, Plus, Search } from "lucide-react";
+import { CatalogDialog, Frame, type CatalogItem, type CatalogStoryView } from "@/components/classic/catalog/CatalogDialog";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 
 // 11-26 카탈로그 한 판(사용자 "기대한 것, 불편한 점을 모아 어떤 고민을 해서 결과를 만들었는지. 잘 이야기하고 진열을 잘하는 게 중요. 이미지 대충 넣지 말고").
@@ -14,11 +15,7 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 // (3)으로 했다. 내려가며 읽기만 하면 이야기가 다 보이고, PC와 휴대폰 화면을 틀에 넣어 크게 둘 자리가 나온다.
 // 길어지는 것은 맨 위 종류 버튼으로 줄인다(이야기와 아래 격자를 함께 거른다). 나머지 화면은 아래에 작은 격자로 두고 8개만 먼저 보여 준다.
 
-/** long: 페이지 전체를 찍은 긴 캡처(있으면 창 안에서 저절로 내려가며 보여 주고, 크게 보기에서는 통째로 편다) */
-export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number } };
-/** tag: 연도와 기법처럼 제목 옆에 붙는 이름표(그 해의 연출로 만든 화면) */
-export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[]; tag?: string };
-export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
+export type { CatalogItem, CatalogStoryView, Shot } from "@/components/classic/catalog/CatalogDialog";
 
 const css = `
 /* 내려가며 볼 때 그림이 제자리로 올라온다. 글자와 그림은 처음부터 다 보이고(투명하게 숨기지 않는다), 지원하지 않는 브라우저에서는 그냥 서 있다 */
@@ -32,50 +29,67 @@ const css = `
 }
 `;
 
-/** 그림 한 장을 브라우저, 휴대폰, 키오스크 틀에 넣는다. scene은 기기를 이미 담은 그림이라 테두리만 둔다 */
-function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?: boolean }) {
-  const img = shot.long ? (
-    full ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={shot.long.src} alt={shot.alt} width={shot.long.w} height={shot.long.h} loading="lazy" decoding="async" className="block h-auto w-full" />
-    ) : (
-      <LongShot src={shot.long.src} alt={shot.alt} w={shot.long.w} h={shot.long.h} ratio={shot.ratio} />
-    )
-  ) : (
-    <span className="relative block w-full bg-[#0f131b]" style={{ aspectRatio: shot.ratio }}>
-      <Image src={shot.src} alt={shot.alt} fill sizes={sizes} className="object-cover object-top" />
-    </span>
+/** 휴대폰 폭에서 PC 화면과 모바일 화면을 좌우로 넘겨 보는 띠. 그림을 누르면 그쪽 화면부터 크게 본다 */
+function Swipe({ s, onOpen }: { s: CatalogStoryView; onOpen: (v: "main" | "side") => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [at, setAt] = useState<"main" | "side">("main");
+  const onScroll = () => {
+    const el = ref.current;
+    if (el) setAt(el.scrollLeft > (el.scrollWidth - el.clientWidth) / 2 ? "side" : "main");
+  };
+  const go = (v: "main" | "side") => {
+    const el = ref.current;
+    if (el) el.scrollTo({ left: v === "side" ? el.scrollWidth : 0, behavior: "smooth" });
+  };
+  const name = `${s.title}${s.tag ? ` ${s.tag}` : ""}`;
+  const side = s.side!;
+  const sideLabel = side.frame === "screen" ? "키오스크" : "모바일";
+  return (
+    <>
+      <div ref={ref} onScroll={onScroll} role="group" aria-label={`${name} PC 화면과 ${sideLabel} 화면`} className="-mx-5 flex snap-x snap-mandatory items-center gap-3 overflow-x-auto overscroll-x-contain px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button type="button" onClick={() => onOpen("main")} aria-label={`${name} PC 화면 크게 보기`} className="block w-[86%] shrink-0 snap-center text-left">
+          <Frame shot={{ ...s.main, ratio: s.main.frame === "browser" ? "4/3" : s.main.ratio }} sizes="86vw" />
+        </button>
+        <button type="button" onClick={() => onOpen("side")} aria-label={`${name} ${sideLabel} 화면 크게 보기`} className="flex w-[86%] shrink-0 snap-center justify-center">
+          <span className="block w-[50%]">
+            <Frame shot={side} sizes="45vw" />
+          </span>
+        </button>
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="flex gap-1.5" role="group" aria-label="화면 종류">
+          {(["main", "side"] as const).map((v) => (
+            <button key={v} type="button" aria-pressed={at === v} onClick={() => go(v)} className={`min-h-10 rounded-full px-4 text-[14px] font-bold transition-colors ${at === v ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white"}`}>
+              {v === "main" ? "PC" : sideLabel}
+            </button>
+          ))}
+        </div>
+        <button type="button" onClick={() => onOpen(at)} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/25 px-4 text-[14px] font-bold text-white">
+          <Maximize2 size={15} aria-hidden /> 크게 보기
+        </button>
+      </div>
+    </>
   );
-  if (shot.frame === "browser")
-    return (
-      <span className="block overflow-hidden rounded-[10px] border border-white/15 bg-[#1b2130] shadow-[0_30px_70px_-24px_rgba(0,0,0,.85)] sm:rounded-[14px]">
-        <span aria-hidden className="flex h-5 items-center gap-1 px-2.5 sm:h-8 sm:gap-1.5 sm:px-3.5">
-          <i className="h-1.5 w-1.5 rounded-full bg-white/25 sm:h-2 sm:w-2" />
-          <i className="h-1.5 w-1.5 rounded-full bg-white/25 sm:h-2 sm:w-2" />
-          <i className="h-1.5 w-1.5 rounded-full bg-white/25 sm:h-2 sm:w-2" />
-          <i className="ml-2 h-2 w-[38%] rounded-full bg-white/10 sm:ml-3 sm:h-3.5" />
-        </span>
-        {img}
-      </span>
-    );
-  if (shot.frame === "phone")
-    return <span className="block overflow-hidden rounded-[14px] border-[3px] border-[#2b3346] bg-[#0b0d12] shadow-[0_24px_50px_-12px_rgba(0,0,0,.9)] ring-1 ring-white/25 sm:rounded-[24px] sm:border-[5px]">{img}</span>;
-  if (shot.frame === "screen")
-    return <span className="block overflow-hidden rounded-[8px] border-[3px] border-[#e6eaf1] bg-white shadow-[0_24px_50px_-12px_rgba(0,0,0,.9)] sm:rounded-[12px] sm:border-[6px]">{img}</span>;
-  return <span className="block overflow-hidden rounded-[10px] border border-white/15 shadow-[0_30px_70px_-24px_rgba(0,0,0,.85)] sm:rounded-[14px]">{img}</span>;
 }
 
 export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: CatalogStoryView[]; trends: CatalogStoryView[]; rest: CatalogItem[]; cats: { name: string; count: number }[]; total: number }) {
   const [cat, setCat] = useState("전체");
   const [more, setMore] = useState(false);
+  // 낱말로 찾기는 통합검색에 맡긴다(종류 필터를 카탈로그로 맞춰서 넘긴다). 거기서 화면을 눌러도 그 자리에서 크게 열리고, 닫으면 검색이 그대로 남는다
+  const router = useRouter();
+  const [q, setQ] = useState("");
+  const find = (e: React.FormEvent) => {
+    e.preventDefault();
+    const t = q.trim();
+    router.push(t ? `/search?q=${encodeURIComponent(t)}&kind=${encodeURIComponent("카탈로그")}` : "/search");
+  };
   const [open, setOpen] = useState<CatalogItem | null>(null);
-  // 크게 보기는 PC와 모바일 화면을 골라 한 장씩 본다(11-26 사용자 "선택해서 볼 수 있도록, 지금은 스크롤이 너무 길어요")
-  const [view, setView] = useState<"main" | "side">("main");
-  const show = (it: CatalogItem) => {
-    setView("main");
+  // 크게 보기에서 먼저 보여 줄 쪽(휴대폰에서 모바일 화면을 넘겨 보다 누르면 모바일부터)
+  const [openView, setOpenView] = useState<"main" | "side">("main");
+  const show = (it: CatalogItem, v: "main" | "side" = "main") => {
+    setOpenView(v);
     setOpen(it);
   };
-  const dlg = useRef<HTMLDialogElement>(null);
   const told = cat === "전체" ? stories : stories.filter((s) => s.cat === cat);
   const byYear = cat === "전체" ? trends : trends.filter((s) => s.cat === cat);
   const others = cat === "전체" ? rest : rest.filter((i) => i.cat === cat);
@@ -94,16 +108,6 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const d = dlg.current;
-    if (!d) return;
-    if (open && !d.open) {
-      d.showModal();
-      // 열릴 때 첫 버튼(로고, 닫기)에 파란 초점 테두리가 뜨지 않게 팝업 자신에 초점을 둔다. 키보드는 Tab으로 이어 간다
-      d.focus();
-    }
-    if (!open && d.open) d.close();
-  }, [open]);
 
   // 이야기와 함께 보는 판 하나(대표 화면, 그 해의 연출로 만든 화면이 함께 쓴다)
   const board = (s: CatalogStoryView, i: number) => {
@@ -125,23 +129,31 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
                 <h2 className="mt-3 break-keep text-[25px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[34px]">{s.headline}</h2>
               </header>
 
-              <button type="button" onClick={() => show(s)} aria-label={`${s.title}${s.tag ? ` ${s.tag}` : ""} 화면 크게 보기`} className="group block w-full self-center text-left lg:col-start-2 lg:row-span-2 lg:row-start-1">
-                <span className={`relative block ${s.side ? "pb-[20%] pr-[4%] sm:pb-[9%] sm:pr-[7%]" : ""}`}>
-                  <span className="ct-main block">
-                    <Frame shot={s.main} sizes="(min-width: 1024px) 640px, 92vw" />
-                  </span>
-                  {s.side && (
-                    <span className="ct-side absolute bottom-0 right-0 block w-[31%] sm:w-[25%]">
-                      <span className="block transition-transform duration-500 group-hover:-translate-y-2 motion-reduce:transition-none">
-                        <Frame shot={s.side} sizes="(min-width: 1024px) 180px, 32vw" />
-                      </span>
+              <div className="self-center lg:col-start-2 lg:row-span-2 lg:row-start-1">
+                {/* 휴대폰: PC 화면과 모바일 화면을 겹쳐 두지 않고 좌우로 넘겨 본다(11-26 사용자 "모바일에서는 좌우로 슬라이드 하면서") */}
+                {s.side ? (
+                  <div className="sm:hidden">
+                    <Swipe s={s} onOpen={(v) => show(s, v)} />
+                  </div>
+                ) : null}
+                <button type="button" onClick={() => show(s)} aria-label={`${s.title}${s.tag ? ` ${s.tag}` : ""} 화면 크게 보기`} className={`group w-full text-left ${s.side ? "hidden sm:block" : "block"}`}>
+                  <span className={`relative block ${s.side ? "pb-[20%] pr-[4%] sm:pb-[9%] sm:pr-[7%]" : ""}`}>
+                    <span className="ct-main block">
+                      <Frame shot={s.main} sizes="(min-width: 1024px) 640px, 92vw" />
                     </span>
-                  )}
-                  <span className={`inline-flex min-h-10 items-center gap-2 rounded-full border border-white/25 px-4 text-[14px] font-bold text-white group-hover:border-white ${s.side ? "absolute bottom-0 left-0" : "mt-4"}`}>
-                    <Maximize2 size={15} aria-hidden /> 크게 보기
+                    {s.side && (
+                      <span className="ct-side absolute bottom-0 right-0 block w-[31%] sm:w-[25%]">
+                        <span className="block transition-transform duration-500 group-hover:-translate-y-2 motion-reduce:transition-none">
+                          <Frame shot={s.side} sizes="(min-width: 1024px) 180px, 32vw" />
+                        </span>
+                      </span>
+                    )}
+                    <span className={`inline-flex min-h-10 items-center gap-2 rounded-full border border-white/25 px-4 text-[14px] font-bold text-white group-hover:border-white ${s.side ? "absolute bottom-0 left-0" : "mt-4"}`}>
+                      <Maximize2 size={15} aria-hidden /> 크게 보기
+                    </span>
                   </span>
-                </span>
-              </button>
+                </button>
+              </div>
 
               <ol className="lg:col-start-1 lg:row-start-2" role="list">
                 {steps.map((st, n) => (
@@ -184,6 +196,17 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
           </button>
         ))}
       </div>
+
+      <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 rounded-full bg-white pl-4 pr-1.5 text-[#0b0d12] md:mt-5">
+        <Search size={18} aria-hidden className="shrink-0 text-[#5b6370]" />
+        <label htmlFor="ct-q" className="sr-only">
+          카탈로그 화면 찾기
+        </label>
+        <input id="ct-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="업종이나 화면 이름 (예: 치과, 랜딩)" autoComplete="off" enterKeyHint="search" className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
+        <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white">
+          찾기
+        </button>
+      </form>
 
       {/* 이야기와 함께 보는 화면: 화면 하나에 판 하나 */}
       <div key={cat} className="mt-6 space-y-4 md:space-y-5">
@@ -234,55 +257,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
         </section>
       )}
 
-      <dialog ref={dlg} tabIndex={-1} onClose={() => setOpen(null)} onClick={(e) => e.target === dlg.current && setOpen(null)} aria-labelledby="ct-dlg-title" className="outline-none focus:outline-none m-auto w-[min(1180px,calc(100vw-24px))] max-w-none rounded-[24px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
-        {open && (
-          // 제목과 닫기는 위에 붙여 두고 그림만 스크롤한다(11-26 사용자 "제목이 고정이 아니라서 모바일에서 닫기 불편")
-          <div className="flex max-h-[calc(100dvh-24px)] flex-col">
-            {/* 휴대폰을 가로로 눕힌 낮은 화면(높이 520 아래)에서는 제목, 화면 종류, 닫기를 한 줄에 둔다. 두 줄이면 그림 볼 자리가 절반도 안 남는다 */}
-            <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 border-b border-white/12 [@media(max-height:520px)]:grid-cols-[minmax(0,1fr)_auto_auto] [@media(max-height:520px)]:items-center">
-              <div className="order-1 px-5 py-4 md:px-8 md:py-5 [@media(max-height:520px)]:flex [@media(max-height:520px)]:items-baseline [@media(max-height:520px)]:gap-2 [@media(max-height:520px)]:py-1.5 [@media(max-height:520px)]:pl-4 [@media(max-height:520px)]:pr-0">
-                <p className="shrink-0 text-[14px] font-bold text-[#7aa7ff]">
-                  {open.cat}
-                  {open.tag ? ` | ${open.tag}` : ""}
-                </p>
-                <h2 id="ct-dlg-title" className="mt-1 break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[28px] [@media(max-height:520px)]:mt-0 [@media(max-height:520px)]:truncate [@media(max-height:520px)]:text-[18px]">
-                  {open.title}
-                </h2>
-              </div>
-              <button type="button" onClick={() => setOpen(null)} aria-label="닫기" className="order-2 mr-3 mt-3 grid h-11 w-11 shrink-0 place-items-center rounded-full text-white hover:bg-white/10 md:mr-6 md:mt-4 [@media(max-height:520px)]:order-3 [@media(max-height:520px)]:mr-2 [@media(max-height:520px)]:mt-0">
-                <X size={22} aria-hidden />
-              </button>
-              {open.side && (
-                <div className="order-3 col-span-2 flex gap-2 border-t border-white/12 px-5 py-3 md:px-8 [@media(max-height:520px)]:order-2 [@media(max-height:520px)]:col-span-1 [@media(max-height:520px)]:border-t-0 [@media(max-height:520px)]:p-0" role="tablist" aria-label="화면 종류">
-                  {([["main", open.main.frame === "browser" ? "PC" : "전체"], ["side", open.side.frame === "screen" ? "키오스크" : "모바일"]] as const).map(([k, label]) => (
-                    <button key={k} type="button" role="tab" aria-selected={view === k} onClick={() => setView(k)} className={`min-h-11 rounded-full px-5 text-[15px] font-bold transition-colors [@media(max-height:520px)]:px-4 ${view === k ? "bg-white text-[#0b0d12]" : "border border-white/25 text-white hover:border-white"}`}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div key={view} className="min-h-0 overflow-y-auto p-5 md:p-8 [@media(max-height:520px)]:p-3">
-            {view === "side" && open.side ? (
-              <span className="mx-auto block w-full max-w-[420px]">
-                <Frame shot={open.side} sizes="(min-width: 768px) 420px, 94vw" full />
-              </span>
-            ) : (
-              <Frame shot={open.main} sizes="(min-width: 768px) 1100px, 94vw" full />
-            )}
-            {open.features.length > 0 && (
-              <ul className="mt-6 flex flex-wrap gap-2 border-t border-white/12 pt-5" role="list" aria-label="구성">
-                {open.features.map((f) => (
-                  <li key={f} className="rounded-full border border-white/20 px-3.5 py-1.5 text-[15px] text-[#e3e7ee]">
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            )}
-            </div>
-          </div>
-        )}
-      </dialog>
+      <CatalogDialog item={open} start={openView} onClose={() => setOpen(null)} />
 
       <BoardClose text="비슷한 화면이 필요하면 업종과 하려는 일을 한 줄만 남겨 주세요." />
     </BoardShell>

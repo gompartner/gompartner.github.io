@@ -40,6 +40,7 @@ const css = `
 html:has(dialog[open]) { overflow: hidden; padding-right: var(--sbw, 0px); }
 /* 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로) */
 dialog:focus, dialog:focus-visible { outline: none; }
+dialog, dialog * { overscroll-behavior: contain; }
 .gp-menu { opacity: 0; transition: opacity .18s ease, overlay .18s allow-discrete, display .18s allow-discrete; }
 .gp-menu[open] { opacity: 1; }
 @starting-style { .gp-menu[open] { opacity: 0; } }

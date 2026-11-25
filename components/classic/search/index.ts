@@ -1,5 +1,7 @@
 import { catalogProjects, demoProjects, industryOf, isProgram, threeProjects, thumbOf } from "@/components/classic/works/samples";
 import { catalogTrends } from "@/data/classic/catalogStories";
+import { buildCatalog } from "@/components/classic/catalog/items";
+import type { CatalogItem } from "@/components/classic/catalog/CatalogDialog";
 import { threeFaq, threeForWhom, threeMeta, threeScope } from "@/data/classic/three";
 import { faq } from "@/data/classic/faq";
 import { maintenanceFaq, maintenanceServices } from "@/data/classic/maintenance";
@@ -20,6 +22,8 @@ export interface SearchItem {
   /** 검색에만 쓰는 낱말(화면에 안 보임) */
   hay: string;
   thumb?: string;
+  /** 카탈로그 화면: 검색 결과에서 그 자리에서 크게 볼 그림(11-26 사용자 "검색에서 레이어팝업을 닫으면 통합검색이 유지되도록") */
+  view?: CatalogItem;
 }
 
 const plain = (t: string) => t.replaceAll("·", ", ");
@@ -56,6 +60,10 @@ export function buildSearchIndex(): SearchItem[] {
     const base = catalogProjects.find((p) => p.id === t.of);
     if (base) catalogs.push({ kind: "카탈로그", title: `${plain(base.title)} ${t.tag}`, desc: t.made, href: `/works#${t.id}`, hay: [base.category, t.headline, t.want, t.think, "연출 트렌드 3D 인터랙션"].join(" "), thumb: `/images/demos/var/${t.id}.jpg` });
   }
+  // 카탈로그 결과마다 크게 볼 그림을 붙인다(카탈로그 판과 같은 목록에서)
+  const cat = buildCatalog();
+  const views = new Map<string, CatalogItem>([...cat.stories, ...cat.trends, ...cat.rest].map((v) => [`/works#${v.id}`, { id: v.id, cat: v.cat, title: v.title, tag: v.tag, thumb: v.thumb, main: v.main, side: v.side, features: v.features }]));
+  for (const c of catalogs) c.view = views.get(c.href);
   // 11-04 키오스크 3D 체험(/work/<slug>/3d). 목록은 app/work/[slug]/3d/page.tsx 의 demos3d 와 같게 둔다
   // 11-26 데모, 샘플 주소를 내려 화면은 카탈로그 한 판(/works)으로만 잇는다
   const kiosk3d: SearchItem[] = [];
