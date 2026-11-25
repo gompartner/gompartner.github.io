@@ -70,5 +70,12 @@
    "w": 390,
    "h": 5600
   }
+ },
+ "app-pilates": {
+  "m": {
+   "src": "/images/catalog/long/app-pilates-m.jpg",
+   "w": 390,
+   "h": 2740
+  }
  }
 }
