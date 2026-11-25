@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 
 // 11-25 조립형 첫 화면(사용자 "면과 선이 조합되며 완성, 합체 로봇처럼 조립되는 메인"). 시안, ?v=build
@@ -25,7 +24,7 @@ const css = `
 .gp-lock { position: absolute; inset: -6px; border: 1.5px solid #7aa7ff; border-radius: 10px; pointer-events: none; animation: gp-lock 0.55s ease-out both; animation-delay: calc(var(--d) + 0.78s); }
 .gp-edge-x { animation: gp-edge-x 0.7s cubic-bezier(0.7, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-edge-y { animation: gp-edge-y 0.7s cubic-bezier(0.7, 0, 0.2, 1) both; animation-delay: var(--d); }
-.gp-clunk { animation: gp-clunk 0.28s ease-out 1.75s both, gp-clunk 0.28s ease-out 2.35s both, gp-clunk 0.32s ease-out 2.95s both; }
+.gp-clunk { animation: gp-clunk 0.28s ease-out 1.75s both, gp-clunk 0.32s ease-out 2.55s both; }
 .gp-scan { animation: gp-scan 0.9s ease-in-out both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.7s ease-out both; animation-delay: var(--d); }
 @media (prefers-reduced-motion: reduce) {
@@ -46,7 +45,7 @@ function Part({ dx, dy, rx = "0deg", ry = "0deg", rot = "0deg", s = "1", d, clas
 
 const at = (d: number): V => ({ "--d": `${d}s` });
 
-export function HeroBuild({ shots }: { shots: { img: string; name: string }[] }) {
+export function HeroBuild() {
   return (
     <section aria-labelledby="c-hero" className="relative isolate overflow-hidden bg-[#0b0d12] text-white">
       <style>{css}</style>
@@ -85,11 +84,12 @@ export function HeroBuild({ shots }: { shots: { img: string; name: string }[] })
         </div>
 
         {/* 오른쪽 브라우저 창: 네 변이 모서리에서 뻗어 만나고, 부품이 차례로 끼워진다 */}
-        <div aria-hidden className="relative">
-          <span className="gp-edge-x absolute left-0 right-0 top-0 h-px origin-left bg-[#7aa7ff]" style={at(0.15)} />
-          <span className="gp-edge-y absolute bottom-0 right-0 top-0 w-px origin-top bg-[#7aa7ff]" style={at(0.45)} />
-          <span className="gp-edge-x absolute bottom-0 left-0 right-0 h-px origin-right bg-[#7aa7ff]" style={at(0.75)} />
-          <span className="gp-edge-y absolute bottom-0 left-0 top-0 w-px origin-bottom bg-[#7aa7ff]" style={at(1.05)} />
+        <div>
+          <div className="relative">
+          <span aria-hidden className="gp-edge-x absolute left-0 right-0 top-0 h-px origin-left bg-[#7aa7ff]" style={at(0.15)} />
+          <span aria-hidden className="gp-edge-y absolute bottom-0 right-0 top-0 w-px origin-top bg-[#7aa7ff]" style={at(0.45)} />
+          <span aria-hidden className="gp-edge-x absolute bottom-0 left-0 right-0 h-px origin-right bg-[#7aa7ff]" style={at(0.75)} />
+          <span aria-hidden className="gp-edge-y absolute bottom-0 left-0 top-0 w-px origin-bottom bg-[#7aa7ff]" style={at(1.05)} />
           <div className="relative overflow-hidden rounded-[2px]">
             <Part dx="0px" dy="-500px" rx="90deg" d={1.5} className="bg-[#151922]">
               <div className="flex h-10 items-center gap-1.5 border-b border-white/10 px-4">
@@ -99,24 +99,22 @@ export function HeroBuild({ shots }: { shots: { img: string; name: string }[] })
                 <span className="ml-3 h-5 flex-1 rounded bg-white/10" />
               </div>
             </Part>
+            {/* 11-25 사용자 "상품은 3D 타운으로": 창 안에 3D 미니어처 마을(public/3d/island). 건물 이름표를 누르면 그 상품 화면이 열린다 */}
             <Part dx="900px" dy="-120px" ry="75deg" rot="8deg" d={1.65}>
-              <span className="relative block aspect-[16/9] w-full overflow-hidden bg-[#151922]">
-                <Image src={shots[0].img} alt="" fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+              <span className="relative block aspect-[4/3] w-full overflow-hidden bg-[#0f1b3d]">
+                <iframe
+                  src={process.env.NODE_ENV === "development" ? "/3d/island.html" : "/3d/island"}
+                  title="3D 마을. 건물 이름표를 누르면 해당 상품 화면을 엽니다."
+                  loading="eager"
+                  className="absolute inset-0 h-full w-full border-0"
+                />
               </span>
             </Part>
-            <div className="grid grid-cols-3 gap-px">
-              {shots.slice(1, 4).map((s, i) => (
-                <Part key={s.img} dx={`${(i - 1) * 520}px`} dy="560px" rx="-60deg" rot={`${(i - 1) * 40}deg`} d={2.1 + i * 0.22} className="bg-[#151922]">
-                  <span className="relative block aspect-[4/3] w-full overflow-hidden">
-                    <Image src={s.img} alt="" fill sizes="20vw" className="object-cover" />
-                  </span>
-                </Part>
-              ))}
-            </div>
             {/* 다 맞물리면 빛이 한 번 훑는다 */}
-            <span className="gp-scan pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-[linear-gradient(90deg,transparent,rgba(122,167,255,.35),transparent)]" style={at(3.1)} />
+            <span className="gp-scan pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-[linear-gradient(90deg,transparent,rgba(122,167,255,.35),transparent)]" style={at(2.7)} />
           </div>
-          <p className="gp-fade mt-3 text-right text-[13px] font-bold tracking-[0.15em] text-[#7aa7ff]" style={at(3.4)}>
+          </div>
+          <p className="gp-fade mt-3 text-right text-[13px] font-bold tracking-[0.15em] text-[#7aa7ff]" style={at(3.0)}>
             BUILD COMPLETE
           </p>
         </div>

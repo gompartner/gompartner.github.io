@@ -66,7 +66,7 @@ export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
       <Suspense fallback={<HeroUs />}>
-        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild shots={works} />} />
+        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild />} />
       </Suspense>
       <Services />
       <Why />
