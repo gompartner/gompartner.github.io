@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
-import { Globe, Mail, Phone, Printer, MessageCircle } from "lucide-react";
+import { Mail, Phone, Printer, MessageCircle } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { KAKAO_CHAT_URL } from "@/components/layout/KakaoChat";
 import { profile } from "@/data/classic/profile";
@@ -114,21 +114,17 @@ export function ClassicFooter() {
             <Link href="/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
               개인정보처리방침
             </Link>
-            <Link href="/en" lang="en" hrefLang="en" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
-              <Globe size={15} strokeWidth={2} aria-hidden />
-              English
-            </Link>
             {/* 11-18 채널 링크는 유튜브 하나만 다시 넣음(사이트 손님과 보는 사람이 같음) */}
             <a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_youtube" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="youtube" />
               유튜브
             </a>
-            {/* 11-25 사용자: 유튜브 옆에 네이버 블로그, 카카오톡(11-21에 뺀 블로그 링크를 다시 넣음) */}
+            {/* 11-25 사용자: 유튜브 옆에 네이버 블로그, 카카오톡(11-21에 뺀 블로그 링크를 다시 넣음). 카카오톡은 1:1 채팅이 아니라 채널 홈으로. English 링크는 뺌 */}
             <a href="https://blog.naver.com/gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_blog" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="naverBlog" />
               네이버 블로그
             </a>
-            <a href={KAKAO_CHAT_URL} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+            <a href={KAKAO_CHAT_URL.replace(/\/chat$/, "")} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <MessageCircle size={16} strokeWidth={2} aria-hidden />
               카카오톡
             </a>
