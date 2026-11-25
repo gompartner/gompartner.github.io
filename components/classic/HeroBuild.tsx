@@ -23,6 +23,7 @@ const css = `
 @keyframes gp-chip { 0% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(0.6); } 62% { opacity: 1; transform: translate(calc(var(--x) * -0.06), calc(var(--y) * 0.1)) rotate(calc(var(--r) * -0.12)) scale(1.05); } 100% { opacity: 1; transform: none; } }
 @keyframes gp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes gp-sweep { from { --gp-a: 0deg; } to { --gp-a: 180deg; } }
+@keyframes gp-body { from { opacity: 0; clip-path: inset(50% 50% 50% 50% round 22px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 22px); } }
 @keyframes gp-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes gp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes gp-clunk { 0%, 100% { transform: none; } 35% { transform: translateY(3px); } 65% { transform: translateY(-1px); } }
@@ -37,6 +38,8 @@ const css = `
 .gp-draw { stroke-dasharray: 1; animation: gp-draw 0.6s ease-in-out both; animation-delay: var(--d); }
 .gp-line { transform-origin: left; animation: gp-line 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.4s ease-out both; animation-delay: var(--d); }
+/* 창 몸통: 틀이 먼저 깔려 있지 않게 가운데 점에서 펼쳐진다 */
+.gp-body { animation: gp-body 0.5s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-clunk { animation: gp-clunk 0.26s ease-out 1.15s both; }
 /* 창틀: 둥근 테두리를 원뿔 마스크로 가려 두 모서리에서 자라게 한다 */
 .gp-frame {
@@ -49,14 +52,14 @@ const css = `
 .gp-scan { transform: translateX(220%); animation: gp-scan 0.7s ease-in-out both; animation-delay: var(--d); }
 
 /* 창이 화면에 들어오기 전에는 창 쪽 조립을 멈춰 둔다(휴대폰에서는 창이 아래에 있다) */
-[data-win]:not([data-win-on]) :is(.gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-fade, .gp-scan) { animation-play-state: paused; }
+[data-win]:not([data-win-on]) :is(.gp-body, .gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-fade, .gp-scan) { animation-play-state: paused; }
 /* 이미 조립했으면(새로고침 전) 조립 없이 완성된 화면 */
-[data-built] :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
+[data-built] :is(.gp-body, .gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
 /* 다시 보일 때: 창틀이 반짝이고 광택이 한 번 훑는다 */
 [data-shine] .gp-frame::before { animation: gp-spark 1s ease-out both; }
 [data-built][data-shine] .gp-scan, [data-shine] .gp-scan { animation: gp-scan 0.7s ease-in-out 0.1s both; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
+  :is(.gp-body, .gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
   [data-shine] .gp-frame::before { animation: none; }
 }
 `;
@@ -167,7 +170,7 @@ export function HeroBuild() {
           {/* 오른쪽 창: 둥근 창틀이 두 모서리에서 자라 만나고, 안에서 3D 마을이 조립된다 */}
           <div data-win className="relative">
             <span aria-hidden className="gp-frame pointer-events-none absolute -inset-px z-20 rounded-[22px]" style={at(0.05)} />
-            <div className="relative overflow-hidden rounded-[22px] bg-[#10141d]">
+            <div className="gp-body relative overflow-hidden rounded-[22px] bg-[#10141d]" style={at(0.1)}>
               <div aria-hidden className="flex h-11 items-center gap-2 border-b border-white/10 px-4">
                 {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
                   <i key={c} className="gp-pop h-3 w-3 rounded-full" style={{ background: c, ...at(0.3 + i * 0.06), "--r": "0deg" } as V} />

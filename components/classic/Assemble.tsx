@@ -40,16 +40,21 @@ const css = `
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="text-[#5b6370]"], [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="text-[#3d4450]"] { color: #5b6370 !important; }
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="border-[#d9dee5]"], [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="border-[#e6e9ee]"] { border-color: #d9dee5 !important; }
 [data-blue] #apply [data-part][class*="rounded-[14px]"] [class*="bg-[#f6f7f9]"] { background-color: #f6f7f9 !important; }
-/* 11-25 "계속 날아다녀": 아래 칸은 날아오지 않고 제자리에서 살짝 떠오르며 나타난다(합체 연출은 첫 화면만) */
-@keyframes gp-dock2 { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* 11-25 아래 칸 조립: 멀리 날아오면 "계속 날아다녀", 제자리에서 떠오르기만 하면 "파도 타기 느낌"이라
+   왼쪽 부품은 왼쪽에서, 오른쪽 부품은 오른쪽에서, 가운데는 아래에서 짧게(48px) 다가와 딱 맞물리게 한다. 회전 없음 */
+@keyframes gp-dock2 {
+  0% { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, 24px)) scale(0.97); }
+  72% { opacity: 1; transform: translate(calc(var(--dx, 0px) * -0.05), calc(var(--dy, 24px) * -0.05)) scale(1.004); }
+  100% { opacity: 1; transform: none; }
+}
 }
 @keyframes gp-glow { 0%, 100% { outline-color: rgba(122, 167, 255, 0); } 35% { outline-color: rgba(122, 167, 255, 0.95); } }
 [data-asm], [data-asm-built] { overflow-x: clip; }
 [data-asm] [data-part]:not([data-go]) { opacity: 0; }
 [data-asm] [data-part][data-go] {
   outline: 1.5px solid transparent; outline-offset: 5px;
-  animation: gp-dock2 0.4s ease-out both, gp-glow 0.6s ease-out none;
-  animation-delay: var(--delay), calc(var(--delay) + 0.25s);
+  animation: gp-dock2 0.36s cubic-bezier(0.2, 0.8, 0.3, 1) both, gp-glow 0.5s ease-out none;
+  animation-delay: var(--delay), calc(var(--delay) + 0.26s);
 }
 /* 이미 조립한 부품이 다시 보일 때: 테두리 반짝과 광택만 */
 @keyframes gp-sheen { from { background-position: 160% 0; } to { background-position: -60% 0; } }
@@ -99,8 +104,16 @@ export function Assemble({ children }: { children: ReactNode }) {
         const hits = entries.filter((e) => e.isIntersecting).map((e) => e.target as HTMLElement);
         const fresh = hits.filter((el) => !built && !("go" in el.dataset));
         // 처음 보는 부품은 조립
+        // 화면 가운데를 기준으로 왼쪽 부품은 왼쪽에서, 오른쪽 부품은 오른쪽에서, 가운데(넓은) 부품은 아래에서 짧게 다가온다.
+        // 한 묶음은 거의 동시에 맞물린다(차례로 떠오르면 파도처럼 보인다)
+        const mid = window.innerWidth / 2;
         fresh.forEach((el, k) => {
-          el.style.setProperty("--delay", `${k * 0.05}s`);
+          const r = el.getBoundingClientRect();
+          const c = r.left + r.width / 2;
+          const wide = r.width > window.innerWidth * 0.6 || Math.abs(c - mid) < 24;
+          el.style.setProperty("--dx", wide ? "0px" : c < mid ? "-48px" : "48px");
+          el.style.setProperty("--dy", wide ? "28px" : "0px");
+          el.style.setProperty("--delay", `${Math.min(k, 3) * 0.03}s`);
           el.dataset.go = "";
         });
         // 이미 조립한 부품이 다시 들어오면 반짝과 광택만

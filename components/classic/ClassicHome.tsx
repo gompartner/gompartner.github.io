@@ -63,8 +63,17 @@ const faqs = [
   { q: "개발 후 소스와 계정은 누구 것인가요?", a: "원본 소스와 서버, 도메인 계정은 모두 고객 명의로 인계합니다." },
 ];
 
+// 다크모드 규칙 중 keep-light를 보지 않는 것(입력 칸 바탕과 글자색)을 메인에서 되돌린다
+const homeFix = `
+html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
+html.gp-dark .cl .gp-home { color-scheme: light; }
+`;
+
 export function ClassicHome() {
   return (
+    // keep-light: 메인은 색을 직접 정한 화면이라 사이트 다크모드(기기 설정을 따라 켜짐)가 흰 부품과 입력 칸을 어둡게 바꾸지 않게 한다
+    <div className="keep-light gp-home">
+      <style>{homeFix}</style>
     <div className="bg-white text-[#15171c]">
       <Suspense fallback={<HeroUs />}>
         <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild />} />
@@ -78,6 +87,7 @@ export function ClassicHome() {
         <Faq />
         <Apply />
       </Assemble>
+    </div>
     </div>
   );
 }
