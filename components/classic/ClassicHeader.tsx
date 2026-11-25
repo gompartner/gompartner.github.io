@@ -296,7 +296,7 @@ export function ClassicHeader() {
                 pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
-              {landing ? "프로젝트 문의" : "상담 신청"}
+              {landing ? "무료 견적 받기" : "상담 신청"}
             </Link>
             <button
               ref={menuBtn}

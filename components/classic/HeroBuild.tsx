@@ -68,9 +68,11 @@ const css = `
 
 const at = (d: number): V => ({ "--d": `${d.toFixed(3)}s` });
 
-const lines = ["아이디어를", "운영되는 서비스로"];
-const sub = "홈페이지, 업무 시스템, 앱을 기획부터 오픈, 운영까지 맡습니다. 개발 책임자가 직접 만들고 원본 소스와 인계 문서까지 드립니다.";
-const trust = ["작업 전 금액 안내", "원본 소스 인계", "계약서와 세금계산서"];
+// 11-25 밤 문구: 컨셉 문장 대신 맡길 이유가 보이게(사용자 "일을 맡기고 싶다는 부분이 약함, 강점이라고 써 놓은 문구가 약점").
+// 사람 수나 사업자 형태처럼 작아 보이는 말은 쓰지 않고, 사이트에 이미 약속해 둔 숫자(기간, 금액, 회신 시간)와 납품물로 말한다
+const lines = ["제작부터 운영까지", "한 곳에서 끝냅니다"];
+const sub = "홈페이지는 29.9만 원부터, 6일이면 완성합니다. 수정 요청은 건별 10,000원부터, 영업일 24시간 안에 원인과 금액을 회신합니다.";
+const trust = ["점검 결과표 납품", "원본 소스와 계정 인계", "무상 하자보수"];
 // 창틀에 붙는 서비스 이름표. 휘어 날아오는 출발점(x, y)과 기울기
 const chips = [
   { name: "홈페이지", pos: "right-[26%] -top-4", x: "140px", y: "-180px", r: "30deg" },
@@ -117,7 +119,7 @@ export function HeroBuild() {
           <div>
             <p className="gp-pill inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.04] px-4 py-1.5 text-[14px] font-bold text-[#c9ced6] md:text-[15px]" style={at(0.2)}>
               <i aria-hidden className="h-2 w-2 rounded-full bg-[#7aa7ff]" />
-              웹, 앱 개발과 유지보수
+              홈페이지, 업무 시스템, 앱 개발
             </p>
             {/* 제목: 글자가 흩어져 있다가 모인다 */}
             <h1 id="c-hero" aria-label={lines.join(" ")} className="mt-6 text-[40px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[68px] xl:text-[76px]">
@@ -148,7 +150,7 @@ export function HeroBuild() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(0.9), "--r": "-14deg" } as V}>
-                프로젝트 문의
+                무료 견적 받기
                 <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#0b0d12]">
                   <ArrowUpRight size={20} />
                 </span>
