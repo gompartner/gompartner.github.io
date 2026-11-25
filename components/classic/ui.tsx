@@ -2,6 +2,7 @@ import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
 import { TabScroll } from "@/components/classic/TabScroll";
 import { ChevronRight, Home } from "lucide-react";
+import { BackLink } from "./BackLink";
 
 // 클래식 보기 공용 조각. 색은 흰 바탕 + 남색 배너 + 곰파트너 파랑 하나.
 // 제목은 Pretendard 800, 자간을 좁혀 크게. 제목 밑 설명 문단은 두지 않는다.
@@ -34,9 +35,10 @@ export function PageHead({ title, trail = [] }: { title: string; trail?: { href:
             {trail.map((t, i) => (
               <li key={`${i}-${t.href}`} className="inline-flex items-center gap-1.5">
                 <ChevronRight size={14} aria-hidden />
-                <Link href={t.href} aria-current={i === trail.length - 1 ? "page" : undefined} className="hover:text-white">
+                {/* 11-25 바로 앞 화면이면 뒤로 간다(목록의 검색어, 보던 자리 유지) */}
+                <BackLink href={t.href} aria-current={i === trail.length - 1 ? "page" : undefined} className="hover:text-white">
                   {t.label}
-                </Link>
+                </BackLink>
               </li>
             ))}
           </ol>

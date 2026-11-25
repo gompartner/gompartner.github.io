@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { wrap } from "@/components/classic/ui";
+import { useSessionState } from "@/lib/useSessionState";
 import s from "./CatalogShelf.module.css";
 
 // 카탈로그 슬라이드(11-24): 시안 첫 화면을 모바일 크기 그대로 좌우로 넘기고, 같은 자리에서 시안 A, B를 전환한다.
@@ -9,9 +10,11 @@ export type ShelfItem = { id: string; name: string; group: string; variants: { a
 
 export function CatalogShelf({ items }: { items: ShelfItem[] }) {
   const groups = useMemo(() => ["전체", ...Array.from(new Set(items.map((i) => i.group)))], [items]);
-  const [group, setGroup] = useState("전체");
+  // 11-25 상세를 보고 돌아와도 고른 카테고리, 보던 시안, A/B 선택이 남게 세션에 둔다
+  const [group, setGroup] = useSessionState("shelf-group", "전체");
   const [cur, setCur] = useState(0);
-  const [side, setSide] = useState<Record<string, number>>({});
+  const [side, setSide] = useSessionState<Record<string, number>>("shelf-side", {});
+  const pending = useRef<number | null>(null);
   const track = useRef<HTMLDivElement>(null);
   const list = useMemo(() => items.filter((i) => group === "전체" || i.group === group), [items, group]);
   const item = list[Math.min(cur, list.length - 1)];
@@ -44,7 +47,30 @@ export function CatalogShelf({ items }: { items: ShelfItem[] }) {
     return () => { el.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
   }, [list]);
 
-  useEffect(() => { setCur(0); if (track.current) track.current.scrollLeft = 0; }, [group]);
+  // 돌아왔을 때 보던 시안 자리로 넘겨 둔다
+  useEffect(() => {
+    const key = `gp-s:${window.location.pathname.replace(/\/+$/, "")}:shelf-cur`;
+    try {
+      const n = Number(sessionStorage.getItem(key));
+      if (n > 0) pending.current = n;
+    } catch {}
+    const t = setTimeout(() => {
+      if (pending.current != null) go(pending.current, false);
+      pending.current = null;
+    }, 120);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(`gp-s:${window.location.pathname.replace(/\/+$/, "")}:shelf-cur`, String(cur));
+    } catch {}
+  }, [cur]);
+  useEffect(() => {
+    if (pending.current != null) return;
+    queueMicrotask(() => setCur(0));
+    if (track.current) track.current.scrollLeft = 0;
+  }, [group]);
 
   if (!item) return null;
   return (

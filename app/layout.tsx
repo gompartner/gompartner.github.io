@@ -5,6 +5,7 @@ import { lookRedirectScript } from "@/lib/look";
 import { firstTouchScript } from "@/lib/attribution";
 import "./globals.css";
 import { CtaTracker } from "@/components/analytics/CtaTracker";
+import { NavMemory } from "@/components/classic/NavMemory";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { profile } from "@/data/profile";
 import { homeDescription, homeTitle } from "@/data/seo";
@@ -108,6 +109,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','${GTM_ID}');`}
         </Script>
         <CtaTracker />
+        <NavMemory />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

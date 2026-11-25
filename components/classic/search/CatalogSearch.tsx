@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
+import { useSessionState } from "@/lib/useSessionState";
 import type { SearchItem } from "./index";
 import { matches } from "./match";
 import { SearchBox } from "./SearchBox";
@@ -10,7 +11,8 @@ const SUGGEST = ["병원", "학원", "카페", "법률", "제조", "랜딩", "�
 
 // 카탈로그 목록 위 검색. 검색어가 없으면 원래 목록(children)을, 있으면 걸러 낸 결과를 보여 준다
 export function CatalogSearch({ index, children, bare = false, suggestions = SUGGEST }: { index: SearchItem[]; children: ReactNode; /** 업종 탭처럼 이미 감싼 칸 안에 넣을 때 */ bare?: boolean; suggestions?: string[] }) {
-  const [q, setQ] = useState("");
+  // 11-25 상세를 보고 돌아와도 검색어가 남게 세션에 둔다
+  const [q, setQ] = useSessionState("q", "");
   const found = useMemo(() => index.filter((i) => matches(`${i.title} ${i.desc} ${i.hay}`, q)), [index, q]);
   if (bare)
     return (

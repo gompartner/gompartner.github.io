@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
+import { IndustryPicker } from "@/components/classic/IndustryPicker";
+import { useSessionState } from "@/lib/useSessionState";
 import s from "./SiteBuilder.module.css";
 
 // 11-25 메인 첫 화면: 홈페이지가 만들어지는 과정을 손님이 직접 본다.
@@ -16,9 +18,9 @@ const STEPS = ["업종과 시안 선택", "상호와 자료 반영", "견적", "
 const PCW = 1280, PCH = 800, MW = 390, MH = 780;
 
 export function SiteBuilder({ items }: { items: BuilderItem[] }) {
-  const groups = useMemo(() => Array.from(new Set(items.map((i) => i.group))), [items]);
-  const [id, setId] = useState(items[0]?.id ?? "");
-  const [v, setV] = useState("a");
+  // 11-25 시안 전체 보기에서 돌아와도 고른 업종과 시안이 남게 세션에 둔다
+  const [id, setId] = useSessionState("builder-id", items[0]?.id ?? "");
+  const [v, setV] = useSessionState("builder-v", "a");
   const [name, setName] = useState("");
   const [typed, setTyped] = useState("");
   // 0 빈 창과 뼈대, 1 화면이 입혀짐, 2 모바일 화면, 3 오픈
@@ -93,19 +95,10 @@ export function SiteBuilder({ items }: { items: BuilderItem[] }) {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:items-start lg:gap-x-12 lg:gap-y-8">
       <div className="min-w-0 lg:col-start-1 lg:row-start-1">
         <div className="grid gap-4 text-[22px] font-[800] leading-[1.35] tracking-[-0.04em] md:gap-5 md:text-[30px]">
-          <label className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-            <span className="sr-only">업종</span>
-            <select value={item.id} onChange={(e) => { setId(e.target.value); setV("a"); }} className="h-12 max-w-full rounded-md border-2 border-[#15171c] bg-white px-3 text-[19px] font-[800] text-[#15171c] md:h-14 md:text-[24px]">
-              {groups.map((g) => (
-                <optgroup key={g} label={g}>
-                  {items.filter((i) => i.group === g).map((i) => (
-                    <option key={i.id} value={i.id}>{i.name}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+            <IndustryPicker items={items} value={item.id} onPick={(nid) => { setId(nid); setV("a"); }} />
             <span>홈페이지</span>
-          </label>
+          </div>
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5" role="group" aria-label="시안">
             <span>시안</span>
             {item.variants.map((x) => (

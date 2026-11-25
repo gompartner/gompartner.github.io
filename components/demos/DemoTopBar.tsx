@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { backIfPrev } from "@/lib/navHistory";
 
 // 카탈로그 데모 맨 위의 곰파트너 바로가기 줄(11-01). 하단 집 버튼과 사용법 가이드를 대신한다.
 // 화면 위에 떠 있지 않고 데모 위에 한 줄로 붙어, 데모 자체 머리글을 가리지 않는다. 썸네일 캡처에서는 숨긴다(.demo-topbar).
 // 11-25 시안 A, B 선택 버튼은 뺐다. 시안은 주소의 ?v= 로만 고른다.
 function backToCatalog(e: React.MouseEvent<HTMLAnchorElement>) {
-  // 카탈로그 카드에서 연 체험은 주소에 from=c가 붙는다. 그때는 뒤로 가서 보던 자리로 돌아간다
+  // 11-25 사이트 안(메인, 포트폴리오, 상세)에서 들어왔으면 어디서 왔든 그 화면으로 뒤로 간다(보던 자리, 검색어 그대로).
+  // 바깥에서 바로 들어왔으면 포트폴리오 첫 화면으로 간다
+  if (backIfPrev(e, "/works", (prev) => !prev.startsWith("/work/"))) return;
   try {
     if (new URLSearchParams(window.location.search).get("from") === "c" && window.history.length > 1) {
       e.preventDefault();
