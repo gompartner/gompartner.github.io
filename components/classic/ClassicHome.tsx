@@ -1,23 +1,60 @@
 import Image from "next/image";
-import { NavLink } from "@/components/classic/NavLink";
-import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Suspense } from "react";
+import { ArrowUpRight, Check, Mail, Phone, Plus } from "lucide-react";
+import { NavLink } from "@/components/classic/NavLink";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { JobApply } from "@/components/classic/JobApply";
-import { HeroSwitch } from "@/components/classic/HeroSwitch";
 import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
+import { profile } from "@/data/classic/profile";
 
-// 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
-// 순서: 첫 화면(미국 개발사 형식: 어두운 배경, 결과 중심 한 줄, 15분 상담, 결과물 띠) > 서비스 4가지와 시작 금액 > 맡기는 이유 4가지 > 기술 > 포트폴리오 > 진행 방식 > 납품 기준 > 자주 묻는 질문 > 프로젝트 문의 신청서.
-// 머리글은 로고와 상담 신청만(ClassicHeader의 landing). 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
+// 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
+// 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
+// 11-25 밤 다시 짬: 흰 바탕용 칸에 색만 뒤집어 덧칠하던 것을 버리고 어두운 바탕 기준으로 처음부터.
+//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 맡기는 이유(큰 숫자 줄) > 기술(흐르는 띠) > 포트폴리오(크기 섞은 격자)
+//    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 자주 묻는 질문 > 프로젝트 문의(흰 신청서)
+//  - 색: 바탕 #0b0d12, 파랑 #256ef4, 하늘 #7aa7ff, 흰색, 포인트 노랑 #ffd84d
+// 비교용이던 한국형, 일본형, 미국형 첫 화면과 ?v= 장치는 지웠다. 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
-const h2c = "break-keep text-[28px] font-[800] leading-[1.25] tracking-[-0.05em] md:text-[44px]";
-const eyebrow = "text-[14px] font-bold uppercase tracking-[0.08em] text-[#256ef4] md:text-[15px]";
+const h2c = "break-keep text-[32px] font-[800] leading-[1.18] tracking-[-0.05em] md:text-[54px]";
 
-// 결과물 띠와 포트폴리오에 쓰는 실제 샘플 화면(카탈로그)
+// 다크모드 규칙 중 keep-light를 보지 않는 것(입력 칸 바탕과 글자색)을 메인에서 되돌리고, 진행 방식의 흐르는 선을 정의한다
+const homeCss = `
+html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
+html.gp-dark .cl .gp-home { color-scheme: light; }
+@keyframes gp-flow { to { stroke-dashoffset: -32; } }
+.gp-flow { animation: gp-flow 1.1s linear infinite; }
+@keyframes gp-flow-y { to { background-position: 0 24px; } }
+.gp-flow-y { background-image: linear-gradient(to bottom, rgba(255,255,255,.7) 50%, transparent 50%); background-size: 2px 12px; animation: gp-flow-y 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .gp-flow, .gp-flow-y { animation: none; } .gp-flow-dot { display: none; } }
+`;
+
+type Tone = "blue" | "white" | "yellow" | "line";
+const services: { no: string; name: string; body: string; price: string; href: string; tone: Tone; span: string }[] = [
+  { no: "01", name: "웹사이트 제작", body: "기업, 병원, 전문직, 쇼핑몰 홈페이지와 광고용 랜딩페이지. 반응형 화면과 검색엔진 등록까지", price: `${manwon(plans[0].price)}부터`, href: "/homepage", tone: "blue", span: "md:col-span-4" },
+  { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면으로", price: "요구사항 확인 후 견적", href: "/program", tone: "white", span: "md:col-span-2" },
+  { no: "03", name: "앱 개발", body: "예약, 주문, 적립, 현장 보고 앱", price: `${manwon(appPlans[0].price)}부터`, href: "/app", tone: "yellow", span: "md:col-span-2" },
+  { no: "04", name: "유지보수와 고도화", body: "수정 건별 처리, 오류 해결, 서버 이전, AI 도구로 만든 서비스의 운영 준비", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
+];
+const tones: Record<Tone, { box: string; sub: string; no: string; link: string; btn: "light" | "dark" }> = {
+  blue: { box: "bg-[#256ef4] text-white", sub: "text-white", no: "text-white/80", link: "text-white hover:underline", btn: "light" },
+  white: { box: "bg-white text-[#0b0d12]", sub: "text-[#3d4450]", no: "text-[#256ef4]", link: "text-[#3d4450] hover:text-[#256ef4]", btn: "dark" },
+  yellow: { box: "bg-[#ffd84d] text-[#0b0d12]", sub: "text-[#2f2c14]", no: "text-[#0b0d12]/70", link: "text-[#2f2c14] hover:underline", btn: "dark" },
+  line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", link: "text-[#c9ced6] hover:text-white", btn: "light" },
+};
+
+const reasons = [
+  { name: "상담한 사람이 직접 개발합니다", body: "중간 관리자 없이 개발 책임자가 요구사항 정의부터 배포까지 맡습니다. 전달 과정에서 빠지는 내용이 없습니다.", c: "#7aa7ff" },
+  { name: "견적을 작업 항목별로 나눕니다", body: "화면, 기능, 데이터 정리, 유지보수를 항목별 금액으로 보여 드립니다. 무엇에 비용이 드는지 계약 전에 확인할 수 있습니다.", c: "#ffd84d" },
+  { name: "운영을 기준으로 설계합니다", body: "오픈 뒤 수정, 백업, 서버 이전까지 고려해 구조를 잡습니다. 유지보수 비용이 덜 드는 방식으로 만듭니다.", c: "#ffffff" },
+  { name: "소스와 계정은 고객 것입니다", body: "원본 소스, 서버, 도메인 계정을 고객 명의로 인계합니다. 다른 업체로 옮겨도 그대로 이어서 쓸 수 있습니다.", c: "#7aa7ff" },
+];
+
+const stack = ["Next.js", "React", "TypeScript", "Node.js", "PHP", "PostgreSQL", "MySQL", "Cloudflare", "AWS", "워드프레스", "그누보드", "아임웹", "카페24"];
+
+// 포트폴리오에 쓰는 실제 샘플 화면(카탈로그). 첫 번째가 큰 칸
 const works = [
   { href: "/sample/dental-homepage", img: "/images/demos/dental-homepage.jpg", kind: "홈페이지", name: "치과 홈페이지" },
   { href: "/sample/logistics", img: "/images/demos/logistics.jpg", kind: "기업 홈페이지", name: "물류 기업 홈페이지" },
@@ -29,23 +66,6 @@ const works = [
   { href: "/sample/landing-move-clean", img: "/images/demos/landing-move-clean.jpg", kind: "랜딩페이지", name: "입주 청소 상담 신청" },
 ];
 
-const services = [
-  { name: "웹사이트 제작", body: "기업, 병원, 전문직, 쇼핑몰 홈페이지와 광고용 랜딩페이지. 반응형 화면과 검색엔진 등록까지", price: `${manwon(plans[0].price)}부터`, href: "/homepage", big: true },
-  { name: "업무 시스템 개발", body: "엑셀로 하던 정산, 재고, 접수, 견적 업무를 웹 관리자 화면으로", price: "요구사항 확인 후 견적", href: "/program", big: false },
-  { name: "앱 개발", body: "예약, 주문, 적립, 현장 보고 앱", price: `${manwon(appPlans[0].price)}부터`, href: "/app", big: false },
-  { name: "유지보수와 고도화", body: "수정 건별 처리, 오류 해결, 서버 이전, AI 도구로 만든 서비스의 운영 준비", price: "건별 10,000원부터", href: "/maintenance", big: true },
-];
-
-// 11-25 개발사 고르는 기준(운영 중인 포트폴리오, 실제 참여 인력, 투입 구조)에 맞춘 이유 4가지. 숫자, 고객사 로고는 실제 실적이 생기면 넣는다
-const reasons = [
-  { name: "상담한 사람이 직접 개발합니다", body: "중간 관리자 없이 개발 책임자가 요구사항 정의부터 배포까지 맡습니다. 전달 과정에서 빠지는 내용이 없습니다." },
-  { name: "견적을 작업 항목별로 나눕니다", body: "화면, 기능, 데이터 정리, 유지보수를 항목별 금액으로 보여 드립니다. 무엇에 비용이 드는지 계약 전에 확인할 수 있습니다." },
-  { name: "운영을 기준으로 설계합니다", body: "오픈 뒤 수정, 백업, 서버 이전까지 고려해 구조를 잡습니다. 유지보수 비용이 덜 드는 방식으로 만듭니다." },
-  { name: "소스와 계정은 고객 것입니다", body: "원본 소스, 서버, 도메인 계정을 고객 명의로 인계합니다. 다른 업체로 옮겨도 그대로 이어서 쓸 수 있습니다." },
-];
-
-const stack = ["Next.js", "React", "TypeScript", "Node.js", "PHP", "PostgreSQL", "MySQL", "Cloudflare", "AWS", "워드프레스", "그누보드", "아임웹", "카페24"];
-
 const steps = [
   { name: "요구사항 정의", body: "만들 범위와 우선순위를 문서로 정리합니다." },
   { name: "견적과 일정", body: "범위에 맞춘 금액과 일정을 먼저 확정합니다." },
@@ -53,6 +73,8 @@ const steps = [
   { name: "테스트와 배포", body: "점검 결과표로 확인한 뒤 운영 서버에 배포합니다." },
   { name: "인계와 운영", body: "원본 소스와 인계 문서를 드리고 하자보수 기간 동안 무상으로 고칩니다." },
 ];
+// 원 다섯 개의 가운데를 지나는 물결 선(가로 1000 기준, 원 가운데 x는 100, 300, 500, 700, 900)
+const flowPath = "M100 70 C 200 70, 200 130, 300 130 S 400 70, 500 70 S 600 130, 700 130 S 800 70, 900 70";
 
 const deliver = ["원본 소스 제공", "점검 결과표", "인계 문서", "무상 하자보수", "계약서와 세금계산서"];
 
@@ -63,198 +85,139 @@ const faqs = [
   { q: "개발 후 소스와 계정은 누구 것인가요?", a: "원본 소스와 서버, 도메인 계정은 모두 고객 명의로 인계합니다." },
 ];
 
-// 다크모드 규칙 중 keep-light를 보지 않는 것(입력 칸 바탕과 글자색)을 메인에서 되돌린다
-const homeFix = `
-html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
-html.gp-dark .cl .gp-home { color-scheme: light; }
-`;
-
 export function ClassicHome() {
   return (
     // keep-light: 메인은 색을 직접 정한 화면이라 사이트 다크모드(기기 설정을 따라 켜짐)가 흰 부품과 입력 칸을 어둡게 바꾸지 않게 한다
     <div className="keep-light gp-home">
-      <style>{homeFix}</style>
-    <div className="bg-white text-[#15171c]">
-      <Suspense fallback={<HeroUs />}>
-        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} build={<HeroBuild />} />
-      </Suspense>
-      <Assemble>
-        <Services />
-        <Why />
-        <Stack />
-        <Portfolio />
-        <Process />
-        <Faq />
-        <Apply />
-      </Assemble>
-    </div>
+      <style>{homeCss}</style>
+      <div className="bg-[#0b0d12] bg-[linear-gradient(rgba(122,167,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.05)_1px,transparent_1px)] bg-[size:48px_48px] text-white">
+        <HeroBuild />
+        <Assemble>
+          <Services />
+          <Why />
+          <Stack />
+          <Portfolio />
+          <Process />
+          <Faq />
+          <Apply />
+        </Assemble>
+      </div>
     </div>
   );
 }
 
-function HeroUs() {
-  const strip = [...works, ...works];
+/** 칸 머리: 번호, 가는 선, 영어 이름, 큰 제목 */
+function Head({ no, en, title, id, onBlue = false }: { no: string; en: string; title: string; id: string; onBlue?: boolean }) {
   return (
-    // 11-25 미국 개발사 홈페이지 흐름: 어두운 첫 화면, 결과 중심 한 줄, 통화 상담 버튼, 움직이는 결과물 화면
-    <section aria-labelledby="c-hero" className="relative isolate overflow-hidden bg-[#0b0d12] text-white">
-      {/* 위쪽 가운데 은은한 파란 빛(색 하나, 보라 그러데이션 없음) */}
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-[-260px] -z-10 h-[620px] w-[1100px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(37,110,244,.35),transparent)]" />
-      <div className={`${wrap} pb-12 pt-16 text-center md:pb-16 md:pt-28`}>
-        <p className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[14px] font-bold text-[#c9ced6] md:text-[15px]">
-          웹, 앱 개발과 유지보수
-        </p>
-        <h1 id="c-hero" className="mx-auto mt-6 max-w-[900px] break-keep text-[38px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[76px]">
-          아이디어를
-          <br />
-          운영되는 서비스로
-        </h1>
-        <p className="mx-auto mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#aab2bf] md:text-[20px]">
-          홈페이지, 업무 시스템, 앱을 기획부터 오픈, 운영까지 맡습니다. 개발 책임자가 직접 만들고 원본 소스와 인계 문서까지 드립니다.
-        </p>
-        <div className="mt-9 flex flex-wrap justify-center gap-2.5 md:mt-11">
-          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-full bg-white px-7 text-[17px] font-bold text-[#0b0d12] hover:bg-[#e8ecf2]">
-            15분 무료 상담 신청
-          </a>
-          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-full border border-white/25 px-7 text-[17px] font-bold text-white hover:border-white">
-            포트폴리오 보기
-          </a>
-        </div>
-      </div>
-      <div aria-hidden className="pb-16 md:pb-24 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
-        <ul className="gp-marquee flex w-max gap-4 md:gap-6" role="list">
-          {strip.map((w, i) => (
-            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[12px] border border-white/10 md:w-[420px]">
-              <Image src={w.img} alt="" fill sizes="420px" className="object-cover" />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <div data-part>
+      <p className={`flex items-center gap-3 text-[13px] font-bold tracking-[0.18em] md:text-[14px] ${onBlue ? "text-white" : "text-[#7aa7ff]"}`}>
+        <span className="tabular-nums">{no}</span>
+        <span aria-hidden className="h-px w-10 bg-current" />
+        {en}
+      </p>
+      <h2 id={id} className={`${h2c} mt-4`}>
+        {title}
+      </h2>
+    </div>
   );
 }
 
-// 한국 개발사형(똑똑한개발자 등): 밝은 배경, 왼쪽 정렬 큰 제목, 문의와 포트폴리오 버튼, 결과물 띠
-function HeroKr() {
-  const strip = [...works, ...works];
+/** 서비스 판 구석의 면과 선 무늬 */
+function Motif({ tone }: { tone: Tone }) {
+  // 좁은 판(흰색, 노랑)에서는 글자와 겹치지 않게 작게, 구석으로
+  const narrow = tone === "white" || tone === "yellow";
+  const cls = `pointer-events-none absolute -z-10 ${narrow ? "-bottom-10 -right-10 h-[170px] w-[170px] md:h-[210px] md:w-[210px]" : "-bottom-6 -right-6 h-[210px] w-[210px] md:h-[300px] md:w-[300px]"}`;
+  if (tone === "blue")
+    return (
+      <svg aria-hidden viewBox="0 0 300 300" className={cls} fill="none" stroke="#fff">
+        <circle cx="170" cy="170" r="120" strokeOpacity=".4" strokeWidth="1.5" />
+        <circle cx="170" cy="170" r="72" strokeOpacity=".4" strokeWidth="1.5" />
+        <circle cx="170" cy="170" r="26" fill="#fff" fillOpacity=".22" stroke="none" />
+        <path d="M0 170 H300 M170 0 V300" strokeOpacity=".25" />
+      </svg>
+    );
+  if (tone === "white")
+    return (
+      <svg aria-hidden viewBox="0 0 300 300" className={cls} fill="none" stroke="#256ef4">
+        <path d="M60 80 H300 M60 130 H300 M60 180 H300 M60 230 H300 M60 80 V300 M140 80 V300 M220 80 V300" strokeOpacity=".28" strokeWidth="1.5" />
+        <rect x="140" y="130" width="80" height="50" fill="#256ef4" fillOpacity=".16" stroke="none" />
+        <circle cx="60" cy="80" r="6" fill="#256ef4" stroke="none" />
+      </svg>
+    );
+  if (tone === "yellow")
+    return (
+      <svg aria-hidden viewBox="0 0 300 300" className={cls} fill="none" stroke="#0b0d12">
+        <rect x="120" y="50" width="130" height="250" rx="26" strokeOpacity=".4" strokeWidth="2" />
+        <path d="M165 76 H205" strokeOpacity=".4" strokeWidth="4" strokeLinecap="round" />
+        <circle cx="90" cy="210" r="46" fill="#0b0d12" fillOpacity=".1" stroke="none" />
+      </svg>
+    );
   return (
-    <section aria-labelledby="c-hero" className="overflow-hidden bg-white">
-      <div className={`${wrap} pb-12 pt-14 md:pb-16 md:pt-24`}>
-        <p data-part className={eyebrow}>Web, App Development</p>
-        <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.055em] md:text-[72px]">
-          웹과 앱을 만들고
-          <br />
-          운영까지 맡습니다
-        </h1>
-        <p className="mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#3d4450] md:text-[20px]">
-          홈페이지, 업무 시스템, 앱 개발과 유지보수. 개발 책임자가 상담부터 배포, 운영까지 직접 맡고 원본 소스와 인계 문서까지 드립니다.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-2.5 md:mt-10">
-          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
-            프로젝트 문의
-          </a>
-          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-md border-2 border-[#15171c] px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
-            포트폴리오 보기
-          </a>
-        </div>
-      </div>
-      <div aria-hidden className="pb-14 md:pb-20">
-        <ul className="gp-marquee flex w-max gap-4 md:gap-6" role="list">
-          {strip.map((w, i) => (
-            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[10px] border border-[#e6e9ee] shadow-[0_6px_18px_rgba(21,23,28,.08)] md:w-[400px]">
-              <Image src={w.img} alt="" fill sizes="400px" className="object-cover" />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-// 일본 기업 사이트형: 넓은 여백, 영어 큰 글자와 한국어 한 줄, 번호 붙은 소제목, 가는 선, 차분한 색, 오른쪽에 결과물 한 장
-function HeroJp() {
-  return (
-    <section aria-labelledby="c-hero" className="border-b border-[#d9dee5] bg-[#fafaf8]">
-      <div className={`${wrap} grid gap-12 pb-20 pt-20 md:pb-32 md:pt-32 lg:grid-cols-[1.1fr_1fr] lg:items-end`}>
-        <div>
-          <p className="flex items-center gap-3 text-[13px] font-bold tracking-[0.2em] text-[#5b6370]">
-            <span className="h-px w-10 bg-[#5b6370]" aria-hidden />
-            GOMPARTNER WEB DEVELOPMENT
-          </p>
-          <p aria-hidden className="mt-8 text-[56px] font-[300] leading-[1.02] tracking-[-0.04em] text-[#15171c] md:text-[104px]">
-            Build,
-            <br />
-            Run, Care.
-          </p>
-          <h1 id="c-hero" className="mt-8 break-keep text-[22px] font-[700] leading-[1.6] tracking-[-0.03em] md:text-[28px]">
-            만들고, 운영하고, 돌봅니다.
-          </h1>
-          <p className="mt-4 max-w-[520px] break-keep text-[16px] leading-[1.9] text-[#5b6370] md:text-[17px]">
-            홈페이지, 업무 시스템, 앱을 기획부터 오픈, 운영까지 개발 책임자가 직접 맡습니다. 오래 쓰는 시스템을 기준으로 설계합니다.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center gap-6">
-            <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center gap-3 border-b-2 border-[#15171c] pb-1 text-[17px] font-bold text-[#15171c] hover:text-[#256ef4] hover:border-[#256ef4]">
-              Contact <span className="text-[15px] font-normal">프로젝트 문의</span>
-            </a>
-            <a href="#portfolio" className="inline-flex min-h-[54px] items-center gap-3 border-b border-[#9aa3b0] pb-1 text-[17px] font-bold text-[#5b6370] hover:text-[#15171c]">
-              Works <span className="text-[15px] font-normal">포트폴리오</span>
-            </a>
-          </div>
-        </div>
-        <div className="relative aspect-[4/3] w-full overflow-hidden border border-[#d9dee5] bg-white">
-          <Image src={works[1].img} alt={`${works[1].name} 화면`} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
-          <span className="absolute bottom-0 left-0 bg-[#15171c] px-3 py-1.5 text-[12px] font-bold tracking-[0.15em] text-white">01 / WORKS</span>
-        </div>
-      </div>
-    </section>
+    <svg aria-hidden viewBox="0 0 300 300" className={cls} fill="none" stroke="#7aa7ff">
+      <path d="M60 240 L130 150 L210 190 L270 80" strokeOpacity=".6" strokeWidth="1.5" />
+      <circle cx="60" cy="240" r="7" fill="#7aa7ff" stroke="none" />
+      <circle cx="130" cy="150" r="7" fill="#0b0d12" strokeWidth="2" />
+      <circle cx="210" cy="190" r="7" fill="#0b0d12" strokeWidth="2" />
+      <circle cx="270" cy="80" r="10" fill="#ffd84d" stroke="none" />
+      <circle cx="170" cy="170" r="130" strokeOpacity=".18" />
+    </svg>
   );
 }
 
 function Services() {
   return (
-    <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
-      <p data-part className={eyebrow}>Services</p>
-      <h2 data-part id="c-services" className={`${h2c} mt-3`}>
-        하는 일
-      </h2>
-      <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-3" role="list">
-        {services.map((s) => (
-          <li data-part key={s.name} className={`flex flex-col gap-4 rounded-[14px] p-6 md:p-8 ${s.big ? "bg-[#0f1115] text-white md:col-span-2" : "border border-[#d9dee5] bg-white"}`}>
-            <span className="text-[22px] font-[800] tracking-[-0.04em] md:text-[28px]">{s.name}</span>
-            <span className={`break-keep text-[16px] leading-[1.65] md:text-[17px] ${s.big ? "text-[#c9ced6]" : "text-[#5b6370]"}`}>{s.body}</span>
-            <span className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
-              <span className={`text-[20px] font-[800] tracking-[-0.03em] md:text-[24px] ${s.big ? "text-white" : "text-[#256ef4]"}`}>{s.price}</span>
-              <span className="flex gap-2">
-                <NavLink href={s.href} className={`inline-flex min-h-11 items-center gap-1 rounded-md px-3 text-[15px] font-bold ${s.big ? "text-[#c9ced6] hover:text-white" : "text-[#5b6370] hover:text-[#256ef4]"}`}>
-                  자세히 <ArrowUpRight size={16} aria-hidden />
-                </NavLink>
-                <JobApply job={s.name} dark={s.big} />
-              </span>
-            </span>
-          </li>
-        ))}
+    <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
+      <Head no="01" en="SERVICES" title="하는 일" id="c-services" />
+      <ul className="mt-10 grid gap-3 md:mt-14 md:grid-cols-6 md:gap-4" role="list">
+        {services.map((s) => {
+          const t = tones[s.tone];
+          return (
+            <li key={s.name} data-part className={`relative isolate flex min-h-[250px] flex-col overflow-hidden rounded-[28px] p-7 md:min-h-[310px] md:p-9 ${s.span} ${t.box}`}>
+              <Motif tone={s.tone} />
+              <span className={`text-[15px] font-bold tabular-nums ${t.no}`}>{s.no}</span>
+              <h3 className="mt-3 break-keep text-[28px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{s.name}</h3>
+              <p className={`mt-3 max-w-[460px] break-keep text-[16px] leading-[1.65] md:text-[17px] ${t.sub}`}>{s.body}</p>
+              <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 gap-y-3 pt-8">
+                <span className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">{s.price}</span>
+                <span className="flex items-center gap-1">
+                  <NavLink href={s.href} className={`inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-[15px] font-bold ${t.link}`}>
+                    자세히 <ArrowUpRight size={16} aria-hidden />
+                  </NavLink>
+                  <JobApply job={s.name} tone={t.btn} />
+                </span>
+              </div>
+            </li>
+          );
+        })}
       </ul>
-      <p className="mt-4 text-[15px] text-[#5b6370]">금액은 부가세 별도입니다.</p>
+      <p className="mt-4 text-[15px] text-[#aab2bf]">금액은 부가세 별도입니다.</p>
     </section>
   );
 }
 
 function Why() {
   return (
-    <section aria-labelledby="c-why" className="bg-[#f4f6fa]">
-      <div className={`${wrap} py-16 md:py-28`}>
-        <p data-part className={eyebrow}>Why Gompartner</p>
-        <h2 data-part id="c-why" className={`${h2c} mt-3`}>
-          곰파트너에 맡기는 이유
-        </h2>
-        <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-2" role="list">
+    <section aria-labelledby="c-why" className="border-y border-white/10 bg-[#0f131b]">
+      <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <Head no="02" en="WHY" title="곰파트너에 맡기는 이유" id="c-why" />
+          <p data-part className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+            누가 실제로 만드는지, 비용이 어디에 드는지, 끝난 뒤 무엇이 남는지. 맡기기 전에 확인하실 것을 먼저 말씀드립니다.
+          </p>
+        </div>
+        <ol role="list">
           {reasons.map((r, i) => (
-            <li data-part key={r.name} className="rounded-[14px] bg-white p-6 md:p-8">
-              <span className="text-[15px] font-bold tabular-nums text-[#256ef4]">{String(i + 1).padStart(2, "0")}</span>
-              <span className="mt-2 block break-keep text-[21px] font-[800] tracking-[-0.04em] md:text-[25px]">{r.name}</span>
-              <span className="mt-3 block break-keep text-[16px] leading-[1.7] text-[#5b6370] md:text-[17px]">{r.body}</span>
+            <li key={r.name} data-part className="grid grid-cols-[64px_1fr] gap-4 border-t border-white/15 py-8 first:border-t-0 first:pt-0 md:grid-cols-[120px_1fr] md:gap-6 md:py-10">
+              <span aria-hidden className="text-[56px] font-[800] leading-[0.9] tracking-[-0.06em] text-transparent md:text-[92px]" style={{ WebkitTextStroke: `1.5px ${r.c}` }}>
+                {i + 1}
+              </span>
+              <div>
+                <h3 className="break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[29px]">{r.name}</h3>
+                <p className="mt-3 break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">{r.body}</p>
+              </div>
             </li>
           ))}
-        </ul>
+        </ol>
       </div>
     </section>
   );
@@ -262,47 +225,15 @@ function Why() {
 
 function Stack() {
   return (
-    <section aria-labelledby="c-stack" className="border-b border-[#e6e9ee] bg-white">
-      <div className={`${wrap} flex flex-col gap-5 py-10 md:flex-row md:items-center md:gap-10 md:py-12`}>
-        <h2 data-part id="c-stack" className="shrink-0 text-[17px] font-[800] tracking-[-0.02em] md:text-[19px]">
-          다루는 기술과 플랫폼
-        </h2>
-        <ul data-part className="flex flex-wrap gap-2" role="list">
-          {stack.map((t) => (
-            <li key={t} className="rounded-full border border-[#d9dee5] bg-white px-3.5 py-1.5 text-[15px] font-bold text-[#3d4450]">
-              {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-function Portfolio() {
-  return (
-    <section id="portfolio" aria-labelledby="c-portfolio" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p data-part className={eyebrow}>Portfolio</p>
-          <h2 data-part id="c-portfolio" className={`${h2c} mt-3`}>
-            만든 화면
-          </h2>
-        </div>
-        <NavLink href="/works" className="flex min-h-11 items-center gap-1 text-[16px] font-bold text-[#5b6370] hover:text-[#256ef4]">
-          카탈로그 전체 <ArrowUpRight size={18} aria-hidden />
-        </NavLink>
-      </div>
-      <ul className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 md:mt-14 md:grid-cols-4 md:gap-x-6" role="list">
-        {works.map((w) => (
-          <li data-part key={w.href}>
-            <NavLink href={w.href} className="group block">
-              <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] border border-[#e6e9ee] bg-[#f4f6fa]">
-                <Image src={w.img} alt={`${w.name} 화면`} fill sizes="(min-width: 768px) 25vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
-              </span>
-              <span className="mt-3 block text-[13px] font-bold text-[#256ef4] md:text-[14px]">{w.kind}</span>
-              <span className="block break-keep text-[16px] font-[800] tracking-[-0.03em] md:text-[18px]">{w.name}</span>
-            </NavLink>
+    <section aria-labelledby="c-stack" className="overflow-hidden border-b border-white/10 py-8 md:py-11">
+      <h2 id="c-stack" className="sr-only">
+        다루는 기술과 플랫폼
+      </h2>
+      <ul className="gp-marquee flex w-max items-center" role="list">
+        {[...stack, ...stack].map((t, i) => (
+          <li key={i} aria-hidden={i >= stack.length} className={`flex items-center gap-8 whitespace-nowrap pr-8 text-[30px] font-[800] tracking-[-0.04em] md:gap-12 md:pr-12 md:text-[46px] ${i % 3 === 0 ? "text-[#7aa7ff]" : "text-white/30"}`}>
+            {t}
+            <i aria-hidden className={`h-2.5 w-2.5 rounded-full ${i % 4 === 1 ? "bg-[#ffd84d]" : "bg-[#256ef4]"}`} />
           </li>
         ))}
       </ul>
@@ -310,27 +241,77 @@ function Portfolio() {
   );
 }
 
+function Portfolio() {
+  return (
+    <section id="portfolio" aria-labelledby="c-portfolio" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
+      <Head no="03" en="PORTFOLIO" title="만든 화면" id="c-portfolio" />
+      <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-4 md:gap-4" role="list">
+        {works.map((w, i) => (
+          <li key={w.href} data-part className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
+            <NavLink href={w.href} className="group flex h-full flex-col overflow-hidden rounded-[22px] border border-white/10 bg-[#121722] hover:border-[#7aa7ff]/60">
+              <span className={`relative block overflow-hidden ${i === 0 ? "aspect-[16/10] md:aspect-auto md:min-h-0 md:flex-1" : "aspect-[16/10]"}`}>
+                <Image src={w.img} alt={`${w.name} 화면`} fill sizes={i === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"} className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" />
+              </span>
+              <span className={`block ${i === 0 ? "p-4 md:p-6" : "p-3 md:p-4"}`}>
+                <span className="block text-[12px] font-bold text-[#7aa7ff] md:text-[13px]">{w.kind}</span>
+                <span className={`mt-0.5 block break-keep font-[800] tracking-[-0.03em] text-white ${i === 0 ? "text-[19px] md:text-[26px]" : "text-[15px] md:text-[18px]"}`}>{w.name}</span>
+              </span>
+            </NavLink>
+          </li>
+        ))}
+        <li data-part>
+          <NavLink href="/works" className="group flex h-full min-h-[150px] flex-col justify-between rounded-[22px] bg-[#256ef4] p-4 text-white hover:bg-[#0b50d0] md:p-6">
+            <span className="grid h-10 w-10 place-items-center self-end rounded-full bg-white text-[#0b0d12] md:h-12 md:w-12">
+              <ArrowUpRight size={20} aria-hidden />
+            </span>
+            <span className="break-keep text-[17px] font-[800] leading-[1.3] tracking-[-0.03em] md:text-[22px]">
+              카탈로그
+              <br />
+              전체 보기
+            </span>
+          </NavLink>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
 function Process() {
   return (
-    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#0f1115] text-white">
-      <div className={`${wrap} py-16 md:py-28`}>
-        <p data-part className={eyebrow}>Process</p>
-        <h2 data-part id="c-process" className={`${h2c} mt-3`}>
-          진행 방식
-        </h2>
-        <ol className="mt-10 grid border-t border-white/15 md:mt-14 md:grid-cols-5" role="list">
-          {steps.map((s, i) => (
-            <li data-part key={s.name} className="border-b border-white/15 bg-[#0f1115] p-6 md:border-r md:p-7 md:last:border-r-0">
-              <span className="text-[15px] font-bold tabular-nums text-[#7aa7ff]">{String(i + 1).padStart(2, "0")}</span>
-              <span className="mt-2 block text-[19px] font-[800] tracking-[-0.03em]">{s.name}</span>
-              <span className="mt-2 block break-keep text-[15px] leading-[1.65] text-[#c9ced6]">{s.body}</span>
-            </li>
-          ))}
-        </ol>
-        <ul data-part className="mt-10 flex flex-wrap gap-x-8 gap-y-3" role="list">
+    <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white">
+      <div className={`${wrap} py-20 md:py-32`}>
+        <Head no="04" en="PROCESS" title="진행 방식" id="c-process" onBlue />
+        <div className="relative mt-12 md:mt-20">
+          {/* 원 다섯 개를 지나 흐르는 선과 그 위를 달리는 점(넓은 화면) */}
+          <svg aria-hidden viewBox="0 0 1000 200" preserveAspectRatio="none" className="absolute inset-x-0 top-0 hidden h-[200px] w-full md:block" fill="none">
+            <path className="gp-flow" d={flowPath} stroke="#fff" strokeOpacity=".7" strokeWidth="2" strokeDasharray="8 8" vectorEffect="non-scaling-stroke" />
+            <circle className="gp-flow-dot" r="7" fill="#ffd84d">
+              <animateMotion dur="7s" repeatCount="indefinite" path={flowPath} />
+            </circle>
+          </svg>
+          {/* 좁은 화면은 세로로 흐르는 선 */}
+          <span aria-hidden className="gp-flow-y absolute bottom-10 left-[43px] top-2 w-0.5 md:hidden" />
+          <ol className="relative grid gap-9 md:grid-cols-5 md:gap-4" role="list">
+            {steps.map((s, i) => (
+              <li key={s.name} data-part className={`flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${i % 2 ? "md:pt-[60px]" : ""}`}>
+                <span className="grid h-[88px] w-[88px] shrink-0 place-items-center rounded-full bg-white text-[#1f5fe0] shadow-[0_10px_30px_rgba(8,26,74,.35)] md:h-[140px] md:w-[140px]">
+                  <span>
+                    <span className="block text-center text-[11px] font-bold tracking-[0.14em] md:text-[13px]">STEP</span>
+                    <span className="block text-center text-[36px] font-[800] leading-none tabular-nums md:text-[56px]">{i + 1}</span>
+                  </span>
+                </span>
+                <span className="block pt-2 md:mt-6 md:pt-0">
+                  <span className="block text-[21px] font-[800] tracking-[-0.03em] md:text-[23px]">{s.name}</span>
+                  <span className="mt-2 block break-keep text-[16px] leading-[1.65] text-white md:px-1">{s.body}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <ul data-part className="mt-14 flex flex-wrap gap-2.5 md:mt-20 md:justify-center" role="list">
           {deliver.map((d) => (
-            <li key={d} className="flex items-center gap-2 text-[16px] font-bold md:text-[18px]">
-              <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#7aa7ff]" />
+            <li key={d} className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2.5 text-[15px] font-bold md:text-[17px]">
+              <Check aria-hidden size={17} strokeWidth={3} className="text-[#ffd84d]" />
               {d}
             </li>
           ))}
@@ -342,21 +323,23 @@ function Process() {
 
 function Faq() {
   return (
-    <section id="faq" aria-labelledby="c-faq" className={`${wrap} scroll-mt-20 py-16 md:py-28`}>
-      <p data-part className={eyebrow}>FAQ</p>
-      <h2 data-part id="c-faq" className={`${h2c} mt-3`}>
-        자주 묻는 질문
-      </h2>
-      <div className="mt-10 border-t-2 border-[#15171c] md:mt-14">
+    <section id="faq" aria-labelledby="c-faq" className={`${wrap} grid scroll-mt-20 gap-10 py-20 md:py-32 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16`}>
+      <div>
+        <Head no="05" en="FAQ" title="자주 묻는 질문" id="c-faq" />
+        <p data-part className="mt-6 max-w-[380px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+          여기에 없는 내용은 아래 문의에 남겨 주세요. 확인 후 답변드립니다.
+        </p>
+      </div>
+      <div className="space-y-3">
         {faqs.map((f) => (
-          <details data-part key={f.q} className="group border-b border-[#d9dee5]">
-            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-5 text-[17px] font-[800] tracking-[-0.02em] md:text-[20px] [&::-webkit-details-marker]:hidden">
+          <details key={f.q} data-part className="group rounded-[20px] border border-white/12 bg-[#121722] px-5 open:border-[#7aa7ff]/50 md:px-7">
+            <summary className="flex min-h-[68px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-[17px] font-[800] tracking-[-0.02em] md:text-[20px] [&::-webkit-details-marker]:hidden">
               {f.q}
-              <span aria-hidden className="text-[24px] font-bold text-[#6b7280] group-open:rotate-45 motion-safe:transition-transform">
-                +
+              <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white group-open:rotate-45 group-open:bg-[#256ef4] motion-safe:transition-transform">
+                <Plus size={18} strokeWidth={2.5} />
               </span>
             </summary>
-            <p className="break-keep pb-6 text-[16px] leading-[1.7] text-[#3d4450] md:text-[17px]">{f.a}</p>
+            <p className="break-keep pb-6 text-[16px] leading-[1.7] text-[#c9ced6] md:text-[17px]">{f.a}</p>
           </details>
         ))}
       </div>
@@ -366,19 +349,34 @@ function Faq() {
 
 function Apply() {
   return (
-    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 bg-[#0b0d12] text-white">
-      <div className={`${wrap} grid gap-10 py-16 md:py-28 lg:grid-cols-[1fr_560px] lg:gap-16`}>
+    <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b]">
+      <div className={`${wrap} grid gap-10 py-20 md:py-32 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
-          <p data-part className={eyebrow}>Contact</p>
-          <h2 data-part id="c-apply" className={`${h2c} mt-3`}>
-            프로젝트 문의
-          </h2>
-          <p className="mt-5 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-            만들거나 고칠 것을 한 줄만 남겨 주세요. 15분 통화로 범위를 듣고 금액과 일정을 먼저 안내합니다. 안내 전에는 비용이 생기지 않습니다.
+          <Head no="06" en="CONTACT" title="프로젝트 문의" id="c-apply" />
+          <p data-part className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+            만들거나 고칠 것을 한 줄만 남겨 주세요. 확인 후 금액과 일정을 먼저 안내합니다. 안내 전에는 비용이 생기지 않습니다.
           </p>
-          <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 725-40-01614(개인 일반과세)</p>
+          <ul data-part className="mt-9 space-y-3" role="list">
+            <li>
+              <a href={`mailto:${profile.email}`} className="inline-flex min-h-11 items-center gap-3 text-[17px] font-bold text-white hover:text-[#7aa7ff]">
+                <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white/10">
+                  <Mail size={18} />
+                </span>
+                {profile.email}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${profile.phone}`} className="inline-flex min-h-11 items-center gap-3 text-[17px] font-bold text-white hover:text-[#7aa7ff]">
+                <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white/10">
+                  <Phone size={18} />
+                </span>
+                {profile.phone}
+              </a>
+            </li>
+          </ul>
+          <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 {profile.bizNo}(개인 일반과세)</p>
         </div>
-        <div data-part className="min-w-0 rounded-[14px] bg-white p-5 text-[#15171c] md:p-8">
+        <div data-part className="min-w-0 rounded-[28px] bg-white p-5 text-[#15171c] md:p-9">
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
             <ContactForm compact />

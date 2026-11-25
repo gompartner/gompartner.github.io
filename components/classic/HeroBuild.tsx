@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { TownWindow } from "@/components/classic/TownWindow";
 import { BuildGate } from "@/components/classic/BuildGate";
@@ -12,6 +13,7 @@ import { BuildGate } from "@/components/classic/BuildGate";
 //  - 3D: 설계선 위로 마을이 나타나고 건물이 하나씩 내려앉는다(TownWindow, public/3d/island ?build=1)
 // 한 번 조립하면 새로고침 전까지 다시 조립하지 않고(data-built), 다시 보일 때 테두리 반짝과 광택만(data-shine).
 
+// 페이지 안 이동(#apply 등)은 next/link로 건다. 그냥 a 태그로 걸면 주소 기록에 Next가 모르는 칸이 생겨, 다른 페이지에 갔다가 뒤로 왔을 때 주소만 바뀌고 화면이 안 바뀐다
 type V = CSSProperties & Record<`--${string}`, string>;
 
 const css = `
@@ -145,15 +147,15 @@ export function HeroBuild() {
               ))}
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(0.9), "--r": "-14deg" } as V}>
+              <Link href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(0.9), "--r": "-14deg" } as V}>
                 프로젝트 문의
                 <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#0b0d12]">
                   <ArrowUpRight size={20} />
                 </span>
-              </a>
-              <a href="#portfolio" className="gp-pop inline-flex min-h-[56px] items-center rounded-full border border-white/30 px-7 text-[17px] font-bold text-white hover:border-white" style={{ ...at(0.98), "--r": "12deg" } as V}>
+              </Link>
+              <Link href="#portfolio" className="gp-pop inline-flex min-h-[56px] items-center rounded-full border border-white/30 px-7 text-[17px] font-bold text-white hover:border-white" style={{ ...at(0.98), "--r": "12deg" } as V}>
                 포트폴리오 보기
-              </a>
+              </Link>
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2.5" role="list">
               {trust.map((t, i) => (
