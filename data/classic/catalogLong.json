@@ -77,5 +77,605 @@
    "w": 390,
    "h": 2740
   }
+ },
+ "online-store": {
+  "pc": {
+   "src": "/images/catalog/long/online-store-pc.jpg",
+   "w": 1200,
+   "h": 2096
+  },
+  "m": {
+   "src": "/images/catalog/long/online-store-m.jpg",
+   "w": 390,
+   "h": 2938
+  }
+ },
+ "cert-lab": {
+  "pc": {
+   "src": "/images/catalog/long/cert-lab-pc.jpg",
+   "w": 1200,
+   "h": 2226
+  },
+  "m": {
+   "src": "/images/catalog/long/cert-lab-m.jpg",
+   "w": 390,
+   "h": 3210
+  }
+ },
+ "dental-homepage": {
+  "pc": {
+   "src": "/images/catalog/long/dental-homepage-pc.jpg",
+   "w": 1200,
+   "h": 3504
+  },
+  "m": {
+   "src": "/images/catalog/long/dental-homepage-m.jpg",
+   "w": 390,
+   "h": 4789
+  }
+ },
+ "clinic-homepage": {
+  "pc": {
+   "src": "/images/catalog/long/clinic-homepage-pc.jpg",
+   "w": 1200,
+   "h": 2543
+  },
+  "m": {
+   "src": "/images/catalog/long/clinic-homepage-m.jpg",
+   "w": 390,
+   "h": 4052
+  }
+ },
+ "pharmacy": {
+  "pc": {
+   "src": "/images/catalog/long/pharmacy-pc.jpg",
+   "w": 1200,
+   "h": 2171
+  },
+  "m": {
+   "src": "/images/catalog/long/pharmacy-m.jpg",
+   "w": 390,
+   "h": 3209
+  }
+ },
+ "law-firm": {
+  "pc": {
+   "src": "/images/catalog/long/law-firm-pc.jpg",
+   "w": 1200,
+   "h": 3225
+  },
+  "m": {
+   "src": "/images/catalog/long/law-firm-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
+ },
+ "tax-office": {
+  "pc": {
+   "src": "/images/catalog/long/tax-office-pc.jpg",
+   "w": 1200,
+   "h": 3342
+  },
+  "m": {
+   "src": "/images/catalog/long/tax-office-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
+ },
+ "real-estate": {
+  "pc": {
+   "src": "/images/catalog/long/real-estate-pc.jpg",
+   "w": 1200,
+   "h": 2215
+  },
+  "m": {
+   "src": "/images/catalog/long/real-estate-m.jpg",
+   "w": 390,
+   "h": 3734
+  }
+ },
+ "korean-restaurant": {
+  "pc": {
+   "src": "/images/catalog/long/korean-restaurant-pc.jpg",
+   "w": 1200,
+   "h": 2784
+  },
+  "m": {
+   "src": "/images/catalog/long/korean-restaurant-m.jpg",
+   "w": 390,
+   "h": 4781
+  }
+ },
+ "interior": {
+  "pc": {
+   "src": "/images/catalog/long/interior-pc.jpg",
+   "w": 1200,
+   "h": 1862
+  },
+  "m": {
+   "src": "/images/catalog/long/interior-m.jpg",
+   "w": 390,
+   "h": 2737
+  }
+ },
+ "academy": {
+  "pc": {
+   "src": "/images/catalog/long/academy-pc.jpg",
+   "w": 1200,
+   "h": 2158
+  },
+  "m": {
+   "src": "/images/catalog/long/academy-m.jpg",
+   "w": 390,
+   "h": 3911
+  }
+ },
+ "pilates-studio": {
+  "pc": {
+   "src": "/images/catalog/long/pilates-studio-pc.jpg",
+   "w": 1200,
+   "h": 2440
+  },
+  "m": {
+   "src": "/images/catalog/long/pilates-studio-m.jpg",
+   "w": 390,
+   "h": 3032
+  }
+ },
+ "hanok-cafe": {
+  "pc": {
+   "src": "/images/catalog/long/hanok-cafe-pc.jpg",
+   "w": 1200,
+   "h": 2603
+  },
+  "m": {
+   "src": "/images/catalog/long/hanok-cafe-m.jpg",
+   "w": 390,
+   "h": 4068
+  }
+ },
+ "roastery": {
+  "pc": {
+   "src": "/images/catalog/long/roastery-pc.jpg",
+   "w": 1200,
+   "h": 2442
+  },
+  "m": {
+   "src": "/images/catalog/long/roastery-m.jpg",
+   "w": 390,
+   "h": 3461
+  }
+ },
+ "hair-salon": {
+  "pc": {
+   "src": "/images/catalog/long/hair-salon-pc.jpg",
+   "w": 1200,
+   "h": 2556
+  },
+  "m": {
+   "src": "/images/catalog/long/hair-salon-m.jpg",
+   "w": 390,
+   "h": 3841
+  }
+ },
+ "optical": {
+  "pc": {
+   "src": "/images/catalog/long/optical-pc.jpg",
+   "w": 1200,
+   "h": 2314
+  },
+  "m": {
+   "src": "/images/catalog/long/optical-m.jpg",
+   "w": 390,
+   "h": 3764
+  }
+ },
+ "furniture-workshop": {
+  "pc": {
+   "src": "/images/catalog/long/furniture-workshop-pc.jpg",
+   "w": 1200,
+   "h": 2190
+  },
+  "m": {
+   "src": "/images/catalog/long/furniture-workshop-m.jpg",
+   "w": 390,
+   "h": 3479
+  }
+ },
+ "coworking": {
+  "pc": {
+   "src": "/images/catalog/long/coworking-pc.jpg",
+   "w": 1200,
+   "h": 2619
+  },
+  "m": {
+   "src": "/images/catalog/long/coworking-m.jpg",
+   "w": 390,
+   "h": 3494
+  }
+ },
+ "campsite": {
+  "pc": {
+   "src": "/images/catalog/long/campsite-pc.jpg",
+   "w": 1200,
+   "h": 2524
+  },
+  "m": {
+   "src": "/images/catalog/long/campsite-m.jpg",
+   "w": 390,
+   "h": 3500
+  }
+ },
+ "photo-studio": {
+  "pc": {
+   "src": "/images/catalog/long/photo-studio-pc.jpg",
+   "w": 1200,
+   "h": 2681
+  },
+  "m": {
+   "src": "/images/catalog/long/photo-studio-m.jpg",
+   "w": 390,
+   "h": 3424
+  }
+ },
+ "nail-shop": {
+  "pc": {
+   "src": "/images/catalog/long/nail-shop-pc.jpg",
+   "w": 1200,
+   "h": 2365
+  },
+  "m": {
+   "src": "/images/catalog/long/nail-shop-m.jpg",
+   "w": 390,
+   "h": 3196
+  }
+ },
+ "car-detailing": {
+  "pc": {
+   "src": "/images/catalog/long/car-detailing-pc.jpg",
+   "w": 1200,
+   "h": 2583
+  },
+  "m": {
+   "src": "/images/catalog/long/car-detailing-m.jpg",
+   "w": 390,
+   "h": 4020
+  }
+ },
+ "lighting-shop": {
+  "pc": {
+   "src": "/images/catalog/long/lighting-shop-pc.jpg",
+   "w": 1200,
+   "h": 2423
+  },
+  "m": {
+   "src": "/images/catalog/long/lighting-shop-m.jpg",
+   "w": 390,
+   "h": 3194
+  }
+ },
+ "liquor-shop": {
+  "pc": {
+   "src": "/images/catalog/long/liquor-shop-pc.jpg",
+   "w": 1200,
+   "h": 2468
+  },
+  "m": {
+   "src": "/images/catalog/long/liquor-shop-m.jpg",
+   "w": 390,
+   "h": 3147
+  }
+ },
+ "small-wedding": {
+  "pc": {
+   "src": "/images/catalog/long/small-wedding-pc.jpg",
+   "w": 1200,
+   "h": 2577
+  },
+  "m": {
+   "src": "/images/catalog/long/small-wedding-m.jpg",
+   "w": 390,
+   "h": 3494
+  }
+ },
+ "korean-medicine": {
+  "pc": {
+   "src": "/images/catalog/long/korean-medicine-pc.jpg",
+   "w": 1200,
+   "h": 2831
+  },
+  "m": {
+   "src": "/images/catalog/long/korean-medicine-m.jpg",
+   "w": 390,
+   "h": 4182
+  }
+ },
+ "orthopedics": {
+  "pc": {
+   "src": "/images/catalog/long/orthopedics-pc.jpg",
+   "w": 1200,
+   "h": 2438
+  },
+  "m": {
+   "src": "/images/catalog/long/orthopedics-m.jpg",
+   "w": 390,
+   "h": 4003
+  }
+ },
+ "eye-clinic": {
+  "pc": {
+   "src": "/images/catalog/long/eye-clinic-pc.jpg",
+   "w": 1200,
+   "h": 2725
+  },
+  "m": {
+   "src": "/images/catalog/long/eye-clinic-m.jpg",
+   "w": 390,
+   "h": 4024
+  }
+ },
+ "animal-hospital": {
+  "pc": {
+   "src": "/images/catalog/long/animal-hospital-pc.jpg",
+   "w": 1200,
+   "h": 2656
+  },
+  "m": {
+   "src": "/images/catalog/long/animal-hospital-m.jpg",
+   "w": 390,
+   "h": 3675
+  }
+ },
+ "nursing-hospital": {
+  "pc": {
+   "src": "/images/catalog/long/nursing-hospital-pc.jpg",
+   "w": 1200,
+   "h": 2332
+  },
+  "m": {
+   "src": "/images/catalog/long/nursing-hospital-m.jpg",
+   "w": 390,
+   "h": 3967
+  }
+ },
+ "labor-firm": {
+  "pc": {
+   "src": "/images/catalog/long/labor-firm-pc.jpg",
+   "w": 1200,
+   "h": 1929
+  },
+  "m": {
+   "src": "/images/catalog/long/labor-firm-m.jpg",
+   "w": 390,
+   "h": 3290
+  }
+ },
+ "scrivener": {
+  "pc": {
+   "src": "/images/catalog/long/scrivener-pc.jpg",
+   "w": 1200,
+   "h": 2479
+  },
+  "m": {
+   "src": "/images/catalog/long/scrivener-m.jpg",
+   "w": 390,
+   "h": 4302
+  }
+ },
+ "patent-office": {
+  "pc": {
+   "src": "/images/catalog/long/patent-office-pc.jpg",
+   "w": 1200,
+   "h": 2342
+  },
+  "m": {
+   "src": "/images/catalog/long/patent-office-m.jpg",
+   "w": 390,
+   "h": 4326
+  }
+ },
+ "family-law": {
+  "pc": {
+   "src": "/images/catalog/long/family-law-pc.jpg",
+   "w": 1200,
+   "h": 2333
+  },
+  "m": {
+   "src": "/images/catalog/long/family-law-m.jpg",
+   "w": 390,
+   "h": 3732
+  }
+ },
+ "visa-agent": {
+  "pc": {
+   "src": "/images/catalog/long/visa-agent-pc.jpg",
+   "w": 1200,
+   "h": 2487
+  },
+  "m": {
+   "src": "/images/catalog/long/visa-agent-m.jpg",
+   "w": 390,
+   "h": 4370
+  }
+ },
+ "architect-office": {
+  "pc": {
+   "src": "/images/catalog/long/architect-office-pc.jpg",
+   "w": 1200,
+   "h": 3255
+  },
+  "m": {
+   "src": "/images/catalog/long/architect-office-m.jpg",
+   "w": 390,
+   "h": 4436
+  }
+ },
+ "presale": {
+  "pc": {
+   "src": "/images/catalog/long/presale-pc.jpg",
+   "w": 1200,
+   "h": 3325
+  },
+  "m": {
+   "src": "/images/catalog/long/presale-m.jpg",
+   "w": 390,
+   "h": 4334
+  }
+ },
+ "saas-startup": {
+  "pc": {
+   "src": "/images/catalog/long/saas-startup-pc.jpg",
+   "w": 1200,
+   "h": 1958
+  },
+  "m": {
+   "src": "/images/catalog/long/saas-startup-m.jpg",
+   "w": 390,
+   "h": 3325
+  }
+ },
+ "logistics": {
+  "pc": {
+   "src": "/images/catalog/long/logistics-pc.jpg",
+   "w": 1200,
+   "h": 2518
+  },
+  "m": {
+   "src": "/images/catalog/long/logistics-m.jpg",
+   "w": 390,
+   "h": 3190
+  }
+ },
+ "food-oem": {
+  "pc": {
+   "src": "/images/catalog/long/food-oem-pc.jpg",
+   "w": 1200,
+   "h": 2402
+  },
+  "m": {
+   "src": "/images/catalog/long/food-oem-m.jpg",
+   "w": 390,
+   "h": 3612
+  }
+ },
+ "piano-academy": {
+  "pc": {
+   "src": "/images/catalog/long/piano-academy-pc.jpg",
+   "w": 1200,
+   "h": 2308
+  },
+  "m": {
+   "src": "/images/catalog/long/piano-academy-m.jpg",
+   "w": 390,
+   "h": 3813
+  }
+ },
+ "taekwondo": {
+  "pc": {
+   "src": "/images/catalog/long/taekwondo-pc.jpg",
+   "w": 1200,
+   "h": 1995
+  },
+  "m": {
+   "src": "/images/catalog/long/taekwondo-m.jpg",
+   "w": 390,
+   "h": 2810
+  }
+ },
+ "art-academy": {
+  "pc": {
+   "src": "/images/catalog/long/art-academy-pc.jpg",
+   "w": 1200,
+   "h": 2759
+  },
+  "m": {
+   "src": "/images/catalog/long/art-academy-m.jpg",
+   "w": 390,
+   "h": 3727
+  }
+ },
+ "english-talk": {
+  "pc": {
+   "src": "/images/catalog/long/english-talk-pc.jpg",
+   "w": 1200,
+   "h": 2600
+  },
+  "m": {
+   "src": "/images/catalog/long/english-talk-m.jpg",
+   "w": 390,
+   "h": 3593
+  }
+ },
+ "driving-school": {
+  "pc": {
+   "src": "/images/catalog/long/driving-school-pc.jpg",
+   "w": 1200,
+   "h": 2272
+  },
+  "m": {
+   "src": "/images/catalog/long/driving-school-m.jpg",
+   "w": 390,
+   "h": 3341
+  }
+ },
+ "reading-academy": {
+  "pc": {
+   "src": "/images/catalog/long/reading-academy-pc.jpg",
+   "w": 1200,
+   "h": 2158
+  },
+  "m": {
+   "src": "/images/catalog/long/reading-academy-m.jpg",
+   "w": 390,
+   "h": 3675
+  }
+ },
+ "landing-water-rental": {
+  "pc": {
+   "src": "/images/catalog/long/landing-water-rental-pc.jpg",
+   "w": 1200,
+   "h": 4120
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-water-rental-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
+ },
+ "landing-popup-store": {
+  "pc": {
+   "src": "/images/catalog/long/landing-popup-store-pc.jpg",
+   "w": 1200,
+   "h": 2997
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-popup-store-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
+ },
+ "landing-zine-fair": {
+  "pc": {
+   "src": "/images/catalog/long/landing-zine-fair-pc.jpg",
+   "w": 1200,
+   "h": 2836
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-zine-fair-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
+ },
+ "landing-leather-class": {
+  "pc": {
+   "src": "/images/catalog/long/landing-leather-class-pc.jpg",
+   "w": 1200,
+   "h": 3247
+  },
+  "m": {
+   "src": "/images/catalog/long/landing-leather-class-m.jpg",
+   "w": 390,
+   "h": 5064
+  }
  }
 }

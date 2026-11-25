@@ -23,6 +23,7 @@ const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public",
 const banned = /시안|샘플|데모|가상/;
 
 type P = (typeof demoProjects)[number];
+const LONGS = catalogLong as Record<string, { pc?: Long; m?: Long }>;
 
 function catOf(p: P) {
   if (p.category === "3D") return "3D 웹";
@@ -43,6 +44,10 @@ function itemOf(p: P): CatalogItem | null {
   // 앱, 키오스크 그림은 기기 여러 대를 한 장에 담은 것이라 휴대폰 화면을 따로 붙이지 않는다
   const m = is3d ? `/images/shelf/${p.id}.jpg` : device ? null : mobileShotOf(p);
   const side: Shot | undefined = m && exists(m) ? { src: m, frame: "phone", ratio: is3d ? "390/802" : "780/1472", alt: `${p.title} 휴대폰 화면` } : undefined;
+  // 페이지 전체 캡처가 있으면 붙인다(data/classic/catalogLong.json). 대표 화면은 창 안에서 저절로 내려가고, 나머지는 크게 보기에서 통째로 펴진다
+  const lg = LONGS[p.id];
+  if (lg?.pc && main.frame === "browser" && exists(lg.pc.src)) main.long = lg.pc;
+  if (lg?.m && side?.frame === "phone" && exists(lg.m.src)) side.long = lg.m;
   return { id: p.id, cat, title: p.title, thumb, main, side, features: p.features.filter((f) => !banned.test(f)) };
 }
 
@@ -58,7 +63,7 @@ export default function WorksPage() {
     const main: Shot = s.main && exists(s.main.src) ? { ...base.main, ...s.main } : base.main;
     const side: Shot | undefined = s.side && exists(s.side.src) ? { ...s.side, alt: `${base.title} ${s.side.frame === "screen" ? "키오스크" : "휴대폰"} 화면` } : base.side;
     // 페이지 전체 캡처가 있으면 붙인다(data/classic/catalogLong.json, 11-26)
-    const lg = (catalogLong as Record<string, { pc?: Long; m?: Long }>)[s.id];
+    const lg = LONGS[s.id];
     if (lg?.pc && main.frame === "browser" && exists(lg.pc.src)) main.long = lg.pc;
     if (lg?.m && side?.frame === "phone" && exists(lg.m.src)) side.long = lg.m;
     stories.push({ ...base, main, side, headline: s.headline, wantLabel: s.wantLabel, want: s.want, think: s.think, made: s.made });
