@@ -9,18 +9,11 @@ import { ThemeSwitch } from "@/components/classic/ThemeSwitch";
 import { cn } from "@/lib/utils";
 
 // 사이트 머리글. 11-26 다시 씀: 메인과 안쪽 판이 모두 같은 어두운 띠 하나를 쓴다.
-//  - 넓은 화면: 메인(/)은 페이지 안 칸으로 내려가는 메뉴, 그 밖의 페이지는 판끼리 오가는 메뉴. 오른쪽에 통합검색과 화면 색(다크, 화이트) 버튼
+//  - 넓은 화면: 어느 페이지에서나 같은 메뉴(Build, Care, Price, Catalog, Wiki, Contact). 오른쪽에 통합검색과 화면 색(다크, 화이트) 버튼
 //  - 좁은 화면: 통합검색과 햄버거 버튼. 햄버거를 누르면 화면을 덮는 메뉴가 열린다(11-26 사용자 "모바일 상단에 햄버거 메뉴로, 통합검색, 다크모드 화이트모드 선택")
 // 견적 버튼은 두지 않는다(11-25 사용자 "있어도 안 누르는 거면"). 문의는 Contact와 메인 맨 아래 신청서로.
 
-const HOME = [
-  { href: "#services", label: "Build" },
-  { href: "#products", label: "Run" },
-  { href: "#care", label: "Care" },
-  { href: "#process", label: "Process" },
-  { href: "#apply", label: "Contact" },
-];
-// 안쪽 판. 순서는 메인의 Build, Run, Care 이야기와 같게
+// 메뉴는 메인과 안쪽 페이지가 같다(11-26 사용자 "메인에 메뉴가 일부 없어": 메인은 랜딩이라 페이지 안 칸으로 가는 바로가기만 뒀었는데, 비용, 카탈로그, 위키로 갈 길이 없었다)
 const BOARDS = [
   { href: "/make", label: "Build", ko: "제작" },
   { href: "/maintenance", label: "Care", ko: "유지보수" },
@@ -68,7 +61,6 @@ const icon = "grid h-11 w-11 shrink-0 place-items-center rounded-full text-[#c9c
 export function ClassicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const home = pathname === "/";
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const dlg = useRef<HTMLDialogElement>(null);
@@ -108,7 +100,7 @@ export function ClassicHeader() {
   }, [open]);
   // 넓은 화면으로 바뀌면 열려 있던 메뉴를 닫는다
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
+    const mq = window.matchMedia("(min-width: 768px)");
     const on = () => mq.matches && setOpen(false);
     mq.addEventListener("change", on);
     return () => mq.removeEventListener("change", on);
@@ -120,8 +112,7 @@ export function ClassicHeader() {
     router.push(q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search");
     setQ("");
   };
-  // 좁은 화면 기준: 메인은 1024 아래, 안쪽 페이지는 768 아래에서 햄버거로 바뀐다(안쪽 페이지는 태블릿에서 메뉴 여섯 개가 들어간다)
-  const wide = home ? "lg" : "md";
+  // 768 아래에서 햄버거로 바뀐다(태블릿에는 메뉴 여섯 개가 들어간다)
 
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보)
@@ -134,8 +125,8 @@ export function ClassicHeader() {
             <span>곰파트너</span>
           </Link>
           <div className="flex items-center gap-0.5 md:gap-1">
-            <ul className={cn("items-center lg:gap-1", wide === "lg" ? "hidden lg:flex" : "hidden md:flex")} role="list">
-              {(home ? HOME : BOARDS).map((a) => (
+            <ul className={cn("items-center lg:gap-1", "hidden md:flex")} role="list">
+              {BOARDS.map((a) => (
                 <li key={a.href}>
                   {/* 페이지 안 이동(#)도 next/link로 건다. 그냥 a 태그는 다른 페이지에 갔다가 뒤로 오면 주소만 바뀌고 화면이 안 바뀐다 */}
                   <Link href={a.href} aria-current={pathname === a.href ? "page" : undefined} className="inline-flex h-11 items-center rounded-md px-2.5 text-[15px] font-bold text-[#c9ced6] hover:text-white aria-[current=page]:text-white lg:px-3 lg:text-[16px]">
@@ -147,8 +138,8 @@ export function ClassicHeader() {
             <Link href="/search" aria-label="통합검색" title="통합검색" aria-current={pathname === "/search" ? "page" : undefined} className={cn(icon, "aria-[current=page]:text-white")}>
               <Search size={20} aria-hidden />
             </Link>
-            <ThemeSwitch className={cn(icon, wide === "lg" ? "hidden lg:grid" : "hidden md:grid")} />
-            <button type="button" onClick={() => setOpen(true)} aria-label="메뉴 열기" aria-haspopup="dialog" aria-expanded={open} className={cn(icon, "text-white", wide === "lg" ? "lg:hidden" : "md:hidden")}>
+            <ThemeSwitch className={cn(icon, "hidden md:grid")} />
+            <button type="button" onClick={() => setOpen(true)} aria-label="메뉴 열기" aria-haspopup="dialog" aria-expanded={open} className={cn(icon, "text-white", "md:hidden")}>
               <Menu size={24} aria-hidden />
             </button>
           </div>
