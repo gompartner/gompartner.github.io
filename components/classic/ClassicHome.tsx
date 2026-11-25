@@ -4,6 +4,7 @@ import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Suspense } from "react";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { JobApply } from "@/components/classic/JobApply";
+import { HeroSwitch } from "@/components/classic/HeroSwitch";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 
 // 11-25 메인은 전문 개발사 홈페이지 형식의 한 페이지(사용자 "랜딩페이지로", "트렌드에 맞게", "전문 개발사 홈페이지").
@@ -63,7 +64,9 @@ const faqs = [
 export function ClassicHome() {
   return (
     <div className="bg-white text-[#15171c]">
-      <Hero />
+      <Suspense fallback={<HeroUs />}>
+        <HeroSwitch kr={<HeroKr />} jp={<HeroJp />} us={<HeroUs />} />
+      </Suspense>
       <Services />
       <Why />
       <Stack />
@@ -75,7 +78,7 @@ export function ClassicHome() {
   );
 }
 
-function Hero() {
+function HeroUs() {
   const strip = [...works, ...works];
   return (
     // 11-25 미국 개발사 홈페이지 흐름: 어두운 첫 화면, 결과 중심 한 줄, 통화 상담 버튼, 움직이는 결과물 화면
@@ -111,6 +114,82 @@ function Hero() {
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+  );
+}
+
+// 한국 개발사형(똑똑한개발자 등): 밝은 배경, 왼쪽 정렬 큰 제목, 문의와 포트폴리오 버튼, 결과물 띠
+function HeroKr() {
+  const strip = [...works, ...works];
+  return (
+    <section aria-labelledby="c-hero" className="overflow-hidden bg-white">
+      <div className={`${wrap} pb-12 pt-14 md:pb-16 md:pt-24`}>
+        <p className={eyebrow}>Web, App Development</p>
+        <h1 id="c-hero" className="mt-4 break-keep text-[38px] font-[800] leading-[1.15] tracking-[-0.055em] md:text-[72px]">
+          웹과 앱을 만들고
+          <br />
+          운영까지 맡습니다
+        </h1>
+        <p className="mt-6 max-w-[640px] break-keep text-[17px] leading-[1.7] text-[#3d4450] md:text-[20px]">
+          홈페이지, 업무 시스템, 앱 개발과 유지보수. 개발 책임자가 상담부터 배포, 운영까지 직접 맡고 원본 소스와 인계 문서까지 드립니다.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-2.5 md:mt-10">
+          <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center rounded-md bg-[#256ef4] px-7 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
+            프로젝트 문의
+          </a>
+          <a href="#portfolio" className="inline-flex min-h-[54px] items-center rounded-md border-2 border-[#15171c] px-7 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
+            포트폴리오 보기
+          </a>
+        </div>
+      </div>
+      <div aria-hidden className="pb-14 md:pb-20">
+        <ul className="gp-marquee flex w-max gap-4 md:gap-6" role="list">
+          {strip.map((w, i) => (
+            <li key={`${w.href}-${i}`} className="relative aspect-[16/10] w-[260px] shrink-0 overflow-hidden rounded-[10px] border border-[#e6e9ee] shadow-[0_6px_18px_rgba(21,23,28,.08)] md:w-[400px]">
+              <Image src={w.img} alt="" fill sizes="400px" className="object-cover" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// 일본 기업 사이트형: 넓은 여백, 영어 큰 글자와 한국어 한 줄, 번호 붙은 소제목, 가는 선, 차분한 색, 오른쪽에 결과물 한 장
+function HeroJp() {
+  return (
+    <section aria-labelledby="c-hero" className="border-b border-[#d9dee5] bg-[#fafaf8]">
+      <div className={`${wrap} grid gap-12 pb-20 pt-20 md:pb-32 md:pt-32 lg:grid-cols-[1.1fr_1fr] lg:items-end`}>
+        <div>
+          <p className="flex items-center gap-3 text-[13px] font-bold tracking-[0.2em] text-[#5b6370]">
+            <span className="h-px w-10 bg-[#5b6370]" aria-hidden />
+            GOMPARTNER WEB DEVELOPMENT
+          </p>
+          <p aria-hidden className="mt-8 text-[56px] font-[300] leading-[1.02] tracking-[-0.04em] text-[#15171c] md:text-[104px]">
+            Build,
+            <br />
+            Run, Care.
+          </p>
+          <h1 id="c-hero" className="mt-8 break-keep text-[22px] font-[700] leading-[1.6] tracking-[-0.03em] md:text-[28px]">
+            만들고, 운영하고, 돌봅니다.
+          </h1>
+          <p className="mt-4 max-w-[520px] break-keep text-[16px] leading-[1.9] text-[#5b6370] md:text-[17px]">
+            홈페이지, 업무 시스템, 앱을 기획부터 오픈, 운영까지 개발 책임자가 직접 맡습니다. 오래 쓰는 시스템을 기준으로 설계합니다.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-6">
+            <a href="#apply" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[54px] items-center gap-3 border-b-2 border-[#15171c] pb-1 text-[17px] font-bold text-[#15171c] hover:text-[#256ef4] hover:border-[#256ef4]">
+              Contact <span className="text-[15px] font-normal">프로젝트 문의</span>
+            </a>
+            <a href="#portfolio" className="inline-flex min-h-[54px] items-center gap-3 border-b border-[#9aa3b0] pb-1 text-[17px] font-bold text-[#5b6370] hover:text-[#15171c]">
+              Works <span className="text-[15px] font-normal">포트폴리오</span>
+            </a>
+          </div>
+        </div>
+        <div className="relative aspect-[4/3] w-full overflow-hidden border border-[#d9dee5] bg-white">
+          <Image src={works[1].img} alt={`${works[1].name} 화면`} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <span className="absolute bottom-0 left-0 bg-[#15171c] px-3 py-1.5 text-[12px] font-bold tracking-[0.15em] text-white">01 / WORKS</span>
+        </div>
       </div>
     </section>
   );

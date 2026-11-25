@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { ThemeToggle } from "@/components/classic/ThemeToggle";
 import { cases } from "@/data/classic/cases";
@@ -71,6 +71,17 @@ export function ClassicHeader() {
   const pathname = usePathname();
   // 11-25 메인은 랜딩페이지: 머리글은 로고와 상담 신청만
   const landing = pathname === "/";
+  // 메인 첫 화면 비교(?v=kr|jp|us). 어두운 머리글은 미국형(us)만
+  // 머리글은 레이아웃에 있어 useSearchParams(정적 내보내기에서 Suspense 필요) 대신 주소를 직접 읽는다
+  const heroV = useSyncExternalStore(
+    (cb) => {
+      window.addEventListener("popstate", cb);
+      return () => window.removeEventListener("popstate", cb);
+    },
+    () => new URLSearchParams(window.location.search).get("v") ?? "us",
+    () => "us",
+  );
+  const dark = landing && heroV === "us";
   const [open, setOpen] = useState(false);
   // 손가락이나 펜으로 누르면 hover가 없으니, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다.
   // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
@@ -154,10 +165,10 @@ export function ClassicHeader() {
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보).
     // sticky는 문서 흐름 안에 있어 맨 위에서는 제목을 덮지 않는다. 본문 위 여백(pt-16, md:pt-[76px])도 같이 뺐다.
-    <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50", landing ? "bg-[#0b0d12]" : "bg-white")}>
-      <div className={cn("border-b", landing ? "border-white/10" : "border-[#e6e9ee]")}>
+    <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50", dark ? "bg-[#0b0d12]" : "bg-white")}>
+      <div className={cn("border-b", dark ? "border-white/10" : "border-[#e6e9ee]")}>
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-6 md:px-6">
-          <Link href="/" className={cn("flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em]", landing ? "text-white" : "text-[#15171c]")}>
+          <Link href="/" className={cn("flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em]", dark ? "text-white" : "text-[#15171c]")}>
             {/* 11-04 곰 얼굴 다시(11-01에 메뉴가 늘어 뺐던 것). 채널 프로필과 같은 곰 */}
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             곰파트너
@@ -254,7 +265,7 @@ export function ClassicHeader() {
                   { href: "#faq", label: "자주 묻는 질문" },
                 ].map((a) => (
                   <li key={a.href}>
-                    <a href={a.href} className="inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold text-[#c9ced6] hover:text-white">
+                    <a href={a.href} className={cn("inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold", dark ? "text-[#c9ced6] hover:text-white" : "text-[#3d4450] hover:text-[#256ef4]")}>
                       {a.label}
                     </a>
                   </li>
