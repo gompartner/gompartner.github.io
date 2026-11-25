@@ -18,13 +18,10 @@ type V = CSSProperties & Record<`--${string}`, string>;
 
 const css = `
 @property --gp-a { syntax: "<angle>"; inherits: false; initial-value: 180deg; }
-@keyframes gp-char {
-  0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) rotate(var(--r)); animation-timing-function: ease-out; }
-  40% { opacity: 1; transform: translate3d(calc(var(--x) * 0.78), calc(var(--y) * 0.78), 0) rotate(calc(var(--r) * 0.7)); animation-timing-function: cubic-bezier(0.85, 0, 1, 0.45); }
-  78% { opacity: 1; transform: translate3d(0px, 0px, 0) rotate(0deg); animation-timing-function: ease-out; }
-  87% { transform: translate3d(calc(var(--x) * -0.04), calc(var(--y) * -0.04), 0) rotate(0deg); }
-  100% { opacity: 1; transform: translate3d(0px, 0px, 0) rotate(0deg); }
-}
+/* 11-25 밤 사용자가 보여 준 참고 영상(빛 한 점 > 가는 빛줄기가 엇갈려 그어짐 > 줄 사이에 면이 차오르며 글자가 완성 > 줄이 사라짐)을 따른다 */
+@keyframes gp-glint { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); } }
+@keyframes gp-ray { 0% { opacity: 1; stroke-dashoffset: 1; } 34% { opacity: 1; stroke-dashoffset: 0; } 78% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
+@keyframes gp-shard { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)); filter: brightness(2.6); } 55% { opacity: 1; transform: none; filter: brightness(2.2); } 100% { opacity: 1; transform: none; filter: brightness(1); } }
 @keyframes gp-word { from { opacity: 0; transform: translateY(0.7em); } to { opacity: 1; transform: none; } }
 @keyframes gp-pill { from { opacity: 0; clip-path: inset(0 50% 0 50% round 999px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 999px); } }
 @keyframes gp-pop { 0% { opacity: 0; transform: scale(0.3) rotate(var(--r, -12deg)); } 70% { opacity: 1; transform: scale(1.06) rotate(0deg); } 100% { opacity: 1; transform: none; } }
@@ -44,7 +41,10 @@ const css = `
 @keyframes gp-scan { from { transform: translateX(-110%); } to { transform: translateX(220%); } }
 @keyframes gp-spark { 0%, 100% { box-shadow: 0 0 0 0 rgba(122, 167, 255, 0), inset 0 0 0 0 rgba(122, 167, 255, 0); } 35% { box-shadow: 0 0 22px 2px rgba(122, 167, 255, 0.7), inset 0 0 14px 0 rgba(122, 167, 255, 0.35); } }
 
-.gp-char { display: inline-block; animation: gp-char 0.55s linear both; animation-delay: var(--d); }
+.gp-glint { opacity: 0; animation: gp-glint 0.7s ease-out both; animation-delay: var(--d); }
+.gp-ray { opacity: 0; stroke-dasharray: 1; animation: gp-ray 1.9s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
+.gp-shard { animation: gp-shard 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d); }
+.gp-ice { background-image: linear-gradient(112deg, #ffffff 0%, #d5e4ff 30%, #8db4ff 52%, #e8f1ff 74%, #ffffff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .gp-word { display: inline-block; animation: gp-word 0.35s ease-out both; animation-delay: var(--d); }
 .gp-pill { animation: gp-pill 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-pop { animation: gp-pop 0.42s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d); }
@@ -68,12 +68,12 @@ const css = `
 /* 창이 화면에 들어오기 전에는 창 쪽 조립을 멈춰 둔다(휴대폰에서는 창이 아래에 있다) */
 [data-win]:not([data-win-on]) :is(.gp-body, .gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-fade, .gp-scan) { animation-play-state: paused; }
 /* 이미 조립했으면(새로고침 전) 조립 없이 완성된 화면 */
-[data-built] :is(.gp-body, .gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
+[data-built] :is(.gp-body, .gp-glint, .gp-ray, .gp-shard, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
 /* 다시 보일 때: 창틀이 반짝이고 광택이 한 번 훑는다 */
 [data-shine] .gp-frame::before { animation: gp-spark 1s ease-out both; }
 [data-built][data-shine] .gp-scan, [data-shine] .gp-scan { animation: gp-scan 0.7s ease-in-out 0.1s both; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.gp-body, .gp-char, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
+  :is(.gp-body, .gp-glint, .gp-ray, .gp-shard, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none !important; }
   [data-shine] .gp-frame::before { animation: none; }
 }
 `;
@@ -85,7 +85,7 @@ const at = (d: number): V => ({ "--d": `${d.toFixed(3)}s` });
 // 11-25 밤 사용자 결정: 첫 문장은 일본 기업 사이트식으로 영어 큰 글자 "Build, Run, Care."와 한국어 한 줄.
 // 아래 칸도 이 세 낱말 순서(만듭니다 > 운영합니다 > 돌봅니다)를 따른다
 const lines = ["Build,", "Run, Care."];
-const ko = "만들고, 운영하고, 돌봅니다.";
+const ko = "만들고, 운영하고, 관리합니다.";
 const sub = "홈페이지, 업무 시스템, 앱을 만들고, 오픈한 뒤의 운영과 수정까지 맡습니다.";
 // 창틀에 붙는 서비스 이름표. 휘어 날아오는 출발점(x, y)과 기울기
 const chips = [
@@ -95,23 +95,15 @@ const chips = [
   { name: "유지보수", pos: "left-[36%] -bottom-4", x: "-60px", y: "220px", r: "36deg" },
 ];
 
-/** 글자마다 떨어져 있는 출발 자리. 황금각으로 돌려 사방에 두되 가깝게(자석처럼 끌려와 붙는다). 서버와 브라우저가 같은 값 */
-function scatter(i: number): V {
-  const a = (i * 137.5 * Math.PI) / 180;
-  const rad = 70 + (i % 4) * 34;
-  return {
-    "--x": `${Math.round(Math.cos(a) * rad)}px`,
-    "--y": `${Math.round(Math.sin(a) * rad * 0.8)}px`,
-    "--r": `${((i * 53) % 36) - 18}deg`,
-    "--d": `${(0.3 + i * 0.03).toFixed(3)}s`,
-  };
-}
-
-// 제목 글자에 차례 번호를 미리 매긴다
-const title = (() => {
-  let n = 0;
-  return lines.map((line) => line.split(" ").map((word) => [...word].map((ch) => ({ ch, i: n++ }))));
-})();
+// 큰 글자를 나누는 면(비스듬한 조각 다섯 장). 위쪽 x와 아래쪽 x(위쪽보다 18 왼쪽)로 자른다. 빛줄기도 이 경계를 따라 그어진다
+const CUT = [22, 41, 63, 82];
+const SLANT = 18;
+const shards = [-30, ...CUT, 130].slice(0, -1).map((x0, i, arr) => {
+  const x1 = i === arr.length - 1 ? 130 : arr[i + 1];
+  return `polygon(${x0}% 0%, ${x1}% 0%, ${x1 - SLANT}% 100%, ${x0 - SLANT}% 100%)`;
+});
+// 면이 나타나는 차례(가운데부터 양옆으로)와 미끄러져 들어오는 방향
+const shardOrder = [3, 1, 0, 2, 4];
 
 export function HeroBuild() {
   return (
@@ -136,38 +128,49 @@ export function HeroBuild() {
               <i aria-hidden className="h-2 w-2 rounded-full bg-[#7aa7ff]" />
               홈페이지, 업무 시스템, 앱 개발
             </p>
-            {/* 영어 큰 글자: 글자가 떨어져 있다가 자석처럼 붙는다. 읽는 제목(h1)은 그 아래 한국어 한 줄 */}
-            <p aria-hidden className="order-2 mt-7 text-[58px] font-[300] leading-[1.02] tracking-[-0.045em] md:text-[96px] xl:text-[108px]">
-              {title.map((words, li) => (
-                <span key={li} className="block">
-                  {words.map((chars, wi) => (
-                    <span key={wi} className="inline-block whitespace-nowrap">
-                      {wi > 0 && <span className="inline-block w-[0.24em]" />}
-                      {chars.map(({ ch, i }) => (
-                        <span key={i} className="gp-char" style={scatter(i)}>
-                          {ch}
-                        </span>
-                      ))}
+            {/* 영어 큰 글자: 빛줄기가 그어지고 그 사이 면이 차오르며 글자가 된다. 읽는 제목(h1)은 그 아래 한국어 한 줄 */}
+            <div aria-hidden className="relative order-2 mt-7 w-fit text-[52px] font-[800] leading-[1.02] tracking-[-0.055em] min-[380px]:text-[58px] md:text-[92px] xl:text-[104px]">
+              {/* 자리만 잡는 보이지 않는 글자. 빛줄기 그림(svg)은 글자 상자보다 위아래로 45%씩 길어, 경계선을 그만큼 늘려 긋는다 */}
+              <span className="invisible block whitespace-nowrap">
+                {lines.map((l) => (
+                  <span key={l} className="block">
+                    {l}
+                  </span>
+                ))}
+              </span>
+              {shards.map((clip, i) => (
+                <span key={i} className="gp-shard gp-ice absolute inset-0 block whitespace-nowrap" style={{ clipPath: clip, ...at(0.7 + shardOrder.indexOf(i) * 0.14), "--sx": `${i % 2 ? 16 : -16}px`, "--sy": `${i % 2 ? -44 : 44}px` } as V}>
+                  {lines.map((l) => (
+                    <span key={l} className="block">
+                      {l}
                     </span>
                   ))}
                 </span>
               ))}
-            </p>
-            <h1 id="c-hero" className="gp-fade order-3 mt-7 break-keep text-[22px] font-[700] leading-[1.5] tracking-[-0.03em] md:text-[28px]" style={at(0.8)}>
+              <span className="gp-glint pointer-events-none absolute left-1/2 top-1/2 h-24 w-24 rounded-full bg-[radial-gradient(closest-side,#fff,rgba(160,195,255,.5)_40%,transparent)]" style={at(0.05)} />
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="pointer-events-none absolute -inset-y-[45%] inset-x-0 h-[190%] w-full overflow-visible" fill="none" stroke="#fff" strokeLinecap="round" style={{ filter: "drop-shadow(0 0 4px rgba(160,195,255,.9))" }}>
+                {CUT.map((x, i) => (
+                  <path key={x} className="gp-ray" pathLength={1} vectorEffect="non-scaling-stroke" strokeWidth="1.2" d={`M${(x + SLANT * 0.45).toFixed(1)} 0 L${(x - SLANT * 1.45).toFixed(1)} 100`} style={at(0.12 + i * 0.12)} />
+                ))}
+                <path className="gp-ray" pathLength={1} vectorEffect="non-scaling-stroke" strokeWidth="1" d="M-12 78 L112 30" style={at(0.3)} />
+                <path className="gp-ray" pathLength={1} vectorEffect="non-scaling-stroke" strokeWidth="1" d="M8 12 L118 70" style={at(0.5)} />
+              </svg>
+            </div>
+            <h1 id="c-hero" className="gp-fade order-3 mt-7 break-keep text-[22px] font-[700] leading-[1.5] tracking-[-0.03em] md:text-[28px]" style={at(1.5)}>
               {ko}
             </h1>
-            <span aria-hidden className="gp-line order-3 mt-5 hidden h-px w-16 bg-[#7aa7ff] lg:block" style={at(0.9)} />
+            <span aria-hidden className="gp-line order-3 mt-5 hidden h-px w-16 bg-[#7aa7ff] lg:block" style={at(1.6)} />
             <p className="order-5 mt-9 max-w-[480px] break-keep text-[16px] leading-[1.8] text-[#aab2bf] md:text-[18px] lg:mt-5">
               {sub.split(" ").map((w, i) => (
                 <span key={i}>
-                  <span className="gp-word" style={at(0.7 + i * 0.015)}>
+                  <span className="gp-word" style={at(1.6 + i * 0.015)}>
                     {w}
                   </span>{" "}
                 </span>
               ))}
             </p>
             <div className="order-6 mt-9 flex flex-wrap gap-3">
-              <Link href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(0.9), "--r": "-14deg" } as V}>
+              <Link href="#apply" data-gtm-cta="classic_hero_contact" className="gp-pop inline-flex min-h-[56px] items-center gap-3 rounded-full bg-[#256ef4] py-2 pl-7 pr-2.5 text-[17px] font-bold text-white hover:bg-[#0b50d0]" style={{ ...at(1.8), "--r": "-14deg" } as V}>
                 무료 견적 받기
                 <span aria-hidden className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#0b0d12]">
                   <ArrowUpRight size={20} />

@@ -81,7 +81,7 @@ const steps = [
   { name: "견적", body: "범위, 일정, 비용을 견적서 한 장으로 확정합니다." },
   { name: "제작", body: "만드는 화면을 단계마다 보여 드리고 확인을 받습니다." },
   { name: "오픈", body: "도메인 연결과 검색 등록까지 마치고 엽니다." },
-  { name: "운영", body: "오픈한 뒤에도 떠나지 않고 계속 고치고 맡습니다." },
+  { name: "운영", body: "오픈한 뒤의 수정과 관리를 이어서 맡습니다." },
 ];
 // 원 다섯 개의 가운데를 지나는 물결 선(가로 1000 기준, 원 가운데 x는 100, 300, 500, 700, 900)
 const flowPath = "M100 70 C 200 70, 200 130, 300 130 S 400 70, 500 70 S 600 130, 700 130 S 800 70, 900 70";
@@ -205,7 +205,7 @@ function Why() {
     <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <Head no="03" en="CARE" title="돌봅니다" id="c-why" />
+          <Head no="03" en="CARE" title="관리합니다" id="c-why" />
           <p data-part className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
             이럴 때 맡기세요.
           </p>
