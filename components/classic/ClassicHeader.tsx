@@ -253,6 +253,7 @@ export function ClassicHeader() {
                   { href: "#products", label: "Run" },
                   { href: "#care", label: "Care" },
                   { href: "#process", label: "Process" },
+                  { href: "#apply", label: "Contact" },
                 ].map((a) => (
                   <li key={a.href}>
                     <Link href={a.href} className={cn("inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold", dark ? "text-[#c9ced6] hover:text-white" : "text-[#3d4450] hover:text-[#256ef4]")}>
@@ -292,8 +293,8 @@ export function ClassicHeader() {
               aria-current={pathname === "/contact" ? "page" : undefined}
               className={cn(
                 "h-11 items-center whitespace-nowrap rounded-md px-3.5 text-[15px] font-bold transition-colors lg:px-5 lg:text-[16px]",
-                // 메인의 휴대폰 화면은 아래쪽에 전화, 카카오톡 상담 바가 늘 떠 있어 머리글 버튼을 뺀다(11-25 사용자). 그 바는 md 미만에서만 나온다
-                landing ? "hidden md:inline-flex" : "inline-flex",
+                // 메인에서는 머리글 견적 버튼을 두지 않는다(11-25 사용자 "있어도 안 누르는 거면"). 견적은 메뉴의 Contact와 맨 아래 신청서로
+                landing ? "hidden" : "inline-flex",
                 pathname === "/contact" ? "bg-[#0b50d0] text-white" : "bg-[#256ef4] text-white hover:bg-[#0b50d0]"
               )}
             >
