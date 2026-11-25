@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/ai-readable-web";
 export const metadata: Metadata = pageMeta({
-  title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO, llms.txt, 에이전트 | 웹 지식",
+  title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO, llms.txt, 에이전트 | 위키",
   description: "웹사이트를 사람만 보는 시대에서 AI가 읽고 인용하고 대신 쓰는 시대로 넘어가고 있습니다. AX, GEO, 제로 클릭, llms.txt, MCP, NLWeb, 에이전트 커머스 같은 새 용어와 검색의 변화, 홈페이지가 준비할 것을 정리했습니다.",
   path: HREF,
   article: true,

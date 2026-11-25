@@ -1,4 +1,4 @@
-// 곰파트너 웹 지식(/knowledge, 11-21 아카이브에서 이름과 주소를 바꿈). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
+// 곰파트너 위키(/knowledge, 11-21 아카이브에서 이름과 주소를 바꿈). 11-21 사용자: 컨플루언스처럼 정돈된 문서 공간, 실적 대신 쌓인 기록을 보여 준다.
 // 틀은 문서 사이트형(왼쪽 분류 트리, 본문, 오른쪽 목차). 우리 색깔은 "인수 시 확인 사항", "이렇게 요청하세요", 같은 그림체 와이어프레임, 확인일.
 // 원래 주소가 있는 자료(인사이트 /insight, 점검표 /jaryo/<id>)는 주소를 그대로 두고 트리에서 잇는다.
 // 문서가 없는 분류(시안 작업 등)는 첫 문서가 생길 때 sections에 더한다. 빈 칸, 준비 중 표시는 두지 않는다.
@@ -295,7 +295,7 @@ export const counts = {
 /** 왼쪽 트리 마디 */
 export type TreeNode = { label: string; href?: string; count?: number; children?: TreeNode[] };
 
-/** 웹 지식 주제(11-21, 컨플루언스식 공간의 페이지 트리). 번호 없이, 문서마다 독립. 주제 페이지는 /knowledge/<id> */
+/** 위키 주제(11-21, 컨플루언스식 공간의 페이지 트리). 번호 없이, 문서마다 독립. 주제 페이지는 /knowledge/<id> */
 export type Topic = { id: string; label: string; desc: string; groups: { title: string; items: TreeNode[] }[] };
 
 const series = (name: string) => insights.filter((n) => n.series === name).sort((a, b) => b.date.localeCompare(a.date) || a.no - b.no).map((n) => ({ label: n.title, href: `/insight/${n.slug}` }));

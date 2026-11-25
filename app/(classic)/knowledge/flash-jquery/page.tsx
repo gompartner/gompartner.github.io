@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/flash-jquery";
 export const metadata: Metadata = pageMeta({
-  title: "플래시와 jQuery: 플래시가 사라진 자리, Flash와 jQuery 2015~2025 | 웹 지식",
+  title: "플래시와 jQuery: 플래시가 사라진 자리, Flash와 jQuery 2015~2025 | 위키",
   description: "Flash를 쓰는 웹사이트는 2015년 12.1%에서 2025년 1.0%로 줄었고, 2020년 말 지원이 끝났습니다. 2019년 국내 민간 500대 사이트 중 142곳이 아직 플래시를 썼습니다. 그 빈자리를 jQuery가 채운 흐름을 봅니다.",
   path: HREF,
   article: true,

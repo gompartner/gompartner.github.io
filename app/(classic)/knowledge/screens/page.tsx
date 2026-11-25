@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 
 // 화면 예시(11-21): 페이지 종류별 와이어프레임 모음. 그림은 용어 문서와 같은 원본, 누르면 그 용어 자리로.
 export const metadata: Metadata = pageMeta({
-  title: "화면 예시 | 웹 지식",
+  title: "화면 예시 | 위키",
   description: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 온라인 접수처럼 페이지 종류별로 와이어프레임을 모았습니다. 업체와 AI에 화면을 요청할 때 이름과 모양을 함께 볼 수 있습니다.",
   path: "/knowledge/screens",
 });
@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMeta({
 export default function ArchiveScreens() {
   const total = screenTypes.reduce((a, t) => a + t.groups.flatMap((id) => termGroups.find((g) => g.id === id)?.terms ?? []).filter((x) => termImages[x.id]).length, 0);
   return (
-    <ArchiveShell section="screens" active="/knowledge/screens" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/screens", label: "화면 예시" }]} toc={screenTypes.map((t) => ({ id: t.id, label: t.title }))}>
+    <ArchiveShell section="screens" active="/knowledge/screens" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/screens", label: "화면 예시" }]} toc={screenTypes.map((t) => ({ id: t.id, label: t.title }))}>
       <DocHead title="화면 예시" meta={[["페이지 종류", `${screenTypes.length}가지`], ["와이어프레임", `${total}장`]]} lead="만들 페이지의 종류부터 고르면, 그 페이지에 흔히 들어가는 부품을 그림으로 한 번에 볼 수 있습니다. 그림을 누르면 이름, 쓰임, 요청 문장이 있는 용어 문서로 갑니다." />
       {screenTypes.map((t) => {
         const gs = t.groups.map((id) => termGroups.find((g) => g.id === id)!).filter(Boolean);

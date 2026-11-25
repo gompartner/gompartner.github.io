@@ -3,10 +3,10 @@ import { WikiBoard, type WikiDoc } from "@/components/classic/wiki/WikiBoard";
 import { docUpdated, kindOf, kinds, topics, type TreeNode } from "@/data/classic/archive";
 import { pageMeta } from "@/lib/seo";
 
-// 11-26 웹 지식 첫 화면을 찾기 판으로 바꿈(예전에는 주제별 나무 목록과 안내 글). 문서 주소와 문서 화면은 그대로.
+// 11-26 위키 첫 화면을 찾기 판으로 바꿈(예전에는 주제별 나무 목록과 안내 글). 문서 주소와 문서 화면은 그대로.
 // 여기서 만드는 목록 한 장(docs)이 위키의 색인이다. 문서가 수백 개를 넘어 이 화면이 무거워지면 이 표를 DB로 옮기고 검색만 서버로 보낸다.
 export const metadata: Metadata = pageMeta({
-  title: "웹 지식",
+  title: "위키",
   description: "홈페이지를 기획하고, 만들고, 넘겨받아 운영하는 데 필요한 문서를 낱말로 찾거나 주제와 종류로 걸러 볼 수 있습니다.",
   path: "/knowledge",
 });

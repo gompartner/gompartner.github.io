@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/company-homepage";
 export const metadata: Metadata = pageMeta({
-  title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지 | 웹 지식",
+  title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지 | 위키",
   description: "기업 홈페이지는 회사 소개서를 옮긴 화면에서 플래시 첫 화면, 휴대폰용 m. 사이트, 반응형을 거쳐 빌더와 CMS로 만드는 일이 많아졌습니다. 그 사이 개인정보 보호법, 웹 접근성 의무가 생겨 만들고 끝나는 일이 관리하는 일로 바뀌었습니다.",
   path: HREF,
   article: true,

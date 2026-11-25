@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/page-weight";
 export const metadata: Metadata = pageMeta({
-  title: "페이지 무게와 속도: 홈페이지는 얼마나 무거워졌나, 페이지 무게 2011~2026 | 웹 지식",
+  title: "페이지 무게와 속도: 홈페이지는 얼마나 무거워졌나, 페이지 무게 2011~2026 | 위키",
   description: "웹 페이지 한 장의 용량 중앙값은 PC 기준 2011년 484KB에서 2026년 2,950KB로 6배, 모바일은 2012년 294KB에서 2,593KB로 9배 늘었습니다.",
   path: HREF,
   article: true,

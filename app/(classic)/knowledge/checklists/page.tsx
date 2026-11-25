@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 
 // 점검표. 점검표 상세(/jaryo/<id>) 주소는 그대로. 11-22 무료 도구는 내리고 사이트 지킴이로 잇는다. 인스타 '자료' DM으로 들어오는 /jaryo 는 여기로 넘긴다.
 export const metadata: Metadata = pageMeta({
-  title: "점검표와 기록표 | 웹 지식",
+  title: "점검표와 기록표 | 위키",
   description: "홈페이지 견적 질문지, 넘겨받은 날 기록표, 매달 점검표를 휴대폰으로 보고 PDF로 내려받습니다.",
   path: "/knowledge/checklists",
   image: { src: "/og/jaryo.jpg", alt: "곰파트너 점검표와 기록표" },
@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 
 export default function ArchiveChecklists() {
   return (
-    <ArchiveShell section="checklists" active="/knowledge/checklists" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/checklists", label: "점검표와 기록표" }]} toc={[{ id: "sheets", label: "점검표와 기록표" }, { id: "watch", label: "사이트 감시" }]}>
+    <ArchiveShell section="checklists" active="/knowledge/checklists" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/checklists", label: "점검표와 기록표" }]} toc={[{ id: "sheets", label: "점검표와 기록표" }, { id: "watch", label: "사이트 감시" }]}>
       <DocHead title="점검표와 기록표" meta={[["점검표", `${jaryo.length}종`]]} lead="휴대폰으로 열어 보고 PDF로 내려받을 수 있습니다." />
       <h2 id="sheets" className={docH2}>점검표와 기록표</h2>
       <ul role="list" className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

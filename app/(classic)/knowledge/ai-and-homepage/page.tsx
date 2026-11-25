@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/ai-and-homepage";
 export const metadata: Metadata = pageMeta({
-  title: "AI 도구와 홈페이지: 산업 변화, 보안, 개인정보 유출 사례, 앞으로 | 웹 지식",
+  title: "AI 도구와 홈페이지: 산업 변화, 보안, 개인정보 유출 사례, 앞으로 | 위키",
   description: "AI 도구로 홈페이지와 서비스를 만드는 비용이 크게 내려갔고, 사고는 새로운 공격보다 접근 설정과 키 관리에서 났습니다. 2025~2026년 산업 변화와 유출 사례, 개정 개인정보 보호법, 구글 2027 보안 전망을 함께 정리했습니다.",
   path: HREF,
   article: true,

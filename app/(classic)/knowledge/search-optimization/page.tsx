@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/search-optimization";
 export const metadata: Metadata = pageMeta({
-  title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지 | 웹 지식",
+  title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지 | 위키",
   description: "SEO 이전에는 사람이 사이트를 분류해 올리는 디렉터리 등록이 있었습니다. 메타 키워드, 링크, 품질과 경험을 거쳐 지금은 AI 답에 인용되는 GEO로 옮겨 가고 있습니다. 구글과 네이버의 변화를 함께 정리했습니다.",
   path: HREF,
   article: true,

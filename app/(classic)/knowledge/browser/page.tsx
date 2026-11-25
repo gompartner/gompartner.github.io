@@ -10,7 +10,7 @@ import { pageMeta } from "@/lib/seo";
 
 // 트렌드 "같은 20년, 세 나라의 홈페이지" 1장(11-21). 숫자는 data/classic/trendData.ts(StatCounter), 법과 지원 종료일은 아래 출처.
 export const metadata: Metadata = pageMeta({
-  title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025 | 웹 지식",
+  title: "브라우저 호환: 한국만 IE를 오래 못 떠난 이유, 한국 일본 미국 2009~2025 | 위키",
   description: "PC 브라우저 중 IE 비율은 2015년 미국 28%, 일본 41%, 한국 68%였습니다. 공인인증서와 ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료까지 차트와 함께 정리했습니다.",
   path: "/knowledge/browser",
   article: true,
@@ -23,7 +23,7 @@ export default function TrendKoreaIe() {
     <ArchiveShell
       section="tech"
       active="/knowledge/browser"
-      crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/dev", label: "개발" }, { href: "/knowledge/browser", label: "브라우저 호환" }]}
+      crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/dev", label: "개발" }, { href: "/knowledge/browser", label: "브라우저 호환" }]}
       toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
       article={{ title: "브라우저 호환", description: "2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다.", modified: TREND_CHECKED }}
     >

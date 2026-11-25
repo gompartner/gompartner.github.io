@@ -38,7 +38,7 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
       section="checklists"
       active={`/jaryo/${it.id}`}
       crumbs={[
-        { href: "/knowledge", label: "웹 지식" },
+        { href: "/knowledge", label: "위키" },
         { href: "/knowledge/checklists", label: "점검표와 기록표" },
         { href: `/jaryo/${it.id}`, label: it.title },
       ]}

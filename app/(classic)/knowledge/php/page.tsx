@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/php";
 export const metadata: Metadata = pageMeta({
-  title: "PHP 버전과 유지보수: PHP 5에서 8까지, 유지보수가 바뀐 10년 | 웹 지식",
+  title: "PHP 버전과 유지보수: PHP 5에서 8까지, 유지보수가 바뀐 10년 | 위키",
   description: "PHP를 쓰는 사이트 중 PHP 5는 2015년 98.2%에서 2026년 9.3%로 줄었고 PHP 8은 54.8%가 됐습니다. 버전마다 공식 지원 종료일이 있어 유지보수가 '고칠 때 부르는 일'에서 '정해진 날짜에 맞춰 올리는 일'로 바뀌었습니다.",
   path: HREF,
   article: true,

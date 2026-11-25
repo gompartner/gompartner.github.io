@@ -54,7 +54,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
       />
       <LdScript
         data={breadcrumbLd([
-          { name: "웹 지식", path: "/knowledge" },
+          { name: "위키", path: "/knowledge" },
           { name: "운영 노트", path: "/knowledge/notes" },
           { name: n.title, path: `/insight/${slug}` },
         ])}
@@ -63,7 +63,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
         section="notes"
         active={`/insight/${slug}`}
         crumbs={[
-          { href: "/knowledge", label: "웹 지식" },
+          { href: "/knowledge", label: "위키" },
           { href: "/knowledge/notes", label: "운영 노트" },
           { href: `/insight/${slug}`, label: n.title },
         ]}

@@ -5,14 +5,14 @@ import { NavLink as Link } from "@/components/classic/NavLink";
 import { ArrowUpRight } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
 
-const ORDER: SearchKind[] = ["서비스", "포트폴리오", "웹 지식", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
+export const ORDER: SearchKind[] = ["서비스", "카탈로그", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {
   // 같은 주소와 제목이 두 번 들어온 결과는 한 번만 보여 준다(내린 페이지들이 /make, /maintenance 하나로 모이며 겹쳤다)
   const seen = new Set<string>();
   const uniq = items.filter((i) => !seen.has(`${i.href}|${i.title}`) && seen.add(`${i.href}|${i.title}`));
-  const groups = grouped ? ORDER.map((k) => ({ k, list: uniq.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "포트폴리오" as SearchKind, list: uniq }];
+  const groups = grouped ? ORDER.map((k) => ({ k, list: uniq.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "카탈로그" as SearchKind, list: uniq }];
   return (
     <div className="space-y-12">
       {groups.map((g) => (
@@ -22,7 +22,7 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
               {g.k} <span className="text-[15px] font-bold tabular-nums text-[#5b6370]">{g.list.length}건</span>
             </h2>
           ) : null}
-          {g.k === "포트폴리오" ? (
+          {g.k === "카탈로그" ? (
             <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4" role="list">
               {g.list.map((i) => (
                 <li key={`${i.href}-${i.title}`} className="min-w-0">

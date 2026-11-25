@@ -10,7 +10,7 @@ import { designDocs, shortTitle, takeover, techDocs, termHref } from "@/data/cla
 import { datasets } from "@/data/classic/trendData";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "서비스" | "포트폴리오" | "웹 지식" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "서비스" | "카탈로그" | "위키" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -42,7 +42,7 @@ export function buildSearchIndex(): SearchItem[] {
     ...makeExtras.flatMap((m) => m.faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/make", hay: m.title }))).map((x) => ({ ...x, kind: "자주 묻는 질문" as const })),
   ];
   const catalogs: SearchItem[] = [...catalogProjects, ...demoProjects.filter(isProgram), ...threeProjects].map((p) => ({
-    kind: "포트폴리오",
+    kind: "카탈로그",
     title: plain(p.title),
     desc: plain(p.features.join(", ")),
     href: "/works",
@@ -68,12 +68,12 @@ export function buildSearchIndex(): SearchItem[] {
   const terms: SearchItem[] = termGroups.flatMap((g) => g.terms.map((t) => ({ kind: "용어" as const, title: t.name, desc: `${t.look}. ${t.alt}`, href: `${termHref(g)}#${t.id}`, hay: [t.alt, t.use, t.say, g.title, g.cat, g.sec].join(" ") })));
   // 11-21 아카이브 문서: 트렌드, 용어 묶음 문서, 데이터
   const archive: SearchItem[] = [
-    { kind: "웹 지식", title: "화면 예시: 페이지 종류별 와이어프레임", desc: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 접수, 검색, 관리자", href: "/knowledge/screens", hay: "화면 예시 와이어프레임 시안 레이아웃 페이지 구성 디자인" },
-    { kind: "웹 지식", title: "웹 지식 공간 홈", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수, 법과 규정", href: "/knowledge", hay: "웹 지식 아카이브 자료 자료실 문서 허브 위키" },
-    ...designDocs.map((d) => ({ kind: "웹 지식" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 디자인 화면 기기 한국 일본 미국 비교 차트 연도별 역사 변화" })),
-    ...techDocs.map((d) => ({ kind: "웹 지식" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 기술 한국 일본 미국 비교 차트 연도별 역사 변화" })),
-    ...termGroups.map((g) => ({ kind: "웹 지식" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
-    ...datasets.map((d) => ({ kind: "웹 지식" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
+    { kind: "위키", title: "화면 예시: 페이지 종류별 와이어프레임", desc: "첫 화면, 회사 소개, 게시판, 로그인, 결제, 예약, 접수, 검색, 관리자", href: "/knowledge/screens", hay: "화면 예시 와이어프레임 시안 레이아웃 페이지 구성 디자인" },
+    { kind: "위키", title: "위키 홈", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수, 법과 규정", href: "/knowledge", hay: "위키 아카이브 자료 자료실 문서 허브 위키" },
+    ...designDocs.map((d) => ({ kind: "위키" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 디자인 화면 기기 한국 일본 미국 비교 차트 연도별 역사 변화" })),
+    ...techDocs.map((d) => ({ kind: "위키" as const, title: d.title, desc: d.desc, href: d.href, hay: "트렌드 기술 한국 일본 미국 비교 차트 연도별 역사 변화" })),
+    ...termGroups.map((g) => ({ kind: "위키" as const, title: `용어 문서: ${shortTitle(g)}`, desc: g.terms.map((t) => t.name).join(", "), href: termHref(g), hay: [g.title, g.cat, g.sec, ...(takeover[g.id] ?? []).flatMap((x) => [x.b, x.t]), takeover[g.id] ? "인수 시 확인 사항" : ""].join(" ") })),
+    ...datasets.map((d) => ({ kind: "위키" as const, title: `데이터: ${d.title}`, desc: d.desc, href: `/knowledge/data#${d.id}`, hay: `데이터 통계 차트 CSV ${d.source.label}` })),
   ];
   return [...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
 }
@@ -81,7 +81,7 @@ export function buildSearchIndex(): SearchItem[] {
 /** 카탈로그 검색용(카탈로그 목록 페이지) */
 export function buildCatalogIndex(only?: { demoUrl: string }[]): SearchItem[] {
   const ids = new Set((only ?? [...catalogProjects, ...threeProjects]).map((p) => (p.demoUrl.startsWith("/work/") ? `/sample/${p.demoUrl.replace("/work/", "")}` : p.demoUrl)));
-  return buildSearchIndex().filter((i) => i.kind === "포트폴리오" && ids.has(i.href));
+  return buildSearchIndex().filter((i) => i.kind === "카탈로그" && ids.has(i.href));
 }
 
 /** 업종 탭 추천 검색어: 그 탭 카탈로그 기능 이름에 두 번 이상 나오는 낱말(눌렀을 때 결과가 있는 말만) */

@@ -10,7 +10,7 @@ import { LdScript } from "@/components/seo/JsonLd";
 import { TermSearch, type TermRow } from "@/components/classic/archive/TermSearch";
 
 export const metadata: Metadata = pageMeta({
-  title: "용어 | 웹 지식",
+  title: "용어 | 위키",
   description: `홈페이지 화면 부품, 디자인 용어, 운영 용어 ${counts.terms}개를 와이어프레임과 요청 문장으로 정리했습니다.`,
   path: "/knowledge/terms",
 });
@@ -28,7 +28,7 @@ const rows: TermRow[] = termGroups.flatMap((g) => g.terms.map((t) => ({ id: t.id
 
 export default function ArchiveTerms() {
   return (
-    <ArchiveShell section="terms" active="/knowledge/terms" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/terms", label: "용어" }]} toc={termSections.map((s, i) => ({ id: `sec-${i}`, label: s }))}>
+    <ArchiveShell section="terms" active="/knowledge/terms" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }]} toc={termSections.map((s, i) => ({ id: `sec-${i}`, label: s }))}>
       <DocHead
         title="용어"
         meta={[["묶음", `${counts.groups}개`], ["용어", `${counts.terms}개`]]}

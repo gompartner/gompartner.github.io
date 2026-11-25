@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/infra-cloud";
 export const metadata: Metadata = pageMeta({
-  title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지 | 웹 지식",
+  title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지 | 위키",
   description: "회사 전산실과 IDC, 웹호스팅에서 2006년 AWS 이후 클라우드로, 2020년대에는 비용과 규제로 일부를 프라이빗 클라우드로 되가져오는 흐름까지. 공공 클라우드 전환 목표는 2025년에서 2030년으로 바뀌었습니다.",
   path: HREF,
   article: true,

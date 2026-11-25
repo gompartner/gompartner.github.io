@@ -30,7 +30,7 @@ for (const p of ["homepage", "landing-page", "program", "app", "kiosk"]) lines.p
 lines.push("/maintenance/* /maintenance 301", "/works/* /works 301", "/sample/* /works 301", "/demo/* /works 301", "/work/* /works 301", "/knowledge/drafts /knowledge 301", "/history /story 301");
 // 11-25 영문 페이지(/en)를 내림(사용자: 영문 유입이 없음). 옛 주소는 메인으로
 lines.push("/en / 301", "/en/* / 301");
-// 11-21 아카이브(/archive)를 웹 지식(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
+// 11-21 아카이브(/archive)를 위키(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
 const moved = [
   ["/archive", "/knowledge"], ["/archive/trends", "/knowledge"], ["/archive/design", "/knowledge/design"], ["/archive/tech", "/knowledge/dev"], ["/knowledge/frontend", "/knowledge/dev"],
   ["/archive/design/styles", "/knowledge/design-styles"], ["/archive/design/mobile", "/knowledge/mobile-screen"], ["/archive/design/screen-size", "/knowledge/screen-size"],

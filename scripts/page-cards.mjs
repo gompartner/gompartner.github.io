@@ -16,7 +16,7 @@ const avatar = readFileSync(`${root}public/images/bear-avatar.webp`).toString("b
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 // 분류 이름표: 주소 앞부분으로 정한다
 const label = (p) =>
-  p.startsWith("/knowledge/terms/") ? "용어" : p.startsWith("/knowledge") ? "웹 지식" : p.startsWith("/tools/") ? "무료 도구" : p.startsWith("/notice") ? "공지사항" : p.startsWith("/maintenance") ? "유지보수" : p.startsWith("/works") ? "업종별 홈페이지" : "곰파트너";
+  p.startsWith("/knowledge/terms/") ? "용어" : p.startsWith("/knowledge") ? "위키" : p.startsWith("/tools/") ? "무료 도구" : p.startsWith("/notice") ? "공지사항" : p.startsWith("/maintenance") ? "유지보수" : p.startsWith("/works") ? "업종별 홈페이지" : "곰파트너";
 const page = (lb, t) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face { font-family: P; src: url(data:font/woff2;base64,${font}) format("woff2"); font-weight: 100 900; }
 * { margin: 0; box-sizing: border-box; }

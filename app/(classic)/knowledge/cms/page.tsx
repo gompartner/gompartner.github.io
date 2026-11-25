@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/cms";
 export const metadata: Metadata = pageMeta({
-  title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress | 웹 지식",
+  title: "만드는 도구(CMS) 비교: 한국은 카페24, 일본은 WordPress | 위키",
   description: "CMS는 개발자 없이 관리자 화면에서 글, 사진, 메뉴, 상품을 고치게 해 주는 홈페이지 관리 프로그램입니다. 만든 도구를 알아낸 사이트 중 한국어 사이트는 Cafe24 39.6%, WordPress 24.1%, 아임웹 16.7%, 일본어 사이트는 WordPress 82.8%입니다. 나라마다 다른 도구가 인수할 때 무엇을 남기는지 정리했습니다.",
   path: HREF,
   article: true,

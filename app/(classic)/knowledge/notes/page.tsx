@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 // 운영 노트 = 인사이트 글(주소 /insight/<slug>는 그대로). 묶음별 목록만 아카이브 틀로 보여 준다.
 export const metadata: Metadata = pageMeta({
-  title: "운영 노트 | 웹 지식",
+  title: "운영 노트 | 위키",
   description: "홈페이지 인수, 운영 관리, 보안 경보, 관리 비용을 실제로 해 온 순서대로 정리한 글입니다.",
   path: "/knowledge/notes",
 });
@@ -15,7 +15,7 @@ const series = [...new Set(insights.map((n) => n.series))].map((s) => ({ name: s
 
 export default function ArchiveNotes() {
   return (
-    <ArchiveShell section="notes" active="/knowledge/notes" crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/notes", label: "운영 노트" }]} toc={series.map((s) => ({ id: encodeURIComponent(s.name), label: s.name }))}>
+    <ArchiveShell section="notes" active="/knowledge/notes" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/notes", label: "운영 노트" }]} toc={series.map((s) => ({ id: encodeURIComponent(s.name), label: s.name }))}>
       <DocHead title="운영 노트" meta={[["주제", `${series.length}개`], ["글", `${insights.length}개`]]} lead="홈페이지를 넘겨받고 운영하며 겪는 일을 주제별로 정리했습니다. 글마다 따로 읽어도 되게 썼습니다." />
       {series.map((s) => (
         <section key={s.name} aria-labelledby={encodeURIComponent(s.name)}>

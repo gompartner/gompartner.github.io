@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/personal-homepage";
 export const metadata: Metadata = pageMeta({
-  title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지 | 웹 지식",
+  title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지 | 위키",
   description: "1990년대 말 한국과 일본의 개인 홈페이지는 무료 계정 위에 CGI 게시판, 방명록, 카운터를 달아 만들었습니다. 한국은 제로보드와 싸이월드 미니홈피, 네이버 블로그로, 일본은 KENT WEB의 무료 CGI와 블로그로 옮겨 갔습니다.",
   path: HREF,
   article: true,

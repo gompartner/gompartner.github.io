@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/https";
 export const metadata: Metadata = pageMeta({
-  title: "https와 인증서: 주소창 자물쇠가 기본이 되기까지, https 2015~2026 | 웹 지식",
+  title: "https와 인증서: 주소창 자물쇠가 기본이 되기까지, https 2015~2026 | 위키",
   description: "크롬에서 https로 열린 페이지는 2015년 일본 25%, 미국 46%에서 2026년 95%, 98%가 됐습니다. 2018년 7월 크롬 68의 '주의 요함' 표시 전후를 차트로 봅니다.",
   path: HREF,
   article: true,

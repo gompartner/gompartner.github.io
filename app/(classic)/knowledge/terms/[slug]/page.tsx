@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const g = groupBySlug((await params).slug);
   if (!g) return {};
   return pageMeta({
-    title: `${g.title} | 웹 지식`,
+    title: `${g.title} | 위키`,
     description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`,
     path: termHref(g),
     ...(termImages[g.terms[0].id] ? { image: { src: `/images/glossary/${g.terms[0].id}.webp`, alt: `${g.title} 와이어프레임`, width: termImages[g.terms[0].id][0], height: termImages[g.terms[0].id][1] } } : {}),
@@ -46,7 +46,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
     <ArchiveShell
       section="terms"
       active={termHref(g)}
-      crumbs={[{ href: "/knowledge", label: "웹 지식" }, { href: "/knowledge/terms", label: "용어" }, { href: termHref(g), label: shortTitle(g) }]}
+      crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }, { href: termHref(g), label: shortTitle(g) }]}
       toc={toc}
       article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: CHECKED, image: termImages[g.terms[0].id] ? `/images/glossary/${g.terms[0].id}.webp` : undefined }}
     >

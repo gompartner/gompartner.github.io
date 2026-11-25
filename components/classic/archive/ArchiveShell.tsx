@@ -8,7 +8,7 @@ import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageCardUrl } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
-// 웹 지식 문서 틀. 11-26 찾기 판(/knowledge, WikiBoard)과 한 화면으로 보이게 다시 짰다(사용자 "개판, 찾을 때 편의성이 없다").
+// 위키 문서 틀. 11-26 찾기 판(/knowledge, WikiBoard)과 한 화면으로 보이게 다시 짰다(사용자 "개판, 찾을 때 편의성이 없다").
 // 예전: 왼쪽에 주제 9개가 접힌 나무 목록, 그 위에 통합검색으로 가는 링크 하나. 문서에서 찾기 판으로 돌아가는 길과 옆 문서가 잘 안 보였다.
 // 지금:
 //  1) 맨 위 띠(판과 같은 바탕): "05 WIKI"(찾기 판으로), 지금 주제, 문서 검색 칸(통합검색 결과로 간다), 주제 버튼 한 줄(전체는 찾기 판).
@@ -82,7 +82,7 @@ function WikiBar({ topic, last }: { topic?: Topic; last?: Crumb }) {
                   <span>05</span>
                   <span aria-hidden className="h-px w-10 bg-current" />
                   WIKI
-                  <span className="sr-only">웹 지식</span>
+                  <span className="sr-only">위키</span>
                 </Link>
               </li>
               {topic ? (
@@ -100,7 +100,7 @@ function WikiBar({ topic, last }: { topic?: Topic; last?: Crumb }) {
               ) : null}
             </ol>
           </nav>
-          {/* 검색은 통합검색 결과 화면으로 보낸다(웹 지식, 운영 노트, 용어 묶음이 따로 나온다). keep-light: 흰 칸 안 글자색을 그대로 둔다 */}
+          {/* 검색은 통합검색 결과 화면으로 보낸다(위키, 운영 노트, 용어 묶음이 따로 나온다). keep-light: 흰 칸 안 글자색을 그대로 둔다 */}
           <form action="/search" method="get" role="search" aria-label="문서 검색" className="keep-light w-full sm:w-[340px]">
             <label className="flex h-12 items-center gap-2.5 rounded-full bg-white pl-4 pr-1 text-[#0b0d12]">
               <Search size={18} aria-hidden className="shrink-0 text-[#5b6370]" />
@@ -112,7 +112,7 @@ function WikiBar({ topic, last }: { topic?: Topic; last?: Crumb }) {
             </label>
           </form>
         </div>
-        <nav aria-label="웹 지식 주제" className="-mx-4 mt-5 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="위키 주제" className="-mx-4 mt-5 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
           <ul role="list" className="flex gap-2 md:flex-wrap">
             <li className="shrink-0">
               <Link href="/knowledge" className="inline-flex min-h-11 items-center rounded-full border border-white/20 px-4 text-[15px] font-bold text-[#c9ced6] hover:border-white/90 hover:text-white">
@@ -143,7 +143,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
   const topic = all.find((t) => t.id === section) ?? topicOf(active);
   const last = crumbs[crumbs.length - 1];
   const isDoc = active !== "/knowledge" && !all.some((t) => active === `/knowledge/${t.id}`);
-  const trail: Crumb[] = [{ href: "/knowledge", label: "웹 지식" }];
+  const trail: Crumb[] = [{ href: "/knowledge", label: "위키" }];
   if (topic && active !== `/knowledge/${topic.id}`) trail.push({ href: `/knowledge/${topic.id}`, label: topic.label });
   if (last && last.href !== "/knowledge") trail.push(last);
   // 왼쪽 목록은 문서 화면에서만(주제 화면은 본문이 곧 그 목록이다)
@@ -170,7 +170,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
         ) : null}
 
         <div id="archive-main" className={`min-w-0 pb-20 pt-6 md:pt-8 ${rail ? "lg:pl-10" : ""} ${hasToc ? "xl:pr-8" : ""}`}>
-          {/* 11-22 웹 지식 문서는 모두 검색엔진에 위치(BreadcrumbList), 글(Article)로 알린다 */}
+          {/* 11-22 위키 문서는 모두 검색엔진에 위치(BreadcrumbList), 글(Article)로 알린다 */}
           <LdScript data={breadcrumbLd(trail.map((c) => ({ name: c.label, path: c.href })))} />
           {article ? (
             <LdScript data={{ "@context": "https://schema.org", "@type": "Article", headline: article.title, description: article.description, datePublished: article.published ?? "2026-11-21", dateModified: article.modified, author: { "@id": ORG_ID }, publisher: { "@id": ORG_ID }, mainEntityOfPage: `${siteUrl}${active}`, inLanguage: "ko", ...((article.image ?? pageCardUrl(active)) ? { image: [`${siteUrl}${article.image ?? pageCardUrl(active)}`] } : {}) }} />

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-// 11-22 웹 지식 읽음 기록(LMS식). 방문자 브라우저에만 저장한다(서버로 보내지 않음).
+// 11-22 위키 읽음 기록(LMS식). 방문자 브라우저에만 저장한다(서버로 보내지 않음).
 // p: 가장 멀리 읽은 비율(0~100), y: 마지막 위치, v: 읽을 때 문서의 최종 수정일, d: 마지막으로 연 날
 export type ReadRec = { p: number; y: number; v?: string; d: string };
 const KEY = "gp-kn-read";

@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 // 11-22 웹어워드코리아 수상 기록으로 본 한국 웹 디자인 흐름(사용자가 i-award.or.kr 제공). 수상 표, 부문 신설, 주최 측 보도자료에서 확인한 것만. 해석은 곰파트너로 밝힌다
 const HREF = "/knowledge/web-award";
 export const metadata: Metadata = pageMeta({
-  title: "웹어워드 수상작으로 본 한국 웹 디자인 22년(2004~2025) | 웹 지식",
+  title: "웹어워드 수상작으로 본 한국 웹 디자인 22년(2004~2025) | 위키",
   description: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션과 플래시 시절에서 모바일웹, 웹표준, 반응형, 소셜, AI 서비스로 심사 축이 옮겨 간 흐름을 수상 기록으로 정리했습니다.",
   path: HREF,
   article: true,

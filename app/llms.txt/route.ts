@@ -54,9 +54,9 @@ ${landingPlans.map((p) => `- ${plain(p.title)}: ${plain(p.summary)}. ${plain(p.i
 
 금액과 일정은 상담 신청을 받은 뒤 견적서로 안내합니다.
 
-## 웹 지식
+## 위키
 
-홈페이지 화면 부품, 디자인 용어, 운영 용어를 와이어프레임과 요청 문장, 넘겨받을 때 확인할 것으로 정리한 문서 공간입니다. 자세히: [웹 지식](${url("/knowledge")}), [용어](${url("/knowledge/terms")}), [점검표](${url("/knowledge/checklists")}), [디자인](${url("/knowledge/design")}), [개발](${url("/knowledge/dev")}), [한국 웹 30년](${url("/knowledge/history")}), [운영과 유지보수](${url("/knowledge/ops")}), [데이터](${url("/knowledge/data")})
+홈페이지 화면 부품, 디자인 용어, 운영 용어를 와이어프레임과 요청 문장, 넘겨받을 때 확인할 것으로 정리한 문서 공간입니다. 자세히: [위키](${url("/knowledge")}), [용어](${url("/knowledge/terms")}), [점검표](${url("/knowledge/checklists")}), [디자인](${url("/knowledge/design")}), [개발](${url("/knowledge/dev")}), [한국 웹 30년](${url("/knowledge/history")}), [운영과 유지보수](${url("/knowledge/ops")}), [데이터](${url("/knowledge/data")})
 
 주제별 문서 목록:
 
@@ -64,7 +64,7 @@ ${topics().map((t) => `- [${plain(t.label)}](${url(`/knowledge/${t.id}`)}): ${pl
 - [화면 예시](${url("/knowledge/screens")}): 페이지 종류별 와이어프레임
 - [운영 노트](${url("/knowledge/notes")}): 실제 사례와 점검 글 목록
 
-웹 지식 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
+위키 문서(차트와 연표, 출처, 넘겨받을 때 확인 사항, 곰파트너 전망이 들어 있습니다):
 
 ${trendDocs.map((d) => `- [${plain(d.title)}](${url(d.href)}): ${plain(d.desc)}`).join("\n")}
 

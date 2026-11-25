@@ -5,7 +5,7 @@ import { TopicList, type TopicRow } from "@/components/classic/archive/TopicList
 import { docUpdated, kindOf, kinds, topics } from "@/data/classic/archive";
 import { pageMeta } from "@/lib/seo";
 
-// 웹 지식 주제 페이지(부모 페이지). 11-22 묶음 제목 대신 종류 태그와 태그 필터
+// 위키 주제 페이지(부모 페이지). 11-22 묶음 제목 대신 종류 태그와 태그 필터
 export function generateStaticParams() {
   return topics().map((t) => ({ topic: t.id }));
 }
@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ topic: st
   const id = (await params).topic;
   const t = topics().find((x) => x.id === id);
   if (!t) return {};
-  return pageMeta({ title: `${t.label} | 웹 지식`, description: `${t.desc}. 곰파트너 웹 지식의 ${t.label} 문서 모음입니다.`, path: `/knowledge/${t.id}` });
+  return pageMeta({ title: `${t.label} | 위키`, description: `${t.desc}. 곰파트너 위키의 ${t.label} 문서 모음입니다.`, path: `/knowledge/${t.id}` });
 }
 
 export default async function TopicPage({ params }: { params: Promise<{ topic: string }> }) {

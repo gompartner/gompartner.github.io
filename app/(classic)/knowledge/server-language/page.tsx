@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 
 const HREF = "/knowledge/server-language";
 export const metadata: Metadata = pageMeta({
-  title: "개발 언어: Perl CGI에서 Next.js까지 | 웹 지식",
+  title: "개발 언어: Perl CGI에서 Next.js까지 | 위키",
   description: "서버 언어를 알 수 있는 사이트 중 PHP는 2015년 80.6%에서 2026년 11월 68.0%로 줄었고, 서버에서 JavaScript(Node.js)를 쓰는 사이트는 0.1%에서 9.0%로 늘었습니다. 한국 .kr 사이트는 Java 비율이 8.0%로 전 세계 평균보다 높습니다.",
   path: HREF,
   article: true,
