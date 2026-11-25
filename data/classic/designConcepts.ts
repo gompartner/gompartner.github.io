@@ -9,7 +9,7 @@ export interface DesignConcept {
 
 export const designConcepts: Record<string, DesignConcept> = {
   "dental-homepage": {
-    keywords: ["미니멀", "가족형"],
+    keywords: ["미니멀", "카드형"],
     colors: [
       { role: "시안 A", name: "틸", hex: "#2A7F86" },
       { role: "시안 B", name: "블랙", hex: "#15171C" },
@@ -18,7 +18,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "online-store": {
-    keywords: ["상품 진열", "공방 이야기"],
+    keywords: ["모노톤", "미니멀"],
     colors: [
       { role: "시안 A", name: "오렌지", hex: "#A0623A" },
       { role: "시안 B", name: "브라운", hex: "#9A5A33" },
@@ -27,7 +27,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "pension": {
-    keywords: ["바다 전망", "숲속 독채"],
+    keywords: ["다크 풀스크린", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#173A63" },
       { role: "시안 B", name: "딥 그린", hex: "#2F5A3C" },
@@ -36,7 +36,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "company": {
-    keywords: ["가공 사양", "기업 소개"],
+    keywords: ["다크 풀스크린", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#10141C" },
       { role: "시안 B", name: "네이비", hex: "#1B2F5E" },
@@ -45,7 +45,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "cert-lab": {
-    keywords: ["인증 안내", "시험분석"],
+    keywords: ["미니멀", "카드형"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#16325C" },
       { role: "시안 B", name: "블루", hex: "#4B3AA8" },
@@ -54,7 +54,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "clinic-homepage": {
-    keywords: ["미니멀", "진료 안내형"],
+    keywords: ["미니멀", "파스텔"],
     colors: [
       { role: "시안 A", name: "그레이", hex: "#7D8F7A" },
       { role: "시안 B", name: "레드", hex: "#D14D6A" },
@@ -63,7 +63,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "pharmacy": {
-    keywords: ["동네 약국", "복약 상담"],
+    keywords: ["미니멀", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "딥 틸", hex: "#1D7A4E" },
       { role: "시안 B", name: "딥 틸", hex: "#0F6E6A" },
@@ -72,7 +72,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "law-firm": {
-    keywords: ["프리미엄", "상담형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#151A21" },
       { role: "시안 B", name: "블루", hex: "#1F4FD8" },
@@ -81,7 +81,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "tax-office": {
-    keywords: ["법인형", "사장님형"],
+    keywords: ["다크 풀스크린", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#0B1F3A" },
       { role: "시안 B", name: "틸", hex: "#0E9F6E" },
@@ -90,7 +90,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "real-estate": {
-    keywords: ["단지 전문형", "매물 상담형"],
+    keywords: ["미니멀", "볼드 컬러"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#1D3557" },
       { role: "시안 B", name: "블루", hex: "#2563EB" },
@@ -108,7 +108,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "korean-restaurant": {
-    keywords: ["노포 브랜드형", "동네 밥집형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "레드", hex: "#A4271C" },
       { role: "시안 B", name: "레드", hex: "#D8321F" },
@@ -117,7 +117,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "interior": {
-    keywords: ["갤러리형", "비용 안심형"],
+    keywords: ["풀스크린 비주얼", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#141414" },
       { role: "시안 B", name: "오렌지", hex: "#A5743F" },
@@ -126,7 +126,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "academy": {
-    keywords: ["입시형", "초중등형"],
+    keywords: ["볼드 컬러", "카드형"],
     colors: [
       { role: "시안 A", name: "블루", hex: "#1638D8" },
       { role: "시안 B", name: "틸", hex: "#13A06F" },
@@ -135,7 +135,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "pilates-studio": {
-    keywords: ["프리미엄", "체험 상담형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#141312" },
       { role: "시안 B", name: "그린", hex: "#4F7A64" },
@@ -144,7 +144,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "hanok-cafe": {
-    keywords: ["전통 찻집", "한옥 커피"],
+    keywords: ["다크 풀스크린", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "브라운", hex: "#9A6A2F" },
       { role: "시안 B", name: "브라운", hex: "#7A4A26" },
@@ -153,7 +153,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "bakery-cafe": {
-    keywords: ["동네 빵집", "베이커리 카페"],
+    keywords: ["미니멀", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "브라운", hex: "#8A4B22" },
       { role: "시안 B", name: "오렌지", hex: "#A77A3A" },
@@ -162,7 +162,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "roastery": {
-    keywords: ["원두 브랜드", "카페 매장"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "브라운", hex: "#7A4A2A" },
       { role: "시안 B", name: "브라운", hex: "#5B3A24" },
@@ -171,7 +171,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "hair-salon": {
-    keywords: ["프리미엄", "가격표형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "딥 틸", hex: "#1F3A32" },
       { role: "시안 B", name: "오렌지", hex: "#C2603E" },
@@ -180,7 +180,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "optical": {
-    keywords: ["누진 검안형", "셀렉트숍형"],
+    keywords: ["미니멀", "다크 풀스크린"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#1D3366" },
       { role: "시안 B", name: "오렌지", hex: "#B4782F" },
@@ -189,7 +189,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "furniture-workshop": {
-    keywords: ["맞춤 제작", "쇼룸 컬렉션"],
+    keywords: ["미니멀", "내추럴"],
     colors: [
       { role: "시안 A", name: "브라운", hex: "#6B4428" },
       { role: "시안 B", name: "그린", hex: "#5D6B3A" },
@@ -198,7 +198,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "coworking": {
-    keywords: ["코워킹", "비상주 사무실"],
+    keywords: ["에디토리얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "딥 틸", hex: "#1F6B47" },
       { role: "시안 B", name: "네이비", hex: "#1F3A6E" },
@@ -207,7 +207,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "campsite": {
-    keywords: ["오토캠핑", "글램핑"],
+    keywords: ["풀스크린 비주얼", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "딥 그린", hex: "#2C5A36" },
       { role: "시안 B", name: "브라운", hex: "#9A6B3C" },
@@ -216,7 +216,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "photo-studio": {
-    keywords: ["증명 프로필", "가족 기념"],
+    keywords: ["에디토리얼", "풀스크린 비주얼"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#111" },
       { role: "시안 B", name: "브라운", hex: "#8B5E3C" },
@@ -225,7 +225,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "nail-shop": {
-    keywords: ["컬러형", "1인 샵형"],
+    keywords: ["미니멀", "파스텔"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#1A1718" },
       { role: "시안 B", name: "레드", hex: "#C94F6D" },
@@ -234,7 +234,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "car-detailing": {
-    keywords: ["PPF 스튜디오", "동네 세차형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "레드", hex: "#D6322B" },
       { role: "시안 B", name: "블루", hex: "#0F6FD6" },
@@ -243,7 +243,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "lighting-shop": {
-    keywords: ["조명 쇼룸", "조명 교체"],
+    keywords: ["에디토리얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "오렌지", hex: "#C27A1A" },
       { role: "시안 B", name: "골드", hex: "#F2B705" },
@@ -252,7 +252,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "liquor-shop": {
-    keywords: ["와인 보틀샵", "전통주"],
+    keywords: ["다크 풀스크린", "미니멀"],
     colors: [
       { role: "시안 A", name: "딥 레드", hex: "#7A1F2B" },
       { role: "시안 B", name: "틸", hex: "#3F7D73" },
@@ -261,7 +261,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "small-wedding": {
-    keywords: ["가든 하우스", "레스토랑 예식"],
+    keywords: ["풀스크린 비주얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "딥 그린", hex: "#59663A" },
       { role: "시안 B", name: "레드", hex: "#B4606C" },
@@ -270,7 +270,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "korean-medicine": {
-    keywords: ["전통 브랜드", "증상 상담형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "브라운", hex: "#4A3020" },
       { role: "시안 B", name: "그린", hex: "#4E6B3A" },
@@ -279,7 +279,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "orthopedics": {
-    keywords: ["척추관절형", "동네 의원형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#13294B" },
       { role: "시안 B", name: "블루", hex: "#1F6FE5" },
@@ -288,7 +288,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "pediatrics": {
-    keywords: ["진료시간형", "검진 접종형"],
+    keywords: ["파스텔", "카드형"],
     colors: [
       { role: "시안 A", name: "블루", hex: "#1B8FD6" },
       { role: "시안 B", name: "틸", hex: "#1F9D62" },
@@ -297,7 +297,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "eye-clinic": {
-    keywords: ["수술센터형", "동네 안과형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#0D4A57" },
       { role: "시안 B", name: "블루", hex: "#1677C9" },
@@ -306,7 +306,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "animal-hospital": {
-    keywords: ["24시 진료", "주치의형"],
+    keywords: ["풀스크린 비주얼", "파스텔"],
     colors: [
       { role: "시안 A", name: "오렌지", hex: "#EC6B2D" },
       { role: "시안 B", name: "그린", hex: "#2E8B57" },
@@ -315,7 +315,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "nursing-hospital": {
-    keywords: ["재활 진료형", "생활 안내형"],
+    keywords: ["풀스크린 비주얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "딥 틸", hex: "#1F5E45" },
       { role: "시안 B", name: "오렌지", hex: "#C8682C" },
@@ -324,7 +324,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "labor-firm": {
-    keywords: ["기업 자문형", "근로자 상담형"],
+    keywords: ["다크 풀스크린", "카드형"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#0F2A5C" },
       { role: "시안 B", name: "딥 틸", hex: "#1D5C4A" },
@@ -333,7 +333,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "scrivener": {
-    keywords: ["등기 전문형", "회생 상담형"],
+    keywords: ["그리드형", "카드형"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#1C2F5A" },
       { role: "시안 B", name: "블루", hex: "#34488C" },
@@ -342,7 +342,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "patent-office": {
-    keywords: ["기술 특허형", "상표 출원형"],
+    keywords: ["미니멀", "파스텔"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#14407A" },
       { role: "시안 B", name: "오렌지", hex: "#D9541E" },
@@ -351,7 +351,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "family-law": {
-    keywords: ["이혼 절차형", "재산 양육형"],
+    keywords: ["다크 풀스크린", "파스텔"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#24304F" },
       { role: "시안 B", name: "버건디", hex: "#6B2F4A" },
@@ -360,7 +360,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "visa-agent": {
-    keywords: ["기업 고용형", "개인 체류형"],
+    keywords: ["풀스크린 비주얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#13265A" },
       { role: "시안 B", name: "딥 틸", hex: "#13795B" },
@@ -369,7 +369,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "architect-office": {
-    keywords: ["작품 갤러리", "주택 건축주형"],
+    keywords: ["풀스크린 비주얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#111" },
       { role: "시안 B", name: "브라운", hex: "#8A5A3C" },
@@ -378,7 +378,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "presale": {
-    keywords: ["분양 정보", "프리미엄"],
+    keywords: ["풀스크린 비주얼", "다크 풀스크린"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#173A6B" },
       { role: "시안 B", name: "오렌지", hex: "#A8874A" },
@@ -387,7 +387,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "saas-startup": {
-    keywords: ["제품 화면", "업종별 도입"],
+    keywords: ["카드형", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "블루", hex: "#1E3A8A" },
       { role: "시안 B", name: "오렌지", hex: "#EA580C" },
@@ -396,7 +396,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "logistics": {
-    keywords: ["풀필먼트", "기업 3PL"],
+    keywords: ["다크 풀스크린", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#12345E" },
       { role: "시안 B", name: "골드", hex: "#F5B301" },
@@ -405,7 +405,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "food-oem": {
-    keywords: ["소스 OEM", "건강식품"],
+    keywords: ["에디토리얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "딥 그린", hex: "#1F6F46" },
       { role: "시안 B", name: "블루", hex: "#4C3BB4" },
@@ -414,7 +414,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "piano-academy": {
-    keywords: ["어린이 피아노", "성인 취미"],
+    keywords: ["파스텔", "다크 풀스크린"],
     colors: [
       { role: "시안 A", name: "딥 틸", hex: "#147A72" },
       { role: "시안 B", name: "오렌지", hex: "#A8823E" },
@@ -423,7 +423,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "taekwondo": {
-    keywords: ["유초등부", "품새 심사"],
+    keywords: ["미니멀", "풀스크린 비주얼"],
     colors: [
       { role: "시안 A", name: "블루", hex: "#1747A6" },
       { role: "시안 B", name: "레드", hex: "#D92B2B" },
@@ -432,7 +432,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "art-academy": {
-    keywords: ["입시 미술", "어린이 미술"],
+    keywords: ["에디토리얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "오렌지", hex: "#E8571E" },
       { role: "시안 B", name: "퍼플", hex: "#6A3FC8" },
@@ -441,7 +441,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "english-talk": {
-    keywords: ["성인 회화", "어린이 영어"],
+    keywords: ["에디토리얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "레드", hex: "#E23B2E" },
       { role: "시안 B", name: "그린", hex: "#1F8A4C" },
@@ -450,7 +450,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "driving-school": {
-    keywords: ["면허 취득", "도로 연수"],
+    keywords: ["풀스크린 비주얼", "다크 풀스크린"],
     colors: [
       { role: "시안 A", name: "네이비", hex: "#142A5C" },
       { role: "시안 B", name: "블루", hex: "#1D5BD8" },
@@ -459,7 +459,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "reading-academy": {
-    keywords: ["초등 독서", "중고등 국어"],
+    keywords: ["미니멀", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "틸", hex: "#2A7A5C" },
       { role: "시안 B", name: "네이비", hex: "#233A7A" },
@@ -522,7 +522,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "flower-expo": {
-    keywords: ["축제 안내", "개화 현황"],
+    keywords: ["풀스크린 비주얼", "미니멀"],
     colors: [
       { role: "시안 A", name: "핑크", hex: "#D6336C" },
       { role: "시안 B", name: "레드", hex: "#D9412F" },
