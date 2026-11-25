@@ -194,19 +194,21 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
 
       <dialog ref={dlg} onClose={() => setOpen(null)} onClick={(e) => e.target === dlg.current && setOpen(null)} aria-labelledby="ct-dlg-title" className="m-auto w-[min(1180px,calc(100vw-24px))] max-w-none rounded-[24px] bg-[#121722] p-0 text-white backdrop:bg-black/80">
         {open && (
-          <div className="max-h-[calc(100dvh-24px)] overflow-y-auto p-5 md:p-8">
-            <div className="flex items-start justify-between gap-3">
+          // 제목과 닫기는 위에 붙여 두고 그림만 스크롤한다(11-26 사용자 "제목이 고정이 아니라서 모바일에서 닫기 불편")
+          <div className="flex max-h-[calc(100dvh-24px)] flex-col">
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/12 px-5 py-4 md:px-8 md:py-5">
               <div>
                 <p className="text-[14px] font-bold text-[#7aa7ff]">{open.cat}</p>
                 <h2 id="ct-dlg-title" className="mt-1 break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[28px]">
                   {open.title}
                 </h2>
               </div>
-              <button type="button" onClick={() => setOpen(null)} aria-label="닫기" className="-mr-2 -mt-2 grid h-11 w-11 shrink-0 place-items-center rounded-full text-white hover:bg-white/10">
+              <button type="button" onClick={() => setOpen(null)} aria-label="닫기" className="-mr-2 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-white hover:bg-white/10">
                 <X size={22} aria-hidden />
               </button>
             </div>
-            <div className={`mt-5 grid gap-5 md:mt-6 md:gap-7 ${open.main.long ? "items-start" : "items-end"} ${open.side ? "md:grid-cols-[minmax(0,1fr)_minmax(0,0.26fr)]" : ""}`}>
+            <div className="min-h-0 overflow-y-auto p-5 md:p-8">
+            <div className={`grid gap-5 md:gap-7 ${open.main.long ? "items-start" : "items-end"} ${open.side ? "md:grid-cols-[minmax(0,1fr)_minmax(0,0.26fr)]" : ""}`}>
               <Frame shot={open.main} sizes="(min-width: 768px) 860px, 94vw" full />
               {open.side && (
                 <span className="mx-auto block w-[62%] md:w-full">
@@ -223,6 +225,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
                 ))}
               </ul>
             )}
+            </div>
           </div>
         )}
       </dialog>
