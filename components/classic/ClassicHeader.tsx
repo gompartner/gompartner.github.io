@@ -145,7 +145,7 @@ export function ClassicHeader() {
                 통합검색
               </label>
               <input id="gp-menu-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="통합검색" autoComplete="off" enterKeyHint="search" className="h-full min-w-0 flex-1 bg-transparent px-3 text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
-              <button type="submit" className="h-9 shrink-0 rounded-full bg-white px-4 text-[14px] font-bold text-[#0b0d12]">
+              <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white">
                 검색
               </button>
             </form>

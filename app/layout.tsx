@@ -74,7 +74,7 @@ export const metadata: Metadata = {
 // (a)로 했다: 내 손이 닿지 않는 부품(검색 결과, 자료 미리보기, 차트)까지 한 번에 같은 색이 되고 11-22에 대비를 재 둔 색표다. 머리와 위키 틀만 판 모양으로 다시 썼고,
 // 흰 바탕이어야 하는 것(상담 신청서)은 메인처럼 keep-light 흰 카드에 둔다((c)는 그 카드에만 썼다). 기기 설정은 보지 않는다(기본은 어두운 화면).
 const THEME_CLASS = "gp-dark";
-const themeScript = `try{if(localStorage.getItem('gp-theme')==='light'){var c=document.documentElement.classList;c.remove('gp-dark');c.add('gp-light')}}catch(e){}`;
+const themeScript = `try{if(localStorage.getItem('gp-theme')==='light'){var c=document.documentElement.classList;c.remove('gp-dark');c.add('gp-light');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#ffffff')}}catch(e){}`;
 
 export default function RootLayout({
   children,
