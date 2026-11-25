@@ -39,7 +39,8 @@ const CARE = ["충치 치료", "신경치료", "임플란트", "잇몸 치료", 
 export function Dental2027() {
   const box = useRef<HTMLElement>(null);
   const progress = useRef(0);
-  const [p, setP] = useState(0);
+  // 화면 글은 구간(stage)과 밝아짐(white)만 쓰므로 그 값이 바뀔 때만 다시 그린다
+  const [view, setView] = useState({ stage: 0, white: 0 });
   const [env, setEnv] = useState<{ still: boolean; low: boolean } | null>(null);
 
   useEffect(() => {
@@ -55,7 +56,9 @@ export function Dental2027() {
         const r = el.getBoundingClientRect();
         const v = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
         progress.current = v;
-        setP(v);
+        const stage = STAGES.findIndex(([a, b]) => v >= a && v < b);
+        const white = Math.round(Math.min(1, Math.max(0, (v - 0.86) / 0.06)) * 20) / 20;
+        setView((o) => (o.stage === stage && o.white === white ? o : { stage, white }));
       });
     };
     on();
@@ -68,13 +71,12 @@ export function Dental2027() {
     };
   }, []);
 
-  const stage = STAGES.findIndex(([a, b]) => p >= a && p < b);
+  const { stage, white } = view;
   const show = (i: number) => ({
     opacity: stage === i ? 1 : 0,
     transform: `translateY(${stage === i ? 0 : 16}px)`,
     transition: "opacity .5s, transform .5s",
   });
-  const white = Math.min(1, Math.max(0, (p - 0.86) / 0.06));
 
   return (
     <div className="text-[16px] leading-[1.7] md:text-[17px]" style={{ background: "#fff", color: C.ink }}>
@@ -185,7 +187,7 @@ export function Dental2027() {
 function Panel({ style, label, title, right, children }: { style: React.CSSProperties; label: string; title: string; right?: boolean; children: React.ReactNode }) {
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-[5svh] mx-auto max-w-[1320px] px-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:px-10">
-      <div style={style} className={`max-w-[440px] rounded-2xl bg-white/92 p-6 shadow-[0_20px_60px_rgba(0,0,0,.22)] backdrop-blur md:p-8 ${right ? "md:ml-auto md:mr-24" : ""}`}>
+      <div style={style} className={`max-w-[440px] rounded-2xl bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,.22)] md:p-8 ${right ? "md:ml-auto md:mr-24" : ""}`}>
         <p className="text-[14px] font-bold" style={{ color: C.key }}>
           {label}
         </p>

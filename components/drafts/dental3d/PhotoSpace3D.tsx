@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 
@@ -38,8 +38,13 @@ const FRAG = /* glsl */ `
   }
 `;
 
-function Layer({ scene, progress, index, still }: { scene: Scene; progress: React.RefObject<number>; index: number; still: boolean }) {
-  const [map, depth] = useLoader(THREE.TextureLoader, [`${IMG}/${scene.k}.jpg`, `${IMG}/${scene.k}-depth.png`]);
+type Opt = { still: boolean; small: boolean };
+
+function Layer({ scene, progress, index, opt }: { scene: Scene; progress: React.RefObject<number>; index: number; opt: Opt }) {
+  const { still, small } = opt;
+  // 휴대폰은 작은 사진(1000px)과 작은 깊이 지도, 적은 격자로 그린다
+  const sfx = small ? "-sm" : "";
+  const [map, depth] = useLoader(THREE.TextureLoader, [`${IMG}/${scene.k}${sfx}.jpg`, `${IMG}/${scene.k}-depth${sfx}.png`]);
   const mesh = useRef<THREE.Mesh>(null);
   const { viewport, camera } = useThree();
   const aspect = map.image ? map.image.width / map.image.height : 1.5;
@@ -54,7 +59,7 @@ function Layer({ scene, progress, index, still }: { scene: Scene; progress: Reac
       uniforms: { uMap: { value: tex }, uDepth: { value: depth }, uStrength: { value: 0 }, uOpacity: { value: 0 }, uBright: { value: 0 } },
     });
   }, [map, depth]);
-  const geo = useMemo(() => new THREE.PlaneGeometry(1, 1, 220, 150), []);
+  const geo = useMemo(() => small ? new THREE.PlaneGeometry(1, 1, 110, 74) : new THREE.PlaneGeometry(1, 1, 200, 134), [small]);
 
   useFrame(() => {
     const m = mesh.current;
@@ -89,27 +94,52 @@ function Layer({ scene, progress, index, still }: { scene: Scene; progress: Reac
   return <mesh ref={mesh} geometry={geo} material={mat} />;
 }
 
+/** 필요할 때만 그린다(frameloop demand). 스크롤, 크기 변경, 포인터 이동 때 한 장 그리고, 카메라가 따라가는 동안만 이어서 그린다 */
 function Rig({ still }: { still: boolean }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const on = () => invalidate();
+    addEventListener("scroll", on, { passive: true });
+    addEventListener("resize", on);
+    addEventListener("pointermove", on, { passive: true });
+    return () => {
+      removeEventListener("scroll", on);
+      removeEventListener("resize", on);
+      removeEventListener("pointermove", on);
+    };
+  }, [invalidate]);
   // 손가락, 마우스 위치에 따라 고개를 살짝 돌리는 느낌
   useFrame((state) => {
     const c = state.camera;
     const tx = still ? 0 : state.pointer.x * 0.35;
     const ty = still ? 0 : state.pointer.y * 0.2;
-    c.position.x = THREE.MathUtils.lerp(c.position.x, tx, 0.05);
-    c.position.y = THREE.MathUtils.lerp(c.position.y, ty, 0.05);
+    c.position.x = THREE.MathUtils.lerp(c.position.x, tx, 0.08);
+    c.position.y = THREE.MathUtils.lerp(c.position.y, ty, 0.08);
     c.lookAt(0, 0, -2);
+    if (Math.abs(c.position.x - tx) + Math.abs(c.position.y - ty) > 0.002) state.invalidate();
   });
   return null;
 }
 
-export default function PhotoSpace3D({ progress, scenes, still, low }: { progress: React.RefObject<number>; scenes: Scene[]; still: boolean; low: boolean }) {
+function PhotoSpace3D({ progress, scenes, still, low }: { progress: React.RefObject<number>; scenes: Scene[]; still: boolean; low: boolean }) {
+  const opt = useMemo(() => ({ still, small: typeof window !== "undefined" && innerWidth < 768 }), [still]);
+  const light = low || opt.small;
   return (
-    <Canvas dpr={low ? [1, 1.25] : [1, 1.75]} camera={{ position: [0, 0, 6], fov: 45, near: 0.1, far: 50 }} gl={{ antialias: true }} style={{ touchAction: "pan-y" }}>
+    <Canvas
+      frameloop="demand"
+      dpr={light ? [1, 1.25] : [1, 1.75]}
+      camera={{ position: [0, 0, 6], fov: 45, near: 0.1, far: 50 }}
+      gl={{ antialias: !light, powerPreference: "high-performance" }}
+      style={{ touchAction: "pan-y" }}
+    >
       <color attach="background" args={["#111"]} />
       <Rig still={still} />
       {scenes.map((s, i) => (
-        <Layer key={s.k} scene={s} index={i} progress={progress} still={still} />
+        <Layer key={s.k} scene={s} index={i} progress={progress} opt={opt} />
       ))}
     </Canvas>
   );
 }
+
+// 바깥(Dental2027)이 스크롤마다 다시 그려져도 3D는 다시 만들지 않는다
+export default memo(PhotoSpace3D);
