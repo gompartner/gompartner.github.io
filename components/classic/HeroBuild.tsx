@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { TownWindow } from "@/components/classic/TownWindow";
+import { BuildGate } from "@/components/classic/BuildGate";
 
 // 11-25 조립형 첫 화면(사용자 "면과 선이 조합되며 완성, 합체 로봇처럼 조립되는 메인"). 시안, ?v=build
 // 1차(파란 덮개)는 "틀이 이미 나와 있어 로딩 느낌"이라 바꿈: 빈 틀을 먼저 보여 주지 않는다.
@@ -28,9 +29,18 @@ const css = `
 .gp-clunk { animation: gp-clunk 0.28s ease-out 1.75s both, gp-clunk 0.32s ease-out 2.55s both; }
 .gp-scan { animation: gp-scan 0.9s ease-in-out both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.7s ease-out both; animation-delay: var(--d); }
+/* 이미 조립했으면(새로고침 전) 조립 연출 없이 완성된 화면 */
+[data-built] .gp-part, [data-built] .gp-edge-x, [data-built] .gp-edge-y, [data-built] .gp-clunk, [data-built] .gp-fade { animation: none; }
+[data-built] .gp-lock, [data-built] .gp-scan { display: none; }
+/* 돌아오거나 다시 보일 때: 선만 반짝이고 광택이 한 번 훑는다 */
+@keyframes gp-spark { 0%, 100% { box-shadow: 0 0 0 0 rgba(122, 167, 255, 0); } 35% { box-shadow: 0 0 10px 2px rgba(122, 167, 255, 0.95); } }
+[data-shine] .gp-edge-x, [data-shine] .gp-edge-y { animation: gp-spark 1s ease-out both; transform: none; }
+[data-shine] .gp-edge-y { animation-delay: 0.15s; }
+[data-built][data-shine] .gp-scan, [data-shine] .gp-scan { display: block; animation: gp-scan 0.9s ease-in-out both; animation-delay: 0.1s; }
 @media (prefers-reduced-motion: reduce) {
   .gp-part, .gp-edge-x, .gp-edge-y, .gp-clunk, .gp-fade { animation: none; }
   .gp-lock, .gp-scan { display: none; }
+  [data-shine] .gp-edge-x, [data-shine] .gp-edge-y { animation: none; }
 }
 `;
 
@@ -48,6 +58,7 @@ const at = (d: number): V => ({ "--d": `${d}s` });
 
 export function HeroBuild() {
   return (
+    <BuildGate>
     <section aria-labelledby="c-hero" className="relative isolate overflow-hidden bg-[#0b0d12] text-white">
       <style>{css}</style>
       <div aria-hidden className="gp-fade absolute inset-0 -z-10 bg-[linear-gradient(rgba(122,167,255,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.07)_1px,transparent_1px)] bg-[size:48px_48px]" style={at(0)} />
@@ -114,5 +125,6 @@ export function HeroBuild() {
         </div>
       </div>
     </section>
+    </BuildGate>
   );
 }
