@@ -2504,6 +2504,7 @@ function placePins() {
     el.classList.toggle('off', !!selected && id !== selected);
     el.style.transform = `translate3d(${cx.toFixed(2)}px, ${cy2.toFixed(2)}px, 0)`; // 11-03 반올림하면 카메라가 천천히 움직일 때 1px씩 튀어 떨려 보였다
     el.classList.toggle('now', id === focus && !selected);
+    if (BUILD) el.style.visibility = b.built ? '' : 'hidden';
   }
 }
 
@@ -2521,6 +2522,8 @@ function size() {
   dirty = true;
 }
 let dirty = true;
+const BUILD = new URLSearchParams(location.search).get('build') === '1' && !reduce;
+let buildClock = 0;
 addEventListener('resize', size);
 size();
 // 아이패드 회전 뒤 폭이 늦게 바뀌어도 다시 잰다
@@ -2550,11 +2553,25 @@ function loop(now) {
   story(day.t, dt, reduce ? 0 : time);
   if (!reduce) background(dt, time);
   else if (first) background(0.016, 3);
+  if (BUILD && !first) buildClock += dt;
   for (const id of ORDER) {
     const b = B[id];
     const want = (hovered === id || selected === id) ? 0.16 : 0;
     b.lift += (want - b.lift) * (reduce ? 1 : 1 - Math.exp(-dt * 10));
     b.g.position.y = b.lift;
+    // 11-25 메인 조립형 첫 화면에서 ?build=1 로 열면 건물이 하늘에서 하나씩 돌며 내려와 자리에 앉는다
+    if (BUILD && !b.built) {
+      if (b.ry0 === undefined) b.ry0 = b.g.rotation.y;
+      // 첫 장면을 그리는 데 걸리는 시간에 연출이 지나가 버리지 않게, 실제로 그린 프레임의 시간(dt는 0.05초로 잘림)만 센다
+      const u = clamp((buildClock - 0.45 - ORDER.indexOf(id) * 0.26) / 0.75, 0, 1);
+      const c1 = 1.70158, c3 = c1 + 1, e = 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); // 살짝 넘쳤다 돌아오는 감속
+      b.g.visible = u > 0;
+      b.g.position.y = b.lift + (1 - e) * 8;
+      b.g.rotation.y = b.ry0 + (1 - e) * 1.4;
+      b.g.scale.setScalar(0.35 + 0.65 * e);
+      if (u >= 1) { b.built = true; b.g.rotation.y = b.ry0; b.g.scale.setScalar(1); }
+      dirty = true;
+    }
   }
   const sel = selected || hovered;
   outline.enabled = !!sel;

@@ -29,7 +29,17 @@ export function BuildGate({ children }: { children: ReactNode }) {
       if (e.isIntersecting) shine();
     }, { threshold: 0.35 });
     io.observe(el);
+    // 휴대폰에서는 창이 첫 화면 아래에 있어, 창이 보일 때 창 쪽 조립을 시작한다(그 전에는 멈춰 둔다)
+    const win = el.querySelector<HTMLElement>("[data-win]");
+    const wio = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && win) {
+        win.dataset.winOn = "";
+        wio.disconnect();
+      }
+    }, { threshold: 0.6 });
+    if (win) wio.observe(win);
     return () => {
+      wio.disconnect();
       io.disconnect();
       window.clearTimeout(timer);
     };
