@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
-import { holdScroll } from "@/components/classic/scrollHold";
+import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
 
 // 11-25 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
 //  - 조립의 단위는 카드 한 장이 아니라 그 안의 작은 부품이다(11-26 "작은 부품 컴포넌트가 조립되는 느낌, 지금은 도장 찍는 느낌").
@@ -174,7 +174,8 @@ export function Assemble({ children }: { children: ReactNode }) {
         held.add(sec);
         const headH = document.querySelector("header")?.getBoundingClientRect().height ?? 72;
         // 칸 위 여백의 절반쯤은 머리글 뒤로 넘겨, 붙잡힌 동안 카드가 더 많이 보이게 한다
-        const delta = Math.max(0, sec.getBoundingClientRect().top - headH + (window.innerWidth >= 768 ? 64 : 36));
+        // 손가락으로 넘기는 기기는 자리를 옮기지 않고 그 자리에서 붙잡는다(scrollHold 설명)
+        const delta = coarsePointer() ? 0 : Math.max(0, sec.getBoundingClientRect().top - headH + (window.innerWidth >= 768 ? 64 : 36));
         const y = window.scrollY + delta;
         for (const el of parts) {
           if (!("go" in el.dataset) && !fresh.includes(el) && el.closest("section") === sec && el.getBoundingClientRect().top - delta < window.innerHeight * 0.94) {
@@ -194,7 +195,7 @@ export function Assemble({ children }: { children: ReactNode }) {
         );
       },
       // 부품 윗변이 화면 가운데 조금 아래(위에서 58%)까지 올라왔을 때. 그래야 붙잡힌 동안 조립되는 부품이 화면 안에 다 보인다
-      { rootMargin: "0px 0px -42% 0px" },
+      { rootMargin: coarsePointer() ? "0px 0px -55% 0px" : "0px 0px -42% 0px" },
     );
     parts.forEach((el) => io.observe(el));
     // 페이지 맨 아래에 닿으면 조립선까지 올라오지 못한 나머지도 조립한다

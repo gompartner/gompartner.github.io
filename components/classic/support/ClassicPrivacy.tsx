@@ -4,14 +4,14 @@ import { relatedPolicies, privacyVersions, type LabelIcon, type PolicyVersion, t
 
 // 주요 개인정보 처리 표시(라벨링) 아이콘. 개인정보보호위원회 개인정보 포털이 쓰는 공식 라벨 이미지(public/privacy-labels, 11-25)
 const labelIcons: Record<LabelIcon, string> = {
-  collect: "/privacy-labels/pi_collect.png",
-  purpose: "/privacy-labels/pi_object.png",
-  period: "/privacy-labels/pi_period.png",
-  contact: "/privacy-labels/img_cpo.png",
+  collect: "/privacy-labels/w/pi_collect.png",
+  purpose: "/privacy-labels/w/pi_object.png",
+  period: "/privacy-labels/w/pi_period.png",
+  contact: "/privacy-labels/w/img_cpo.png",
 };
 
-// 11-26 공식 아이콘은 남색 선 그림(바탕 투명)이라 어두운 바탕에서 안 보인다. 어두운 화면(html.gp-dark)일 때만 흰색으로 뒤집는다: filter: brightness(0) invert(1)
-const onDark = "[html.gp-dark_&]:brightness-0 [html.gp-dark_&]:invert";
+// 11-26 공식 아이콘은 남색 선 그림이라 어두운 바탕에서 안 보인다. 선은 흰색, 흰 면은 투명, 주황 강조는 그대로 둔 판(public/privacy-labels/w)을 쓴다.
+// 통째로 흰색으로 뒤집으면(filter) 색 면이 있는 아이콘이 흰 덩어리가 된다. 원본은 public/privacy-labels에 그대로 있다.
 
 function LabelBadge({ icon }: { icon: LabelIcon }) {
   // 고충처리(img_cpo)는 원본이 31px이라 키우지 않는다
@@ -19,7 +19,7 @@ function LabelBadge({ icon }: { icon: LabelIcon }) {
   return (
     <span aria-hidden className="inline-flex h-12 shrink-0 items-center justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={labelIcons[icon]} alt="" className={onDark} style={{ height: h, width: "auto" }} />
+      <img src={labelIcons[icon]} alt="" style={{ height: h, width: "auto" }} />
     </span>
   );
 }
@@ -30,7 +30,7 @@ function SectionIcon({ name }: { name: string }) {
     // 원본마다 폭이 31~36px로 달라 같은 폭 상자에 넣어 글자 시작점을 맞춘다
     <span aria-hidden className="inline-flex h-9 w-9 shrink-0 items-center justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`/privacy-labels/${name}.png`} alt="" className={`max-h-9 w-auto ${onDark}`} />
+      <img src={`/privacy-labels/w/${name}.png`} alt="" className={`max-h-9 w-auto`} />
     </span>
   );
 }

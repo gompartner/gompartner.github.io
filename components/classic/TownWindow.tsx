@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { asm } from "@/components/classic/assembleState";
-import { holdScroll } from "@/components/classic/scrollHold";
+import { coarsePointer, holdScroll } from "@/components/classic/scrollHold";
 
 // 11-25 조립형 첫 화면 창 안의 3D 마을.
 // 순서: 설계선(등각 바닥과 건물 윤곽)이 그려진다 > 3D가 나타나고 건물이 하나씩 내려앉는다(island ?build=1).
@@ -134,7 +134,8 @@ export function TownWindow() {
       const headH = document.querySelector("header")?.getBoundingClientRect().height ?? 72;
       let y = window.scrollY;
       // 창 아래가 잘렸으면 다 보일 만큼만 내리고, 창 위가 머리글에 가렸으면(화면이 뜨기 전에 이미 내린 경우) 그만큼 올린다
-      if (r.top < headH + 12) y = Math.max(0, y + r.top - headH - 12);
+      if (coarsePointer()) y = window.scrollY; // 손가락 기기는 자리를 옮기지 않는다
+      else if (r.top < headH + 12) y = Math.max(0, y + r.top - headH - 12);
       else if (r.bottom > window.innerHeight - 16) y += Math.max(0, Math.min(r.top - headH - 12, r.bottom - window.innerHeight + 24));
       if (Math.abs(y - window.scrollY) > 4) window.scrollTo({ top: y, behavior: "smooth" });
       release = holdScroll(y, 3200);
