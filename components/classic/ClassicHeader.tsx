@@ -16,22 +16,9 @@ import { cn } from "@/lib/utils";
 export const classicMenu = [
   // 11-12 리뉴얼: 상단은 유지보수, 제작, 비용(+오른쪽 상담 신청 버튼). 회사소개, 공지, 인사이트, 자주 묻는 질문은 바닥글과 휴대폰 메뉴 아래로
   {
-    label: "유지보수",
-    href: "/maintenance",
-    match: ["/maintenance"],
-    items: [
-      { href: "/maintenance/takeover", label: "업체 변경" },
-      { href: "/maintenance/ai-site", label: "AI 사이트" },
-      { href: "/maintenance/fix", label: "오류 수정" },
-      { href: "/maintenance/update", label: "보안 업데이트" },
-      { href: "/maintenance/monthly", label: "월 유지보수" },
-      { href: "/maintenance/standard", label: "운영 기준" },
-    ],
-  },
-  {
     label: "제작",
     href: "/homepage",
-    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d", "/works", "/sample"],
+    match: ["/works", "/sample", "/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
       { href: "/homepage", label: "홈페이지 제작" },
@@ -40,8 +27,20 @@ export const classicMenu = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
-      // 11-25 포트폴리오(옛 카탈로그 /works)를 제작 아래로
+      // 11-25 포트폴리오(옛 카탈로그)는 제작 아래 마지막
       { href: "/works", label: "포트폴리오" },
+    ],
+  },
+  {
+    label: "유지보수",
+    href: "/maintenance",
+    match: ["/maintenance"],
+    items: [
+      { href: "/maintenance", label: "전체" },
+      { href: "/maintenance/fix", label: "유지보수" },
+      { href: "/maintenance/monthly", label: "유지관리" },
+      { href: "/maintenance/perf", label: "성능 개선" },
+      { href: "/maintenance/ai-site", label: "고도화" },
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
@@ -51,6 +50,7 @@ export const classicMenu = [
     href: "/knowledge",
     match: ["/knowledge", "/insight", "/jaryo"],
     items: [
+      { href: "/knowledge", label: "전체" },
       { href: "/knowledge/plan", label: "기획" },
       { href: "/knowledge/design", label: "디자인" },
       { href: "/knowledge/dev", label: "개발" },
@@ -68,6 +68,7 @@ export const classicMenu = [
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
 const subMenu = [
   { href: "/story", label: "회사소개" },
+  { href: "/history", label: "연혁" },
   { href: "/notice", label: "공지사항" },
   { href: "/faq", label: "자주 묻는 질문" },
 ];
@@ -83,7 +84,6 @@ export function ClassicHeader() {
   // 손가락이나 펜으로 누르면 hover가 없으니, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다.
   // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
   const [all, setAll] = useState(false);
-  const pointer = useRef("mouse");
   // 키보드로 메뉴 안에 들어오면 하위 항목을 연다(초점이 메뉴 밖으로 나가거나 Esc를 누르면 닫는다)
   const [kb, setKb] = useState(false);
   const menuBtn = useRef<HTMLButtonElement>(null);
@@ -188,7 +188,7 @@ export function ClassicHeader() {
               setKb(false);
               setAll(false);
               // 하위 항목에서 닫으면 그 메뉴 이름으로 초점을 옮긴다
-              const top = (e.target as HTMLElement).closest("li[data-top]")?.querySelector<HTMLElement>("a");
+              const top = (e.target as HTMLElement).closest("li[data-top]")?.querySelector<HTMLElement>("button, a");
               if (top && top !== e.target) {
                 escaped.current = true;
                 top.focus();
@@ -200,23 +200,27 @@ export function ClassicHeader() {
                 const active = m.match.some((p) => pathname === p || pathname.startsWith(p + "/"));
                 return (
                   <li key={m.label} data-top className="relative flex w-[128px] justify-center xl:w-[142px]">
-                    <Link
-                      href={m.href}
-                      onPointerDown={(e) => {
-                        pointer.current = e.pointerType;
-                      }}
-                      onClick={(e) => {
-                        if (m.items.length === 0 || all || pointer.current === "mouse") return;
-                        e.preventDefault();
-                        setAll(true);
-                      }}
-                      aria-expanded={m.items.length > 0 ? all || kb : undefined}
-                      aria-current={pathname === m.href ? "page" : active ? "true" : undefined}
-                      className={cn("flex items-center gap-1 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]", active ? "text-[#256ef4]" : "text-[#15171c]")}
-                    >
-                      {m.label}
-                      {m.items.length > 0 && <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#6b7280]" />}
-                    </Link>
+                    {m.items.length > 0 ? (
+                      // 11-25 하위 메뉴가 있는 메뉴는 누르면 펼치기만 한다(이동은 하위 항목으로). 마우스와 터치가 같은 동작
+                      <button
+                        type="button"
+                        onClick={() => setAll((v) => !v)}
+                        aria-expanded={all || kb}
+                        aria-current={active ? "true" : undefined}
+                        className={cn("flex items-center gap-1 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]", active ? "text-[#256ef4]" : "text-[#15171c]")}
+                      >
+                        {m.label}
+                        <ChevronDown size={15} strokeWidth={2.5} aria-hidden className="text-[#6b7280]" />
+                      </button>
+                    ) : (
+                      <Link
+                        href={m.href}
+                        aria-current={pathname === m.href ? "page" : undefined}
+                        className={cn("flex items-center gap-1 text-[17px] font-bold tracking-[-0.02em] transition-colors hover:text-[#256ef4]", active ? "text-[#256ef4]" : "text-[#15171c]")}
+                      >
+                        {m.label}
+                      </Link>
+                    )}
                     {m.items.length > 0 && (
                       <ul
                         role="list"
@@ -301,9 +305,13 @@ export function ClassicHeader() {
           </Link>
           {classicMenu.map((m) => (
             <section key={m.label} className="border-b border-[#e6e9ee] py-4">
-              <Link href={m.href} aria-current={pathname === m.href ? "page" : undefined} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
-                {m.label}
-              </Link>
+              {m.items.length > 0 ? (
+                <p className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">{m.label}</p>
+              ) : (
+                <Link href={m.href} aria-current={pathname === m.href ? "page" : undefined} className="text-[18px] font-[800] tracking-[-0.02em] text-[#15171c]">
+                  {m.label}
+                </Link>
+              )}
               {m.items.length > 0 && (
                 <ul className="mt-2 grid grid-cols-2 gap-x-4" role="list">
                   {m.items.map((i) => (
