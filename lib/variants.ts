@@ -14,7 +14,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "b", label: "시안 B 에디토리얼" },
   ],
   "dental-homepage": [
-    { id: "a", label: "시안 A 미니멀" },
+    { id: "a", label: "시안 A 그리드형" },
     { id: "b", label: "시안 B 카드형" },
     { id: "2026", label: "시안 C 2026 인터랙티브 3D" },
     { id: "2027-window", label: "시안 D 2027 키네틱 타이포" },
@@ -25,7 +25,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "b", label: "시안 B 카드형" },
   ],
   interior: [
-    { id: "a", label: "시안 A 풀스크린 비주얼" },
+    { id: "a", label: "시안 A 그리드형" },
     { id: "b", label: "시안 B 에디토리얼" },
   ],
   "korean-restaurant": [

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Lightbulb } from "lucide-react";
 
+// 가격 시세 확인(11-25): 거실등 제품 4.5~16만(glasswallet.com LED 거실등), 방등, 주방등 설치비 개당 2만부터, 펜던트 설치 3만부터(당근 조명 설치 프로필).
 // 조명 가게 시안 B 동네 조명 교체형(11-22 사례 분석: 숨고 조명 시공 목록처럼 동네 조명 가게 손님은 LED 교체 비용, 출장 지역, 당일 되는지, A/S를 묻는다. 쇼룸형과 달리 가격표와 순서를 앞에). 흰 바탕, 노랑과 검정. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/lt/b-*)
 const IMG = "/images/drafts/lt";

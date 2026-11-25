@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 
+// 가격 시세 확인(11-25): 서울 기구 그룹 회당 2.4만~8만, 1:1 회당 6만~15만(당근 업체 프로필, glasswallet.com/calculate/pilates-cost). 체험 1회 2만은 예시값.
 // 필라테스 시안 B 체험 상담형(11-21 사례 분석: MY Yoga, Magma처럼 밝은 자연광 사진, 메인에 수업 일정. 처음 오는 회원은 체험 수업, 시간표, 횟수권을 먼저 찾는다). 흰 바탕, 세이지 포인트. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/pil/b-*)
 const IMG = "/images/drafts/pil";
@@ -109,9 +110,9 @@ export function PilatesB() {
       <section className="px-5 pb-20 md:px-8 md:pb-28">
         <div className="mx-auto grid max-w-[1200px] gap-5 md:grid-cols-3">
           {[
-            { t: "그룹 8회", s: "주 2회, 1개월", p: "200,000원", d: ["기구 또는 매트 선택", "수업 4시간 전까지 변경"] },
-            { t: "그룹 24회", s: "주 2회, 3개월", p: "528,000원", d: ["회당 22,000원", "연기 1회 가능"], pick: true },
-            { t: "개인 10회", s: "1:1, 2개월", p: "700,000원", d: ["체형 평가 2회 포함", "재활, 통증 관리"] },
+            { t: "그룹 8회", s: "주 2회, 1개월", p: "280,000원", d: ["기구 또는 매트 선택", "수업 4시간 전까지 변경"] },
+            { t: "그룹 24회", s: "주 2회, 3개월", p: "720,000원", d: ["회당 30,000원", "연기 1회 가능"], pick: true },
+            { t: "개인 10회", s: "1:1, 2개월", p: "800,000원", d: ["체형 평가 2회 포함", "재활, 통증 관리"] },
           ].map((m) => (
             <article key={m.t} className="flex flex-col rounded-[24px] p-8" style={m.pick ? { background: C.ink, color: "#fff" } : { background: C.soft }}>
               <p className="text-[14px] font-bold" style={{ color: m.pick ? "#a9d3bb" : C.sage }}>{m.s}</p>

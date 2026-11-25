@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 
+// 가격 시세 확인(11-25): 어린이 코딩 주 2회 월 12~18만(당근 코드마루 프로필).
 // 코딩 교실 특강 모집 랜딩 시안 B 학부모 안내문형(11-22. 시안 A는 기존 모집 랜딩. 학원 방학 특강 안내문처럼 반별 요일, 시간, 정원, 수업료를 표 한 장으로 먼저 보여 주고, 4주 결과물을 주차별로 짧게). 흰 바탕, 보라와 노랑. 인물 없음. 메인 한 장, 신청 폼은 모양만.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/ld/code-*)
 const IMG = "/images/drafts/ld";
@@ -54,7 +55,7 @@ export function LdCodeB() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-[15px]" style={{ color: C.sub }}>4주 수업료 24만 원, 교재와 노트북 대여 포함. 교습비는 학원 안에 게시합니다.</p>
+          <p className="mt-4 text-[15px]" style={{ color: C.sub }}>4주 수업료 16만 원, 교재와 노트북 대여 포함. 교습비는 학원 안에 게시합니다.</p>
         </div>
       </section>
 

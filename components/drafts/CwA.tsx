@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Wifi } from "lucide-react";
 
+// 가격 시세 확인(11-25): 자유석 월 15~30만, 4인실 100~160만(glasswallet.com/blog/coworking-space-cost-guide), 1인실 위워크 56만부터(wework.com/ko-KR/search?slug=seoul).
 // 공유오피스 시안 A 코워킹형(11-22 사례 분석: 공간앤톡, 이스트라운지처럼 깔끔한 사진과 짧은 정보. 프리랜서, 소규모 팀은 좌석 종류별 월 이용료, 24시간 출입, 회의실 시간, 주소 등록을 묻는다). 흰 바탕, 검정과 초록. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/cw/a-*)
 const IMG = "/images/drafts/cw";
@@ -10,7 +11,7 @@ const C = { ink: "#121614", sub: "#5f6763", line: "#e3e8e5", soft: "#f2f5f3", gr
 
 const PLANS = [
   ["자유석", "라운지 빈자리 이용", "월 19만 원"],
-  ["고정석", "내 책상, 잠금 서랍", "월 29만 원"],
+  ["고정석", "내 책상, 잠금 서랍", "월 33만 원"],
   ["1인실", "문 닫히는 방, 책상 2개까지", "월 55만 원"],
   ["4인실", "팀 사무실, 창가", "월 140만 원"],
 ];

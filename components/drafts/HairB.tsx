@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Car, Clock, Scissors } from "lucide-react";
 
+// 가격 시세 확인(11-25): 기장 추가 S 2만, M 3만, L 4만(당근 미용실 프로필).
 // 미용실 시안 B 동네 가격표형(11-21 사례 분석: 뷰티 매장 사이트는 머리글에 가격과 예약을 따로 둔다. 동네 손님은 남녀 가격표, 걸리는 시간, 영업시간을 먼저 본다). 흰 바탕, 테라코타 포인트. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/hair/b-*)
 const IMG = "/images/drafts/hair";
@@ -65,7 +66,7 @@ export function HairB() {
         <div className="mx-auto max-w-[1200px]">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <h2 className="text-[30px] font-bold tracking-[-0.04em] md:text-[44px]">가격표</h2>
-            <p className="text-[15px]" style={{ color: C.sub }}>어깨 아래 기장은 펌, 염색에 20,000원이 추가됩니다.</p>
+            <p className="text-[15px]" style={{ color: C.sub }}>펌, 염색은 기장에 따라 20,000 ~ 40,000원이 추가됩니다.</p>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {PRICE.map((p) => (

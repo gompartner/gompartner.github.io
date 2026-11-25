@@ -13,8 +13,21 @@ import { cn } from "@/lib/utils";
 // 클래식 보기(/classic)의 머리글. 로고와 내림 메뉴만 둔다(10-30 채널 줄과 웹툰 전환 버튼 뺌).
 
 // match는 그 메뉴를 켜는 주소. 한 주소가 두 메뉴를 켜지 않게 겹치지 않게 둔다.
+// 1단 순서는 유지보수, 제작, 비용, 웹 지식(11-06, 11-12 대표 결정. 11-25 다시 확인)
 export const classicMenu = [
   // 11-12 리뉴얼: 상단은 유지보수, 제작, 비용(+오른쪽 상담 신청 버튼). 회사소개, 공지, 인사이트, 자주 묻는 질문은 바닥글과 휴대폰 메뉴 아래로
+  {
+    label: "유지보수",
+    href: "/maintenance",
+    match: ["/maintenance"],
+    items: [
+      { href: "/maintenance", label: "전체" },
+      { href: "/maintenance/fix", label: "유지보수" },
+      { href: "/maintenance/monthly", label: "유지관리" },
+      { href: "/maintenance/perf", label: "성능 개선" },
+      { href: "/maintenance/ai-site", label: "고도화" },
+    ],
+  },
   {
     label: "제작",
     href: "/homepage",
@@ -29,18 +42,6 @@ export const classicMenu = [
       { href: "/3d", label: "3D 웹 제작" },
       // 11-25 포트폴리오(옛 카탈로그)는 제작 아래 마지막
       { href: "/works", label: "포트폴리오" },
-    ],
-  },
-  {
-    label: "유지보수",
-    href: "/maintenance",
-    match: ["/maintenance"],
-    items: [
-      { href: "/maintenance", label: "전체" },
-      { href: "/maintenance/fix", label: "유지보수" },
-      { href: "/maintenance/monthly", label: "유지관리" },
-      { href: "/maintenance/perf", label: "성능 개선" },
-      { href: "/maintenance/ai-site", label: "고도화" },
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },

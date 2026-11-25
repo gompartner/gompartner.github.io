@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Leaf } from "lucide-react";
 
+// 가격 시세 확인(11-25): 쌍화, 대추, 오미자 세트 8,000~10,000(종로 더쌍화 메뉴, polle.com). 작설차는 예시값.
 // 한옥 카페 시안 A 전통 찻집형(11-22 사례 분석: 한옥호텔 담처럼 처마와 대나무 사진, 먹 산수 같은 여백, 한옥 스테이 사례는 큰 사진과 공간 설명 중심. 찻집 손님은 차 종류, 계절 디저트, 좌식인지 입식인지를 묻는다). 흰 바탕, 먹색과 황토. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/hk/a-*)
 const IMG = "/images/drafts/hk";

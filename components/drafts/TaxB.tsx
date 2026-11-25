@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 
+// 가격 시세 확인(11-25): 개인 기장료 서울 중간값 8.8만(findsemusa.com/hub/guide/bookkeeping-fee), 법인 월 15만부터(enjoytax.net/pricing).
 // 세무회계 시안 B 사장님 친화형(11-21). 밝은 바탕, 개인사업자와 프리랜서 눈높이로 "언제 무엇을 내야 하는지"를 먼저 보여 준다. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/tax/b-*)
 const IMG = "/images/drafts/tax";
@@ -24,7 +25,7 @@ const FOR = [
 
 const PRICE = [
   { t: "간이과세자", p: "월 5만 원부터", d: ["부가세 신고", "종합소득세 신고", "카톡 질문 무제한"] },
-  { t: "일반 개인사업자", p: "월 10만 원부터", d: ["월 기장, 부가세 신고", "종합소득세 신고", "직원 1~2명 급여"] },
+  { t: "일반 개인사업자", p: "월 8만 원부터", d: ["월 기장, 부가세 신고", "종합소득세 신고", "직원 1~2명 급여"] },
   { t: "법인", p: "월 15만 원부터", d: ["월 기장, 결산", "법인세 신고", "월간 손익 리포트"] },
 ];
 

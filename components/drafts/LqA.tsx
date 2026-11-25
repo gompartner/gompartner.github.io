@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
+// 가격대 시세 확인(11-25): 가성비 와인 2~3만 원대(인사이트), 데일리 1~2만 원대(아이뉴스24).
 // 주류 가게 시안 A 와인 보틀샵형(11-22 사례 분석: Vinery처럼 어두운 첫 화면과 와인 이야기, CORKK처럼 원페이지에 리스트와 위치. 보틀샵 손님은 가격대별 추천, 산지, 시음회, 선물 포장을 묻는다. 온라인 판매 없이 매장 안내만, 청소년 판매 금지와 과음 경고 문구). 흰 바탕, 버건디. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/lq/a-*)
 const IMG = "/images/drafts/lq";

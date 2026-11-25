@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { CalendarCheck, Clock, Sparkles } from "lucide-react";
 
+// 가격 시세 확인(11-25): 타샵 젤 제거 1만~1.5만부터(당근 네일 프로필).
 // 네일 시안 B 1인 샵 안내형(11-21 사례 분석: 왁싱, 네일 같은 1인 샵 사이트는 머리글에 PRICE, BOOKING을 두고 예약제 안내를 크게 쓴다. 손님은 걸리는 시간, 보수 기간, 예약 변경 규칙을 먼저 본다). 흰 바탕, 장미색 포인트. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/nail/b-*)
 const IMG = "/images/drafts/nail";
@@ -92,7 +93,7 @@ export function NailB() {
           <div>
             <h2 className="text-[28px] font-bold leading-[1.35] tracking-[-0.04em] md:text-[38px]">예약 전에 알아 두세요</h2>
             <ul className="mt-7 grid gap-3">
-              {["15분 넘게 늦으시면 다음 시간으로 옮깁니다", "다른 샵 젤 제거는 5,000원이 추가됩니다", "도구는 손님마다 소독하고 파일은 1회용을 씁니다", "주차는 건물 뒤 공영주차장을 이용해 주세요"].map((x) => (
+              {["15분 넘게 늦으시면 다음 시간으로 옮깁니다", "다른 샵 젤 제거는 10,000원이 추가됩니다", "도구는 손님마다 소독하고 파일은 1회용을 씁니다", "주차는 건물 뒤 공영주차장을 이용해 주세요"].map((x) => (
                 <li key={x} className="border-b pb-3" style={{ borderColor: C.line, color: C.sub }}>{x}</li>
               ))}
             </ul>

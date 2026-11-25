@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Clock } from "lucide-react";
 
+// 물류 단가는 예시값(11-25 확인: 3PL 업체는 단가를 공개하지 않고 견적 문의 방식).
 // 물류 대행 시안 A 풀필먼트형(11-22 사례 분석: 라라로지스처럼 "단 1건이라도" 중소 판매자 대상, 영케이3PL처럼 하루 출고 시간표. 온라인 판매자는 몇 시까지 주문이 당일 나가는지, 입고, 보관, 출고 비용이 각각 얼마인지, 어느 택배를 쓰는지 묻는다). 흰 바탕, 남색과 하늘색. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/lg/a-*)
 const IMG = "/images/drafts/lg";

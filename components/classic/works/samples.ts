@@ -32,7 +32,7 @@ export const threeProjects: Project[] = threeDemos.map((d) => ({
 export const hrefOf = (p: Project) => (p.demoUrl.startsWith("/work/") ? `/sample/${slugOf(p.demoUrl)}` : p.demoUrl);
 
 /** 썸네일을 다시 찍으면 올린다. /images는 하루 캐시라 같은 이름이면 휴대폰에 예전 사진이 남는다(11-22). */
-const IMG_VER = "1125";
+const IMG_VER = "1125b";
 
 const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public", src));
 

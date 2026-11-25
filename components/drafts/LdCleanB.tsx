@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 
+// 가격 기준(11-25): 수도권 입주청소 평당 1.2만~1.8만 원과 옵션가(LandingMoveCleanDemo와 같은 기준).
 // 입주청소 견적 랜딩 시안 B 가격표 우선형(11-22. 시안 A는 기존 견적 계산기 랜딩. 청소요정처럼 머리글에 전화번호와 청소 종류, 숨고 청소 업체 글처럼 평형별 가격과 추가 요금 조건을 첫 화면 바로 아래 표로. 계산기 대신 표 한 장). 흰 바탕, 민트와 검정. 인물 없음. 메인 한 장, 신청 폼은 모양만.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/ld/clean-*)
 const IMG = "/images/drafts/ld";

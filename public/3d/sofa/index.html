@@ -449,13 +449,16 @@ const $ = id => document.getElementById(id);
 const wide = () => innerWidth >= 900;
 
 // ---------- 상품 정보와 단가 (부가세 포함, 생활방수 패브릭 기준) ----------
+// 시세 확인(11-25): 자코모 필로 모듈 와이드 1인 135만, 3인 210만이라 1석 약 70만(다나와 기획전 plan.danawa.com/info/?nPlanSeq=12860),
+// 저가 한샘 데일리구스 1인 21만(store.hanssem.com/goods/1012877). 1인 52만은 그 사이 중고가 기준. 스툴 11~27만(컬리, 컴퓨존).
+// 팔걸이 단품, 배송설치비는 공개 가격을 못 찾아 예시값.
 const MOD = {
   S: { name: '1인 모듈', short: '1인', w: 0.82, dp: 0.95, price: 520000, sub: '폭 820mm, 깊이 950mm' },
   C: { name: '코너 모듈', short: '코너', w: 0.95, dp: 0.95, price: 690000, sub: '폭 950mm, 깊이 950mm' },
   L: { name: '카우치 모듈', short: '카우치', w: 0.82, dp: 1.6, price: 860000, sub: '폭 820mm, 깊이 1,600mm' }
 };
 const ARM_W = 0.16, ARM_PRICE = 150000, ARM_LONG_PRICE = 190000;
-const STOOL_W = 0.8, STOOL_PRICE = 290000, MAX_STOOL = 2;
+const STOOL_W = 0.8, STOOL_PRICE = 270000, MAX_STOOL = 2;
 const MAXM = 8;
 const FABS = [
   { id: 'w', name: '생활방수 패브릭', short: '패브릭', rate: 0, colors: [

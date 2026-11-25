@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Clock } from "lucide-react";
 
+// 가격 시세 확인(11-25): 크루아상 루엘드파리 4,900원(서울시 미디어허브 mediahub.seoul.go.kr/archives/2017997). 바게트는 출처 못 찾아 예시값.
 // 베이커리 시안 A 동네 빵집형(11-22 사례 분석: 빵아빵아처럼 메뉴와 매장 정보를 쉽게 찾게 둔다. 동네 손님은 몇 시에 무슨 빵이 나오는지, 케이크는 며칠 전에 주문하는지를 묻는다). 흰 바탕, 갈색과 빨강. 인물 없음. 메인 한 장, 기능 없음.
 // data-mt 표시는 유지보수 화면의 수정 요청 처리 연출(RequestFlow)이 바꿀 자리를 찾는 데 쓴다.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/bk/a-*)
@@ -76,7 +77,7 @@ export function BkA() {
           <ul className="mt-10 grid gap-4 md:grid-cols-2">
             {[
               { f: "a-baguette", alt: "도마 위 바게트 두 개", t: "바게트", d: "프랑스 밀가루, 저온 숙성 18시간", p: "4,500원" },
-              { f: "a-croissant", alt: "종이 위에 놓인 크루아상", t: "버터 크루아상", d: "발효 버터 27겹", p: "4,000원" },
+              { f: "a-croissant", alt: "종이 위에 놓인 크루아상", t: "버터 크루아상", d: "발효 버터 27겹", p: "4,800원" },
             ].map((x) => (
               <li key={x.t} className="overflow-hidden rounded-[24px] border" style={{ borderColor: C.line }}>
                 <div className="relative aspect-[16/10]">

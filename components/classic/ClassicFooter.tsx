@@ -9,6 +9,15 @@ import { profile } from "@/data/classic/profile";
 // 11-02 머리글 메뉴와 같은 묶음으로 맞춘다. 11-22 순서도 머리글대로(유지보수 먼저, 업체 변경부터)
 const groups = [
   {
+    title: "유지보수",
+    items: [
+      { href: "/maintenance/fix", label: "유지보수" },
+      { href: "/maintenance/monthly", label: "유지관리" },
+      { href: "/maintenance/perf", label: "성능 개선" },
+      { href: "/maintenance/ai-site", label: "고도화" },
+    ],
+  },
+  {
     title: "제작",
     items: [
       { href: "/homepage", label: "홈페이지 제작" },
@@ -18,15 +27,6 @@ const groups = [
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
       { href: "/works", label: "포트폴리오" },
-    ],
-  },
-  {
-    title: "유지보수",
-    items: [
-      { href: "/maintenance/fix", label: "유지보수" },
-      { href: "/maintenance/monthly", label: "유지관리" },
-      { href: "/maintenance/perf", label: "성능 개선" },
-      { href: "/maintenance/ai-site", label: "고도화" },
     ],
   },
   {

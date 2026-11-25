@@ -9,7 +9,7 @@ export interface DesignConcept {
 
 export const designConcepts: Record<string, DesignConcept> = {
   "dental-homepage": {
-    keywords: ["미니멀", "카드형"],
+    keywords: ["그리드형", "카드형"],
     colors: [
       { role: "시안 A", name: "틸", hex: "#2A7F86" },
       { role: "시안 B", name: "블랙", hex: "#15171C" },
@@ -117,7 +117,7 @@ export const designConcepts: Record<string, DesignConcept> = {
     font: "Pretendard",
   },
   "interior": {
-    keywords: ["풀스크린 비주얼", "에디토리얼"],
+    keywords: ["그리드형", "에디토리얼"],
     colors: [
       { role: "시안 A", name: "블랙", hex: "#141414" },
       { role: "시안 B", name: "오렌지", hex: "#A5743F" },

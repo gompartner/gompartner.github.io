@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
+// 가격 시세 확인(11-25): 약과 3,800원부터(서촌 공방 당근 프로필). 라테, 에이드는 출처 못 찾아 예시값.
 // 한옥 카페 시안 B 한옥 커피형(11-22 사례 분석: 한옥 스테이, 카페 사례처럼 사진을 크게 두고 공간 이야기를 짧게. 한옥 커피집 손님은 시그니처 음료, 자리(창가, 툇마루), 사진 찍기 좋은 시간을 묻는다). 흰 바탕, 검정과 갈색. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/hk/b-*)
 const IMG = "/images/drafts/hk";

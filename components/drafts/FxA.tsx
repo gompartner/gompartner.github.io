@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Calendar } from "lucide-react";
 
+// 가격 시세 확인(11-25): 태안 튤립 성인 14,000, 곡성 장미 5,000, 자라섬 7,000(세계일보 2025-03-12).
 // 꽃박람회 시안 A 축제 안내형(11-22 사례 분석: 스윙앤소울 페스티벌처럼 대회 개요(일정, 장소, 참가 방법)를 한눈에, TEC FAIR처럼 프로그램 일정과 공지. 나들이 가족은 기간, 입장료, 날짜별 프로그램, 어떤 길로 돌면 좋은지를 묻는다). 흰 바탕, 분홍과 초록. 인물 없음. 메인 한 장, 기능 없음.
 // 사진: Unsplash 무료 라이선스(public/images/drafts/fx/a-*)
 const IMG = "/images/drafts/fx";
