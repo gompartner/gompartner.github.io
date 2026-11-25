@@ -7,6 +7,7 @@ import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
+import { NewTabMark } from "@/components/classic/NewTab";
 
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
@@ -255,7 +256,7 @@ function Products() {
                 ))}
               </ul>
               <a href={p.href} target="_blank" rel="noopener noreferrer" className={`mt-7 inline-flex min-h-11 items-center gap-1 text-[16px] font-bold underline-offset-4 hover:underline ${p.light ? "text-[#0b50d0]" : "text-[#7aa7ff]"}`}>
-                {p.name} 열기 <ArrowUpRight size={17} aria-hidden />
+                {p.name} 열기 <NewTabMark size={16} />
               </a>
             </div>
             <div className="mt-auto px-7 md:px-9">

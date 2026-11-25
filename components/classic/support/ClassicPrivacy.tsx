@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { relatedPolicies, privacyVersions, type LabelIcon, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
+import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 
 // 주요 개인정보 처리 표시(라벨링) 아이콘. 개인정보보호위원회 개인정보 포털이 쓰는 공식 라벨 이미지(public/privacy-labels, 11-25)
 const labelIcons: Record<LabelIcon, string> = {
@@ -160,7 +161,10 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
             <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1">
               {relatedPolicies.map((r) => (
                 <li key={r.href}>
-                  <a href={r.href} className="text-[#256ef4] underline underline-offset-4">{r.name}</a>
+                  <a href={r.href} {...NEW_TAB} className="inline-flex items-center gap-1 text-[#256ef4] underline underline-offset-4">
+                    {r.name}
+                    <NewTabMark size={14} />
+                  </a>
                 </li>
               ))}
             </ul>

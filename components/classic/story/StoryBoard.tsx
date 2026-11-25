@@ -6,6 +6,7 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { Frame } from "@/components/classic/story/Frame";
 import { StoryWindow } from "@/components/classic/story/StoryWindow";
 import { boards, conclusion, stages, storyLead, ways, works } from "@/data/classic/storyline";
+import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 
 // 11-26 회사소개 한 판(사용자 "변천사와 서사 스토리도 녹일 거지", "우린 어떤 고민을 해서 결과를 만들었다", "이미지 대충 넣지 말고", "경력팔이 그만").
 // 대표 경력, 수상, 연차는 쓰지 않는다. 회사가 하는 일과, 이 사이트와 상품을 어떤 고민으로 바꿔 왔는지를 쓴다. 옛 연혁(/history)도 여기로 합쳤다.
@@ -36,9 +37,8 @@ export function StoryBoard() {
               {w.links.map((l) => {
                 const cls = `inline-flex min-h-11 items-center gap-1 rounded-full border px-4 text-[15px] font-bold ${tones[i].link}`;
                 return l.href.startsWith("http") ? (
-                  <a key={l.href} href={l.href} target="_blank" rel="noopener" className={cls}>
-                    {l.label} <ArrowUpRight size={16} aria-hidden />
-                    <span className="sr-only">(새 창)</span>
+                  <a key={l.href} href={l.href} {...NEW_TAB} className={cls}>
+                    {l.label} <NewTabMark size={15} />
                   </a>
                 ) : (
                   <Link key={l.href} href={l.href} className={cls}>

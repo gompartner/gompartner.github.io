@@ -4,6 +4,7 @@ import Image from "next/image";
 import { NavLink as Link } from "@/components/classic/NavLink";
 import { ArrowUpRight } from "lucide-react";
 import type { SearchItem, SearchKind } from "./index";
+import { NEW_TAB, NewTabMark, isOutside } from "@/components/classic/NewTab";
 
 export const ORDER: SearchKind[] = ["바로가기", "서비스", "카탈로그", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
 
@@ -40,13 +41,18 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
             <ul role="list">
               {g.list.map((i) => (
                 <li key={`${i.href}-${i.title}`} className="border-b border-[#e6e9ee]">
-                  <Link href={i.href} {...(/^https?:\/\//.test(i.href) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="group flex items-start justify-between gap-4 py-5">
+                  <Link href={i.href} {...(isOutside(i.href) ? NEW_TAB : {})} className="group flex items-start justify-between gap-4 py-5">
                     <span className="min-w-0">
                       <span className="block text-[17px] font-bold leading-[1.45] group-hover:text-[#256ef4]">{i.title}</span>
                       <span className="mt-1 line-clamp-2 block text-[15px] leading-[1.6] text-[#5b6370]">{i.desc}</span>
-                      {/^https?:\/\//.test(i.href) ? <span className="sr-only">(새 창 열림)</span> : null}
                     </span>
-                    <ArrowUpRight size={20} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
+                    {isOutside(i.href) ? (
+                      <span className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]">
+                        <NewTabMark size={19} />
+                      </span>
+                    ) : (
+                      <ArrowUpRight size={20} aria-hidden className="mt-1 shrink-0 text-[#6b7280] group-hover:text-[#256ef4]" />
+                    )}
                   </Link>
                 </li>
               ))}

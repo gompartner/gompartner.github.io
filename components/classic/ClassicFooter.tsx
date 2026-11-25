@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
+import { NEW_TAB, NewTabMark, isOutside } from "@/components/classic/NewTab";
 import { Mail, Phone, Printer } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
 import { profile } from "@/data/classic/profile";
@@ -88,8 +89,9 @@ export function ClassicFooter() {
             <ul className="mt-4 grid gap-y-2.5" role="list">
               {g.items.map((m) => (
                 <li key={m.href}>
-                  <NavLink href={m.href} className="-my-1.5 inline-block py-1.5 hover:text-white">
+                  <NavLink href={m.href} {...(isOutside(m.href) ? NEW_TAB : {})} className="-my-1.5 inline-flex items-center gap-1.5 py-1.5 hover:text-white">
                     {m.label}
+                    {isOutside(m.href) ? <NewTabMark size={14} /> : null}
                   </NavLink>
                 </li>
               ))}
@@ -107,15 +109,18 @@ export function ClassicFooter() {
             <a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_youtube" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="youtube" />
               유튜브
+              <NewTabMark size={13} />
             </a>
             {/* 11-25 사용자: 유튜브 옆에 네이버 블로그, 카카오톡(11-21에 뺀 블로그 링크를 다시 넣음). 카카오톡은 1:1 채팅이 아니라 채널 홈으로. English 링크는 뺌 */}
             <a href="https://blog.naver.com/gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_blog" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="naverBlog" />
               네이버 블로그
+              <NewTabMark size={13} />
             </a>
             <a href={KAKAO_CHANNEL_HOME} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <ChannelIcon name="kakao" />
               카카오톡
+              <NewTabMark size={13} />
             </a>
           </div>
           <div className="md:text-right">

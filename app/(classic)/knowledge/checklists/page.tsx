@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { jaryo } from "@/data/classic/jaryo";
 import { pageMeta } from "@/lib/seo";
+import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 
 // 점검표. 점검표 상세(/jaryo/<id>) 주소는 그대로. 11-22 무료 도구는 내리고 사이트 지킴이로 잇는다. 인스타 '자료' DM으로 들어오는 /jaryo 는 여기로 넘긴다.
 export const metadata: Metadata = pageMeta({
@@ -36,7 +37,7 @@ export default function ArchiveChecklists() {
       </ul>
       <h2 id="watch" className={docH2}>사이트 감시</h2>
       <p className="mt-3 text-[16px] leading-[1.7] text-[#3a404b]">
-        인증서와 도메인 만료, 접속 장애는 <a href="https://jikimi.gompartner.co.kr/" className="font-bold text-[#256ef4] underline underline-offset-4">사이트 지킴이</a>에 주소를 등록하면 만료 전에 알림으로 받습니다.
+        인증서와 도메인 만료, 접속 장애는 <a href="https://jikimi.gompartner.co.kr/" {...NEW_TAB} className="inline-flex items-center gap-1 font-bold text-[#256ef4] underline underline-offset-4">사이트 지킴이<NewTabMark size={14} /></a>에 주소를 등록하면 만료 전에 알림으로 받습니다.
       </p>
     </ArchiveShell>
   );
