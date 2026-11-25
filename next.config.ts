@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
           return {
             beforeFiles: [
               { source: "/3d/island", destination: "/3d/island.html" },
-              { source: "/3d/:name(ar|configurator|door|hanok|sign|sofa|space)", destination: "/3d/:name/index.html" },
+              { source: "/3d/:name(ar|configurator|door|hanok|room|sign|sofa|space)", destination: "/3d/:name/index.html" },
             ],
           };
         },
