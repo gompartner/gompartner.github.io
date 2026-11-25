@@ -54,7 +54,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
           <ul className="flex gap-2 md:flex-wrap" role="list" aria-label="종류로 거르기">
             <li>
               <button type="button" aria-pressed={active.length === 0} onClick={() => setKinds([])} className={chip(active.length === 0)}>
-                전체 <span className="tabular-nums opacity-80">{found.length}</span>
+                전체 <span className={`tabular-nums ${active.length === 0 ? "" : "opacity-80"}`}>{found.length}</span>
               </button>
             </li>
             {counts.map((c) => {
@@ -63,7 +63,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                 <li key={c.k}>
                   <button type="button" aria-pressed={on} onClick={() => toggle(c.k)} className={chip(on)}>
                     {on ? <Check size={15} aria-hidden /> : null}
-                    {c.k} <span className="tabular-nums opacity-80">{c.n}</span>
+                    {c.k} <span className={`tabular-nums ${on ? "" : "opacity-80"}`}>{c.n}</span>
                   </button>
                 </li>
               );

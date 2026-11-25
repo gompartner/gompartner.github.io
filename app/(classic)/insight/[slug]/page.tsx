@@ -169,7 +169,8 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
                                 className="border-b border-[#e6e9ee] align-top"
                               >
                                 {r.map((c, ci) =>
-                                  ci === 0 ? (
+                                  // 첫 칸이 빈 줄은 줄 제목이 아니라 빈 칸으로(빈 머리 칸은 화면 읽기 프로그램에서 이름 없는 제목이 된다)
+                                  ci === 0 && c.trim() ? (
                                     <th
                                       key={ci}
                                       scope="row"

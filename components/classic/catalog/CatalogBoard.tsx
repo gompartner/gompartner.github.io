@@ -120,7 +120,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
             }}
             className={`min-h-12 shrink-0 whitespace-nowrap rounded-full border px-5 text-[16px] font-[800] tracking-[-0.03em] transition-colors md:text-[17px] ${cat === c.name ? "border-white bg-white text-[#0b0d12]" : "border-white/20 text-white/70 hover:border-white/60 hover:text-white"}`}
           >
-            {c.name} <span className={`ml-1 text-[14px] font-bold tabular-nums ${cat === c.name ? "text-[#256ef4]" : "text-white/40"}`}>{c.count}</span>
+            {c.name} <span className={`ml-1 text-[14px] font-bold tabular-nums ${cat === c.name ? "text-[#256ef4]" : "text-white/55"}`}>{c.count}</span>
           </button>
         ))}
       </div>
@@ -137,7 +137,7 @@ export function CatalogBoard({ stories, rest, cats, total }: { stories: CatalogS
             <article key={s.id} className="bd-in grid gap-x-12 gap-y-6 rounded-[24px] border border-white/12 bg-[#121722] p-5 md:rounded-[28px] md:p-9 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:grid-rows-[auto_1fr] lg:p-11" style={{ "--d": `${Math.min(i, 3) * 0.05}s` } as React.CSSProperties}>
               <header className="lg:col-start-1 lg:row-start-1">
                 <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
-                  <span className="tabular-nums text-white/40">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="tabular-nums text-white/55">{String(i + 1).padStart(2, "0")}</span>
                   <span className="text-[#7aa7ff]">{s.cat}</span>
                   <span aria-hidden className="h-3 w-px bg-white/25" />
                   <span className="text-[#c9ced6]">{s.title}</span>

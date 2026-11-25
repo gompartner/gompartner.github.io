@@ -54,7 +54,7 @@ export function CareBoard() {
           <h2 className="mt-3 break-keep text-[26px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[34px]">{k.a}</h2>
           <p className="mt-9 text-[36px] font-[800] leading-none tracking-[-0.05em] md:text-[46px]">{k.price}</p>
           <p className="mt-3 break-keep text-[16px] text-white md:text-[17px]">{k.note}</p>
-          <p className="mt-9 inline-flex items-center gap-2.5 rounded-full bg-white/15 px-4 py-2.5 text-[15px] font-bold md:text-[16px]">
+          <p className="mt-9 inline-flex items-center gap-2.5 rounded-full bg-[#081a4a]/25 px-4 py-2.5 text-[15px] font-bold md:text-[16px]">
             <FileText aria-hidden size={17} />
             끝나면 {s.report.name}를 드립니다
           </p>

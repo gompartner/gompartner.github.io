@@ -45,7 +45,7 @@ const services: { no: string; name: string; body: string; price: string; href: s
   { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
-  blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white/80", arrow: "bg-white text-[#256ef4]" },
+  blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white", arrow: "bg-white text-[#256ef4]" },
   white: { box: "bg-white text-[#0b0d12] hover:bg-[#f1f5ff]", sub: "text-[#3d4450]", no: "text-[#256ef4]", arrow: "bg-[#0b0d12] text-white" },
   yellow: { box: "bg-[#ffd84d] text-[#0b0d12] hover:bg-[#ffcf24]", sub: "text-[#2f2c14]", no: "text-[#0b0d12]/70", arrow: "bg-[#0b0d12] text-white" },
   line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white hover:border-[#7aa7ff]", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", arrow: "bg-white text-[#0b0d12]" },

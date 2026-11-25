@@ -156,7 +156,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
       <WikiBar topic={topic} last={last} />
       <div className={`${wrap} grid lg:min-h-[calc(100vh-4.75rem)] ${cols}`}>
         {rail ? (
-          <aside className="sidebar hidden border-r border-white/10 pb-12 pr-4 pt-8 lg:block">
+          <aside aria-label="같은 주제 문서" className="sidebar hidden border-r border-white/10 pb-12 pr-4 pt-8 lg:block">
             <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain pr-1 [@media(pointer:coarse)_and_(min-width:768px)]:top-5 [@media(pointer:coarse)_and_(min-width:768px)]:max-h-[calc(100vh-2.5rem)]">
               <nav aria-label={`${rail.label} 문서`}>
                 <Link href={`/knowledge/${rail.id}`} className="mb-2 flex items-baseline justify-between gap-2 px-3 text-[13px] font-bold text-[#7aa7ff] hover:text-white">
@@ -196,7 +196,7 @@ export function ArchiveShell({ section, active, crumbs, toc, article, children }
         </div>
 
         {hasToc ? (
-          <aside className="sidebar hidden pl-2 pt-8 xl:block">
+          <aside aria-label="이 문서의 목차" className="sidebar hidden pl-2 pt-8 xl:block">
             <div className="sticky top-24 [@media(pointer:coarse)_and_(min-width:768px)]:top-5">
               <p className="mb-2.5 text-[13px] font-bold text-[#7aa7ff]">이 페이지</p>
               <ul role="list">
