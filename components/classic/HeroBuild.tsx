@@ -82,9 +82,11 @@ const at = (d: number): V => ({ "--d": `${d.toFixed(3)}s` });
 
 // 11-25 밤 문구: 컨셉 문장 대신 맡길 이유가 보이게(사용자 "일을 맡기고 싶다는 부분이 약함, 강점이라고 써 놓은 문구가 약점").
 // 사람 수나 사업자 형태처럼 작아 보이는 말은 쓰지 않고, 사이트에 이미 약속해 둔 숫자(기간, 금액, 회신 시간)와 납품물로 말한다
-// 11-25 밤 다시: 업체 자랑이 아니라 고객이 돈을 내는 이유로. 브랜드 이야기(11-24 사용자 긍정: 단군 이야기의 남은 곰, 만들고 떠나는 업체와 반대)를 첫 문장에 쓴다
-const lines = ["만들고", "떠나지 않습니다"];
-const sub = "새로 만드는 일부터 글자 하나 고치는 일까지, 말씀하시면 바로 답합니다. 홈페이지, 업무 시스템, 앱을 만들고 오픈한 뒤에도 계속 맡습니다.";
+// 11-25 밤 사용자 결정: 첫 문장은 일본 기업 사이트식으로 영어 큰 글자 "Build, Run, Care."와 한국어 한 줄.
+// 아래 칸도 이 세 낱말 순서(만듭니다 > 운영합니다 > 돌봅니다)를 따른다
+const lines = ["Build,", "Run, Care."];
+const ko = "만들고, 운영하고, 돌봅니다.";
+const sub = "홈페이지, 업무 시스템, 앱을 만들고, 오픈한 뒤의 운영과 수정까지 맡습니다.";
 // 창틀에 붙는 서비스 이름표. 휘어 날아오는 출발점(x, y)과 기울기
 const chips = [
   { name: "홈페이지", pos: "right-[26%] -top-4", x: "140px", y: "-180px", r: "30deg" },
@@ -134,13 +136,13 @@ export function HeroBuild() {
               <i aria-hidden className="h-2 w-2 rounded-full bg-[#7aa7ff]" />
               홈페이지, 업무 시스템, 앱 개발
             </p>
-            {/* 제목: 글자가 흩어져 있다가 모인다 */}
-            <h1 id="c-hero" aria-label={lines.join(" ")} className="order-2 mt-6 text-[40px] font-[800] leading-[1.12] tracking-[-0.055em] md:text-[68px] xl:text-[76px]">
+            {/* 영어 큰 글자: 글자가 떨어져 있다가 자석처럼 붙는다. 읽는 제목(h1)은 그 아래 한국어 한 줄 */}
+            <p aria-hidden className="order-2 mt-7 text-[58px] font-[300] leading-[1.02] tracking-[-0.045em] md:text-[96px] xl:text-[108px]">
               {title.map((words, li) => (
-                <span key={li} aria-hidden className="block">
+                <span key={li} className="block">
                   {words.map((chars, wi) => (
                     <span key={wi} className="inline-block whitespace-nowrap">
-                      {wi > 0 && <span className="inline-block w-[0.22em]" />}
+                      {wi > 0 && <span className="inline-block w-[0.24em]" />}
                       {chars.map(({ ch, i }) => (
                         <span key={i} className="gp-char" style={scatter(i)}>
                           {ch}
@@ -150,9 +152,12 @@ export function HeroBuild() {
                   ))}
                 </span>
               ))}
+            </p>
+            <h1 id="c-hero" className="gp-fade order-3 mt-7 break-keep text-[22px] font-[700] leading-[1.5] tracking-[-0.03em] md:text-[28px]" style={at(0.8)}>
+              {ko}
             </h1>
-            <span aria-hidden className="gp-line order-3 mt-5 block h-1.5 w-24 rounded-full bg-[#256ef4] md:w-32" style={at(0.75)} />
-            <p className="order-5 mt-9 max-w-[540px] break-keep text-[17px] leading-[1.7] text-[#aab2bf] md:text-[19px] lg:mt-6">
+            <span aria-hidden className="gp-line order-3 mt-5 hidden h-px w-16 bg-[#7aa7ff] lg:block" style={at(0.9)} />
+            <p className="order-5 mt-9 max-w-[480px] break-keep text-[16px] leading-[1.8] text-[#aab2bf] md:text-[18px] lg:mt-5">
               {sub.split(" ").map((w, i) => (
                 <span key={i}>
                   <span className="gp-word" style={at(0.7 + i * 0.015)}>

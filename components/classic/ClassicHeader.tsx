@@ -249,10 +249,10 @@ export function ClassicHeader() {
             {landing && (
               <ul aria-label="이 페이지" className="mr-2 hidden items-center gap-1 lg:flex" role="list">
                 {[
-                  { href: "#services", label: "서비스" },
-                  { href: "#products", label: "운영 서비스" },
+                  { href: "#services", label: "Build" },
+                  { href: "#products", label: "Run" },
+                  { href: "#care", label: "Care" },
                   { href: "#process", label: "진행 방식" },
-                  { href: "#faq", label: "자주 묻는 질문" },
                 ].map((a) => (
                   <li key={a.href}>
                     <Link href={a.href} className={cn("inline-flex h-11 items-center rounded-md px-3 text-[16px] font-bold", dark ? "text-[#c9ced6] hover:text-white" : "text-[#3d4450] hover:text-[#256ef4]")}>

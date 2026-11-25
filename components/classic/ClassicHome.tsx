@@ -11,7 +11,7 @@ import { profile } from "@/data/classic/profile";
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
 // 11-25 밤 다시 짬: 흰 바탕용 칸에 색만 뒤집어 덧칠하던 것을 버리고 어두운 바탕 기준으로 처음부터.
-//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 약속(큰 숫자 줄) > 운영 서비스(사이트 지킴이, 거래장부)
+//  - 첫 문장 "Build, Run, Care." 순서대로: 만듭니다(색이 다른 큰 판 4장) > 운영합니다(사이트 지킴이, 거래장부) > 돌봅니다(이럴 때 맡기세요, 큰 숫자 줄)
 //    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 자주 묻는 질문 > 프로젝트 문의(흰 신청서)
 //  - 색: 바탕 #0b0d12, 파랑 #256ef4, 하늘 #7aa7ff, 흰색, 포인트 노랑 #ffd84d
 // 비교용이던 한국형, 일본형, 미국형 첫 화면과 ?v= 장치는 지웠다. 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
@@ -102,8 +102,8 @@ export function ClassicHome() {
         <HeroBuild />
         <Assemble>
           <Services />
-          <Why />
           <Products />
+          <Why />
           <Process />
           <Faq />
           <Apply />
@@ -174,7 +174,7 @@ function Motif({ tone }: { tone: Tone }) {
 function Services() {
   return (
     <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
-      <Head no="01" en="SERVICES" title="하는 일" id="c-services" />
+      <Head no="01" en="BUILD" title="만듭니다" id="c-services" />
       <ul className="mt-10 grid gap-3 md:mt-14 md:grid-cols-6 md:gap-4" role="list">
         {services.map((s) => {
           const t = tones[s.tone];
@@ -202,12 +202,12 @@ function Services() {
 
 function Why() {
   return (
-    <section aria-labelledby="c-why" className="border-y border-white/10 bg-[#0f131b]">
+    <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <Head no="02" en="WHY" title="이럴 때 맡기세요" id="c-why" />
+          <Head no="03" en="CARE" title="돌봅니다" id="c-why" />
           <p data-part className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-            홈페이지 일로 번거로운 순간입니다. 하나라도 해당하면 말씀만 하세요.
+            이럴 때 맡기세요.
           </p>
         </div>
         <ol role="list">
@@ -231,9 +231,9 @@ function Why() {
 function Products() {
   return (
     <section id="products" aria-labelledby="c-products" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
-      <Head no="03" en="PRODUCTS" title="직접 만들어 운영하는 서비스" id="c-products" />
+      <Head no="02" en="RUN" title="운영합니다" id="c-products" />
       <p data-part className="mt-6 max-w-[560px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-        만들고 끝내지 않고 지금도 매일 고치며 운영하는 서비스입니다. 맡기신 일도 이렇게 만들고, 만든 뒤에도 계속 고칩니다.
+        직접 만들어 지금도 운영하고 있는 서비스입니다.
       </p>
       <ul className="mt-10 grid gap-4 md:mt-14 lg:grid-cols-2" role="list">
         {products.map((p) => (
