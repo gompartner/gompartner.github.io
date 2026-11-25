@@ -168,9 +168,6 @@ export function HeroBuild() {
                   <ArrowUpRight size={20} />
                 </span>
               </Link>
-              <Link href="#portfolio" className="gp-pop inline-flex min-h-[56px] items-center rounded-full border border-white/30 px-7 text-[17px] font-bold text-white hover:border-white" style={{ ...at(0.98), "--r": "12deg" } as V}>
-                포트폴리오 보기
-              </Link>
             </div>
             <ul className="order-7 mt-8 flex flex-wrap gap-x-6 gap-y-2.5" role="list">
               {trust.map((t, i) => (

@@ -48,9 +48,8 @@ export const classicMenu = [
 ];
 
 // 11-25 사용자 "랜딩 수준으로 심플하게, 카탈로그, 웹 지식 별도 서비스로 분리". 주 메뉴는 유지보수, 제작, 비용만 두고
-// 카탈로그(/works)와 웹 지식(/knowledge)은 머리글 오른쪽에 따로 둔다. 주소는 그대로라 검색 노출은 유지된다
+// 웹 지식(/knowledge)은 머리글 오른쪽에 따로 둔다. 카탈로그(/works)는 11-25 밤 사용자 결정으로 메뉴에서 내렸다(실적이 아닌 샘플은 보여 주지 않는다)
 export const sideServices = [
-  { href: "/works", label: "카탈로그", match: ["/works", "/sample"] },
   { href: "/knowledge", label: "웹 지식", match: ["/knowledge", "/insight", "/jaryo"] },
 ];
 
@@ -251,7 +250,7 @@ export function ClassicHeader() {
               <ul aria-label="이 페이지" className="mr-2 hidden items-center gap-1 lg:flex" role="list">
                 {[
                   { href: "#services", label: "서비스" },
-                  { href: "#portfolio", label: "포트폴리오" },
+                  { href: "#products", label: "운영 서비스" },
                   { href: "#process", label: "진행 방식" },
                   { href: "#faq", label: "자주 묻는 질문" },
                 ].map((a) => (

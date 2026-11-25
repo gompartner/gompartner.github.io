@@ -69,15 +69,6 @@ export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   // 페이지를 연 시각. 너무 빨리 제출된 신청(자동 입력)을 거르는 데 쓴다.
   const startedAt = useRef(0);
-  // 11-25 메인 랜딩의 "이 일로 신청" 버튼이 보내는 일 이름을 문의 내용에 채운다
-  useEffect(() => {
-    const on = (e: Event) => {
-      const job = (e as CustomEvent<string>).detail;
-      if (job) setMessage(`${job}: `);
-    };
-    window.addEventListener("gp:prefill", on);
-    return () => window.removeEventListener("gp:prefill", on);
-  }, []);
   useEffect(() => {
     startedAt.current = Date.now();
   }, []);

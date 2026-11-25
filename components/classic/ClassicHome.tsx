@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { ArrowUpRight, Check, Mail, Phone, Plus } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
-import { JobApply } from "@/components/classic/JobApply";
 import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
@@ -12,10 +11,12 @@ import { profile } from "@/data/classic/profile";
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
 // 11-25 밤 다시 짬: 흰 바탕용 칸에 색만 뒤집어 덧칠하던 것을 버리고 어두운 바탕 기준으로 처음부터.
-//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 맡기는 이유(큰 숫자 줄) > 기술(흐르는 띠) > 포트폴리오(크기 섞은 격자)
+//  - 칸마다 모양을 다르게: 하는 일(색이 다른 큰 판 4장) > 약속(큰 숫자 줄) > 기술(흐르는 띠) > 운영 서비스(사이트 지킴이, 거래장부)
 //    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 자주 묻는 질문 > 프로젝트 문의(흰 신청서)
 //  - 색: 바탕 #0b0d12, 파랑 #256ef4, 하늘 #7aa7ff, 흰색, 포인트 노랑 #ffd84d
 // 비교용이던 한국형, 일본형, 미국형 첫 화면과 ?v= 장치는 지웠다. 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
+// 11-25 밤 사용자 결정: 샘플(카탈로그) 포트폴리오는 실적이 아니라 메인에서 내리고, 직접 만들어 운영하는 사이트 지킴이와 거래장부를 보여 준다.
+// 문의 버튼은 머리글과 첫 화면에 하나씩, 그리고 맨 아래 신청서뿐(칸마다 달던 문의하기는 "남발"이라 뺌).
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 const h2c = "break-keep text-[32px] font-[800] leading-[1.18] tracking-[-0.05em] md:text-[54px]";
@@ -39,11 +40,11 @@ const services: { no: string; name: string; body: string; price: string; href: s
   { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지. 예약, 주문, 적립, 현장 보고", price: `${manwon(appPlans[0].price)}부터`, href: "/app", tone: "yellow", span: "md:col-span-2" },
   { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받습니다. 요청하면 영업일 24시간 안에 원인과 금액을 회신합니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
-const tones: Record<Tone, { box: string; sub: string; no: string; link: string; btn: "light" | "dark" }> = {
-  blue: { box: "bg-[#256ef4] text-white", sub: "text-white", no: "text-white/80", link: "text-white hover:underline", btn: "light" },
-  white: { box: "bg-white text-[#0b0d12]", sub: "text-[#3d4450]", no: "text-[#256ef4]", link: "text-[#3d4450] hover:text-[#256ef4]", btn: "dark" },
-  yellow: { box: "bg-[#ffd84d] text-[#0b0d12]", sub: "text-[#2f2c14]", no: "text-[#0b0d12]/70", link: "text-[#2f2c14] hover:underline", btn: "dark" },
-  line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", link: "text-[#c9ced6] hover:text-white", btn: "light" },
+const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
+  blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white/80", arrow: "bg-white text-[#256ef4]" },
+  white: { box: "bg-white text-[#0b0d12] hover:bg-[#f1f5ff]", sub: "text-[#3d4450]", no: "text-[#256ef4]", arrow: "bg-[#0b0d12] text-white" },
+  yellow: { box: "bg-[#ffd84d] text-[#0b0d12] hover:bg-[#ffcf24]", sub: "text-[#2f2c14]", no: "text-[#0b0d12]/70", arrow: "bg-[#0b0d12] text-white" },
+  line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white hover:border-[#7aa7ff]", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", arrow: "bg-white text-[#0b0d12]" },
 };
 
 // 회사소개(data/classic/about.ts)의 원칙과 같은 약속. 사람 수, 사업자 형태처럼 작아 보이는 말 대신 고객이 받는 것으로 쓴다
@@ -56,16 +57,24 @@ const reasons = [
 
 const stack = ["Next.js", "React", "TypeScript", "Node.js", "PHP", "PostgreSQL", "MySQL", "Cloudflare", "AWS", "워드프레스", "그누보드", "아임웹", "카페24"];
 
-// 포트폴리오에 쓰는 실제 샘플 화면(카탈로그). 첫 번째가 큰 칸
-const works = [
-  { href: "/sample/dental-homepage", img: "/images/demos/dental-homepage.jpg", kind: "홈페이지", name: "치과 홈페이지" },
-  { href: "/sample/logistics", img: "/images/demos/logistics.jpg", kind: "기업 홈페이지", name: "물류 기업 홈페이지" },
-  { href: "/sample/saas-startup", img: "/images/demos/saas-startup.jpg", kind: "서비스 소개", name: "SaaS 서비스 소개" },
-  { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약 앱" },
-  { href: "/sample/tax-office", img: "/images/demos/tax-office.jpg", kind: "전문직", name: "세무사무소 홈페이지" },
-  { href: "/sample/online-store", img: "/images/demos/online-store.jpg", kind: "쇼핑몰", name: "온라인 쇼핑몰" },
-  { href: "/sample/kiosk-clinic", img: "/images/demos/kiosk-clinic.jpg", kind: "키오스크", name: "병원 접수 키오스크" },
-  { href: "/sample/landing-move-clean", img: "/images/demos/landing-move-clean.jpg", kind: "랜딩페이지", name: "입주 청소 상담 신청" },
+// 직접 기획하고 만들어 운영하는 서비스. 문구는 각 서비스 사이트의 소개 문장에서 가져온다
+const products = [
+  {
+    name: "사이트 지킴이",
+    href: "https://jikimi.gompartner.co.kr/",
+    img: "/images/products/jikimi.jpg",
+    lead: "웹사이트가 멈추거나 인증서, 도메인이 만료되기 전에 알려 주는 모니터링 서비스",
+    facts: ["10분 주기 가용성 점검", "SSL 인증서와 도메인 만료 단계별 알림", "사이트 3개까지 무료"],
+    light: true,
+  },
+  {
+    name: "거래장부",
+    href: "https://jangbu.gompartner.co.kr/",
+    img: "/images/products/jangbu.jpg",
+    lead: "거래명세서와 견적서를 링크로 보내고 미수금까지 관리하는 업무 도구",
+    facts: ["거래명세서, 견적서 작성과 링크 전송", "거래처 수령 확인", "미수금과 월 합계 관리"],
+    light: false,
+  },
 ];
 
 const steps = [
@@ -98,7 +107,8 @@ export function ClassicHome() {
         <Assemble>
           <Services />
           <Why />
-          <Portfolio />
+          <Stack />
+          <Products />
           <Process />
           <Faq />
           <Apply />
@@ -174,20 +184,18 @@ function Services() {
         {services.map((s) => {
           const t = tones[s.tone];
           return (
-            <li key={s.name} data-part className={`relative isolate flex min-h-[250px] flex-col overflow-hidden rounded-[28px] p-7 md:min-h-[310px] md:p-9 ${s.span} ${t.box}`}>
-              <Motif tone={s.tone} />
-              <span className={`text-[15px] font-bold tabular-nums ${t.no}`}>{s.no}</span>
-              <h3 className="mt-3 break-keep text-[28px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{s.name}</h3>
-              <p className={`mt-3 max-w-[460px] break-keep text-[16px] leading-[1.65] md:text-[17px] ${t.sub}`}>{s.body}</p>
-              <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 gap-y-3 pt-8">
-                <span className="text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">{s.price}</span>
-                <span className="flex items-center gap-1">
-                  <NavLink href={s.href} className={`inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-[15px] font-bold ${t.link}`}>
-                    자세히 <ArrowUpRight size={16} aria-hidden />
-                  </NavLink>
-                  <JobApply job={s.name} tone={t.btn} />
+            <li key={s.name} data-part className={s.span}>
+              {/* 판 전체가 상세 페이지로 가는 링크. 문의 버튼은 두지 않는다(맨 아래 신청서와 머리글에 있다) */}
+              <NavLink href={s.href} className={`group relative isolate flex h-full min-h-[250px] flex-col overflow-hidden rounded-[28px] p-7 transition-colors md:min-h-[310px] md:p-9 ${t.box}`}>
+                <Motif tone={s.tone} />
+                <span aria-hidden className={`absolute right-6 top-6 grid h-11 w-11 place-items-center rounded-full transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none md:right-8 md:top-8 ${t.arrow}`}>
+                  <ArrowUpRight size={20} />
                 </span>
-              </div>
+                <span className={`text-[15px] font-bold tabular-nums ${t.no}`}>{s.no}</span>
+                <h3 className="mt-3 break-keep pr-12 text-[28px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{s.name}</h3>
+                <p className={`mt-3 max-w-[460px] break-keep text-[16px] leading-[1.65] md:text-[17px] ${t.sub}`}>{s.body}</p>
+                <span className="mt-auto block pt-8 text-[22px] font-[800] tracking-[-0.03em] md:text-[26px]">{s.price}</span>
+              </NavLink>
             </li>
           );
         })}
@@ -227,7 +235,7 @@ function Why() {
 
 function Stack() {
   return (
-    <div className="overflow-hidden border-b border-white/10 py-8 md:py-11">
+    <section aria-labelledby="c-stack" className="overflow-hidden border-b border-white/10 py-8 md:py-11">
       <h2 id="c-stack" className="sr-only">
         다루는 기술과 플랫폼
       </h2>
@@ -239,45 +247,45 @@ function Stack() {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }
 
-function Portfolio() {
+function Products() {
   return (
-    <section id="portfolio" aria-labelledby="c-portfolio">
-      {/* 기술 띠는 이 칸 맨 위에 둔다(스크롤이 칸 머리에 붙을 때 띠가 같이 보이게) */}
-      <Stack />
-      <div className={`${wrap} py-20 md:py-32`}>
-      <Head no="03" en="PORTFOLIO" title="만든 화면" id="c-portfolio" />
-      <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-4 md:gap-4" role="list">
-        {works.map((w, i) => (
-          <li key={w.href} data-part className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
-            <NavLink href={w.href} className="group flex h-full flex-col overflow-hidden rounded-[22px] border border-white/10 bg-[#121722] hover:border-[#7aa7ff]/60">
-              <span className={`relative block overflow-hidden ${i === 0 ? "aspect-[16/10] md:aspect-auto md:min-h-0 md:flex-1" : "aspect-[16/10]"}`}>
-                <Image src={w.img} alt={`${w.name} 화면`} fill sizes={i === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw"} className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none" />
+    <section id="products" aria-labelledby="c-products" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
+      <Head no="03" en="PRODUCTS" title="직접 만들어 운영하는 서비스" id="c-products" />
+      <p data-part className="mt-6 max-w-[560px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
+        기획부터 개발, 운영까지 직접 하고 있는 서비스입니다. 맡기신 일도 같은 방식으로 만들고 운영합니다.
+      </p>
+      <ul className="mt-10 grid gap-4 md:mt-14 lg:grid-cols-2" role="list">
+        {products.map((p) => (
+          <li key={p.name} data-part className={`flex flex-col overflow-hidden rounded-[28px] ${p.light ? "bg-[#e6eeff] text-[#0b0d12]" : "border border-[#7aa7ff]/45 bg-[#121722] text-white"}`}>
+            <div className="p-7 md:p-9">
+              <h3 className="text-[28px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{p.name}</h3>
+              <p className={`mt-3 max-w-[460px] break-keep text-[16px] leading-[1.65] md:text-[17px] ${p.light ? "text-[#3d4450]" : "text-[#aab2bf]"}`}>{p.lead}</p>
+              <ul className="mt-6 space-y-2.5" role="list">
+                {p.facts.map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-[16px] font-bold md:text-[17px]">
+                    <span aria-hidden className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ${p.light ? "bg-[#256ef4] text-white" : "bg-[#7aa7ff]/20 text-[#7aa7ff]"}`}>
+                      <Check size={13} strokeWidth={3} />
+                    </span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a href={p.href} target="_blank" rel="noopener noreferrer" className={`mt-7 inline-flex min-h-11 items-center gap-1 text-[16px] font-bold underline-offset-4 hover:underline ${p.light ? "text-[#0b50d0]" : "text-[#7aa7ff]"}`}>
+                {p.name} 열기 <ArrowUpRight size={17} aria-hidden />
+              </a>
+            </div>
+            <div className="mt-auto px-7 md:px-9">
+              <span className="relative block aspect-[3/2] overflow-hidden rounded-t-[16px] border border-b-0 border-black/10 bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+                <Image src={p.img} alt={`${p.name} 화면`} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover object-top" />
               </span>
-              <span className={`block ${i === 0 ? "p-4 md:p-6" : "p-3 md:p-4"}`}>
-                <span className="block text-[12px] font-bold text-[#7aa7ff] md:text-[13px]">{w.kind}</span>
-                <span className={`mt-0.5 block break-keep font-[800] tracking-[-0.03em] text-white ${i === 0 ? "text-[19px] md:text-[26px]" : "text-[15px] md:text-[18px]"}`}>{w.name}</span>
-              </span>
-            </NavLink>
+            </div>
           </li>
         ))}
-        <li data-part>
-          <NavLink href="/works" className="group flex h-full min-h-[150px] flex-col justify-between rounded-[22px] bg-[#256ef4] p-4 text-white hover:bg-[#0b50d0] md:p-6">
-            <span className="grid h-10 w-10 place-items-center self-end rounded-full bg-white text-[#0b0d12] md:h-12 md:w-12">
-              <ArrowUpRight size={20} aria-hidden />
-            </span>
-            <span className="break-keep text-[17px] font-[800] leading-[1.3] tracking-[-0.03em] md:text-[22px]">
-              카탈로그
-              <br />
-              전체 보기
-            </span>
-          </NavLink>
-        </li>
       </ul>
-      </div>
     </section>
   );
 }

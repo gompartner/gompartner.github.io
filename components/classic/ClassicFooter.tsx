@@ -32,7 +32,8 @@ const groups = [
   {
     title: "다른 서비스",
     items: [
-      { href: "/works", label: "카탈로그" },
+      { href: "https://jikimi.gompartner.co.kr/", label: "사이트 지킴이" },
+      { href: "https://jangbu.gompartner.co.kr/", label: "거래장부" },
       { href: "/knowledge", label: "웹 지식" },
     ],
   },
