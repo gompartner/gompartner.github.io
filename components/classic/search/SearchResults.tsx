@@ -9,7 +9,10 @@ const ORDER: SearchKind[] = ["서비스", "포트폴리오", "웹 지식", "운�
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {
-  const groups = grouped ? ORDER.map((k) => ({ k, list: items.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "포트폴리오" as SearchKind, list: items }];
+  // 같은 주소와 제목이 두 번 들어온 결과는 한 번만 보여 준다(내린 페이지들이 /make, /maintenance 하나로 모이며 겹쳤다)
+  const seen = new Set<string>();
+  const uniq = items.filter((i) => !seen.has(`${i.href}|${i.title}`) && seen.add(`${i.href}|${i.title}`));
+  const groups = grouped ? ORDER.map((k) => ({ k, list: uniq.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "포트폴리오" as SearchKind, list: uniq }];
   return (
     <div className="space-y-12">
       {groups.map((g) => (
