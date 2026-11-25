@@ -24,6 +24,16 @@ const h2c = "break-keep text-[32px] font-[800] leading-[1.18] tracking-[-0.05em]
 const homeCss = `
 html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
 html.gp-dark .cl .gp-home { color-scheme: light; }
+/* 11-25 밤 "스크롤도 딱 잠깐 걸리면서 보여야 하는데 휘릭 지나감": 칸이 바뀌는 자리마다 스크롤이 자석처럼 붙는다.
+   손가락으로 넘기는 기기(휴대폰, 태블릿)는 mandatory: 넘기면 칸 머리에 딱 붙고, always라 세게 넘겨도 칸마다 한 번은 멈춘다.
+   화면보다 긴 칸 안에서는 자유롭게 움직인다(브라우저 규칙). 바닥글은 끝에 붙여 맨 아래까지 내려갈 수 있게 한다.
+   마우스 휠은 한 칸씩 굴리면 mandatory에서 제자리로 되돌아가 갇히므로(시험으로 확인) 가까울 때만 붙는 proximity로 둔다 */
+html:has(.gp-home) { scroll-snap-type: y proximity; }
+@media (hover: none) and (pointer: coarse) { html:has(.gp-home) { scroll-snap-type: y mandatory; } }
+.gp-home section { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 64px; }
+@media (min-width: 768px) { .gp-home section { scroll-margin-top: 76px; } }
+html:has(.gp-home) footer { scroll-snap-align: end; }
+@media (prefers-reduced-motion: reduce) { html:has(.gp-home) { scroll-snap-type: none; } }
 @keyframes gp-flow { to { stroke-dashoffset: -32; } }
 .gp-flow { animation: gp-flow 1.1s linear infinite; }
 @keyframes gp-flow-y { to { background-position: 0 24px; } }
@@ -97,7 +107,6 @@ export function ClassicHome() {
         <Assemble>
           <Services />
           <Why />
-          <Stack />
           <Portfolio />
           <Process />
           <Faq />
@@ -227,7 +236,7 @@ function Why() {
 
 function Stack() {
   return (
-    <section aria-labelledby="c-stack" className="overflow-hidden border-b border-white/10 py-8 md:py-11">
+    <div className="overflow-hidden border-b border-white/10 py-8 md:py-11">
       <h2 id="c-stack" className="sr-only">
         다루는 기술과 플랫폼
       </h2>
@@ -239,13 +248,16 @@ function Stack() {
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   );
 }
 
 function Portfolio() {
   return (
-    <section id="portfolio" aria-labelledby="c-portfolio" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
+    <section id="portfolio" aria-labelledby="c-portfolio">
+      {/* 기술 띠는 이 칸 맨 위에 둔다(스크롤이 칸 머리에 붙을 때 띠가 같이 보이게) */}
+      <Stack />
+      <div className={`${wrap} py-20 md:py-32`}>
       <Head no="03" en="PORTFOLIO" title="만든 화면" id="c-portfolio" />
       <ul className="mt-10 grid grid-cols-2 gap-3 md:mt-14 md:grid-cols-4 md:gap-4" role="list">
         {works.map((w, i) => (
@@ -274,6 +286,7 @@ function Portfolio() {
           </NavLink>
         </li>
       </ul>
+      </div>
     </section>
   );
 }
