@@ -46,7 +46,7 @@ export function ClassicHeader() {
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보)
     <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50 bg-[#0b0d12]")}>
       <div className="border-b border-white/10">
-        <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-6 md:px-6">
+        <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-1 px-3 min-[360px]:gap-2 min-[360px]:px-4 md:h-[76px] md:gap-6 md:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {/* 안쪽 페이지의 좁은 화면에서는 메뉴 다섯 개가 들어갈 자리를 위해 이름을 감춘다(곰 얼굴만) */}
@@ -60,7 +60,7 @@ export function ClassicHeader() {
                 <Link
                   href={a.href}
                   aria-current={pathname === a.href ? "page" : undefined}
-                  className="inline-flex h-11 items-center rounded-md px-2 text-[14px] font-bold text-[#c9ced6] hover:text-white aria-[current=page]:text-white sm:px-3 sm:text-[16px]"
+                  className="inline-flex h-11 items-center rounded-md px-1.5 text-[13px] font-bold text-[#c9ced6] hover:text-white aria-[current=page]:text-white min-[360px]:px-2 min-[360px]:text-[14px] sm:px-3 sm:text-[16px]"
                 >
                   {a.label}
                 </Link>
