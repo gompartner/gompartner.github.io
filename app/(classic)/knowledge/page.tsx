@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 // 여기서 만드는 목록 한 장(docs)이 위키의 색인이다. 문서가 수백 개를 넘어 이 화면이 무거워지면 이 표를 DB로 옮기고 검색만 서버로 보낸다.
 export const metadata: Metadata = pageMeta({
   title: "위키",
-  description: "홈페이지를 기획하고, 만들고, 넘겨받아 운영하는 데 필요한 문서를 낱말로 찾거나 주제와 종류로 걸러 볼 수 있습니다.",
+  description: "홈페이지를 기획하고, 만들고, 넘겨받아 운영하는 데 필요한 문서를 검색어와 주제, 종류 필터로 찾을 수 있습니다.",
   path: "/knowledge",
 });
 
