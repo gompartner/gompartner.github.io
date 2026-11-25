@@ -7,7 +7,7 @@ import type { Scene } from "./dental3d/PhotoSpace3D";
 
 // 치과 2027형(11-25 세 번째). 2027 흐름 예상: AI로 만든 비슷한 사이트가 넘치는 만큼 "진짜 공간"이 차별점이 된다.
 // 실제 병원 사진을 깊이 지도로 입체로 세우고, 스크롤하면 사진 속으로 걸어 들어간다(실제 납품은 그 병원을 휴대폰으로 찍어 같은 방식).
-// 장면 순서: 1 대기실 전체와 병원 이름 2 대기실 안으로, 진료 시간 3 진료실, 진료 과목 4 진료 의자, 설명 방식 5 밝아지며 오시는 길과 예약 버튼.
+// 장면 순서: 1 접수대와 병원 이름 2 대기실, 진료 시간 3 진료실, 진료 과목 4 거울 가까이, 상담 방식 5 밝아지며 오시는 길과 예약 버튼.
 // 코드로 지은 3D 병원(목업 느낌)과 유리 치아(2026형과 같은 틀)는 사용자가 거절해 뺐다.
 const PhotoSpace3D = dynamic(() => import("./dental3d/PhotoSpace3D"), { ssr: false });
 
@@ -17,16 +17,17 @@ const C = { ink: "#141414", sub: "#5c5c5c", key: "#0f6b5c" };
 const IMG = "/images/drafts/dent27";
 
 const SCENES: Scene[] = [
-  { k: "wait", from: 0, to: 0.42, focus: 0.5, push: 2.4 },
-  { k: "room", from: 0.42, to: 0.72, focus: 0.6, push: 1.9 },
-  { k: "chair", from: 0.72, to: 1.0, focus: 0.42, push: 1.6 },
+  { k: "rec", from: 0, to: 0.3, focus: 0.5, push: 1.2, sway: 0.12, aim: [0.58, 0.55], aimM: [0.55, 0.58] },
+  { k: "wait", from: 0.3, to: 0.55, focus: 0.5, push: 0.9, sway: -0.1, aim: [0.4, 0.6], aimM: [0.42, 0.72] },
+  { k: "room", from: 0.55, to: 0.78, focus: 0.6, push: 0.9, sway: 0.1, aim: [0.42, 0.6], aimM: [0.36, 0.62] },
+  { k: "mirror", from: 0.78, to: 1.0, focus: 0.55, push: 0.7, sway: -0.07, aim: [0.6, 0.62], aimM: [0.55, 0.6] },
 ];
-// 진행값 구간마다 보여 줄 글(0 첫 화면, 1 대기실, 2 진료실, 3 진료 의자, 4 끝)
+// 진행값 구간마다 보여 줄 글(0 첫 화면 접수, 1 대기실, 2 진료실, 3 상담, 4 끝)
 const STAGES: [number, number][] = [
-  [0, 0.12],
-  [0.17, 0.4],
-  [0.47, 0.7],
-  [0.76, 0.88],
+  [0, 0.14],
+  [0.33, 0.52],
+  [0.58, 0.75],
+  [0.8, 0.88],
   [0.9, 1.01],
 ];
 const HOURS = [
@@ -99,8 +100,8 @@ export function Dental2027() {
           {/* 3D가 사진을 다 받기 전까지만 정지 사진을 보여 주고, 준비되면 치운다(뒤에 겹쳐 비치지 않게) */}
           {!ready && (
             <picture>
-              <source media="(orientation: portrait)" srcSet={`${IMG}/wait-m.jpg`} />
-              <img src={`${IMG}/wait-sm.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <source media="(orientation: portrait)" srcSet={`${IMG}/rec-m.jpg`} />
+              <img src={`${IMG}/rec-sm.jpg`} alt="" className="absolute inset-0 h-full w-full object-cover" />
             </picture>
           )}
           <div className="absolute inset-0 transition-opacity duration-500" style={{ opacity: ready ? 1 : 0 }}>
@@ -141,9 +142,9 @@ export function Dental2027() {
             </ul>
           </Panel>
 
-          <Panel style={show(3)} label="진료 의자" title="치료하는 동안 모니터로 같이 봅니다">
+          <Panel style={show(3)} label="상담" title="치료 계획은 CT를 같이 보며 정합니다">
             <p className="mt-4 text-[16px]" style={{ color: C.sub }}>
-              치료 계획은 CT를 같이 보며 정합니다. 순서와 기간, 비용을 먼저 적어 드리고 결정은 집에 가서 하셔도 됩니다.
+              치료 순서와 기간, 비용을 먼저 적어 드립니다. 치료 중에는 모니터로 지금 하는 일을 보여 드리고, 결정은 집에 가서 하셔도 됩니다.
             </p>
           </Panel>
 
@@ -173,7 +174,7 @@ export function Dental2027() {
           </div>
 
           <ol className="pointer-events-none absolute right-10 top-1/2 hidden -translate-y-1/2 flex-col gap-3 text-[13px] font-bold lg:flex" style={{ opacity: 1 - white }}>
-            {["대기실", "진료실", "진료 의자"].map((t, i) => (
+            {["대기실", "진료실", "상담"].map((t, i) => (
               <li key={t} className="flex items-center justify-end gap-2 text-white" style={{ opacity: stage === i + 1 ? 1 : 0.5 }}>
                 {t}
                 <span className="h-px bg-white" style={{ width: stage === i + 1 ? 36 : 16, transition: "width .4s" }} />

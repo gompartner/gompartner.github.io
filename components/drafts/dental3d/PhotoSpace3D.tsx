@@ -6,12 +6,14 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 
 // 치과 2027형(11-25) 실사 공간. 실제 치과 사진과 그 사진에서 뽑은 깊이 지도(Depth Anything V2)로 사진을 입체로 세우고,
 // 스크롤하면 카메라가 사진 속으로 걸어 들어간다. 사진은 Unsplash 라이선스(상업 사용 가능, 출처 표기 의무 없음).
-// 대기실 Benyamin Bohlouli(B_sK_xgzwVA), 진료실 aFqSRokmw2E, 진료 의자 Ozkan Guner(AQG6C_xYEpA).
+// 사진(11-25 교체): 접수 Unsplash ECBg5FQkBXI, 대기실 Unsplash pxOQ-P97sA8, 진료실 Pexels 9062525, 거울 Unsplash rubu_NvklJE.
+// 움직임: 사진 속으로 다가가며 옆으로 비스듬히 돌아(앞뒤 물체가 따로 움직임), 초점이 먼 곳에서 가까운 곳으로 옮겨 간다.
 // 11-25 손봄: 스크롤 값을 바로 쓰지 않고 따라가게(부드럽게), 사진 두 장이 겹쳐 비치지 않게 어두워졌다 밝아지며 넘김,
 // 앞 물건 가장자리가 늘어나 번져 보이지 않게 입체 높이와 옆 움직임을 줄임.
 
 const IMG = "/images/drafts/dent27";
-export type Scene = { k: string; from: number; to: number; focus: number; push: number };
+/** aim, aimM: 다가갈 지점(사진 안 비율 x, y, 위에서부터). aimM은 세로 사진용 */
+export type Scene = { k: string; from: number; to: number; focus: number; push: number; sway?: number; aim?: [number, number]; aimM?: [number, number] };
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const ease = (x: number) => x * x * (3 - 2 * x);
@@ -21,9 +23,11 @@ const VERT = /* glsl */ `
   uniform sampler2D uDepth;
   uniform float uStrength;
   varying vec2 vUv;
+  varying float vDepth;
   void main() {
     vUv = uv;
     float d = texture2D(uDepth, uv).r;
+    vDepth = d;
     vec3 p = position;
     p.z += d * uStrength; // 가까운 것(밝은 값)이 앞으로 나온다
     gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
@@ -32,10 +36,15 @@ const VERT = /* glsl */ `
 const FRAG = /* glsl */ `
   uniform sampler2D uMap;
   uniform float uOpacity;
+  uniform float uFocus;
+  uniform float uBlur;
   varying vec2 vUv;
+  varying float vDepth;
   void main() {
-    vec4 c = texture2D(uMap, vUv);
-    gl_FragColor = vec4(c.rgb * uOpacity, 1.0); // 투명하게 겹치지 않고 어둡게 바뀐다
+    // 초점 거리에서 먼 곳일수록 작은 밉맵을 읽어 흐리게(초점 옮기기)
+    float b = clamp(abs(vDepth - uFocus) * uBlur, 0.0, 3.5);
+    vec4 c = texture2D(uMap, vUv, b);
+    gl_FragColor = vec4(mix(vec3(0.965, 0.965, 0.957), c.rgb, uOpacity), 1.0); // 겹치지 않고 밝은 바탕으로 바뀐다
     #include <colorspace_fragment>
   }
 `;
@@ -58,7 +67,7 @@ function Layer({ scene, index, last, smoothRef, opt }: { scene: Scene; index: nu
     return new THREE.ShaderMaterial({
       vertexShader: VERT,
       fragmentShader: FRAG,
-      uniforms: { uMap: { value: tex }, uDepth: { value: depth }, uStrength: { value: 0 }, uOpacity: { value: 0 } },
+      uniforms: { uMap: { value: tex }, uDepth: { value: depth }, uStrength: { value: 0 }, uOpacity: { value: 0 }, uFocus: { value: 0.3 }, uBlur: { value: 0 } },
     });
   }, [map, depth]);
   const geo = useMemo(() => (small ? new THREE.PlaneGeometry(1, 1, 110, 74) : new THREE.PlaneGeometry(1, 1, 200, 134)), [small]);
@@ -78,16 +87,30 @@ function Layer({ scene, index, last, smoothRef, opt }: { scene: Scene; index: nu
     // 화면을 꽉 채우도록(cover) 크기를 맞추고, 사진 속으로 들어갈 여유를 둔다
     const vh = 2 * Math.tan(THREE.MathUtils.degToRad((camera as THREE.PerspectiveCamera).fov / 2)) * 6;
     const vw = vh * viewport.aspect;
-    const cover = Math.max(vw / aspect, vh) * 1.1;
+    const cover = Math.max(vw / aspect, vh) * 1.14;
     m.scale.set(cover * aspect, cover, 1);
     // 좁은 화면은 사진의 중요한 부분(focus, 0~1)을 가운데로
     const extra = Math.max(0, cover * aspect - vw) / 2;
     m.position.x = THREE.MathUtils.clamp((0.5 - focus) * cover * aspect, -extra, extra);
     const out = 1 - fadeOut;
-    m.position.z = still ? 0 : ease(local) * scene.push + out * 0.9;
+    const e = ease(local);
+    // 다가가는 동안 그 지점이 화면 가운데로 오게 판을 옮긴다(빈 벽이 아니라 의자, 꽃, 거울 쪽으로)
+    const [ax, ay] = (tall ? scene.aimM : scene.aim) ?? [0.5, 0.5];
+    const px = (ax - 0.5) * cover * aspect;
+    const py = (0.5 - ay) * cover;
+    m.position.x = THREE.MathUtils.clamp(m.position.x - px * e, -extra - Math.abs(px), extra + Math.abs(px));
+    m.position.y = still ? 0 : -py * e;
+    m.position.z = still ? 0 : e * scene.push + out * 0.9;
+    // 비스듬히 돌아 들어가기: 판을 조금씩 돌리면 앞 물체와 뒤 벽이 다른 속도로 움직인다
+    const sway = scene.sway ?? 0.12;
+    m.rotation.y = still ? 0 : (0.5 - e) * sway * 2;
+    m.rotation.x = still ? 0 : (e - 0.5) * sway * 0.4;
     const u = (m.material as THREE.ShaderMaterial).uniforms;
-    u.uStrength.value = still ? 0 : cover * 0.085;
+    u.uStrength.value = still ? 0 : cover * 0.13;
     u.uOpacity.value = ease(Math.min(fadeIn, fadeOut));
+    // 처음엔 안쪽(먼 곳)에 초점, 다가갈수록 앞 물건으로 초점이 온다
+    u.uFocus.value = 0.25 + e * 0.6;
+    u.uBlur.value = still ? 0 : small ? 1.8 : 2.6;
   });
 
   return <mesh ref={mesh} geometry={geo} material={mat} />;
@@ -150,7 +173,7 @@ function PhotoSpace3D({ progress, scenes, still, low, onReady }: { progress: Rea
       gl={{ antialias: !light, powerPreference: "high-performance" }}
       style={{ touchAction: "pan-y" }}
     >
-      <color attach="background" args={["#0d0d0d"]} />
+      <color attach="background" args={["#f6f6f4"]} />
       <Rig progress={progress} smoothRef={smoothRef} still={still} />
       {scenes.map((s, i) => (
         <Layer key={s.k} scene={s} index={i} last={i === scenes.length - 1} smoothRef={smoothRef} opt={opt} />
