@@ -27,7 +27,7 @@ for (const t of ["site-check", "php-check"]) lines.push(`/tools/${t} https://jik
 for (const t of ["accessibility-check", "cron", "estimate-questions", "hosting-cost", "image-compress", "jwt-parser", "privacy-policy", "qr-code", "search-preview", "terms", "unix-time"]) lines.push(`/tools/${t} /knowledge/checklists 301`);
 // 11-26 안쪽을 판 네 개로 다시 만들며 내린 주소. 제작 상세 5종은 제작 판, 유지보수 하위는 유지보수 판, 데모와 샘플과 업종별 목록은 카탈로그 판으로
 for (const p of ["homepage", "landing-page", "program", "app", "kiosk"]) lines.push(`/${p} /make 301`);
-lines.push("/maintenance/* /maintenance 301", "/works/* /works 301", "/sample/* /works 301", "/demo/* /works 301", "/work/* /works 301", "/knowledge/drafts /knowledge 301");
+lines.push("/maintenance/* /maintenance 301", "/works/* /works 301", "/sample/* /works 301", "/demo/* /works 301", "/work/* /works 301", "/knowledge/drafts /knowledge 301", "/history /story 301");
 // 11-25 영문 페이지(/en)를 내림(사용자: 영문 유입이 없음). 옛 주소는 메인으로
 lines.push("/en / 301", "/en/* / 301");
 // 11-21 아카이브(/archive)를 웹 지식(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로

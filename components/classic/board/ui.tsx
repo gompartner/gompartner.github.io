@@ -53,8 +53,9 @@ export function BoardShell({ no, en, ice, title, lead, children }: { no: string;
           </p>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
             <h1 className="relative break-keep text-[40px] font-[800] leading-[1.1] tracking-[-0.05em] md:text-[68px]">
-              {/* 읽는 글자는 한 벌(보이지 않게 자리만), 보이는 글자는 면 네 장으로 나눠 조립한다 */}
-              <span className="invisible">
+              {/* 보이는 글자는 면 네 장으로 나눠 조립한다 */}
+              {/* opacity-0: 자리와 읽는 글자를 맡는다(visibility로 숨기면 화면 읽기 프로그램에서 제목이 비어 버린다) */}
+              <span className="opacity-0">
                 {ice}
                 {title}
               </span>

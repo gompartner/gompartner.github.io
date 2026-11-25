@@ -50,7 +50,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
-    { path: "/history", priority: 0.5, files: ["app/(classic)/history/page.tsx", "data/classic/history.ts"] },
     { path: "/faq", priority: 0.7, files: ["app/(classic)/faq/page.tsx", "data/classic/faq.ts"] },
     { path: "/contact", priority: 0.7, files: ["app/(classic)/contact/page.tsx"] },
 
