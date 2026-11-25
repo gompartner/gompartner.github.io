@@ -1,13 +1,10 @@
-import Image from "next/image";
 import { NavLink } from "@/components/classic/NavLink";
 import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { OnepageFreePromo } from "@/components/classic/OnepageFreePromo";
-import { SiteBuilder } from "@/components/classic/SiteBuilder";
-import { builderItems } from "@/components/classic/works/samples";
-import { manualLog } from "@/data/classic/archive";
 import { appPlans, kioskPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 
-// 11-24 원페이지 메인(사용자 "임팩트 있는 원페이지"): 첫 화면 시안 미리보기, 파는 것(유지보수, 제작과 시작 금액), 약속, 포트폴리오, 웹 지식.
+// 11-25 랜딩 수준 메인(사용자 "랜딩 수준으로 심플하게, 카탈로그, 웹 지식 별도 서비스로 분리"): 건별 수정 띠, 한 줄 소개와 상담 버튼, 파는 것과 시작 금액, 납품 기준, 원페이지 무료 제작 (마지막 상담 띠는 공통 바닥글 위에 이미 있다).
+// 시안 고르기(SiteBuilder)와 포트폴리오는 카탈로그(/works)로, 웹 지식은 /knowledge로 따로 둔다.
 // 서비스 설명, 비용 상세, 자주 묻는 질문은 각 페이지에 그대로 있고 여기서는 링크로 잇는다.
 
 const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
@@ -29,12 +26,6 @@ const care = [
   { href: "/maintenance/ai-site", name: "고도화", body: "MVP와 시제품 완제품화" },
 ];
 
-const portfolio = [
-  { href: "/sample/app-pilates", img: "/images/demos/app-pilates.jpg", kind: "앱", name: "필라테스 예약과 회원권 앱", alt: "필라테스 예약과 회원권 앱 화면" },
-  { href: "/sample/kiosk-clinic", img: "/images/demos/kiosk-clinic.jpg", kind: "키오스크", name: "병원 접수 키오스크", alt: "병원 접수 키오스크 화면" },
-  { href: "/sample/bakery-cafe", img: "/images/demos/bakery-cafe.jpg", kind: "홈페이지", name: "베이커리 홈페이지", alt: "베이커리 홈페이지 화면" },
-  { href: "/sample/landing-water-rental", img: "/images/demos/landing-water-rental.jpg", kind: "랜딩페이지", name: "정수기 렌탈 상담 신청", alt: "정수기 렌탈 상담 랜딩페이지 화면" },
-];
 
 const strengths = ["원본 소스 제공", "점검 결과표", "인계 문서", "무상 하자보수"];
 
@@ -44,9 +35,7 @@ export function ClassicHome() {
       <Hero />
       <Products />
       <Promise />
-      <Portfolio />
       <OnepageFreePromo />
-      <Knowledge />
     </div>
   );
 }
@@ -71,11 +60,21 @@ function Hero() {
           </div>
         </div>
       </div>
-      <div className={`${wrap} pb-10 pt-8 md:pb-16 md:pt-12`}>
-        <h1 id="c-hero" className="mb-6 break-keep text-[17px] font-bold tracking-[-0.02em] text-[#3d4450] md:mb-8 md:text-[19px]">
-          홈페이지, 앱 제작과 유지보수
+      <div className={`${wrap} pb-14 pt-12 md:pb-24 md:pt-20`}>
+        <h1 id="c-hero" className="break-keep text-[34px] font-[800] leading-[1.2] tracking-[-0.05em] md:text-[56px]">
+          홈페이지 제작과 유지보수
         </h1>
-        <SiteBuilder items={builderItems()} />
+        <p className="mt-4 max-w-[640px] break-keep text-[17px] leading-[1.6] text-[#3d4450] md:mt-5 md:text-[20px]">
+          새로 만들 때도, 이미 있는 사이트를 고칠 때도 금액과 일정을 먼저 안내하고 시작합니다. 원본 소스와 인계 문서까지 드립니다.
+        </p>
+        <div className="mt-7 flex flex-wrap gap-2.5 md:mt-9">
+          <NavLink href="/contact" data-gtm-cta="classic_hero_contact" className="inline-flex min-h-[52px] items-center rounded-md bg-[#256ef4] px-6 text-[17px] font-bold text-white hover:bg-[#0b50d0]">
+            상담 신청
+          </NavLink>
+          <NavLink href="/works" data-gtm-cta="classic_hero_catalog" className="inline-flex min-h-[52px] items-center gap-1 rounded-md border-2 border-[#15171c] px-6 text-[17px] font-bold text-[#15171c] hover:bg-[#f4f6fa]">
+            카탈로그 보기 <ArrowUpRight size={19} aria-hidden />
+          </NavLink>
+        </div>
       </div>
     </section>
   );
@@ -142,64 +141,6 @@ function Promise() {
           <li key={s} className="flex items-center gap-2 text-[16px] font-[800] tracking-[-0.03em] md:text-[19px]">
             <CheckCircle2 aria-hidden className="size-5 shrink-0 text-[#256ef4] md:size-6" />
             {s}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function Portfolio() {
-  return (
-    <section aria-labelledby="c-portfolio" className={`${wrap} py-14 md:py-24`}>
-      <div className="mb-7 flex items-baseline justify-between gap-3 md:mb-9">
-        <h2 id="c-portfolio" className={h2c}>
-          포트폴리오
-        </h2>
-        <NavLink href="/works" className="flex min-h-11 items-center gap-1 text-[16px] font-bold text-[#5b6370] hover:text-[#256ef4]">
-          전체 보기 <ArrowUpRight size={18} aria-hidden />
-        </NavLink>
-      </div>
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-6 md:gap-x-7 md:gap-y-10" role="list">
-        {portfolio.map((p) => (
-          <li key={p.href}>
-            <NavLink href={p.href} data-gtm-cta={`classic_portfolio_${p.href.split("/").filter(Boolean).pop()}`} className="group block">
-              <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] bg-[#f4f6fa]">
-                <Image src={p.img} alt={p.alt} fill sizes="50vw" className="object-cover transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-[1.025] motion-reduce:transition-none" />
-              </span>
-              <span className="block pt-2.5 md:flex md:items-baseline md:gap-2.5 md:pt-3">
-                <span className="block shrink-0 text-[13px] font-bold text-[#256ef4] md:text-[14px]">{p.kind}</span>
-                <span className="block min-w-0 flex-1 break-keep text-[16px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[21px]">{p.name}</span>
-                <span className="hidden shrink-0 text-[15px] font-bold text-[#5b6370] group-hover:text-[#256ef4] md:block">상세보기</span>
-              </span>
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function Knowledge() {
-  const posts = manualLog.slice(0, 4);
-  return (
-    <section aria-labelledby="c-knowledge" className={`${wrap} py-14 md:py-24`}>
-      <div className="mb-6 flex items-baseline justify-between gap-3 md:mb-8">
-        <h2 id="c-knowledge" className={h2c}>
-          웹 지식
-        </h2>
-        <NavLink href="/knowledge" className="flex min-h-11 items-center gap-1 text-[16px] font-bold text-[#5b6370] hover:text-[#256ef4]">
-          전체 보기 <ArrowUpRight size={18} aria-hidden />
-        </NavLink>
-      </div>
-      <ul className="border-t-2 border-[#15171c]" role="list">
-        {posts.map((p) => (
-          <li key={p.href} className="border-b border-[#d9dee5]">
-            <NavLink href={p.href} className="group grid gap-x-6 gap-y-0.5 py-4 md:grid-cols-[110px_1fr_auto] md:items-baseline md:py-5">
-              <span className="text-[14px] font-bold text-[#256ef4] md:text-[15px]">{p.kind}</span>
-              <span className="break-keep text-[17px] font-[800] tracking-[-0.03em] transition-colors group-hover:text-[#256ef4] md:text-[19px]">{p.title}</span>
-              <span className="text-[14px] tabular-nums text-[#5b6370]">{p.date.replaceAll("-", ".")}</span>
-            </NavLink>
           </li>
         ))}
       </ul>

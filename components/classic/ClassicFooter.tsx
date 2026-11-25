@@ -26,7 +26,14 @@ const groups = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
-      { href: "/works", label: "포트폴리오" },
+    ],
+  },
+  // 11-25 별도 서비스(머리글 오른쪽과 같게)
+  {
+    title: "다른 서비스",
+    items: [
+      { href: "/works", label: "카탈로그" },
+      { href: "/knowledge", label: "웹 지식" },
     ],
   },
   {
@@ -57,7 +64,7 @@ const contactIcon = "shrink-0 text-[#7d8594]";
 export function ClassicFooter() {
   return (
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
-      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
         <div className="col-span-2 md:col-span-3 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />

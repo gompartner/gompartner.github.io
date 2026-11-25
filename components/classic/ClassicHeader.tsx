@@ -31,7 +31,7 @@ export const classicMenu = [
   {
     label: "제작",
     href: "/homepage",
-    match: ["/works", "/sample", "/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
+    match: ["/homepage", "/landing-page", "/program", "/app", "/kiosk", "/3d"],
     // 11-01 랜딩, 업무 프로그램은 제작 안에 둔다(10-29 사용자 결정)
     items: [
       { href: "/homepage", label: "홈페이지 제작" },
@@ -40,30 +40,18 @@ export const classicMenu = [
       { href: "/app", label: "앱 제작" },
       { href: "/kiosk", label: "키오스크 화면 제작" },
       { href: "/3d", label: "3D 웹 제작" },
-      // 11-25 포트폴리오(옛 카탈로그)는 제작 아래 마지막
-      { href: "/works", label: "포트폴리오" },
     ],
   },
   { label: "비용", href: "/pricing", match: ["/pricing"], items: [] },
-  // 11-21 웹 지식(컨플루언스식 공간). 인사이트, 점검표는 원래 주소 그대로 두고 웹 지식 트리에서 잇는다
-  {
-    label: "웹 지식",
-    href: "/knowledge",
-    match: ["/knowledge", "/insight", "/jaryo"],
-    items: [
-      { href: "/knowledge", label: "전체" },
-      { href: "/knowledge/plan", label: "기획" },
-      { href: "/knowledge/design", label: "디자인" },
-      { href: "/knowledge/dev", label: "개발" },
-      { href: "/knowledge/infra", label: "인프라" },
-      { href: "/knowledge/security", label: "보안" },
-      { href: "/knowledge/search", label: "검색" },
-      { href: "/knowledge/ops", label: "운영과 유지보수" },
-      { href: "/knowledge/law", label: "법과 규정" },
-    ],
-  },
   // 고객 사례는 계약 끝나고 게재 동의를 받은 실제 사례가 data/classic/cases.ts에 들어가는 순간 메뉴에 나온다(그 전엔 빈 값, 메뉴와 페이지 없음)
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/cases", match: ["/cases"], items: [] }] : []),
+];
+
+// 11-25 사용자 "랜딩 수준으로 심플하게, 카탈로그, 웹 지식 별도 서비스로 분리". 주 메뉴는 유지보수, 제작, 비용만 두고
+// 카탈로그(/works)와 웹 지식(/knowledge)은 머리글 오른쪽에 따로 둔다. 주소는 그대로라 검색 노출은 유지된다
+export const sideServices = [
+  { href: "/works", label: "카탈로그", match: ["/works", "/sample"] },
+  { href: "/knowledge", label: "웹 지식", match: ["/knowledge", "/insight", "/jaryo"] },
 ];
 
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
@@ -254,19 +242,25 @@ export function ClassicHeader() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            {/* 11-02 통합검색: 넓은 화면은 바로 입력하는 칸, 좁은 화면은 돋보기 */}
-            <form action="/search" method="get" role="search" className="hidden h-11 w-[220px] items-center rounded-md border border-[#d9dee5] bg-white focus-within:border-[#15171c] xl:flex">
-              <Search size={18} aria-hidden className="ml-3 shrink-0 text-[#6b7280]" />
-              <label htmlFor="header-q" className="sr-only">
-                통합검색
-              </label>
-              <input id="header-q" name="q" type="search" placeholder="서비스 검색" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[15px] outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
-            </form>
+            {/* 11-25 별도 서비스: 카탈로그, 웹 지식 */}
+            <ul aria-label="다른 서비스" className="mr-1 hidden items-center gap-1 border-r border-[#e6e9ee] pr-3 lg:flex" role="list">
+              {sideServices.map((s) => (
+                <li key={s.href}>
+                  <NavLink
+                    href={s.href}
+                    aria-current={s.match.some((p) => pathname.startsWith(p)) ? "page" : undefined}
+                    className="inline-flex h-11 items-center rounded-md px-2.5 text-[15px] font-bold text-[#5b6370] hover:text-[#256ef4] aria-[current=page]:text-[#256ef4]"
+                  >
+                    {s.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
             <Link
               href="/search"
               aria-label="통합검색"
               aria-current={pathname === "/search" ? "page" : undefined}
-              className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] min-[360px]:grid xl:hidden"
+              className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] min-[360px]:grid"
             >
               <Search size={21} aria-hidden />
             </Link>
@@ -326,6 +320,18 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
+          <section className="border-b border-[#e6e9ee] py-4">
+            <p className="text-[15px] font-bold text-[#5b6370]">다른 서비스</p>
+            <ul className="mt-2 grid grid-cols-2 gap-x-4" role="list">
+              {sideServices.map((s) => (
+                <li key={s.href}>
+                  <NavLink href={s.href} className="block py-2 text-[17px] font-[800] text-[#15171c]">
+                    {s.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </section>
           <ul className="mt-4 grid grid-cols-2 gap-x-4" role="list">
             {subMenu.map((i) => (
               <li key={i.href}>
