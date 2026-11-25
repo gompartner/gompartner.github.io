@@ -49,6 +49,10 @@ export function DentalA() {
             <p className="mt-6 max-w-[440px] text-[16px] md:text-[18px]" style={{ color: C.sub }}>
               당장 필요한 치료와 나중에 해도 되는 치료를 나눠서 말씀드립니다. 진료 전에 비용과 횟수를 먼저 확인하실 수 있습니다.
             </p>
+            <span className="mt-10 inline-flex h-[54px] items-center gap-2 px-7 font-bold text-white" style={{ background: C.ink }}>
+              상담 문의
+              <ArrowRight size={18} aria-hidden />
+            </span>
           </div>
           <div className="relative aspect-[4/3] lg:aspect-[5/6] lg:self-stretch">
             <Image src={`${IMG}/a-hero.jpg`} alt="밝은 회색 배경 위의 전동 칫솔" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />

@@ -45,6 +45,9 @@ export function OrthoA() {
             엑스레이, 초음파로 통증 부위를 직접 확인한 뒤 주사, 도수, 체외충격파 같은 비수술 치료 순서를 정합니다.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
+            <span className="inline-flex h-[54px] items-center gap-2 bg-white px-7 text-[16px] font-bold" style={{ color: C.navy }}>
+              상담 문의 <ArrowRight size={18} aria-hidden />
+            </span>
             <span className="inline-flex h-[54px] items-center border border-white/60 px-7 text-[16px] font-bold">02-000-0000</span>
           </div>
         </div>

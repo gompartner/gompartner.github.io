@@ -46,6 +46,10 @@ export function SkinA() {
             <p className="mt-6 max-w-[440px] text-[16px] md:text-[18px]" style={{ color: C.sub }}>
               같은 기미도 깊이에 따라 치료가 다릅니다. 피부 측정 결과를 보여 드리고, 필요한 시술만 권합니다.
             </p>
+            <span className="mt-10 inline-flex h-[54px] items-center gap-2 px-7 font-bold text-white" style={{ background: C.ink }}>
+              상담 문의
+              <ArrowRight size={18} aria-hidden />
+            </span>
           </div>
           <div className="relative aspect-[4/3] lg:aspect-[5/6]">
             <Image src={`${IMG}/a-hero.jpg`} alt="밝은 배경 위에 놓인 흰 화장품 병들" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
