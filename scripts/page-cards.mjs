@@ -1,5 +1,7 @@
 // 11-22 대표 이미지가 따로 없는 페이지의 공유, 검색 썸네일(1200x675 JPG). 인사이트 카드와 같은 그림체.
-// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all]
+// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all] [--only <주소 앞부분>]
+//  --only /knowledge 처럼 주면 그 주소로 시작하는 페이지만 다시 만든다(이름표가 바뀌었을 때)
+//  CDP=http://127.0.0.1:9333 을 주면 새 크롬을 띄우지 않고 이미 떠 있는 업무용 크롬의 새 탭으로 만든다
 // 사이트맵의 각 페이지를 열어 og:image가 공통 이미지(og-image.png)인 페이지만 h1과 분류로 카드를 만든다. 결과는 public/og/page/<주소>.jpg
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -8,6 +10,7 @@ import { chromium } from "playwright-core";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const base = process.argv[2] ?? "http://localhost:3000";
 const all = process.argv.includes("--all");
+const only = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : "";
 const OUT = `${root}public/og/page`;
 mkdirSync(OUT, { recursive: true });
 const key = (p) => p.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
@@ -16,7 +19,9 @@ const avatar = readFileSync(`${root}public/images/bear-avatar.webp`).toString("b
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 // 분류 이름표: 주소 앞부분으로 정한다
 const label = (p) =>
-  p.startsWith("/knowledge/terms/") ? "용어" : p.startsWith("/knowledge") ? "위키" : p.startsWith("/tools/") ? "무료 도구" : p.startsWith("/notice") ? "공지사항" : p.startsWith("/maintenance") ? "유지보수" : p.startsWith("/works") ? "업종별 홈페이지" : "곰파트너";
+  p.startsWith("/knowledge/terms/") ? "용어" : p.startsWith("/knowledge") ? "위키" : p.startsWith("/tools/") ? "무료 도구" : p.startsWith("/notice") ? "공지사항" : p.startsWith("/maintenance") ? "유지보수" : p.startsWith("/works") ? "카탈로그" : p.startsWith("/make") ? "제작" : "곰파트너";
+// 11-26 판으로 바꾼 페이지는 큰 제목이 질문 문장이라(무엇을 만들까요 등) 카드에는 페이지 이름을 쓴다
+const TITLES = { "/make": "홈페이지, 앱 제작", "/works": "만든 화면 카탈로그", "/maintenance": "홈페이지 유지보수", "/pricing": "비용", "/knowledge": "위키", "/story": "회사소개" };
 const page = (lb, t) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face { font-family: P; src: url(data:font/woff2;base64,${font}) format("woff2"); font-weight: 100 900; }
 * { margin: 0; box-sizing: border-box; }
@@ -31,16 +36,19 @@ h1 { margin-top: 26px; font-size: ${t.length > 22 ? 48 : 56}px; font-weight: 800
 
 const xml = await (await fetch(`${base}/sitemap.xml`)).text();
 const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname).filter((p) => p !== "/" && !p.startsWith("/en") && !p.startsWith("/3d/") && !p.startsWith("/insight/"));
-const b = await chromium.launch({ channel: "chrome" });
-const p = await b.newPage({ viewport: { width: 1200, height: 675 } });
+const cdp = process.env.CDP;
+const b = cdp ? await chromium.connectOverCDP(cdp) : await chromium.launch({ channel: "chrome" });
+const p = cdp ? await b.contexts()[0].newPage() : await b.newPage({ viewport: { width: 1200, height: 675 } });
+if (cdp) await p.setViewportSize({ width: 1200, height: 675 });
 let n = 0;
 for (const path of paths) {
   const file = `${OUT}/${key(path)}.jpg`;
-  if (!all && existsSync(file)) continue;
+  if (only && !path.startsWith(only)) continue;
+  if (!all && !only && existsSync(file)) continue;
   const html = await (await fetch(base + path)).text();
   const og = html.match(/<meta property="og:image" content="([^"]*)/)?.[1] ?? "";
   if (!/og-image\.png/.test(og) && !og.includes("/og/page/")) continue;
-  const h1 = (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
+  const h1 = TITLES[path] ?? (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
   if (!h1) continue;
   await p.setContent(page(label(path), h1));
   await p.evaluate(() => document.fonts.ready);
@@ -48,5 +56,7 @@ for (const path of paths) {
   n++;
   console.log(path, "|", h1);
 }
-await b.close();
+await p.close();
+if (!cdp) await b.close();
 console.log("만든 카드", n);
+process.exit(0);
