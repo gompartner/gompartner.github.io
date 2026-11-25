@@ -26,7 +26,7 @@ export default function ClassicContactPage() {
       />
       <SupportTabs current="/contact" />
 
-      {/* 11-26 메인 맨 아래 신청서와 같은 배치: 왼쪽 연락처, 오른쪽 흰 카드 안 신청서(keep-light: 카드 안은 밝은 색 그대로) */}
+      {/* 11-26 메인 맨 아래 신청서와 같은 배치: 왼쪽 연락처, 오른쪽 카드 안 신청서. 어두운 화면에서는 어두운 카드, 밝은 화면에서는 흰 카드 */}
       <div className={`${wrap} grid gap-10 pb-20 pt-8 md:pb-28 md:pt-12 lg:grid-cols-[1fr_640px] lg:gap-16`}>
         <div>
         <ul className="space-y-3" role="list" aria-label="연락처">
@@ -49,11 +49,11 @@ export default function ClassicContactPage() {
         </ul>
         <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 {profile.bizNo}</p>
         </div>
-        <section aria-labelledby="contact-form" className="keep-light min-w-0">
+        <section aria-labelledby="contact-form" className="min-w-0">
           <h2 id="contact-form" className="sr-only">
             신청서
           </h2>
-          <div className="rounded-[28px] bg-white p-5 text-[#15171c] md:p-9">
+          <div className="rounded-[28px] border border-[#e6e9ee] bg-white p-5 text-[#15171c] md:p-9">
             {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
             <Suspense fallback={null}>
               <ContactForm />

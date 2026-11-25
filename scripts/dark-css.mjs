@@ -69,8 +69,9 @@ for (const f of files) {
 
 const esc = (s) => s.replace(/[#\[\]:./]/g, (c) => "\\" + c);
 const S = "html.gp-dark .cl";
-// keep-light 안과 바닥글 안은 자기 색을 그대로 쓴다(바닥글은 원래 어두운 띠)
-const NOT = ":not(.keep-light *):not(.cl > footer *)";
+// keep-light 안과 바닥글 안은 자기 색을 그대로 쓴다(바닥글은 원래 어두운 띠).
+// 11-26 keep-light 안이라도 use-dark를 붙인 상자와 그 안은 다시 색표를 적용한다(메인의 신청서 카드: 어두운 화면에서 혼자 흰 덩어리였다)
+const NOT = ":not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *)";
 const rules = new Map(); // css 값 -> 선택자 목록
 const add = (sel, decl) => { if (!rules.has(decl)) rules.set(decl, []); rules.get(decl).push(sel); };
 for (const full of [...found].sort()) {
@@ -109,4 +110,12 @@ ${S} svg [fill="#fff"]${NOT}, ${S} svg [fill="white"]${NOT}, ${S} svg [fill="#ff
 ${S} input:not([type=checkbox]):not([type=radio]):not([class*="bg-transparent"])${NOT}, ${S} textarea${NOT}, ${S} select${NOT} { background-color: ${SURF2}; color: ${TXT}; }
 `;
 for (const [decl, sels] of rules) css += `${sels.join(",\n")} { ${decl}; }\n`;
+// 11-26 사용자 "파란 버튼이 다크모드에 비해 눈에 띔": 어두운 화면에서 누르는 파란 버튼(버튼, 링크 버튼)은 판의 Contact 버튼과 같은 흰 버튼으로 바꾼다.
+// 파란 타일, 카드, 띠 같은 큰 면은 그대로 둔다(버튼, 링크가 아닌 것과 keep-light 안의 것).
+const BTN = `:is(button, a, input[type=submit]).bg-\\[\\#256ef4\\]`;
+css += `${S} .use-dark { color-scheme: dark; }
+${S} ${BTN}${NOT} { background-color: #ffffff; border-color: #ffffff; color: #0b0d12; }
+${S} ${BTN}:hover${NOT} { background-color: #dfe9ff; border-color: #dfe9ff; }
+${S} ${BTN}${NOT} :is(svg, span, b) { color: inherit; }
+`;
 process.stdout.write(css);

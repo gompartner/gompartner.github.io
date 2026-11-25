@@ -27,7 +27,7 @@ const css = `${assembleCss}${longShotCss}
 html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }
 @media (max-width: 767px) { html:has(.gp-home) footer { padding-bottom: 0; } }
 /* 사이트 다크모드가 흰 판과 입력 칸을 어둡게 바꾸지 않게 */
-html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not(.on-dark), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
+html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not(.on-dark):not(.use-dark *), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]):not(.use-dark *) { background-color: #fff; color: #15171c; }
 html.gp-dark .cl .gp-home { color-scheme: light; }
 `;
 

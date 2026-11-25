@@ -199,7 +199,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
           카탈로그 화면 찾기
         </label>
         <input id="ct-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="업종이나 화면 이름 (예: 치과, 랜딩)" autoComplete="off" enterKeyHint="search" className="on-dark h-full min-w-0 flex-1 bg-transparent text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
-        <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white">
+        <button type="submit" className="gp-ghost h-9 shrink-0 rounded-full px-4 text-[14px] font-bold">
           찾기
         </button>
       </form>

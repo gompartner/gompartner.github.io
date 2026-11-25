@@ -106,7 +106,7 @@ function WikiBar({ topic, last }: { topic?: Topic; last?: Crumb }) {
               <Search size={18} aria-hidden className="shrink-0 text-[#aab2bf]" />
               <span className="sr-only">검색어</span>
               <input type="search" name="q" required placeholder="문서 검색" autoComplete="off" className="on-dark h-full min-w-0 flex-1 bg-transparent text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
-              <button type="submit" className="h-9 shrink-0 rounded-full bg-[#256ef4] px-4 text-[14px] font-bold text-white hover:bg-[#0b50d0]">
+              <button type="submit" className="gp-ghost h-9 shrink-0 rounded-full px-4 text-[14px] font-bold">
                 검색
               </button>
             </label>

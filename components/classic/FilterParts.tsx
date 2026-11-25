@@ -23,7 +23,7 @@ export function BoxCheck({ checked, onChange, children }: { checked: boolean; on
   return (
     <label className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-md text-[16px] text-[#c9ced6] ${focus}`}>
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
-      <span aria-hidden className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[6px] border-[1.5px] ${checked ? "border-[#256ef4] bg-[#256ef4] text-white" : "border-white/40"}`}>
+      <span aria-hidden className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[6px] border-[1.5px] ${checked ? "gp-box-on" : "border-white/40"}`}>
         {checked ? <Check size={15} strokeWidth={3} /> : null}
       </span>
       {children}

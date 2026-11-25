@@ -41,6 +41,19 @@ html:has(dialog[open]) { overflow: hidden; padding-right: var(--sbw, 0px); }
 /* 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로) */
 dialog:focus, dialog:focus-visible { outline: none; }
 dialog, dialog * { overscroll-behavior: contain; }
+/* 11-26 사용자 "파란 버튼이 다크모드에 비해 눈에 띔": 어두운 화면에서 누르는 버튼은 파랑 대신 흰 버튼(결정), 옅은 버튼(곁 동작), 옅은 파랑 면(고른 것)으로.
+   밝은 화면에서는 파란 버튼이 자연스러워 그대로 둔다. 파란 타일, 카드, 띠 같은 큰 면은 두 화면 모두 그대로 */
+.gp-primary { background: #256ef4; color: #fff; }
+.gp-primary:hover { background: #0b50d0; }
+.gp-ghost { background: #256ef4; color: #fff; }
+.gp-on { background: #256ef4; color: #fff; font-weight: 800; }
+.gp-box-on { background: #256ef4; border-color: #256ef4; color: #fff; }
+html.gp-dark .gp-primary { background: #fff; color: #0b0d12; }
+html.gp-dark .gp-primary:hover { background: #dfe9ff; }
+html.gp-dark .gp-ghost { background: rgba(255, 255, 255, 0.12); color: #fff; }
+html.gp-dark .gp-ghost:hover { background: rgba(255, 255, 255, 0.22); }
+html.gp-dark .gp-on { background: rgba(122, 167, 255, 0.16); color: #fff; box-shadow: inset 3px 0 0 #7aa7ff; }
+html.gp-dark .gp-box-on { background: #7aa7ff; border-color: #7aa7ff; color: #0b0d12; }
 .gp-menu { opacity: 0; transition: opacity .18s ease, overlay .18s allow-discrete, display .18s allow-discrete; }
 .gp-menu[open] { opacity: 1; }
 @starting-style { .gp-menu[open] { opacity: 0; } }

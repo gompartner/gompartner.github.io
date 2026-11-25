@@ -154,7 +154,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
                 const n = x.groups.filter((g) => draft.groups.includes(key(x.label, g))).length;
                 return (
                   <li key={x.label} role="presentation">
-                    <button type="button" role="tab" aria-selected={tab === i} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${tab === i ? "bg-[#256ef4] font-[800] text-white" : "text-[#c9ced6] hover:bg-white/5"}`}>
+                    <button type="button" role="tab" aria-selected={tab === i} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${tab === i ? "gp-on" : "text-[#c9ced6] hover:bg-white/5"}`}>
                       <span className="break-keep">{x.label}</span>
                       {n > 0 && <span className="tabular-nums">{n}</span>}
                     </button>
@@ -205,7 +205,7 @@ export function WikiBoard({ docs, topics, kinds }: { docs: WikiDoc[]; topics: { 
                 setShown(PAGE);
                 setOpen(false);
               }}
-              className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#1f63e6]"
+              className="gp-primary min-h-[52px] rounded-lg text-[16px] font-bold"
             >
               선택 완료
             </button>

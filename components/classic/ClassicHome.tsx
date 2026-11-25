@@ -25,8 +25,6 @@ const h2c = "break-keep text-[32px] font-[800] leading-[1.18] tracking-[-0.05em]
 
 // 다크모드 규칙 중 keep-light를 보지 않는 것(입력 칸 바탕과 글자색)을 메인에서 되돌리고, 진행 방식의 흐르는 선을 정의한다
 const homeCss = `
-html.gp-dark .cl .gp-home input:not([type=checkbox]):not([type=radio]):not([type=hidden]), html.gp-dark .cl .gp-home textarea:not([hidden]):not([type=x]):not([type=y]) { background-color: #fff; color: #15171c; }
-html.gp-dark .cl .gp-home { color-scheme: light; }
 /* 스크롤을 칸마다 붙이는 것(scroll snap)은 넣었다가 뺐다(11-25 밤 사용자 "힘들어 보이는 느낌"). 원래 문제는 휴대폰에서 3D 창이 보이기 전에 지나가는 것이었고, 창을 제목 바로 아래로 올려 해결했다(HeroBuild) */
 /* 11-25 사용자: 메인의 휴대폰 화면에서는 아래에 떠 있는 전화, 카카오톡 상담 바도 뺀다(카카오톡은 바닥글에, 견적은 맨 아래 신청서에). 바 높이만큼 비워 두던 바닥글 여백도 없앤다 */
 html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }
@@ -363,7 +361,8 @@ function Apply() {
           </ul>
           <p className="mt-8 text-[14px] leading-[1.6] text-[#8a94a6]">곰파트너, 사업자등록번호 {profile.bizNo}</p>
         </div>
-        <div data-part className="min-w-0 rounded-[28px] bg-white p-5 text-[#15171c] md:p-9">
+        {/* use-dark: 어두운 화면에서는 이 카드도 어두운 카드로 나온다(11-26 사용자 "메인에 톤이 흰색 맞나", "메인 상담하기는 고민 좀"). 밝은 화면에서는 흰 카드 그대로 */}
+        <div data-part className="use-dark min-w-0 rounded-[28px] border border-[#e6e9ee] bg-white p-5 text-[#15171c] md:p-9">
           {/* 폼이 주소의 ?site= 를 읽어서(useSearchParams) 정적 내보내기에는 Suspense가 있어야 한다 */}
           <Suspense fallback={null}>
             <ContactForm compact />

@@ -136,7 +136,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                   const n = draft.filter((x) => kindOf(x) === o.k).length;
                   return (
                     <li key={o.k} role="presentation">
-                      <button type="button" role="tab" aria-selected={cur?.k === o.k} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${cur?.k === o.k ? "bg-[#256ef4] font-[800] text-white" : "text-[#c9ced6] hover:bg-white/5"}`}>
+                      <button type="button" role="tab" aria-selected={cur?.k === o.k} onClick={() => setTab(i)} className={`flex min-h-[52px] w-full items-center justify-between gap-2 px-4 text-left text-[16px] md:px-6 md:text-[17px] ${cur?.k === o.k ? "gp-on" : "text-[#c9ced6] hover:bg-white/5"}`}>
                         <span className="break-keep">{o.k}</span>
                         {n > 0 ? <span className="tabular-nums">{draft.includes(o.k) ? "전체" : n}</span> : null}
                       </button>
@@ -173,7 +173,7 @@ export function SiteSearch({ index }: { index: SearchItem[] }) {
                   setKinds(draft);
                   setOpen(false);
                 }}
-                className="min-h-[52px] rounded-lg bg-[#256ef4] text-[16px] font-bold text-white hover:bg-[#1f63e6]"
+                className="gp-primary min-h-[52px] rounded-lg text-[16px] font-bold"
               >
                 선택 완료
               </button>
