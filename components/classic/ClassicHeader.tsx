@@ -69,6 +69,8 @@ const toggle = "inline-flex h-11 w-11 items-center justify-center rounded-md bor
 
 export function ClassicHeader() {
   const pathname = usePathname();
+  // 11-25 메인은 랜딩페이지: 머리글은 로고와 상담 신청만
+  const landing = pathname === "/";
   const [open, setOpen] = useState(false);
   // 손가락이나 펜으로 누르면 hover가 없으니, 하위 메뉴가 있는 메뉴는 첫 탭에 전체 메뉴를 열고 두 번째 탭에 이동한다.
   // 아이패드는 데스크톱 모드나 트랙패드에서 (hover: none)이 거짓으로 나와서, 미디어 쿼리 대신 실제로 누른 입력 종류를 본다
@@ -164,7 +166,7 @@ export function ClassicHeader() {
           {/* 메뉴 하나에 올리거나(터치는 한 번 누르면) 모든 메뉴의 하위 항목을 한 판에 펼친다. 항목은 한 줄 고정이라 판 높이를 줄 수로 계산한다 */}
           <div
             data-drop
-            className="group/nav hidden h-full lg:block"
+            className={cn("group/nav hidden h-full", !landing && "lg:block")}
             onFocus={(e) => {
               if (escaped.current) escaped.current = false;
               else if (e.target.matches(":focus-visible")) setKb(true);
@@ -243,7 +245,7 @@ export function ClassicHeader() {
 
           <div className="flex shrink-0 items-center gap-2">
             {/* 11-25 별도 서비스: 카탈로그, 웹 지식 */}
-            <ul aria-label="다른 서비스" className="mr-1 hidden items-center gap-1 border-r border-[#e6e9ee] pr-3 lg:flex" role="list">
+            <ul aria-label="다른 서비스" className={cn("mr-1 hidden items-center gap-1 border-r border-[#e6e9ee] pr-3", !landing && "lg:flex")} role="list">
               {sideServices.map((s) => (
                 <li key={s.href}>
                   <NavLink
@@ -260,11 +262,11 @@ export function ClassicHeader() {
               href="/search"
               aria-label="통합검색"
               aria-current={pathname === "/search" ? "page" : undefined}
-              className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] min-[360px]:grid"
+              className={cn("hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6]", !landing && "min-[360px]:grid")}
             >
               <Search size={21} aria-hidden />
             </Link>
-            <ThemeToggle className="hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6] lg:grid" />
+            <ThemeToggle className={cn("hidden h-11 w-11 place-items-center rounded-md text-[#15171c] transition-colors hover:bg-[#f1f3f6]", !landing && "lg:grid")} />
             {/* 휴대폰과 태블릿은 작게, PC는 크게. 같은 버튼 하나를 폭에 따라 줄인다 */}
             <Link
               href={pathname === "/" ? "#apply" : "/contact"}
@@ -284,7 +286,7 @@ export function ClassicHeader() {
               aria-expanded={open}
               aria-controls="classic-menu"
               aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
-              className={cn(toggle, "lg:hidden")}
+              className={cn(toggle, landing ? "hidden" : "lg:hidden")}
             >
               {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
             </button>
