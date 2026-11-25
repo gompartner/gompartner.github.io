@@ -7,7 +7,7 @@ import { BuildGate } from "@/components/classic/BuildGate";
 // 11-25 조립형 첫 화면(사용자 "면과 선이 조합되며 완성, 합체 로봇처럼 조립되는 메인"). 시안, ?v=build
 // 3차: "단순 스퀘어라 너무 네모네모, 3D까지 조립, 글자도 포함해 쓸 수 있는 수준으로".
 // 네모 상자가 통째로 날아오던 것을 버리고 부품 단위를 바꿨다.
-//  - 글자: 제목은 글자 하나하나가 흩어져 있다가 모여 낱말이 된다
+//  - 글자: 제목은 글자 하나하나가 떨어져 있다가 자석처럼 끌려와 딱 붙어 낱말이 된다(팔랑거리지 않게, 11-25 밤)
 //  - 선: 창틀은 둥근 테두리가 마주 보는 두 모서리에서 자라 만나고, 뒤쪽 큰 원호와 창 안 설계선이 그려진다
 //  - 둥근 부품: 꼬리표, 버튼, 서비스 이름표는 알약 모양으로 튀어나오거나 휘어 날아와 창틀에 붙는다
 //  - 3D: 설계선 위로 마을이 나타나고 건물이 하나씩 내려앉는다(TownWindow, public/3d/island ?build=1)
@@ -18,11 +18,23 @@ type V = CSSProperties & Record<`--${string}`, string>;
 
 const css = `
 @property --gp-a { syntax: "<angle>"; inherits: false; initial-value: 180deg; }
-@keyframes gp-char { 0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) rotate(var(--r)) scale(var(--s)); } 55% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@keyframes gp-char {
+  0% { opacity: 0; transform: translate3d(var(--x), var(--y), 0) rotate(var(--r)); animation-timing-function: ease-out; }
+  40% { opacity: 1; transform: translate3d(calc(var(--x) * 0.78), calc(var(--y) * 0.78), 0) rotate(calc(var(--r) * 0.7)); animation-timing-function: cubic-bezier(0.85, 0, 1, 0.45); }
+  78% { opacity: 1; transform: translate3d(0px, 0px, 0) rotate(0deg); animation-timing-function: ease-out; }
+  87% { transform: translate3d(calc(var(--x) * -0.04), calc(var(--y) * -0.04), 0) rotate(0deg); }
+  100% { opacity: 1; transform: translate3d(0px, 0px, 0) rotate(0deg); }
+}
 @keyframes gp-word { from { opacity: 0; transform: translateY(0.7em); } to { opacity: 1; transform: none; } }
 @keyframes gp-pill { from { opacity: 0; clip-path: inset(0 50% 0 50% round 999px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 999px); } }
 @keyframes gp-pop { 0% { opacity: 0; transform: scale(0.3) rotate(var(--r, -12deg)); } 70% { opacity: 1; transform: scale(1.06) rotate(0deg); } 100% { opacity: 1; transform: none; } }
-@keyframes gp-chip { 0% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(0.6); } 62% { opacity: 1; transform: translate(calc(var(--x) * -0.06), calc(var(--y) * 0.1)) rotate(calc(var(--r) * -0.12)) scale(1.05); } 100% { opacity: 1; transform: none; } }
+@keyframes gp-chip {
+  0% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(calc(var(--r) * 0.3)) scale(1); animation-timing-function: ease-out; }
+  42% { opacity: 1; transform: translate(calc(var(--x) * 0.8), calc(var(--y) * 0.8)) rotate(calc(var(--r) * 0.2)) scale(1); animation-timing-function: cubic-bezier(0.85, 0, 1, 0.45); }
+  80% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); animation-timing-function: ease-out; }
+  88% { transform: translate(calc(var(--x) * -0.03), calc(var(--y) * -0.03)) rotate(0deg) scale(0.97); }
+  100% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); }
+}
 @keyframes gp-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes gp-sweep { from { --gp-a: 0deg; } to { --gp-a: 180deg; } }
 @keyframes gp-body { from { opacity: 0; clip-path: inset(50% 50% 50% 50% round 22px); } to { opacity: 1; clip-path: inset(0 0 0 0 round 22px); } }
@@ -32,11 +44,11 @@ const css = `
 @keyframes gp-scan { from { transform: translateX(-110%); } to { transform: translateX(220%); } }
 @keyframes gp-spark { 0%, 100% { box-shadow: 0 0 0 0 rgba(122, 167, 255, 0), inset 0 0 0 0 rgba(122, 167, 255, 0); } 35% { box-shadow: 0 0 22px 2px rgba(122, 167, 255, 0.7), inset 0 0 14px 0 rgba(122, 167, 255, 0.35); } }
 
-.gp-char { display: inline-block; animation: gp-char 0.5s cubic-bezier(0.16, 0.84, 0.3, 1) both; animation-delay: var(--d); }
+.gp-char { display: inline-block; animation: gp-char 0.55s linear both; animation-delay: var(--d); }
 .gp-word { display: inline-block; animation: gp-word 0.35s ease-out both; animation-delay: var(--d); }
 .gp-pill { animation: gp-pill 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-pop { animation: gp-pop 0.42s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d); }
-.gp-chip { animation: gp-chip 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: var(--d); }
+.gp-chip { animation: gp-chip 0.6s linear both; animation-delay: var(--d); }
 .gp-draw { stroke-dasharray: 1; animation: gp-draw 0.6s ease-in-out both; animation-delay: var(--d); }
 .gp-line { transform-origin: left; animation: gp-line 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.4s ease-out both; animation-delay: var(--d); }
@@ -81,16 +93,15 @@ const chips = [
   { name: "유지보수", pos: "left-[36%] -bottom-4", x: "-60px", y: "220px", r: "36deg" },
 ];
 
-/** 글자마다 흩어진 출발 자리. 황금각으로 돌려 사방에서 모이게 한다(서버와 브라우저가 같은 값) */
+/** 글자마다 떨어져 있는 출발 자리. 황금각으로 돌려 사방에 두되 가깝게(자석처럼 끌려와 붙는다). 서버와 브라우저가 같은 값 */
 function scatter(i: number): V {
   const a = (i * 137.5 * Math.PI) / 180;
-  const rad = 180 + (i % 4) * 70;
+  const rad = 70 + (i % 4) * 34;
   return {
     "--x": `${Math.round(Math.cos(a) * rad)}px`,
-    "--y": `${Math.round(Math.sin(a) * rad * 0.7)}px`,
-    "--r": `${((i * 53) % 120) - 60}deg`,
-    "--s": `${[0.4, 1.5, 0.8][i % 3]}`,
-    "--d": `${(0.3 + i * 0.025).toFixed(3)}s`,
+    "--y": `${Math.round(Math.sin(a) * rad * 0.8)}px`,
+    "--r": `${((i * 53) % 36) - 18}deg`,
+    "--d": `${(0.3 + i * 0.03).toFixed(3)}s`,
   };
 }
 
