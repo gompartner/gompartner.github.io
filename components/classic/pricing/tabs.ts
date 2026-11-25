@@ -6,7 +6,6 @@ export const serviceTabs = [
   { href: "/app", label: "앱 제작" },
   { href: "/kiosk", label: "키오스크 화면 제작" },
   { href: "/3d", label: "3D 웹 제작" },
-  { href: "/works", label: "포트폴리오" },
 ];
 
 /** 유지보수 묶음 하위 탭(11-25): 전체, 유지보수, 유지관리, 성능 개선, 고도화, 운영 기준. 업체 변경, 보안 업데이트 페이지는 전체 화면의 칸에서 잇는다 */

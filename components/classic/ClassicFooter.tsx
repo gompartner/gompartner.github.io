@@ -3,11 +3,13 @@ import Link from "next/link";
 import { NavLink } from "@/components/classic/NavLink";
 import { Mail, Phone, Printer, MessageCircle } from "lucide-react";
 import { ChannelIcon, type ChannelIconName } from "@/components/layout/Footer";
-import { KAKAO_CHAT_URL } from "@/components/layout/KakaoChat";
 import { profile } from "@/data/classic/profile";
 
 // 클래식 보기 바닥글. 사업자 정보는 상호와 번호만 둔다(통신판매업 신고 전).
 // 11-02 머리글 메뉴와 같은 묶음으로 맞춘다. 11-22 순서도 머리글대로(유지보수 먼저, 업체 변경부터)
+// 카카오톡 채널 홈(1:1 채팅 주소에서 /chat을 뺀 것). KakaoChat.tsx는 브라우저용 파일이라 여기(서버에서 그리는 바닥글)로 값을 가져오면 문자열이 아니게 되어 따로 적는다
+const KAKAO_CHANNEL_HOME = "https://pf.kakao.com/_JxntWX";
+
 const groups = [
   {
     title: "유지보수",
@@ -31,11 +33,10 @@ const groups = [
   },
   // 11-25 별도 서비스(머리글 오른쪽과 같게)
   {
-    title: "다른 서비스",
+    title: "운영 서비스",
     items: [
       { href: "https://jikimi.gompartner.co.kr/", label: "사이트 지킴이" },
       { href: "https://jangbu.gompartner.co.kr/", label: "거래장부" },
-      { href: "/knowledge", label: "웹 지식" },
     ],
   },
   {
@@ -124,7 +125,7 @@ export function ClassicFooter() {
               <ChannelIcon name="naverBlog" />
               네이버 블로그
             </a>
-            <a href={KAKAO_CHAT_URL.replace(/\/chat$/, "")} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
+            <a href={KAKAO_CHANNEL_HOME} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
               <MessageCircle size={16} strokeWidth={2} aria-hidden />
               카카오톡
             </a>

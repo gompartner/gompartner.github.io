@@ -25,6 +25,8 @@ lines.push("/insight /knowledge/notes 301");
 lines.push("/tools /knowledge/checklists 301");
 for (const t of ["site-check", "php-check"]) lines.push(`/tools/${t} https://jikimi.gompartner.co.kr/ 301`);
 for (const t of ["accessibility-check", "cron", "estimate-questions", "hosting-cost", "image-compress", "jwt-parser", "privacy-policy", "qr-code", "search-preview", "terms", "unix-time"]) lines.push(`/tools/${t} /knowledge/checklists 301`);
+// 11-25 영문 페이지(/en)를 내림(사용자: 영문 유입이 없음). 옛 주소는 메인으로
+lines.push("/en / 301", "/en/* / 301");
 // 11-21 아카이브(/archive)를 웹 지식(/knowledge)으로 옮김. 같은 날 공개한 옛 주소를 모두 새 주소로
 const moved = [
   ["/archive", "/knowledge"], ["/archive/trends", "/knowledge"], ["/archive/design", "/knowledge/design"], ["/archive/tech", "/knowledge/dev"], ["/knowledge/frontend", "/knowledge/dev"],

@@ -47,12 +47,7 @@ export const classicMenu = [
   ...(cases.length > 0 ? [{ label: "고객 사례", href: "/cases", match: ["/cases"], items: [] }] : []),
 ];
 
-// 11-25 사용자 "랜딩 수준으로 심플하게, 카탈로그, 웹 지식 별도 서비스로 분리". 주 메뉴는 유지보수, 제작, 비용만 두고
-// 웹 지식(/knowledge)은 머리글 오른쪽에 따로 둔다. 카탈로그(/works)는 11-25 밤 사용자 결정으로 메뉴에서 내렸다(실적이 아닌 샘플은 보여 주지 않는다)
-export const sideServices = [
-  { href: "/knowledge", label: "웹 지식", match: ["/knowledge", "/insight", "/jaryo"] },
-];
-
+// 카탈로그(/works)와 웹 지식(/knowledge)은 독립 사이트로 분리할 예정이라 머리글 메뉴에 두지 않는다(11-25 밤 사용자). 페이지 주소는 분리할 때까지 그대로 살아 있다
 // 휴대폰 메뉴 아래 작은 줄(PC는 바닥글)
 const subMenu = [
   { href: "/story", label: "회사소개" },
@@ -263,20 +258,6 @@ export function ClassicHeader() {
                 ))}
               </ul>
             )}
-            {/* 11-25 별도 서비스: 카탈로그, 웹 지식 */}
-            <ul aria-label="다른 서비스" className={cn("mr-1 hidden items-center gap-1 border-r border-[#e6e9ee] pr-3", !landing && "lg:flex")} role="list">
-              {sideServices.map((s) => (
-                <li key={s.href}>
-                  <NavLink
-                    href={s.href}
-                    aria-current={s.match.some((p) => pathname.startsWith(p)) ? "page" : undefined}
-                    className="inline-flex h-11 items-center rounded-md px-2.5 text-[15px] font-bold text-[#5b6370] hover:text-[#256ef4] aria-[current=page]:text-[#256ef4]"
-                  >
-                    {s.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
             <Link
               href="/search"
               aria-label="통합검색"
@@ -343,18 +324,6 @@ export function ClassicHeader() {
               )}
             </section>
           ))}
-          <section className="border-b border-[#e6e9ee] py-4">
-            <p className="text-[15px] font-bold text-[#5b6370]">다른 서비스</p>
-            <ul className="mt-2 grid grid-cols-2 gap-x-4" role="list">
-              {sideServices.map((s) => (
-                <li key={s.href}>
-                  <NavLink href={s.href} className="block py-2 text-[17px] font-[800] text-[#15171c]">
-                    {s.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </section>
           <ul className="mt-4 grid grid-cols-2 gap-x-4" role="list">
             {subMenu.map((i) => (
               <li key={i.href}>

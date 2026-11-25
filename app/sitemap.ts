@@ -42,11 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1.0, files: ["app/(home)/page.tsx", "components/classic/ClassicHome.tsx", "data/seo.ts"] },
 
     { path: "/homepage", priority: 0.9, files: ["app/(classic)/homepage/page.tsx"] },
-    { path: "/en", priority: 0.6, files: ["app/en/page.tsx"] },
-    // 11-04 영문 서비스 상세 3종, 3D, 카탈로그
-    ...["naver-setup", "korean-payments", "localization"].map((x) => ({ path: `/en/${x}`, priority: 0.5, files: ["app/en/[service]/page.tsx", "data/en/site.ts"] })),
-    { path: "/en/3d", priority: 0.5, files: ["app/en/3d/page.tsx", "data/en/site.ts"] },
-    { path: "/en/works", priority: 0.5, files: ["app/en/works/page.tsx", "data/en/site.ts"] },
     { path: "/landing-page", priority: 0.8, files: ["app/(classic)/landing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/program", priority: 0.8, files: ["app/(classic)/program/page.tsx"] },
     { path: "/app", priority: 0.8, files: ["app/(classic)/app/page.tsx", "data/classic/makeExtra.ts"] },
