@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     ...pageMeta({
       title: it.title,
-      description: `${it.title}. ${it.parts.join(", ")}. 휴대폰으로 열람하고 PDF로 내려받을 수 있습니다.`,
+      description: `${it.title}. ${it.parts.join(" / ")}. 휴대폰으로 열람하고 PDF로 내려받을 수 있습니다.`,
       path: `/jaryo/${it.id}`,
     }),
     robots: { index: false, follow: false },

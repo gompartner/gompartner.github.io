@@ -2,6 +2,7 @@
 // 하나라도 빠지면 빌드를 실패시킨다(점검표를 사람이 보는 대신 장치로). 빌드 뒤 자동 실행(package.json postbuild).
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { checkOut } from "./copy-check.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const out = `${root}out`;
@@ -34,6 +35,11 @@ for (const p of paths) {
   need(/og:image:alt" content="[^"]+/.test(h), "대표 이미지 alt 없음");
   need(/name="twitter:card" content="summary_large_image"/.test(h) && /name="twitter:image" content="[^"]+/.test(h), "twitter 카드 없음");
   if (/^\/(insight|knowledge|tools)\//.test(p)) need(llms.includes(p), "llms.txt에 없음");
+}
+// 11-26 문구 점검(쉼표 나열, 장식 기호). 규칙은 scripts/copy-check.mjs
+{
+  const copy = checkOut(out);
+  for (const b of copy.bad) for (const e of b.errors) errs.push(`${b.page}: 문구 ${e}`);
 }
 if (errs.length) {
   console.error(`\n기본 점검 실패 ${errs.length}건\n` + errs.join("\n"));
