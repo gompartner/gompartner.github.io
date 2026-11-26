@@ -22,7 +22,9 @@ const V = "/videos/3d";
 const demo = (id: string) => threeDemos.find((d) => d.href === `/3d/${id}/`)!;
 
 /** 영상으로 보여 주는 화면(맨 위에서 직접 만지는 거실 상담 화면은 여기서 뺀다). head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
+// 11-27 사용자 "소파 아래 넣어 줘야지 사라짐": 맨 위를 거실로 바꾸며 빠졌던 모듈 소파를 첫 카드로
 const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] = [
+  { id: "sofa", head: "모듈을 붙이고 원단을 바꾸면 금액이 바뀝니다" },
   { id: "configurator", head: "칸과 부속을 붙이면 금액이 바뀝니다" },
   { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
@@ -38,9 +40,9 @@ const answers = [
 
 /** 패키지마다 대표 화면 한 장 */
 const planShot: Record<string, { img: string; alt: string }> = {
-  "3d-viewer": { img: "/3d/assets/thumb/space.jpg", alt: "아파트 시공 사례를 3D로 둘러보는 화면" },
+  "3d-viewer": { img: "/3d/assets/thumb/space.jpg?v=11273", alt: "아파트 시공 사례를 3D로 둘러보는 화면" },
   "3d-brand": { img: "/3d/assets/thumb/island.jpg", alt: "3D 마을로 시작하는 곰파트너 홈페이지 첫 화면" },
-  "3d-config": { img: "/3d/assets/thumb/configurator.jpg", alt: "시스템 선반을 구성하고 견적을 받는 화면" },
+  "3d-config": { img: "/3d/assets/thumb/configurator.jpg?v=11272", alt: "시스템 선반을 구성하고 견적을 받는 화면" },
 };
 
 const h2 = "break-keep text-[28px] font-[800] leading-[1.25] tracking-[-0.045em] md:text-[40px]";
@@ -73,8 +75,8 @@ export function ThreeBoard() {
           src={`${room.href}?embed=1`}
           href={room.href}
           title="3D 거실 상담 화면. 거실 크기를 정하고 가구를 놓고 옮기면 합계가 바뀝니다."
-          poster={`${V}/room.jpg?v=1127`}
-          preview={{ src: `${V}/room-m.mp4?v=1127`, poster: `${V}/room-m.jpg?v=1127`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
+          poster={`${V}/room.jpg?v=11272`}
+          preview={{ src: `${V}/room-m.mp4?v=11273`, poster: `${V}/room-m.jpg?v=11272`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
           hint="가구를 눌러 고르고 끌어서 옮기면 합계가 같이 바뀝니다. 고른 구성은 견적서로 보낼 수 있습니다."
         >
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
@@ -101,10 +103,10 @@ export function ThreeBoard() {
               return (
                 <li key={s.id} className={`${card} flex w-[86%] shrink-0 snap-center flex-col gap-5 p-4 md:w-auto md:p-6 ${s.wide ? "md:col-span-2 md:grid md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-center md:gap-9 md:p-8" : ""}`}>
                   <div className={`relative ${s.phone ? "md:pb-[7%] md:pr-[8%]" : ""}`}>
-                    <Frame shot={{ src: `${V}/${s.id}.jpg?v=1127`, frame: "browser", ratio: "16/10", alt: `${name} 화면을 조작하는 영상`, video: { src: `${V}/${s.id}.mp4?v=1127`, w: 960, h: 600 } }} sizes="(min-width: 768px) 600px, 86vw" />
+                    <Frame shot={{ src: `${V}/${s.id}.jpg?v=11273`, frame: "browser", ratio: "16/10", alt: `${name} 화면을 조작하는 영상`, video: { src: `${V}/${s.id}.mp4?v=11273`, w: 960, h: 600 } }} sizes="(min-width: 768px) 600px, 86vw" />
                     {s.phone && (
                       <div className="absolute bottom-0 right-0 hidden w-[21%] md:block">
-                        <Frame shot={{ src: `${V}/${s.id}-m.jpg?v=1127`, frame: "phone", ratio: "390/844", alt: `${name} 휴대폰 화면을 조작하는 영상`, video: { src: `${V}/${s.id}-m.mp4?v=1127`, w: 390, h: 844 } }} sizes="160px" />
+                        <Frame shot={{ src: `${V}/${s.id}-m.jpg?v=11273`, frame: "phone", ratio: "390/844", alt: `${name} 휴대폰 화면을 조작하는 영상`, video: { src: `${V}/${s.id}-m.mp4?v=11273`, w: 390, h: 844 } }} sizes="160px" />
                       </div>
                     )}
                   </div>

@@ -5,9 +5,9 @@ import type { Plan } from "@/data/classic/pricing";
 
 export const threeMeta = {
   title: "3D 웹 제작",
-  metaTitle: "3D 홈페이지 제작 (3D 견적, 제품 컨피규레이터)",
+  metaTitle: "3D 홈페이지 제작 (3D 견적, 인테리어 3D)",
   metaDescription:
-    "가구나 중문을 고객이 3D로 직접 구성하고 견적까지 접수하는 3D 홈페이지를 제작합니다. 공간 3D 뷰어 180만 원부터.",
+    "가구나 중문을 고객이 3D로 직접 구성하고 견적까지 접수하는 3D 홈페이지를 제작합니다. 인테리어 3D 시공 사례 화면 180만 원부터.",
   heroTitle: "고객이 직접 구성하는 3D 견적 화면",
   lead: "가구나 중문을 고객이 3D로 직접 구성하고 견적까지 받는 화면을 만듭니다",
   leadNote: "운영 중인 홈페이지(아임웹, 카페24, 워드프레스)에 연동해 드립니다",
@@ -115,11 +115,11 @@ export const threeCompare = {
 
 /** 카탈로그(public/3d 데모) */
 export const threeDemos = [
-  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=1127", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "거래장부 견적서로 보내기"] },
-  { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg?v=1125", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단과 다리 선택", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg?v=1125", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸과 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg?v=1125", category: "인테리어", title: "현관 중문", desc: "문 방식과 프레임 색, 유리를 골라 견적을 받습니다", features: ["3D 구성", "폭과 높이 입력", "프레임 색과 유리 선택", "실시간 견적", "견적 요청 접수"] },
-  { href: "/3d/space/", img: "/3d/assets/thumb/space.jpg?v=1125", category: "인테리어", title: "시공 사례", desc: "시공한 공간을 3D와 평면도로 둘러보게 합니다", features: ["공간 3D 뷰어", "평면도", "둘러보기", "시공 사례"] },
+  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=11272", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "거래장부 견적서로 보내기"] },
+  { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg?v=11272", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단과 다리 선택", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg?v=11272", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸과 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg?v=11272", category: "인테리어", title: "현관 중문", desc: "문 방식과 프레임 색, 유리를 골라 견적을 받습니다", features: ["3D 구성", "폭과 높이 입력", "프레임 색과 유리 선택", "실시간 견적", "견적 요청 접수"] },
+  { href: "/3d/space/", img: "/3d/assets/thumb/space.jpg?v=11273", category: "인테리어", title: "시공 사례", desc: "시공 전과 후를 막대로 비교하고 3D와 평면도로 둘러보게 합니다", features: ["시공 전후 비교", "공간 3D 뷰어", "평면도", "둘러보기"] },
 ];
 
 export const threeSteps = [

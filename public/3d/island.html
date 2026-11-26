@@ -15,17 +15,30 @@
   // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
   // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
   (function () {
-    var PINCH = true, last = 0;
+    var PINCH = true;
+    // 11-27 사용자 "가로채기 필요, 먹통이 아니라 확대돼서 안 줄어듦": 두 번째 탭 가로채기는 되살리고(3D 위도 포함) 확대된 채로 갇히지 않게 한다
+    //  1) 두 번째 탭은 기본 동작(확대)을 막고 누른 버튼은 대신 누른다
+    //  2) 그래도 확대되면(다른 손짓 등) 한 손가락을 뗄 때 배율을 1로 되돌린다(viewport에 maximum-scale을 잠깐 넣었다 뺀다)
+    //  3) 확대된 동안에는 두 손가락 축소를 막지 않는다
+    var last = 0, meta = document.querySelector('meta[name="viewport"]');
+    var zoomed = function () { return window.visualViewport && visualViewport.scale > 1.01; };
+    var unzoom = function () {
+      if (!meta || !zoomed()) return;
+      var c = meta.getAttribute('content');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+      setTimeout(function () { meta.setAttribute('content', c); }, 400);
+    };
     document.addEventListener('touchend', function (e) {
       var now = Date.now();
-      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea')) {
         e.preventDefault();
         var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
         if (b) b.click();
       }
       last = now;
+      if (e.touches.length === 0) setTimeout(unzoom, 60);
     }, { passive: false });
-    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { if (!zoomed()) e.preventDefault(); }, { passive: false }); });
   })();
 </script>
 <title>3D 웹 제작 | 곰파트너</title>
@@ -52,7 +65,7 @@
 <link rel="apple-touch-icon" href="/apple-icon.png">
 <!-- 11-26 글꼴을 외부(jsdelivr) 전체판 749KB에서 사이트와 같은 부분 글꼴(약 250KB)로. 카카오톡 안 브라우저 첫 로딩이 늘어지던 원인 -->
 <link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2" as="font" type="font/woff2" crossorigin>
-<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}  html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}  html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
 </style>
 <style>
   :root {

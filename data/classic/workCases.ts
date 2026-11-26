@@ -67,8 +67,8 @@ export const workCases: WorkCase[] = [
     problem: "인테리어와 가구 상담은 손님이 자기 집에 들어갈지 몰라 같은 질문을 반복하고, 실측을 다녀와도 계약으로 이어지지 않는 일이 잦습니다.",
     made: "손님이 거실 크기를 정하고 소파와 선반, 붙박이장을 직접 놓고 옮겨 보며 금액을 확인합니다. 고른 구성은 거래장부 견적서로 이어집니다.",
     now: "가구는 끌어 옮기고 손잡이로 크기를 바꾸며 서로 겹치지 않습니다. 바닥재와 벽 색까지 바꿔 보고 링크로 저장합니다.",
-    pc: "/images/works/room-pc.jpg",
-    m: "/images/works/room-m.jpg",
+    pc: "/images/works/room-pc.jpg?v=11272",
+    m: "/images/works/room-m.jpg?v=11272",
     alt: "3D 거실 상담 화면. 시스템 선반과 카우치 소파를 놓은 거실과 오른쪽 선택 패널",
   },
 ];

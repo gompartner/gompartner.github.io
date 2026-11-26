@@ -20,17 +20,30 @@
   // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
   // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
   (function () {
-    var PINCH = true, last = 0;
+    var PINCH = true;
+    // 11-27 사용자 "가로채기 필요, 먹통이 아니라 확대돼서 안 줄어듦": 두 번째 탭 가로채기는 되살리고(3D 위도 포함) 확대된 채로 갇히지 않게 한다
+    //  1) 두 번째 탭은 기본 동작(확대)을 막고 누른 버튼은 대신 누른다
+    //  2) 그래도 확대되면(다른 손짓 등) 한 손가락을 뗄 때 배율을 1로 되돌린다(viewport에 maximum-scale을 잠깐 넣었다 뺀다)
+    //  3) 확대된 동안에는 두 손가락 축소를 막지 않는다
+    var last = 0, meta = document.querySelector('meta[name="viewport"]');
+    var zoomed = function () { return window.visualViewport && visualViewport.scale > 1.01; };
+    var unzoom = function () {
+      if (!meta || !zoomed()) return;
+      var c = meta.getAttribute('content');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+      setTimeout(function () { meta.setAttribute('content', c); }, 400);
+    };
     document.addEventListener('touchend', function (e) {
       var now = Date.now();
-      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea')) {
         e.preventDefault();
         var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
         if (b) b.click();
       }
       last = now;
+      if (e.touches.length === 0) setTimeout(unzoom, 60);
     }, { passive: false });
-    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { if (!zoomed()) e.preventDefault(); }, { passive: false }); });
   })();
 </script>
 <title>3D 인테리어 상담 화면 | 곰파트너</title>
@@ -41,20 +54,22 @@
 <meta property="og:url" content="https://gompartner.co.kr/3d/room/">
 <meta property="og:title" content="3D 인테리어 상담 화면 | 곰파트너">
 <meta property="og:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
-<meta property="og:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112701">
+<meta property="og:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112702">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="3D 인테리어 상담 화면 | 곰파트너">
 <meta name="twitter:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
-<meta name="twitter:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112701">
+<meta name="twitter:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112702">
 <meta name="twitter:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <link rel="canonical" href="https://gompartner.co.kr/3d/room/">
 <meta name="theme-color" content="#0b0d12">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!-- 11-26 점검: 외부 글꼴(굵기별 파일 세 개, 2.3MB) 대신 3D 화면 글자만 담은 작은 글꼴(257KB, 첫 화면 3D 마을과 같은 파일) -->
+<link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}</style>
 <script>
   // 다른 페이지에 끼워 넣으면(iframe) 위쪽 상호 줄을 뺀다
   if (window.top !== window.self) document.documentElement.classList.add('embed');
@@ -342,6 +357,19 @@
   @media (prefers-reduced-motion: reduce) {
     #gl, .sw, .sw::after, .hint { transition: none; }
   }
+
+  /* 11-27 사용자 "3D 쪽 버튼 위치, 구성, 배치는 맞춰요": 다섯 3D 화면 공통 배치. 위 오른쪽에 링크와 메뉴(같은 크기, 같은 순서), 확대 단추는 그 아래 */
+  .util { position: absolute; right: 12px; top: 12px; z-index: 6; display: flex; gap: 8px; }
+  .ub { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: rgba(18, 23, 34, 0.92); color: var(--ink-2); }
+  .ub:hover, .ub[aria-expanded="true"] { color: #fff; }
+  .ub svg { width: 20px; height: 20px; }
+  .smenu { position: absolute; right: 12px; top: 64px; z-index: 7; width: 220px; padding: 8px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+  .smenu[hidden] { display: none; }
+  .smenu a { display: flex; align-items: center; min-height: 48px; padding: 0 12px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 16px; }
+  .smenu a:hover { background: var(--panel-3); }
+  .smenu a[aria-current="page"] { font-weight: 700; background: rgba(37, 110, 244, .22); }
+  .zoom { top: 64px; }
+  .tools, .zoom, .rs-sum, #roomsize { z-index: 5; }   /* 평면도에서 벽 손잡이가 아래 버튼(3D 등)을 덮어 눌리지 않던 것 */
 </style>
 <script type="importmap">
 { "imports": {
@@ -372,6 +400,17 @@
     <button type="button" class="hdl item" id="hdl-tvUnit" aria-label="거실장 끝을 끌어 폭 바꾸기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></button>
     <button type="button" class="hdl item" id="hdl-sofa" aria-label="소파 끝을 끌어 모듈 붙이고 빼기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></button>
     <button type="button" class="hdl" id="hdl-D" aria-label="앞쪽 끝을 끌어 거실 깊이 바꾸기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></button>
+    <div class="util">
+      <button type="button" class="ub" id="linkbtn" aria-label="이 구성 링크 공유" title="이 구성 링크 공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
+      <button type="button" class="ub" id="menubtn" aria-label="메뉴" aria-expanded="false" aria-controls="smenu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+    <nav class="smenu" id="smenu" aria-label="3D 화면" hidden>
+      <a href="./" aria-current="page">3D 거실 상담</a>
+      <a href="../sofa/">모듈 소파</a>
+      <a href="../configurator/">시스템 선반</a>
+      <a href="../door/">현관 중문</a>
+      <a href="../space/">시공 사례</a>
+    </nav>
     <div class="zoom"><button type="button" id="zin" aria-label="확대">+</button><button type="button" id="zout" aria-label="축소">-</button></div>
     <p class="hint" id="hint"></p>
     <div class="tools">
@@ -380,8 +419,7 @@
         <button type="button" id="vplan" aria-pressed="false">평면도</button>
       </div>
       <button type="button" class="tog" id="dimbtn" aria-pressed="true"><i></i>치수</button>
-      <button type="button" class="tog fold" id="foldbtn" aria-expanded="true" aria-controls="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span id="foldtxt">메뉴</span></button>
-      <button type="button" class="tog lnk" id="linkbtn" aria-label="이 구성 링크 복사" title="이 구성 링크 복사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
+      <button type="button" class="tog fold" id="foldbtn" aria-expanded="true" aria-controls="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span id="foldtxt">옵션</span></button>
     </div>
     <p class="nogl" id="nogl" hidden>이 기기에서는 3D 화면을 열 수 없습니다. 아래에서 품목을 고르면 금액은 그대로 계산됩니다.</p>
   </main>
@@ -800,11 +838,19 @@ renderPanel(); renderRoomSize();
 
 const coarse = matchMedia('(pointer: coarse)').matches;
 // 메뉴 접기, 펴기(11-26 사용자 "메뉴 접고 펼치는 건 위쪽에")
+// 11-27 화면 메뉴(다섯 3D 화면 같은 목록)
+{
+  const mb = $('menubtn'), mn = $('smenu');
+  const setM = (o) => { mn.hidden = !o; mb.setAttribute('aria-expanded', String(o)); };
+  mb.addEventListener('click', () => setM(mn.hidden));
+  document.addEventListener('click', (e) => { if (!mn.hidden && !e.target.closest('#smenu, #menubtn')) setM(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !mn.hidden) { setM(false); mb.focus(); } });
+}
 $('foldbtn').addEventListener('click', () => {
   const fold = document.querySelector('.app').classList.toggle('fold');
-  $('foldbtn').setAttribute('aria-expanded', String(!fold)); $('foldbtn').setAttribute('aria-label', fold ? '메뉴 펴기' : '메뉴 접기');
+  $('foldbtn').setAttribute('aria-expanded', String(!fold)); $('foldbtn').setAttribute('aria-label', fold ? '옵션 펴기' : '옵션 접기');
 });
-$('hint').textContent = coarse ? '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다' : '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다. 빈 곳을 끌면 회전, Ctrl + 휠 확대';
+$('hint').textContent = coarse ? '가구를 끌어서 옮기고 손잡이로 크기를 바꿉니다' : '가구를 끌어서 옮기고 손잡이로 크기를 바꿉니다. 빈 곳을 끌면 회전합니다';   // 11-26 점검: 쉼표 나열 줄임
 
 /* =====================================================================
    3D

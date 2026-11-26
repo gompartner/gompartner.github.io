@@ -7,17 +7,30 @@
   // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
   // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
   (function () {
-    var PINCH = true, last = 0;
+    var PINCH = true;
+    // 11-27 사용자 "가로채기 필요, 먹통이 아니라 확대돼서 안 줄어듦": 두 번째 탭 가로채기는 되살리고(3D 위도 포함) 확대된 채로 갇히지 않게 한다
+    //  1) 두 번째 탭은 기본 동작(확대)을 막고 누른 버튼은 대신 누른다
+    //  2) 그래도 확대되면(다른 손짓 등) 한 손가락을 뗄 때 배율을 1로 되돌린다(viewport에 maximum-scale을 잠깐 넣었다 뺀다)
+    //  3) 확대된 동안에는 두 손가락 축소를 막지 않는다
+    var last = 0, meta = document.querySelector('meta[name="viewport"]');
+    var zoomed = function () { return window.visualViewport && visualViewport.scale > 1.01; };
+    var unzoom = function () {
+      if (!meta || !zoomed()) return;
+      var c = meta.getAttribute('content');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+      setTimeout(function () { meta.setAttribute('content', c); }, 400);
+    };
     document.addEventListener('touchend', function (e) {
       var now = Date.now();
-      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea')) {
         e.preventDefault();
         var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
         if (b) b.click();
       }
       last = now;
+      if (e.touches.length === 0) setTimeout(unzoom, 60);
     }, { passive: false });
-    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { if (!zoomed()) e.preventDefault(); }, { passive: false }); });
   })();
 </script>
 <title>시스템 선반 3D 견적 화면 | 곰파트너</title>
@@ -28,19 +41,21 @@
 <meta property="og:url" content="https://gompartner.co.kr/3d/configurator/">
 <meta property="og:title" content="시스템 선반 3D 견적 화면 | 곰파트너">
 <meta property="og:description" content="벽 폭에 맞춰 칸을 붙이고 서랍, 도어, 행거봉을 넣은 뒤 프레임 색상과 선반 재질을 선택하면 견적이 바로 계산되는 3D 화면입니다.">
-<meta property="og:image" content="https://gompartner.co.kr/3d/assets/og/configurator.jpg?v=2026112602">
+<meta property="og:image" content="https://gompartner.co.kr/3d/assets/og/configurator.jpg?v=2026112702">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="시스템 선반을 구성하는 3D 견적 화면">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="시스템 선반 3D 견적 화면 | 곰파트너">
 <meta name="twitter:description" content="벽 폭에 맞춰 칸을 붙이고 서랍, 도어, 행거봉을 넣은 뒤 프레임 색상과 선반 재질을 선택하면 견적이 바로 계산되는 3D 화면입니다.">
-<meta name="twitter:image" content="https://gompartner.co.kr/3d/assets/og/configurator.jpg?v=2026112602">
+<meta name="twitter:image" content="https://gompartner.co.kr/3d/assets/og/configurator.jpg?v=2026112702">
 <meta name="twitter:image:alt" content="시스템 선반을 구성하는 3D 견적 화면">
 <link rel="canonical" href="https://gompartner.co.kr/3d/configurator/">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!-- 11-26 점검: 외부 글꼴(굵기별 파일 세 개, 2.3MB) 대신 3D 화면 글자만 담은 작은 글꼴(257KB, 첫 화면 3D 마을과 같은 파일) -->
+<link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}</style>
 <style>
   @property --a { syntax: '<angle>'; inherits: false; initial-value: 90deg; }
   :root {
@@ -334,6 +349,34 @@
   .gp-bar .gp-t { font-size: 14px; font-weight: 500; color: #c9d0de; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.22); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
   .tojb { display: flex; align-items: center; justify-content: center; margin-top: 10px; text-decoration: none; color: inherit; font-weight: 600; }
+  /* 11-26 사용자 "견적서 보내기 앞에 링크 아이콘": 링크, 견적서 보내기, 메뉴 순서 */
+  .top #share-btn { order: 1; } .top .cta { order: 2; } .top #menu-btn { order: 3; }
+
+  /* 11-27 사용자 "3D 쪽 버튼 위치, 구성, 배치는 맞춰요, 유틸리티 버튼이 제각각": 다섯 3D 화면 공통 배치
+     위 왼쪽 치수, 위 오른쪽 링크와 메뉴(다섯 화면 같은 목록), 아래 예상 합계와 견적서 보내기(거실 화면과 같은 자리).
+     3D 안의 상호 제목("가구 쇼룸", "인테리어")은 위 곰파트너 줄과 겹쳐 뺐다 */
+  .top #share-btn { margin-left: auto; }
+  .info { left: 16px; transform: none; top: calc(var(--top) + 6px); max-width: calc(100vw - 144px); }
+  .wbtn { border-radius: 12px; }
+  .wallpop { left: 16px; transform: none; top: calc(var(--top) + 66px); }
+  .buy {
+    position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px calc(10px + var(--bot)); background: var(--surface); box-shadow: 0 -1px 0 var(--line), 0 -8px 24px rgba(0,0,0,.06);
+  }
+  .buy .pbtn { border: 0 !important; border-radius: 8px; background: none; margin-right: auto; padding: 2px 4px; min-height: 48px; display: grid; align-content: center; text-align: left; font-variant-numeric: tabular-nums; }
+  .buy .pbtn small { font-size: 13px; color: var(--ink-3); }
+  .buy .pbtn b { font-size: 21px; }
+  .buy .delta { top: auto; bottom: 100%; left: 4px; right: auto; margin: 0 0 6px; }
+  .buy .cta { height: 48px; padding: 0 22px; box-shadow: none; }
+  .tray { bottom: calc(var(--bot) + 80px); }
+  .toast { bottom: calc(var(--bot) + 172px); }
+  @media (min-width: 900px) {
+    .info { top: 52px; } .wallpop { top: 118px; }
+    .embed .info { top: 12px; } .embed .wallpop { top: 78px; }
+    .buy { left: auto; right: 24px; bottom: 24px; padding: 10px 10px 10px 18px; border-radius: 14px; box-shadow: var(--shadow); gap: 20px; }
+    .tray { left: 24px; transform: none; width: min(620px, calc(100% - 420px)); bottom: 24px; }
+    .toast { bottom: 132px; }
+  }
 </style>
 <script type="importmap">
 { "imports": {
@@ -350,19 +393,19 @@
 <div class="nogl" id="nogl">이 브라우저에서는 3D 화면을 열 수 없습니다. 아래 버튼으로 칸과 부속을 붙이고 견적을 요청할 수 있습니다.</div>
 
 <div class="top">
-  <a class="brand" href="./"><b>가구 쇼룸</b></a>
   <button class="ibtn" type="button" id="menu-btn" aria-label="메뉴" aria-expanded="false" aria-controls="menu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
-  <button class="cta" type="button" id="to-quote">링크 공유</button>
+  <button class="ibtn" type="button" id="share-btn" aria-label="이 구성 링크 공유" title="이 구성 링크 공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
 </div>
-<nav class="menu" id="menu" aria-label="주요 메뉴" hidden>
+<nav class="menu" id="menu" aria-label="3D 화면" hidden>
+  <a href="../room/">3D 거실 상담</a>
   <a href="../sofa/">모듈 소파</a>
   <a href="./" aria-current="page">시스템 선반</a>
-  <a href="../">카탈로그 목록</a>
-  <hr>
-  <button type="button" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>구성 링크 복사</button>
+  <a href="../door/">현관 중문</a>
+  <a href="../space/">시공 사례</a>
 </nav>
+<button type="button" hidden id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>구성 링크 복사</button>
 
 <div class="info">
   <button class="wbtn" type="button" id="wbtn" aria-expanded="false" aria-controls="wallpop">
@@ -370,7 +413,10 @@
     <span><b id="wtxt">폭 0mm</b><small id="wsub">벽 2,400mm</small></span>
     <span class="sr">, 벽 폭 바꾸기</span>
   </button>
-  <button class="pbtn" type="button" id="pbtn"><b id="total">0원</b><span class="sr">, 견적 내역 보기</span><em class="delta" id="delta" aria-hidden="true"></em></button>
+</div>
+<div class="buy">
+  <button class="pbtn" type="button" id="pbtn"><small>예상 합계</small><b id="total">0원</b><span class="sr">, 견적 내역 보기</span><em class="delta" id="delta" aria-hidden="true"></em></button>
+  <button class="cta" type="button" id="to-quote">견적서 보내기</button>
 </div>
 <div class="wallpop" id="wallpop" hidden>
   <label for="wall">놓을 벽</label>
@@ -414,8 +460,8 @@
       <details class="parts" id="more"><summary>추가 옵션</summary>
         <div class="seg" id="depths" role="radiogroup" aria-label="선반 깊이"></div>
       </details>
-      <button class="cta send" type="button" id="sheet-share">이 구성 링크 공유</button>
-      <a class="line-btn tojb" id="to-jangbu" href="https://jangbu.gompartner.co.kr/write" target="_blank" rel="noopener">거래장부에서 견적서로 보내기</a>
+      <button class="cta send" type="button" id="sheet-quote">견적서 보내기</button>
+      <button class="line-btn tojb" type="button" id="sheet-share">이 구성 링크 공유</button>
       <form id="quote-form" novalidate hidden>
         <label class="in">이름<input name="name" autocomplete="name" required aria-describedby="err-name"><span class="err" id="err-name"></span></label>
         <label class="in">연락처<input name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" maxlength="13" required aria-describedby="err-tel"><span class="err" id="err-tel"></span></label>
@@ -878,17 +924,20 @@ async function shareLink() {
   if (navigator.share && matchMedia('(pointer: coarse)').matches) { try { await navigator.share({ title: document.title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
   $('copy').click();
 }
-$('to-quote').addEventListener('click', shareLink);
+// 11-26 사용자 "링크 공유는 견적서 보내기로, 그 앞에 링크 아이콘": 위 큰 버튼은 거래장부 견적서, 링크는 아이콘으로
+$('share-btn').addEventListener('click', shareLink);
 $('sheet-share').addEventListener('click', shareLink);
 // 11-26 사용자 "견적은 자연스럽게 거래장부로 이어지면 좋겠음": 이 구성을 거래장부 견적서 품목 한 줄로 채워 연다
-$('to-jangbu').addEventListener('click', e => {
-  e.preventDefault();
-  const name = document.title.replace(/ 3D 견적 화면.*$/, '').trim(), what = ($('qt-what').textContent || '').trim().slice(0, 40);
+function sendQuote() {
+  if (typeof renderInfo === 'function') renderInfo();   // 견적 내역 창을 열지 않고 눌러도 지금 구성 금액으로
+  const name = document.title.replace(/ 3D 견적 화면.*$/, '').trim(), what = ($('qt-what').innerHTML || '').replace(/<br\s*\/?>/gi, ', ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim().slice(0, 40).replace(/[,\s]+$/, '');
   const price = Number(($('qt-total').textContent || '').replace(/[^0-9]/g, '')) || 0, incl = /부가세 포함/.test($('sheet').textContent);
   const j = JSON.stringify({ k: '견적서', i: [[name, what, '식', 1, price]], m: '3D 견적 화면에서 고른 구성입니다.', v: incl ? 'incl' : '' });
   const b = btoa(unescape(encodeURIComponent(j))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   window.open(`https://jangbu.gompartner.co.kr/write?from=3d-configurator&q=${b}`, '_blank', 'noopener');
-});
+}
+$('to-quote').addEventListener('click', sendQuote);
+$('sheet-quote').addEventListener('click', sendQuote);
 $('pbtn').addEventListener('click', openSheet);
 $('sheet-close').addEventListener('click', () => sheet.close());
 sheet.addEventListener('click', e => { if (e.target === sheet) sheet.close(); });

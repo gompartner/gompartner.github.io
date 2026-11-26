@@ -7,40 +7,55 @@
   // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
   // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
   (function () {
-    var PINCH = false, last = 0;
+    var PINCH = false;
+    // 11-27 사용자 "가로채기 필요, 먹통이 아니라 확대돼서 안 줄어듦": 두 번째 탭 가로채기는 되살리고(3D 위도 포함) 확대된 채로 갇히지 않게 한다
+    //  1) 두 번째 탭은 기본 동작(확대)을 막고 누른 버튼은 대신 누른다
+    //  2) 그래도 확대되면(다른 손짓 등) 한 손가락을 뗄 때 배율을 1로 되돌린다(viewport에 maximum-scale을 잠깐 넣었다 뺀다)
+    //  3) 확대된 동안에는 두 손가락 축소를 막지 않는다
+    var last = 0, meta = document.querySelector('meta[name="viewport"]');
+    var zoomed = function () { return window.visualViewport && visualViewport.scale > 1.01; };
+    var unzoom = function () {
+      if (!meta || !zoomed()) return;
+      var c = meta.getAttribute('content');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+      setTimeout(function () { meta.setAttribute('content', c); }, 400);
+    };
     document.addEventListener('touchend', function (e) {
       var now = Date.now();
-      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea')) {
         e.preventDefault();
         var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
         if (b) b.click();
       }
       last = now;
+      if (e.touches.length === 0) setTimeout(unzoom, 60);
     }, { passive: false });
-    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { if (!zoomed()) e.preventDefault(); }, { passive: false }); });
   })();
 </script>
-<title>인테리어 공간 3D 뷰어 화면 | 곰파트너</title>
-<meta name="description" content="32평 아파트 리모델링 공간을 3D, 평면도, 둘러보기로 전환해 보고 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
+<title>인테리어 3D 시공 사례 화면 | 곰파트너</title>
+<meta name="description" content="32평 아파트 리모델링 사례를 3D와 평면도로 보고 막대를 끌어 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="곰파트너">
 <meta property="og:url" content="https://gompartner.co.kr/3d/space/">
-<meta property="og:title" content="인테리어 공간 3D 뷰어 화면 | 곰파트너">
-<meta property="og:description" content="32평 아파트 리모델링 공간을 3D, 평면도, 둘러보기로 전환해 보고 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
-<meta property="og:image" content="https://gompartner.co.kr/3d/assets/og/space.jpg?v=2026112602">
+<meta property="og:title" content="인테리어 3D 시공 사례 화면 | 곰파트너">
+<meta property="og:description" content="32평 아파트 리모델링 사례를 3D와 평면도로 보고 막대를 끌어 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
+<meta property="og:image" content="https://gompartner.co.kr/3d/assets/og/space.jpg?v=2026112703">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="아파트 리모델링 공간을 3D와 평면도로 보는 화면">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="인테리어 공간 3D 뷰어 화면 | 곰파트너">
-<meta name="twitter:description" content="32평 아파트 리모델링 공간을 3D, 평면도, 둘러보기로 전환해 보고 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
-<meta name="twitter:image" content="https://gompartner.co.kr/3d/assets/og/space.jpg?v=2026112602">
+<meta name="twitter:title" content="인테리어 3D 시공 사례 화면 | 곰파트너">
+<meta name="twitter:description" content="32평 아파트 리모델링 사례를 3D와 평면도로 보고 막대를 끌어 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
+<meta name="twitter:image" content="https://gompartner.co.kr/3d/assets/og/space.jpg?v=2026112703">
 <meta name="twitter:image:alt" content="아파트 리모델링 공간을 3D와 평면도로 보는 화면">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
 <link rel="canonical" href="https://gompartner.co.kr/3d/space/">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!-- 11-26 점검: 외부 글꼴(굵기별 파일 세 개, 2.3MB) 대신 3D 화면 글자만 담은 작은 글꼴(257KB, 첫 화면 3D 마을과 같은 파일) -->
+<link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2?v=1127) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}</style>
 <style>
   :root {
     --bg: #f7f5f1;
@@ -70,69 +85,17 @@
   button, input, select { font: inherit; }
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-  header {
-    position: sticky; top: 0; z-index: 20;
-    background: var(--surface); border-bottom: 1px solid var(--line);
+  /* 11-27 사용자 "배치랑 불필요한 박스들, 박스 안에 또 쑤셔 넣은 느낌 개선", "리모델링 A/B 전환 효과": 다른 3D 화면처럼 3D가 화면 전체.
+     위 왼쪽 보기 방식과 시공 전후, 위 오른쪽 링크와 메뉴. 사례 정보는 PC 오른쪽 한 판, 휴대폰 아래 한 판.
+     시공 전후는 가운데 막대를 끌어 비교(왼쪽 시공 전, 오른쪽 시공 후), 전과 후 단추는 막대가 끝까지 밀리며 바뀐다 */
+  [hidden] { display: none !important; }
+  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+  :root {
+    --top: calc(env(safe-area-inset-top, 0px) + 40px); --bot: env(safe-area-inset-bottom, 0px);
+    --side: 0px; --sheet: 132px;
+    --shadow: 0 1px 2px rgba(31,29,26,.08), 0 6px 18px rgba(31,29,26,.10);
   }
-  .bar {
-    max-width: 1440px; margin: 0 auto; height: 60px;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 0 24px;
-  }
-  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; }
-  .brand b { font-size: 19px; letter-spacing: -0.01em; white-space: nowrap; }
-  .brand small {
-    font-size: 12px; color: var(--ink-2); border: 1px solid var(--line);
-    border-radius: 4px; padding: 1px 6px; white-space: nowrap;
-  }
-  nav { display: flex; gap: 4px; }
-  nav a {
-    display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px;
-    text-decoration: none; font-size: 15px; color: var(--ink-2); border-radius: 6px;
-  }
-  nav a:hover { color: var(--ink); background: var(--bg); }
-  nav a { white-space: nowrap; }
-
-  .wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
-  .case-head { padding: 24px 0 16px; }
-  .case-head h1 { margin: 0; font-size: 28px; line-height: 1.35; letter-spacing: -0.01em; }
-  .case-head p { margin: 4px 0 0; color: var(--ink-2); font-size: 16px; }
-
-  .viewer-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
-  .viewer { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-  .viewbar {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
-    padding: 10px 12px; border-bottom: 1px solid var(--line);
-  }
-  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
-  .seg button {
-    min-height: 44px; padding: 0 16px; border: 0; background: var(--surface); color: var(--ink);
-    font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
-  }
-  .seg button + button { border-left: 1px solid var(--line-strong); }
-  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
-  .seg button:focus-visible { outline-offset: -3px; outline-color: var(--focus); box-shadow: inset 0 0 0 3px #fff; }
-  .spacer { flex: 1; }
-  .share { display: inline-flex; align-items: center; gap: 8px; }
-  .share-btn {
-    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px;
-    border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface);
-    color: var(--ink); font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
-  }
-  .share-btn svg { width: 18px; height: 18px; flex: none; }
-  .share-btn:hover, .seg button:not([aria-pressed="true"]):hover { background: var(--bg); }
-  .share-msg { font-size: 14px; color: var(--accent); min-height: 1em; }
-  .share-fallback { display: none; width: 100%; }
-  .share-fallback input {
-    width: 100%; min-width: 0; height: 44px; padding: 0 10px; font-size: 15px;
-    border: 1px solid var(--line-strong); border-radius: 6px; background: var(--bg); color: var(--ink);
-  }
-
-  .stage {
-    position: relative; background: var(--stage);
-    height: clamp(460px, calc(100vh - 290px), 720px);
-    overflow: hidden;
-  }
+  .stage { position: fixed; z-index: 1; left: 0; top: var(--top); right: var(--side); bottom: var(--sheet); background: var(--stage); overflow: hidden; }
   #scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
   #scene.walk { cursor: crosshair; }
   #scene:active { cursor: grabbing; }
@@ -174,110 +137,123 @@
     cursor: pointer; color: var(--ink-2); display: grid; place-items: center;
   }
   .mat-card svg { width: 16px; height: 16px; }
+  .nogl { position: absolute; inset: 0; display: none; place-items: center; padding: 24px; text-align: center; color: var(--ink-2); }
   .hint {
-    position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px);
+    position: absolute; left: 16px; bottom: 12px; max-width: calc(100% - 32px);
     font-size: 13px; color: var(--ink-2); background: rgba(255, 255, 255, 0.86);
     padding: 4px 8px; border-radius: 4px; pointer-events: none;
   }
-  .state-tag {
-    position: absolute; right: 12px; top: 12px; font-size: 13px; font-weight: 700;
-    background: var(--ink); color: #fff; padding: 3px 8px; border-radius: 3px; pointer-events: none;
-  }
-  .state-tag.after { background: var(--accent); }
-  .nogl { position: absolute; inset: 0; display: none; place-items: center; padding: 24px; text-align: center; color: var(--ink-2); }
 
-  .roombar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--line); }
+  /* 시공 전후 비교 막대 */
+  .split { position: absolute; z-index: 3; left: 0; top: 0; bottom: 0; width: 44px; margin-left: -22px; cursor: ew-resize; touch-action: none; display: none; }
+  .split.on { display: block; }
+  .split::before { content: ""; position: absolute; left: 21px; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 0 1px rgba(31,29,26,.14); }
+  .split.fixed { pointer-events: none; }
+  .split.fixed .knob { display: none; }
+  .knob {
+    position: absolute; left: 0; top: 50%; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%;
+    background: var(--surface); color: var(--ink); box-shadow: var(--shadow); display: grid; place-items: center;
+  }
+  .knob svg { width: 22px; height: 22px; }
+  .split .tag {
+    position: absolute; top: calc(50% - 64px); font-size: 13px; font-weight: 700; line-height: 1.4;
+    padding: 3px 8px; border-radius: 4px; color: #fff; white-space: nowrap; pointer-events: none;
+  }
+  .split .tag.b { right: 32px; background: var(--ink); }
+  .split .tag.a { left: 32px; background: var(--accent); }
+
+  /* 위 조작 줄 */
+  .top {
+    position: fixed; z-index: 5; left: 0; right: var(--side); top: calc(var(--top) + 10px); padding: 0 16px;
+    display: flex; flex-wrap: wrap; align-items: flex-start; column-gap: 8px; pointer-events: none;
+  }
+  .top > * { pointer-events: auto; }
+  .top::after { content: ""; order: 3; flex-basis: 100%; height: 0; }
+  .views { order: 1; } .util { order: 2; } .states { order: 4; margin-top: 8px; }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow); }
+  .seg button {
+    min-height: 38px; padding: 0 13px; border: 0; border-radius: 8px; background: none; color: var(--ink);
+    font-size: 15px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  }
+  .seg button:not([aria-pressed="true"]):hover { background: var(--bg); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .util { margin-left: auto; position: relative; display: flex; gap: 8px; }
+  .ibtn {
+    width: 44px; height: 44px; flex: none; display: inline-grid; place-items: center; padding: 0; cursor: pointer;
+    background: var(--surface); border: 0; border-radius: 10px; color: var(--ink); box-shadow: var(--shadow);
+  }
+  .ibtn svg { width: 22px; height: 22px; }
+  .menu {
+    position: absolute; z-index: 30; top: calc(100% + 8px); right: 0; width: 220px;
+    background: var(--surface); border-radius: 12px; box-shadow: 0 1px 2px rgba(31,29,26,.08), 0 10px 30px rgba(31,29,26,.16); padding: 8px;
+  }
+  .menu a { display: flex; align-items: center; width: 100%; min-height: 48px; padding: 0 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 16px; }
+  .menu a[aria-current="page"] { font-weight: 700; background: var(--accent-soft); }
+  .menu a:hover { background: #f3f2ef; }
+  .share-msg {
+    position: absolute; right: 0; top: calc(100% + 8px); white-space: nowrap; font-size: 14px;
+    background: var(--ink); color: #fff; padding: 6px 10px; border-radius: 6px;
+  }
+  .share-msg:empty { display: none; }
+  .share-fallback { display: none; position: absolute; right: 0; top: calc(100% + 48px); width: min(300px, calc(100vw - 32px)); }
+  .share-fallback input {
+    width: 100%; height: 44px; padding: 0 10px; font-size: 15px;
+    border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--ink);
+  }
+
+  /* 사례 정보: 휴대폰은 아래 한 판(펼치기), PC는 오른쪽 한 판 */
+  .case {
+    position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; background: var(--surface);
+    border-radius: 16px 16px 0 0; box-shadow: 0 -1px 0 var(--line), 0 -8px 24px rgba(31,29,26,.07);
+    padding: 12px 0 calc(12px + var(--bot)); max-height: calc(100dvh - var(--top) - 24px); overflow-y: auto; overscroll-behavior: contain;
+  }
+  .case-h { display: flex; align-items: center; gap: 12px; padding: 0 16px; }
+  .case-h > div { min-width: 0; flex: 1; }
+  .case h1 { margin: 0; font-size: 17px; line-height: 1.4; letter-spacing: -0.01em; }
+  .case-h p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .more { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; }
+  .more svg { width: 20px; height: 20px; transition: transform .2s ease; }
+  .more[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .roombar { display: flex; gap: 6px; padding: 10px 16px 0; overflow-x: auto; scrollbar-width: none; }
+  .roombar::-webkit-scrollbar { display: none; }
   .roombar button {
-    min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 6px;
+    flex: none; min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px;
     background: var(--surface); color: var(--ink); font-size: 15px; cursor: pointer; white-space: nowrap;
   }
   .roombar button:hover { border-color: var(--line-strong); }
   .roombar button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
-
-  aside { min-width: 0; display: grid; gap: 16px; }
-  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; }
-  .panel h2 { margin: 0 0 12px; font-size: 18px; }
-  dl.info { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 16px; }
+  .case-body { padding: 0 16px; }
+  .case-body h2 { margin: 20px 0 8px; font-size: 15px; color: var(--ink-2); font-weight: 700; }
+  dl.info { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 15px; }
   dl.info dt { color: var(--ink-2); }
   dl.info dd { margin: 0; }
-  ul.changes { list-style: none; margin: 0; padding: 0; font-size: 16px; }
+  ul.changes { list-style: none; margin: 0; padding: 0; font-size: 15px; }
   ul.changes li { padding: 10px 0; border-top: 1px solid var(--line); }
-  ul.changes li:first-child { border-top: 0; padding-top: 0; }
-  ul.changes b { display: block; font-size: 15px; }
-  ul.changes span { color: var(--ink-2); font-size: 15px; }
+  ul.changes li:first-child { border-top: 0; padding-top: 2px; }
+  ul.changes b { display: block; }
+  ul.changes span { color: var(--ink-2); }
 
-  .consult { padding: 48px 0 56px; }
-  .consult-box {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 32px;
+  @media (max-width: 360px) {
+    .seg button { padding: 0 9px; font-size: 14px; }
   }
-  .consult h2 { margin: 0 0 8px; font-size: 24px; }
-  .consult-intro p { margin: 0 0 12px; color: var(--ink-2); font-size: 16px; }
-  .ref { border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; font-size: 15px; background: var(--bg); }
-  .ref b { display: block; }
-  form { display: grid; gap: 14px; min-width: 0; }
-  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
-  label.f { display: grid; gap: 6px; font-size: 15px; font-weight: 600; min-width: 0; }
-  label.f input, label.f select {
-    width: 100%; min-width: 0; height: 48px; padding: 0 12px; font-size: 16px; font-weight: 400;
-    color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px;
-  }
-  label.f select { -webkit-appearance: none; appearance: none; padding-right: 36px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%234f4a43' stroke-width='1.6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 14px center; }
-  input[type="date"] { -webkit-appearance: none; appearance: none; display: block; text-align: left; }
-  label.check { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--ink-2); min-height: 44px; padding-top: 10px; cursor: pointer; }
-  label.check input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
-  .submit {
-    min-height: 50px; border: 0; border-radius: 6px; background: var(--accent); color: #fff;
-    font-size: 17px; font-weight: 700; cursor: pointer;
-  }
-  .submit:hover { background: var(--accent-hover); }
-  .done { display: none; border: 1px solid var(--accent); border-radius: 6px; padding: 18px 20px; background: var(--accent-soft); }
-  .done b { display: block; font-size: 18px; margin-bottom: 8px; }
-  .done dl { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: 16px; }
-  .done dt { color: var(--ink-2); }
-  .done dd { margin: 0; }
-
-  footer { border-top: 1px solid var(--line); background: var(--surface); }
-  footer .wrap { padding-top: 20px; padding-bottom: 28px; font-size: 14px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 8px 16px; }
-  footer a { color: var(--ink); }
-
-  @media (max-width: 1080px) {
-    .viewer-grid { grid-template-columns: minmax(0, 1fr); }
-    aside { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  }
-  @media (max-width: 760px) {
-    .bar { height: 56px; padding: 0 16px; }
-    .wrap { padding: 0 16px; }
-    nav a { padding: 0 8px; font-size: 14px; }
-    .brand b { font-size: 17px; }
-    .brand small { font-size: 11px; padding: 0 5px; }
-    .case-head { padding: 16px 0 12px; }
-    .case-head h1 { font-size: 21px; }
-    .case-head p { font-size: 15px; }
-    .viewbar { padding: 8px; gap: 8px; }
-    .viewbar .seg.views { width: 100%; }
-    .viewbar .seg.views button { flex: 1; padding: 0 8px; }
-    .seg button { padding: 0 12px; }
-    .share-btn { padding: 0 12px; }
-    .stage { height: 56vh; min-height: 380px; max-height: 520px; }
-    .roombar { flex-wrap: nowrap; overflow-x: auto; padding: 8px; scrollbar-width: none; }
-    .roombar::-webkit-scrollbar { display: none; }
-    .roombar button { flex: none; padding: 0 12px; }
-    .hint { font-size: 12px; left: 8px; bottom: 8px; }
-    .state-tag { right: 8px; top: 8px; }
-    .mat-card { width: 220px; }
-    .room-label { font-size: 12px; padding: 1px 4px; }
-    .room-label span { font-size: 11px; }
-    aside { grid-template-columns: minmax(0, 1fr); }
-    .panel { padding: 16px; }
-    .consult { padding: 32px 0 40px; }
-    .consult-box { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px 16px; }
-    .consult h2 { font-size: 21px; }
-  }
-  @media (max-width: 480px) {
-    nav a:first-child { display: none; }
+  @media (min-width: 900px) {
+    :root { --side: 360px; --sheet: 0px; }
+    .top { padding: 0 24px; top: calc(var(--top) + 18px); }
+    .top::after { display: none; }
+    .views { order: 1; } .states { order: 2; margin-top: 0; } .util { order: 3; }
+    .hint { left: 24px; bottom: 24px; }
+    .case {
+      top: var(--top); left: auto; width: 360px; border-radius: 0; box-shadow: none; border-left: 1px solid var(--line);
+      padding: 28px 0 32px; max-height: none;
+    }
+    .case h1 { font-size: 22px; }
+    .case-h p { font-size: 15px; margin-top: 4px; }
+    .more { display: none; }
+    .case-body[hidden] { display: block !important; }
+    .roombar { flex-wrap: wrap; padding-top: 20px; }
+    .case-body { padding: 0 24px; }
+    .case-h, .roombar { padding-left: 24px; padding-right: 24px; }
+    .case-body h2 { margin-top: 28px; }
   }
   /* 11-04 다른 카탈로그 데모와 같은 맨 위 곰파트너 바로가기 줄(40px, 검정) */
   .gp-bar { height: 40px; background: #15171c; color: #fff; z-index: 40; font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; }
@@ -286,13 +262,14 @@
   .gp-bar a:hover { color: #8fb4ff; }
   .gp-bar a:focus-visible { outline: 2px solid #8fb4ff; outline-offset: 2px; }
   @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
-  .gp-bar { position: relative; }
+  .gp-bar { position: fixed; top: 0; left: 0; right: 0; }
   /* 11-26 사용자 "상단 곰파트너 바로가기는 최근 3D(거실 상담 화면)처럼": 곰파트너와 화면 이름을 한 줄에 */
   .gp-bar { background: #0b0d12 !important; border-bottom: 1px solid rgba(255,255,255,.1); }
   .gp-bar > div { gap: 10px; min-width: 0; }
   .gp-bar a { font-size: 16px !important; font-weight: 800 !important; letter-spacing: -0.02em; white-space: nowrap; }
   .gp-bar .gp-t { font-size: 14px; font-weight: 500; color: #c9d0de; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.22); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
+
 </style>
 <script type="importmap">
 { "imports": {
@@ -302,150 +279,106 @@
 </script>
 </head>
 <body>
-<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/3d">곰파트너</a><span class="gp-t">인테리어 공간 3D 뷰어 화면</span></div></div>
-<header>
-  <div class="bar">
-    <a class="brand" href="#top"><b>인테리어</b></a>
-    <nav aria-label="주요 메뉴">
-      <a href="#case">시공 사례</a>
-      <a href="../door/">중문 견적</a>
-    </nav>
-  </div>
-</header>
+<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/3d">곰파트너</a><span class="gp-t">인테리어 3D 시공 사례 화면</span></div></div>
+
 
 <main id="top">
-  <div class="wrap" id="case">
-    <div class="case-head">
-      <h1>분당 32평 아파트 종합 리모델링</h1>
-      <p>1998년 준공 아파트, 공사 기간 6주</p>
+  <div class="stage" id="stage" aria-label="3D 공간 뷰어">
+    <canvas id="scene" role="img" aria-label="32평 아파트 시공 사례 3D 모델"></canvas>
+    <div class="overlay" id="overlay"></div>
+    <div class="split" id="split">
+      <span class="tag b">시공 전</span><span class="tag a">시공 후</span>
+      <div class="knob" id="knob" role="slider" tabindex="0" aria-label="시공 전후 비교 위치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="왼쪽 시공 전, 오른쪽 시공 후"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></div>
     </div>
+    <div class="mat-card" id="matCard" role="dialog" aria-labelledby="matName">
+      <b id="matName"></b>
+      <p id="matSpec"></p>
+      <button type="button" id="matClose" aria-label="자재 정보 닫기">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="nogl" id="nogl">3D 화면을 표시할 수 없는 브라우저입니다. 다른 브라우저에서 열어 주십시오.</div>
+  </div>
 
-    <div class="viewer-grid">
-      <section class="viewer" aria-label="3D 공간 뷰어">
-        <div class="viewbar">
-          <div class="seg views" role="group" aria-label="보기 방식">
-            <button type="button" data-view="3d" aria-pressed="true">3D</button>
-            <button type="button" data-view="plan" aria-pressed="false">평면도</button>
-            <button type="button" data-view="walk" aria-pressed="false">둘러보기</button>
-          </div>
-          <div class="seg" role="group" aria-label="시공 전후">
-            <button type="button" data-state="before" aria-pressed="false">시공 전</button>
-            <button type="button" data-state="after" aria-pressed="true">시공 후</button>
-          </div>
-          <div class="spacer"></div>
-          <div class="share">
-            <span class="share-msg" id="shareMsg" role="status" aria-live="polite"></span>
-            <button type="button" class="share-btn" id="shareBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
-              링크 복사
-            </button>
-          </div>
-          <div class="share-fallback" id="shareFallback">
-            <input type="text" readonly aria-label="공유 링크" id="shareInput">
-          </div>
-        </div>
-
-        <div class="stage" id="stage">
-          <canvas id="scene" role="img" aria-label="32평 아파트 시공 사례 3D 모델"></canvas>
-          <div class="overlay" id="overlay"></div>
-          <div class="mat-card" id="matCard" role="dialog" aria-labelledby="matName">
-            <b id="matName"></b>
-            <p id="matSpec"></p>
-            <button type="button" id="matClose" aria-label="자재 정보 닫기">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
-            </button>
-          </div>
-          <div class="state-tag after" id="stateTag">시공 후</div>
-          <div class="hint" id="hint"></div>
-          <div class="nogl" id="nogl">3D 화면을 표시할 수 없는 브라우저입니다. 다른 브라우저에서 열어 주십시오.</div>
-        </div>
-
-        <div class="roombar" id="roombar" role="group" aria-label="공간 목록"></div>
-      </section>
-
-      <aside>
-        <div class="panel">
-          <h2>사례 정보</h2>
-          <dl class="info">
-            <dt>지역</dt><dd>경기 성남시 분당구</dd>
-            <dt>주거 형태</dt><dd>아파트, 3베이 판상형</dd>
-            <dt>평수</dt><dd>32평, 전용 84제곱미터</dd>
-            <dt>공사 종류</dt><dd>종합 리모델링</dd>
-            <dt>가족 형태</dt><dd>4인 가족</dd>
-            <dt>공사 기간</dt><dd>6주</dd>
-          </dl>
-        </div>
-        <div class="panel">
-          <h2>공간별 시공 내용</h2>
-          <ul class="changes">
-            <li><b>바닥</b><span>장판 철거 후 강마루 시공, 현관과 욕실은 타일</span></li>
-            <li><b>주방</b><span>ㄱ자 주방을 일자형 주방과 아일랜드로 변경</span></li>
-            <li><b>욕실 2곳</b><span>기존 타일 철거, 방수 후 벽과 바닥 타일 재시공</span></li>
-            <li><b>벽</b><span>전 공간 도배, 체리 몰딩을 화이트 무몰딩으로 교체</span></li>
-          </ul>
-        </div>
-      </aside>
+  <div class="top">
+    <div class="seg views" role="group" aria-label="보기 방식">
+      <button type="button" data-view="3d" aria-pressed="true">3D</button>
+      <button type="button" data-view="plan" aria-pressed="false">평면도</button>
+      <button type="button" data-view="walk" aria-pressed="false">둘러보기</button>
+    </div>
+    <div class="seg states" role="group" aria-label="시공 전후">
+      <button type="button" data-state="before" aria-pressed="false">시공 전</button>
+      <button type="button" data-state="compare" aria-pressed="true">비교</button>
+      <button type="button" data-state="after" aria-pressed="false">시공 후</button>
+    </div>
+    <div class="util">
+      <button type="button" class="ibtn" id="shareBtn" aria-label="이 화면 링크 공유" title="이 화면 링크 공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
+      <button type="button" class="ibtn" id="menu-btn" aria-label="메뉴" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <nav class="menu" id="menu" aria-label="3D 화면" hidden>
+        <a href="../room/">3D 거실 상담</a>
+        <a href="../sofa/">모듈 소파</a>
+        <a href="../configurator/">시스템 선반</a>
+        <a href="../door/">현관 중문</a>
+        <a href="./" aria-current="page">시공 사례</a>
+      </nav>
+      <span class="share-msg" id="shareMsg" role="status" aria-live="polite"></span>
+      <div class="share-fallback" id="shareFallback"><input type="text" readonly aria-label="공유 링크" id="shareInput"></div>
     </div>
   </div>
 
-  <!-- 11-26 사용자 "작은 3D는 견적 상담은 필요 없고 링크 공유만": 상담 구역은 숨기고 위의 링크 공유만 남긴다 -->
-  <section class="consult" id="consult" aria-labelledby="consultTitle" hidden>
-    <div class="wrap">
-      <div class="consult-box">
-        <div class="consult-intro">
-          <h2 id="consultTitle">비슷한 시공 상담</h2>
-          <p>평형과 희망 시기를 남기시면 이 사례의 공정과 자재를 기준으로 상담합니다. 현장 실측은 상담 뒤 일정을 정해 방문합니다.</p>
-          <div class="ref"><b>참고 사례</b>분당 32평 아파트 종합 리모델링, 공사 기간 6주</div>
-        </div>
-        <form id="consultForm" novalidate>
-          <div class="row">
-            <label class="f">이름<input type="text" name="name" autocomplete="name" required></label>
-            <label class="f">연락처<input type="tel" name="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000" required></label>
-          </div>
-          <div class="row">
-            <label class="f">평형
-              <select name="size" required>
-                <option value="">선택</option>
-                <option>24평 이하</option>
-                <option>25~29평</option>
-                <option selected>30~34평</option>
-                <option>35~39평</option>
-                <option>40평 이상</option>
-              </select>
-            </label>
-            <label class="f">희망 시기
-              <select name="when" required>
-                <option value="">선택</option>
-                <option>1개월 안</option>
-                <option>1~3개월</option>
-                <option>3~6개월</option>
-                <option>6개월 이후</option>
-              </select>
-            </label>
-          </div>
-          <label class="check"><input type="checkbox" name="agree" required>상담 회신을 위한 개인정보 수집과 이용에 동의합니다. 보관 기간은 3개월입니다.</label>
-          <p class="form-err" id="formErr" role="alert" style="margin:0;color:#a3261d;font-size:15px;display:none"></p>
-          <button type="submit" class="submit">상담 신청</button>
-          <div class="done" id="done" role="status" tabindex="-1">
-            <b>상담 신청을 접수했습니다</b>
-            <dl>
-              <dt>접수 번호</dt><dd id="doneNo"></dd>
-              <dt>담당 창구</dt><dd>인테리어 상담팀</dd>
-              <dt>회신 예정</dt><dd id="doneDate"></dd>
-            </dl>
-          </div>
-        </form>
+  <aside class="case" id="case" aria-label="사례 정보">
+    <div class="case-h">
+      <div>
+        <h1>분당 32평 아파트 종합 리모델링</h1>
+        <p>1998년 준공 아파트, 공사 기간 6주</p>
       </div>
+      <button type="button" class="more" id="moreBtn" aria-expanded="false" aria-controls="caseBody" aria-label="사례 정보 펴기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
     </div>
-  </section>
+    <div class="roombar" id="roombar" role="group" aria-label="공간 목록"></div>
+    <div class="case-body" id="caseBody" hidden>
+      <h2>사례 정보</h2>
+      <dl class="info">
+        <dt>지역</dt><dd>경기 성남시 분당구</dd>
+        <dt>주거 형태</dt><dd>아파트, 3베이 판상형</dd>
+        <dt>평수</dt><dd>32평, 전용 84제곱미터</dd>
+        <dt>공사 종류</dt><dd>종합 리모델링</dd>
+        <dt>가족 형태</dt><dd>4인 가족</dd>
+        <dt>공사 기간</dt><dd>6주</dd>
+      </dl>
+      <h2>공간별 시공 내용</h2>
+      <ul class="changes">
+        <li><b>바닥</b><span>장판 철거 후 강마루 시공, 현관과 욕실은 타일</span></li>
+        <li><b>주방</b><span>ㄱ자 주방을 일자형 주방과 아일랜드로 변경</span></li>
+        <li><b>욕실 2곳</b><span>기존 타일 철거, 방수 후 벽과 바닥 타일 재시공</span></li>
+        <li><b>벽</b><span>전 공간 도배, 체리 몰딩을 화이트 무몰딩으로 교체</span></li>
+      </ul>
+    </div>
+  </aside>
 </main>
-
-<footer>
-  <div class="wrap">
-    <span>인테리어</span>
-    <a href="../">카탈로그 목록</a>
-  </div>
-</footer>
+<script>
+  (function () {
+    var btn = document.getElementById('menu-btn'), menu = document.getElementById('menu');
+    var set = function (open) { menu.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    btn.addEventListener('click', function () { set(menu.hidden); });
+    menu.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
+    document.addEventListener('click', function (e) { if (!menu.hidden && !e.target.closest('#menu, #menu-btn')) set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { set(false); btn.focus(); } });
+    // 휴대폰 아래 판: 접힌 높이만큼 3D를 위로 올리고(가리지 않게), 펼치면 3D 위로 덮는다
+    var root = document.documentElement, box = document.getElementById('case'), more = document.getElementById('moreBtn'), body = document.getElementById('caseBody');
+    var wide = window.matchMedia('(min-width: 900px)');
+    var fit = function () { if (wide.matches) root.style.removeProperty('--sheet'); else if (body.hidden) root.style.setProperty('--sheet', box.offsetHeight + 'px'); };
+    more.addEventListener('click', function () {
+      var open = body.hidden; body.hidden = !open;
+      more.setAttribute('aria-expanded', open ? 'true' : 'false');
+      more.setAttribute('aria-label', open ? '사례 정보 접기' : '사례 정보 펴기');
+      if (!open) fit();
+    });
+    fit(); window.addEventListener('resize', fit);
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(document.getElementById('roombar'));
+    if (document.fonts) document.fonts.ready.then(fit);
+  })();
+</script>
 
 <script type="module">
 import * as THREE from 'three';
@@ -989,36 +922,66 @@ cabinet(7.67, 0.25, 7.98, 1.9, 0, 2.3, 'x+', M.white, M.front, furn, { doorW: 0.
 [furn, KA, KB].forEach(g => g.children.forEach(m => intro.furn.push({ m, base: m.position.clone(), dist: Math.hypot(m.position.x - CX, m.position.z - CZ), j: rnd() })));
 
 /* ---------- 시공 전후 ---------- */
-let state = 'after';
+// 11-27 사용자 "리모델링 A/B 전환 효과": 화면을 막대 위치에서 둘로 나눠 왼쪽은 시공 전, 오른쪽은 시공 후로 그린다.
+// split은 왼쪽(시공 전)이 차지하는 비율. 시공 후 0, 시공 전 1, 비교는 끌어서 정한다. 단추를 누르면 막대가 그 끝까지 밀린다.
+let state = 'compare', split = 0.5, splitAnim = null, lastSplit = 0.5;
 const WALL_A = new THREE.Color('#f3eee6'), WALL_B = new THREE.Color('#e6d8bc');
 const SOFA_A = new THREE.Color('#bdb5a8'), SOFA_B = new THREE.Color('#8c6f58');
-let mix = 1, stateAnim = null;
 const clamp01 = v => Math.min(1, Math.max(0, v));
 const smooth = t => t * t * (3 - 2 * t);
 const outBack = t => { const c = 1.4; return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2; };
 function setMix(k) {
-  mix = k;
   const b = 1 - k;
   [M.jangpan, M.oldTile, M.oldWallTile].forEach(m => { m.opacity = b; m.transparent = b < 0.999; m.depthWrite = b >= 0.999; });
   beforeMeshes.forEach(m => m.visible = b > 0.002);
   M.wall.color.copy(WALL_B).lerp(WALL_A, k);
   M.sofa.color.copy(SOFA_B).lerp(SOFA_A, k);
-  const ka = smooth(clamp01((k - 0.35) / 0.65)), kb = smooth(clamp01((0.65 - k) / 0.65));
-  KA.scale.y = Math.max(0.001, ka); KA.visible = ka > 0.001;
-  KB.scale.y = Math.max(0.001, kb); KB.visible = kb > 0.001;
-  dirty = true;
+  KA.scale.y = k > 0.5 ? 1 : 0.001; KA.visible = k > 0.5;
+  KB.scale.y = k > 0.5 ? 0.001 : 1; KB.visible = k <= 0.5;
 }
+const splitEl = document.getElementById('split'), knob = document.getElementById('knob');
 function applyState(instant) {
-  const after = state === 'after';
-  const to = after ? 1 : 0;
-  if (instant || reduce) { stateAnim = null; setMix(to); }
-  else stateAnim = { from: mix, to, t0: performance.now(), dur: 1000 };
+  const to = state === 'after' ? 0 : state === 'before' ? 1 : lastSplit;
+  if (instant || reduce) { splitAnim = null; split = to; }
+  else splitAnim = { from: split, to, t0: performance.now(), dur: 900 };
   document.querySelectorAll('[data-state]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.state === state)));
-  const tag = document.getElementById('stateTag');
-  tag.textContent = after ? '시공 후' : '시공 전';
-  tag.classList.toggle('after', after);
+  splitEl.classList.toggle('fixed', state !== 'compare');
   closeCard();
   dirty = true;
+}
+let dragS = null;
+function moveSplit(clientX) {
+  const r = stage.getBoundingClientRect();
+  split = lastSplit = Math.min(0.97, Math.max(0.03, (clientX - r.left) / r.width));
+  splitAnim = null; closeCard(); dirty = true;
+}
+splitEl.addEventListener('pointerdown', e => {
+  if (state !== 'compare') return;
+  e.preventDefault(); e.stopPropagation();
+  dragS = e.pointerId; splitEl.setPointerCapture(e.pointerId); moveSplit(e.clientX);
+});
+splitEl.addEventListener('pointermove', e => { if (dragS === e.pointerId) moveSplit(e.clientX); });
+['pointerup', 'pointercancel'].forEach(t => splitEl.addEventListener(t, e => { if (dragS === e.pointerId) dragS = null; }));
+knob.addEventListener('keydown', e => {
+  const d = e.key === 'ArrowLeft' ? -0.05 : e.key === 'ArrowRight' ? 0.05 : e.key === 'Home' ? -1 : e.key === 'End' ? 1 : 0;
+  if (!d || state !== 'compare') return;
+  e.preventDefault();
+  split = lastSplit = Math.min(0.97, Math.max(0.03, split + d)); splitAnim = null; closeCard(); dirty = true;
+});
+function draw() {
+  const w = stage.clientWidth, h = stage.clientHeight, sx = Math.round(w * split);
+  if (sx <= 0 || sx >= w) {
+    setMix(sx <= 0 ? 1 : 0);
+    renderer.render(scene, camera);
+  } else {
+    renderer.setScissorTest(true);
+    setMix(0); renderer.setScissor(0, 0, sx, h); renderer.render(scene, camera);
+    setMix(1); renderer.setScissor(sx, 0, w - sx, h); renderer.render(scene, camera);
+    renderer.setScissorTest(false);
+  }
+  splitEl.classList.toggle('on', sx > 0 && sx < w);
+  splitEl.style.transform = `translateX(${sx}px)`;
+  knob.setAttribute('aria-valuenow', String(Math.round(split * 100)));
 }
 
 /* ---------- 첫 진입 연출 ---------- */
@@ -1071,13 +1034,14 @@ function pose3d(room) {
     return { pos: tgt.clone().add(new THREE.Vector3(0.35, 1.25, 0.95).normalize().multiplyScalar(dist)), tgt, fov: 40 };
   }
   const tgt = new THREE.Vector3(CX, 0, CZ + 0.2);
-  const dist = Math.min(30, 15 * Math.max(1, 1.3 / a));
+  const dist = Math.min(40, 15 * Math.max(1, 1.3 / a));
   return { pos: tgt.clone().add(new THREE.Vector3(0.3, 1.3, 0.95).normalize().multiplyScalar(dist)), tgt, fov: 40 };
 }
 function posePlan(room) {
   const a = aspect(), fov = 40, t = Math.tan(THREE.MathUtils.degToRad(fov / 2));
   let w = W + 1.6, d = D + 1.6, cx = CX, cz = CZ;
   if (room) { const [x1, z1, x2, z2] = ROOM[room].rect; w = Math.max(x2 - x1, 3) * 2.2; d = Math.max(z2 - z1, 3) * 2.2; cx = (x1 + x2) / 2; cz = (z1 + z2) / 2; }
+  if (stage.clientWidth < 600) { w *= 1.25; d *= 1.25; }   // 휴대폰은 위 버튼 두 줄에 가리지 않게 여백
   const rot = a < 0.95;
   if (rot) [w, d] = [d, w];
   const h = Math.max(d / 2 / t, w / 2 / (t * a)) + H;
@@ -1316,14 +1280,15 @@ function updateOverlay() {
     l.el.style.display = s.ok ? '' : 'none';
     l.el.style.transform = `translate(${s.x}px, ${s.y}px) translate(-50%, -50%)`;
   });
-  const showSpots = state === 'after' && !anim && !stateAnim && introT0 === null && view !== 'plan';
+  const showSpots = split < 0.97 && !anim && !splitAnim && introT0 === null && view !== 'plan';
+  const splitX = stage.clientWidth * split + 24;
   const camDir = new THREE.Vector3(); camera.getWorldDirection(camDir);
   spots.forEach(s => {
     let vis = showSpots;
     if (vis && view === 'walk') vis = s.m.room === currentRoom || (currentRoom === 'living' && s.m.room === 'kitchen');
     if (vis && view === 'walk') vis = v3.copy(s.p).sub(camera.position).dot(camDir) > 0.3;
     const pr = vis ? project(s.p) : null;
-    vis = vis && pr.ok;
+    vis = vis && pr.ok && pr.x > splitX;
     s.el.style.display = vis ? '' : 'none';
     if (vis) { s.sx = pr.x; s.sy = pr.y; s.el.style.transform = `translate(${pr.x}px, ${pr.y}px)`; }
     if (openMat === s.m && !vis) closeCard();
@@ -1363,7 +1328,7 @@ function readHash() {
   const q = new URLSearchParams(location.hash.slice(1));
   const v = ['3d', 'plan', 'walk'].includes(q.get('view')) ? q.get('view') : '3d';
   const r = ROOM[q.get('room')] ? q.get('room') : null;
-  const s = q.get('state') === 'before' ? 'before' : 'after';
+  const s = ['before', 'after'].includes(q.get('state')) ? q.get('state') : 'compare';
   return { v, r, s };
 }
 window.addEventListener('hashchange', () => {
@@ -1433,45 +1398,21 @@ function loop(now) {
     introT0 += dt;
     if (introT0 >= INTRO_DUR) endIntro(); else { setIntro(introT0); dirty = true; }
   }
-  if (stateAnim) {
-    const k = clamp01((now - stateAnim.t0) / stateAnim.dur);
-    setMix(stateAnim.from + (stateAnim.to - stateAnim.from) * smooth(k));
-    if (k >= 1) stateAnim = null;
+  if (splitAnim) {
+    const k = clamp01((now - splitAnim.t0) / splitAnim.dur);
+    split = splitAnim.from + (splitAnim.to - splitAnim.from) * smooth(k);
+    dirty = true;
+    if (k >= 1) splitAnim = null;
   }
   if (!dirty) return;
   dirty = false;
-  renderer.render(scene, camera);
+  draw();
   updateOverlay();
 }
 requestAnimationFrame(loop);
-window.__space = { setView, goRoom, screen: (x, y, z) => project(new THREE.Vector3(x, y, z)), get view() { return view; }, get room() { return currentRoom; } };
+window.__space = { setView, goRoom, get split() { return split; }, get state() { return state; }, screen: (x, y, z) => project(new THREE.Vector3(x, y, z)), get view() { return view; }, get room() { return currentRoom; } };
 }
 
-/* ---------- 상담 신청 ---------- */
-const form = document.getElementById('consultForm');
-const err = document.getElementById('formErr');
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const fd = new FormData(form);
-  const miss = [];
-  if (!String(fd.get('name') || '').trim()) miss.push('이름');
-  const tel = String(fd.get('tel') || '').replace(/[^0-9]/g, '');
-  if (tel.length < 9) miss.push('연락처');
-  if (!fd.get('size')) miss.push('평형');
-  if (!fd.get('when')) miss.push('희망 시기');
-  if (!fd.get('agree')) miss.push('개인정보 동의');
-  if (miss.length) { err.textContent = miss.join(', ') + ' 항목을 확인해 주십시오.'; err.style.display = 'block'; return; }
-  err.style.display = 'none';
-  const d = new Date();
-  do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6);
-  const days = ['일', '월', '화', '수', '목', '금', '토'];
-  const now = new Date();
-  document.getElementById('doneNo').textContent = 'ON-' + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0') + '-' + String(Math.floor(1000 + Math.random() * 9000));
-  document.getElementById('doneDate').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일(${days[d.getDay()]}) 18시까지, 남기신 연락처로 전화드립니다.`;
-  form.querySelectorAll('.row, .check, .submit').forEach(el => el.style.display = 'none');
-  const done = document.getElementById('done');
-  done.style.display = 'block'; done.focus();
-});
 </script>
 </body>
 </html>

@@ -45,7 +45,7 @@ for (const f of files) {
     const type = (/type\s*=\s*"([^"]+)"/i.exec(k.attrs) || [])[1] || "";
     if (/\bsrc\s*=/.test(k.attrs) || /importmap|json/i.test(type) || !k.body.trim()) { out.push(`<script${k.attrs}>${k.body}</script>`); continue; }
     const r = await minify(k.body, { module: type === "module", compress: { passes: 2 }, mangle: true, format: { comments: false } });
-    if (!r.code) throw new Error(`${f}: 줄이지 못함`);
+    if (r.code == null) throw new Error(`${f}: 줄이지 못함`);   // 할 일이 없는 스크립트는 빈 글자로 줄어든다(오류 아님)
     out.push(`<script${k.attrs}>${r.code}</script>`);
   }
   html = html.replace(/\u0000(\d+)\u0000/g, (m, i) => out[+i]);
