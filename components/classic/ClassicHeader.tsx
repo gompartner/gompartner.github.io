@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 // 메뉴는 메인과 안쪽 페이지가 같다(11-26 사용자 "메인에 메뉴가 일부 없어": 메인은 랜딩이라 페이지 안 칸으로 가는 바로가기만 뒀었는데, 비용, 카탈로그, 위키로 갈 길이 없었다)
 const BOARDS = [
   { href: "/make", label: "Build", ko: "제작" },
+  // 11-26 사용자 "상단 메뉴에 3D 웹이 없어": 소개 페이지를 새로 만들었는데 가는 길이 바닥글과 제작 판 안에만 있었다
+  { href: "/3d", label: "3D Web", ko: "3D 웹" },
   { href: "/maintenance", label: "Care", ko: "유지보수" },
   { href: "/pricing", label: "Price", ko: "비용" },
   { href: "/works", label: "Catalog", ko: "카탈로그" },
