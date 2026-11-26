@@ -229,7 +229,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
             <h2 id="ct-year" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
               웹 트렌드를 반영한 화면
             </h2>
-            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">병원 홈페이지에 3D, 스크롤 인터랙션, 타이포그래피 연출을 적용한 화면입니다.</p>
+            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">병원 홈페이지에 3D와 스크롤 인터랙션을 적용한 화면입니다.</p>
           </div>
           <div className="mt-5 space-y-4 md:mt-6 md:space-y-5">{byYear.map((s, i) => board(s, i))}</div>
         </section>
@@ -256,7 +256,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
           <button type="button" aria-expanded={more} aria-controls="ct-rest-list" onClick={() => setMore((v) => !v)} className="flex w-full items-center justify-between gap-4 rounded-[20px] border border-white/15 px-5 py-5 text-left hover:border-white/40 md:rounded-[24px] md:px-8 md:py-6">
             <span>
               <span className="block text-[20px] font-[800] tracking-[-0.04em] md:text-[24px]">업종별 화면 {more ? "접기" : "더 보기"}</span>
-              <span className="mt-1 block break-keep text-[15px] leading-[1.6] text-[#aab2bf] md:text-[16px]">병원, 매장, 전문직, 기업, 학원 화면을 업종별로 모았습니다.</span>
+              <span className="mt-1 block break-keep text-[15px] leading-[1.6] text-[#aab2bf] md:text-[16px]">병원과 매장, 기업 등 업종별 화면을 모았습니다.</span>
             </span>
             <ChevronDown size={24} aria-hidden className={`shrink-0 transition-transform motion-reduce:transition-none ${more ? "rotate-180" : ""}`} />
           </button>

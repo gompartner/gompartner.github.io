@@ -20,7 +20,7 @@ export const allProjects: Project[] = [
     kind: "신규 제작",
     category: "앱",
     layout: "앱",
-    title: "필라테스 수업 예약, 회원권 앱",
+    title: "필라테스 수업 예약과 회원권 앱",
     description: "필라테스 스튜디오 회원 앱. 수업 시간표에서 남은 자리를 보고 예약하고, 회원권 잔여 횟수와 출석 기록, 대기 예약을 확인합니다.",
     features: ["수업 시간표와 남은 자리", "수업 예약과 취소", "회원권 잔여 횟수", "대기 예약 알림", "출석 기록"],
     imageUrl: "/images/demos/app-pilates.jpg",

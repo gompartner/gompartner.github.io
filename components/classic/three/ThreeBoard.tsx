@@ -33,10 +33,10 @@ const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] =
 
 /** 도입이 필요한 경우(threeForWhom)마다 화면이 하는 일. 구현 범위(threeScope)에 있는 기능으로만 답한다 */
 const answers = [
-  "단가표와 옵션 규칙을 연결해, 고객이 고르는 즉시 합계가 표시됩니다.",
+  "단가표와 옵션 규칙을 연결해 고객이 고르는 즉시 합계가 표시됩니다.",
   "구성과 금액, 연락처가 함께 접수됩니다. 접수된 구성을 3D로 다시 확인한 뒤 실측을 진행합니다.",
   "색상과 소재를 바꿔 가며 360도로 돌려 볼 수 있습니다.",
-  "폭과 높이를 입력해 맞추고, 평면도와 둘러보기로 전환해 보여 드립니다.",
+  "폭과 높이를 입력해 맞추고 평면도와 둘러보기로 전환해 보여 드립니다.",
 ];
 
 /** 패키지마다 대표 화면 한 장 */
@@ -77,7 +77,7 @@ export function ThreeBoard() {
           title="모듈 소파 3D 구성 화면. 모듈을 붙이고 원단을 바꾸면 폭과 금액이 바뀝니다."
           poster={`${V}/sofa-stage.jpg`}
           preview={{ src: `${V}/sofa-stage-m.mp4`, poster: `${V}/sofa-stage-m.jpg`, w: 712, h: 1120, alt: "모듈 소파에 1인 모듈과 스툴을 붙이고 원단을 가죽으로 바꾸는 화면" }}
-          hint="1인, 카우치, 스툴을 붙이거나 원단을 부클레, 가죽으로 바꾸면 위쪽 금액이 같이 바뀝니다. 끌면 소파가 돌아갑니다."
+          hint="모듈을 붙이거나 원단을 바꾸면 위쪽 금액이 같이 바뀝니다. 끌면 소파가 돌아갑니다."
         >
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
             <span className="text-[#7aa7ff]">{sofa.category}</span>
@@ -152,7 +152,7 @@ export function ThreeBoard() {
           {/* 파란 면: 사장님이 받게 되는 것 */}
           <div className="flex flex-col rounded-[24px] bg-[#256ef4] p-5 text-white sm:p-6 md:p-9">
             <h3 className={h3}>견적 요청 접수 예시</h3>
-            <p className="mt-2 break-keep text-[16px] leading-[1.65] text-white">고객이 선택한 구성과 금액이 이름, 연락처와 함께 접수됩니다.</p>
+            <p className="mt-2 break-keep text-[16px] leading-[1.65] text-white">고객이 선택한 구성과 금액이 연락처와 함께 접수됩니다.</p>
             <div className="mt-6 rounded-[18px] bg-white p-4 text-[#0b0d12] sm:p-5 md:p-6">
               <p className="break-keep text-[18px] font-[800] tracking-[-0.03em] md:text-[20px]">{threeLeadSample.title}</p>
               <p className="mt-1 text-[14px] text-[#5b6370]">{threeLeadSample.from}</p>

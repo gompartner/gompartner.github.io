@@ -8,7 +8,7 @@ import { breadcrumbLd, pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "자주 묻는 질문",
-  description: "홈페이지 제작 견적과 일정, 수정 횟수, 결제와 환불, 도메인과 호스팅, 오픈 뒤 유지보수에 대한 답변입니다.",
+  description: "홈페이지 제작 견적과 일정부터 결제, 오픈 뒤 유지보수까지 자주 묻는 질문입니다.",
   path: "/faq",
 });
 
@@ -16,7 +16,7 @@ export default function ClassicFaqPage() {
   return (
     <>
       <LdScript data={breadcrumbLd([{ name: "자주 묻는 질문", path: "/faq" }])} />
-      <PageHead en="FAQ" title="자주 묻는 질문" lead="견적과 일정, 수정, 결제와 환불, 오픈 뒤 유지보수에 대한 답변입니다." trail={[{ href: "/faq", label: "자주 묻는 질문" }]} />
+      <PageHead en="FAQ" title="자주 묻는 질문" lead="견적과 일정부터 결제, 오픈 뒤 유지보수까지 자주 묻는 질문입니다." trail={[{ href: "/faq", label: "자주 묻는 질문" }]} />
       <SupportTabs current="/faq" />
       <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         <FaqBlock items={faq} bare />

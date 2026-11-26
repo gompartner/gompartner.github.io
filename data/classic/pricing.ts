@@ -31,8 +31,8 @@ export const plans: Plan[] = [
     price: 299_000,
     days: 6,
     revisions: 2,
-    summary: "매장, 병원 등 사업장 소개 중심",
-    includes: ["기본 5페이지 구성", "반응형 화면(PC, 모바일)", "전화, 지도, 영업시간 안내", "네이버, 구글 검색엔진 등록"],
+    summary: "매장과 병원 등 사업장 소개 중심",
+    includes: ["기본 5페이지 구성", "반응형 화면(PC와 모바일)", "전화와 지도, 영업시간 안내", "네이버와 구글 검색엔진 등록"],
   },
   {
     id: "standard",
@@ -41,8 +41,8 @@ export const plans: Plan[] = [
     price: 490_000,
     days: 9,
     revisions: 3,
-    summary: "문의, 예약 접수와 게시물 직접 관리",
-    includes: ["기본 10페이지 구성", "소개 홈페이지 구성 전부", "문의와 예약 신청 폼", "관리자 페이지(공지, 사진 게시)"],
+    summary: "문의와 예약 접수, 게시물 직접 관리",
+    includes: ["기본 10페이지 구성", "소개 홈페이지 구성 전부", "문의와 예약 신청 폼", "관리자 페이지(공지와 사진 게시)"],
   },
   {
     id: "premium",
@@ -51,8 +51,8 @@ export const plans: Plan[] = [
     price: 990_000,
     days: 12,
     revisions: 4,
-    summary: "예약, 주문 등 업종 맞춤 기능 개발",
-    includes: ["기본 10페이지 구성", "문의, 예약 홈페이지 구성 전부", "업종 맞춤 기능 개발", "업종 맞춤 메인 화면 디자인"],
+    summary: "예약과 주문 등 업종 맞춤 기능 개발",
+    includes: ["기본 10페이지 구성", "문의와 예약 홈페이지 구성 전부", "업종 맞춤 기능 개발", "업종 맞춤 메인 화면 디자인"],
   },
 ];
 
@@ -65,7 +65,7 @@ export const landingPlans: Plan[] = [
     days: 4,
     revisions: 2,
     summary: "신청 접수와 즉시 알림",
-    includes: ["기본 5개 섹션 구성", "반응형 화면(PC, 모바일)", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
+    includes: ["기본 5개 섹션 구성", "반응형 화면(PC와 모바일)", "신청 폼과 개인정보 수집 동의", "접수 메일 알림", "구글 시트 자동 저장"],
   },
   {
     id: "landing-standard",
@@ -194,7 +194,7 @@ export const addons: Addon[] = [
   { id: "live", name: "실시간 예약 현황", price: 300_000, unit: "식", days: 3 },
   { id: "map", name: "지도 검색", price: 300_000, unit: "식", days: 3 },
   { id: "pay", name: "온라인 결제 연동", price: 300_000, unit: "식", days: 2 },
-  { id: "cart", name: "상품, 장바구니, 주문", price: 500_000, unit: "식", days: 4 },
+  { id: "cart", name: "상품과 장바구니, 주문", price: 500_000, unit: "식", days: 4 },
 ];
 
 type Extra = [AddonId, number?];
