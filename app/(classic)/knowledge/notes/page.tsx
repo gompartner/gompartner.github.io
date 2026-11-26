@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 // 운영 노트 = 인사이트 글(주소 /insight/<slug>는 그대로). 묶음별 목록만 아카이브 틀로 보여 준다.
 export const metadata: Metadata = pageMeta({
   title: "운영 노트 | 위키",
-  description: "홈페이지 인수, 운영 관리, 보안 경보, 관리 비용을 실제로 해 온 순서대로 정리한 글입니다.",
+  description: "홈페이지 인수와 운영 관리, 보안 경보와 관리 비용을 실제로 해 온 순서대로 정리한 글입니다.",
   path: "/knowledge/notes",
 });
 

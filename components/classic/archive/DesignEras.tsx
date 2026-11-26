@@ -11,7 +11,7 @@ export function DesignEras() {
     {
       when: "2000년대 후반",
       name: "입체와 광택",
-      desc: "그라데이션 메뉴 띠, 반짝이는 버튼, 그림자와 반사. 가운데 고정 폭.",
+      desc: "그라데이션 메뉴 띠와 반짝이는 버튼, 그림자와 반사. 가운데 고정 폭.",
       screen: (
         <Screen>
           <div className="absolute left-[12%] right-[12%] top-2 h-4 rounded-[4px]" style={{ background: "linear-gradient(#f4f6f9,#b9c2ce)" }} />
@@ -26,7 +26,7 @@ export function DesignEras() {
     {
       when: "2013년 무렵부터",
       name: "플랫",
-      desc: "광택과 그림자를 걷어 낸 단색 면, 화면 폭을 채운 큰 사진, 얇은 글꼴.",
+      desc: "광택과 그림자를 걷어 낸 단색 면과 화면 폭을 채운 큰 사진, 얇은 글꼴.",
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 50, height: 9 }} />
@@ -81,7 +81,7 @@ export function DesignEras() {
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 네 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 시기는 대략이고, 나라와 업종마다 겹칩니다.</p>
+      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 네 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 시기는 대략이고 나라와 업종마다 겹칩니다.</p>
     </div>
   );
 }

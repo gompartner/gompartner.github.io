@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 // 데이터 분류(11-21). 차트마다 출처, 확인일, 원본 CSV. 출처 없는 숫자는 넣지 않는다.
 export const metadata: Metadata = pageMeta({
   title: "데이터 | 위키",
-  description: "브라우저, 모바일 접속, https, Flash와 jQuery, 페이지 무게를 연도별 차트와 원본 CSV로 공개합니다. 출처와 확인일을 함께 적습니다.",
+  description: "브라우저와 모바일 접속부터 https, Flash와 jQuery, 페이지 무게까지 연도별 차트와 원본 CSV로 공개합니다. 출처와 확인일을 함께 적습니다.",
   path: "/knowledge/data",
 });
 

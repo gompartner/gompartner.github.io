@@ -40,7 +40,7 @@ export const examples2012: Example[] = [
 
 /** 2장 모바일 실제 사례(2012년 보관본을 휴대폰 폭 390px로 열어 확인) */
 export const examplesMobile2012: Example[] = [
-  { country: "한국", site: "네이버 모바일(m.naver.com)", date: "2012-06-01", url: "https://web.archive.org/web/20120601050848/http://m.naver.com:80/", seen: "PC 주소와 다른 모바일 전용 주소. 검색창, 실시간 급상승, 주요뉴스를 한 줄씩 쌓은 화면", alive: true, checked: "2026-11-21" },
+  { country: "한국", site: "네이버 모바일(m.naver.com)", date: "2012-06-01", url: "https://web.archive.org/web/20120601050848/http://m.naver.com:80/", seen: "PC 주소와 다른 모바일 전용 주소. 검색창과 실시간 급상승, 주요뉴스를 한 줄씩 쌓은 화면", alive: true, checked: "2026-11-21" },
   { country: "일본", site: "Yahoo! JAPAN", date: "2012-06-01", url: "https://web.archive.org/web/20120601191309/http://www.yahoo.co.jp/", seen: "휴대폰 폭으로 열어도 PC 화면 그대로. 메뉴와 뉴스가 옆으로 잘려 확대해서 봐야 함", alive: true, checked: "2026-11-21" },
   { country: "미국", site: "The Boston Globe", date: "2012-06-02", url: "https://web.archive.org/web/20120602022806/http://www.bostonglobe.com/", seen: "같은 주소가 휴대폰 폭에서 한 줄 배치로 바뀜(반응형). PC에서는 여러 단, 휴대폰에서는 기사와 사진이 위아래로", alive: true, checked: "2026-11-21" },
 ];
@@ -97,7 +97,7 @@ export const searchDemand: Series[] = [
 export const examplesDesign: Example[] = [
   { country: "2008", site: "Apple", date: "2008-06-05", url: "https://web.archive.org/web/20080605045531/http://www.apple.com/", seen: "광택 나는 은색 메뉴 띠, 바닥에 반사되는 제품 사진, 가운데 고정 폭 화면", alive: true, checked: "2026-11-21" },
   { country: "2014", site: "Apple", date: "2014-06-01", url: "https://web.archive.org/web/20140601225706/http://www.apple.com/", seen: "화면을 꽉 채운 사진 한 장과 문장 하나, 아래 4칸 타일. 메뉴 띠는 아직 회색 그라데이션", alive: true, checked: "2026-11-21" },
-  { country: "2016", site: "네이버", date: "2016-05-28", url: "https://web.archive.org/web/20160528005834/http://www.naver.com/", seen: "가운데 고정 폭, 초록 검색창과 메뉴 띠, 언론사 로고 칸(뉴스스탠드), 글꼴 설정 버튼", alive: true, checked: "2026-11-21" },
+  { country: "2016", site: "네이버", date: "2016-05-28", url: "https://web.archive.org/web/20160528005834/http://www.naver.com/", seen: "가운데 고정 폭 화면에 초록 검색창과 메뉴 띠. 언론사 로고 칸(뉴스스탠드)과 글꼴 설정 버튼", alive: true, checked: "2026-11-21" },
 ];
 
 /** 디자인: PC 화면 해상도 중 1920x1080 비율(StatCounter, 연도별 해상도 표에서 뽑음) */
@@ -177,8 +177,8 @@ export const datasets: Dataset[] = [
     desc: "구글에서 \"홈페이지 제작\"을 찾는 정도의 연평균. 2004년 44에서 2014년 8.5로 내려온 뒤 6~8 사이를 오갑니다. 같은 기간 \"유지보수\", \"리뉴얼\"은 거의 0입니다.",
     series: searchDemand,
     source: { label: "Google Trends(대한민국, 2004~2026)", href: "https://trends.google.com/trends/explore?date=all&geo=KR&q=%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80%20%EC%A0%9C%EC%9E%91" },
-    csv: [{ label: "월별 값(제작, 유지보수, 리뉴얼)", href: "/data/trend/google-trends-kr-homepage.csv" }],
-    usedIn: [{ label: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" }],
+    csv: [{ label: "월별 값(제작과 유지보수, 리뉴얼)", href: "/data/trend/google-trends-kr-homepage.csv" }],
+    usedIn: [{ label: "기업 홈페이지: 회사 소개서 화면에서 플래시와 모바일을 거쳐 빌더까지", href: "/knowledge/company-homepage" }],
   },
   {
     id: "php-versions",
@@ -252,7 +252,7 @@ export const datasets: Dataset[] = [
     note: "방문 표본 기반이라 해마다 튀는 값이 있습니다(예: 미국 2023년)",
     title: "전체 접속 중 모바일 비율, 한국 일본 미국",
     unit: "%",
-    desc: "PC, 모바일, 태블릿을 합친 방문 중 모바일 비율. 연간 값.",
+    desc: "PC와 모바일, 태블릿을 합친 방문 중 모바일 비율. 연간 값.",
     series: mobileShare,
     source: { label: "StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet" },
     csv: ["KR", "JP", "US"].map((c) => ({ label: `${c} 기기별`, href: `/data/trend/platform-${c}.csv` })),

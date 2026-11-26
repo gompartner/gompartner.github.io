@@ -9,7 +9,7 @@ import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 // 점검표. 점검표 상세(/jaryo/<id>) 주소는 그대로. 11-22 무료 도구는 내리고 사이트 지킴이로 잇는다. 인스타 '자료' DM으로 들어오는 /jaryo 는 여기로 넘긴다.
 export const metadata: Metadata = pageMeta({
   title: "점검표와 기록표 | 위키",
-  description: "홈페이지 견적 질문지, 넘겨받은 날 기록표, 매달 점검표를 휴대폰으로 보고 PDF로 내려받습니다.",
+  description: "홈페이지 견적 질문지와 넘겨받은 날 기록표, 매달 점검표를 휴대폰으로 보고 PDF로 내려받습니다.",
   path: "/knowledge/checklists",
 });
 

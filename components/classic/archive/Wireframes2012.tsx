@@ -17,7 +17,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
   const items = [
     {
       name: "한국",
-      desc: "고정 폭 화면, 큰 배너, 팝업존, 오른쪽 퀵메뉴. 들어가자마자 보안 프로그램 설치 안내.",
+      desc: "고정 폭 화면에 큰 배너와 팝업존, 오른쪽 퀵메뉴. 들어가자마자 보안 프로그램 설치 안내.",
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
@@ -41,7 +41,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
     },
     {
       name: "일본",
-      desc: "왼쪽 메뉴, 글자가 빽빽한 새 소식 목록, 작은 배너 여러 개. 한 화면에 정보를 많이 담는 편.",
+      desc: "왼쪽 메뉴와 글자가 빽빽한 새 소식 목록, 작은 배너 여러 개. 한 화면에 정보를 많이 담는 편.",
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
@@ -57,7 +57,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
     },
     {
       name: "미국",
-      desc: "가로 꽉 찬 큰 사진, 한 문장과 버튼 하나, 아래 기능 3칸. 반응형이 퍼지기 시작한 때.",
+      desc: "가로 꽉 찬 큰 사진에 한 문장과 버튼 하나, 아래 기능 3칸. 반응형이 퍼지기 시작한 때.",
       screen: (
         <Screen>
           <div className={g} style={{ left: 8, top: 8, width: 60, height: 12 }} />
@@ -85,7 +85,7 @@ export function Wireframes2012({ examples = [] }: { examples?: Example[] }) {
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 세 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 실제 사례는 인터넷 아카이브에 남은 그날의 화면이며, 문구는 보관본에서 직접 확인했습니다.</p>
+      <p className="mt-2 text-[12.5px] text-[#6b7380]">위 세 화면은 그 시기 흔하던 모양을 곰파트너가 다시 그린 것입니다. 실제 사례는 인터넷 아카이브에 남은 그날의 화면입니다. 문구는 보관본에서 직접 확인했습니다.</p>
     </div>
   );
 }

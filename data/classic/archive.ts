@@ -12,30 +12,30 @@ import { datasets } from "@/data/classic/trendData";
 export type TrendDoc = { href: string; title: string; desc: string };
 /** 디자인 트렌드: 새 기기(휴대폰, 태블릿, 큰 모니터)가 생길 때마다 화면 크기, 배치, 모양이 어떻게 바뀌었나. 문서마다 독립(번호, 연재 없음) */
 export const designDocs: TrendDoc[] = [
-  { href: "/knowledge/web-award", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", desc: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션에서 모바일웹, 웹표준, 반응형, 소셜, AI 서비스로 옮겨 간 심사 축." },
-  { href: "/knowledge/design-styles", title: "디자인 흐름: 입체, 플랫, 카드, 벤토", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
-  { href: "/knowledge/design-trends", title: "2026, 2027 웹 디자인 트렌드", desc: "2026년 웹 디자인 트렌드 글 열 곳 비교. 인터랙티브 3D, 볼드와 키네틱 타이포그래피, 스크롤 인터랙션, 마이크로 인터랙션, 리퀴드 글래스의 모습과 맞는 업종, 속도와 접근성 확인 사항, 2027년 전망." },
-  { href: "/knowledge/mobile-screen", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
+  { href: "/knowledge/web-award", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", desc: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션에서 모바일웹과 웹표준, 반응형을 거쳐 소셜과 AI 서비스로 옮겨 간 심사 축." },
+  { href: "/knowledge/design-styles", title: "디자인 흐름: 입체에서 플랫과 카드, 벤토까지", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
+  { href: "/knowledge/design-trends", title: "2026, 2027 웹 디자인 트렌드", desc: "2026년 웹 디자인 트렌드 글 열 곳 비교. 인터랙티브 3D와 타이포그래피, 스크롤과 마이크로 인터랙션, 리퀴드 글래스의 모습과 맞는 업종. 속도와 접근성 확인 사항과 2027년 전망." },
+  { href: "/knowledge/mobile-screen", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트와 PC 화면 그대로, 반응형으로 갈린 길." },
   { href: "/knowledge/screen-size", title: "화면 크기와 해상도", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
 ];
 /** 기술 트렌드: 브라우저, 보안, 언어, 도구, 무게처럼 화면 뒤에서 바뀐 것. 문서마다 독립 */
 export const techDocs: TrendDoc[] = [
-  { href: "/knowledge/history", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", desc: "한국 웹 변천사를 시대 네 장(무료 계정과 게시판, 포털과 플래시, 휴대폰과 법, 클라우드와 AI)으로 엮은 연표와 이야기." },
-  { href: "/knowledge/browser", title: "브라우저 호환", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서, ActiveX, 2020년 전자서명법 개정, 2022년 IE 지원 종료." },
+  { href: "/knowledge/history", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", desc: "한국 웹 변천사를 시대 네 장으로 엮은 연표와 이야기. 무료 계정과 게시판에서 포털과 플래시, 휴대폰과 법을 거쳐 클라우드와 AI까지." },
+  { href: "/knowledge/browser", title: "브라우저 호환", desc: "PC 브라우저 중 IE 비율, 한국 일본 미국 2009~2025. 공인인증서와 ActiveX, 2020년 전자서명법 개정과 2022년 IE 지원 종료." },
   { href: "/knowledge/https", title: "https와 인증서", desc: "크롬에서 https로 열린 페이지 비율, 일본 미국 2015~2026. 2018년 크롬 68 주의 요함 표시." },
-  { href: "/knowledge/flash-jquery", title: "플래시와 jQuery", desc: "Flash, jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
-  { href: "/knowledge/cms", title: "만드는 도구(CMS) 비교: 카페24, WordPress, 아임웹", desc: "CMS란 무엇인지, 설치형과 임대형의 차이, 한국어, 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
-  { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값, PC 2011~2026 6배, 모바일 9배." },
-  { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정, 서명 키, 스토어 요구." },
-  { href: "/knowledge/search-optimization", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", desc: "야후 디렉터리, 메타 키워드, PageRank, 판다와 펭귄, 모바일, 네이버 C-Rank, AI 개요와 AI 브리핑. 시대마다 검색엔진이 본 것과 꼼수." },
-  { href: "/knowledge/ai-readable-web", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", desc: "AX, GEO, 제로 클릭, llms.txt, MCP, NLWeb, 에이전트 커머스. AI 요약이 뜨면 링크 클릭 15%에서 8%로, 홈페이지가 준비할 것." },
-  { href: "/knowledge/ai-and-homepage", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", desc: "AI 빌더의 성장, AI가 만든 코드의 보안, Tea, Moltbook, 쿠팡, SK텔레콤 유출 사례, 개정 개인정보 보호법, 구글 2027 보안 전망." },
-  { href: "/knowledge/company-homepage", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", desc: "\"홈페이지 제작\" 검색 관심도 2004~2026, 한국 기업 홈페이지 연표. 플래시, m. 사이트, 개인정보 보호법, 웹 접근성, 빌더." },
-  { href: "/knowledge/public-homepage", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", desc: "공공기관 홈페이지 연표 1996~2025. 전자정부법, 웹 접근성 의무, 표준프레임워크, 공인인증서 폐지, KRDS, 국정자원 화재." },
-  { href: "/knowledge/personal-homepage", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", desc: "한국과 일본 연표 1997~2019. 무료 계정, 나모 웹에디터, 테크노트와 제로보드, KENT WEB 무료 CGI, 미니홈피, 블로그, 지오시티즈 종료." },
-  { href: "/knowledge/server-language", title: "개발 언어: Perl CGI에서 Next.js까지", desc: "서버 언어 비율 2015~2026(PHP, ASP.NET, Java, Node.js). Perl CGI 게시판, PHP 공유 호스팅, 공공의 Java, 화면과 서버를 함께 쓰는 Next.js." },
-  { href: "/knowledge/php", title: "PHP 버전과 유지보수", desc: "PHP 사이트 중 버전 비율 2015~2026, 공식 지원 종료일, 서버 앞단 CDN의 확산." },
-  { href: "/knowledge/infra-cloud", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", desc: "사이트 앞단 CDN 비율 2016~2026. 전산실과 웹호스팅, 2006년 AWS, 국내 리전, 공공 클라우드 전환 2030년 연기, 국정자원 화재, 클라우드 탈출과 하이브리드." },
+  { href: "/knowledge/flash-jquery", title: "플래시와 jQuery", desc: "Flash와 jQuery 사용 비율 2015~2025. 2020년 말 지원 종료, 2019년 국내 500대 사이트 28.4%가 플래시 사용." },
+  { href: "/knowledge/cms", title: "만드는 도구(CMS) 비교: 카페24, WordPress, 아임웹", desc: "CMS의 뜻, 설치형과 임대형의 차이. 한국어와 일본어, 영어 사이트의 만드는 도구 점유율 상위 3." },
+  { href: "/knowledge/page-weight", title: "페이지 무게와 속도", desc: "페이지 한 장 용량 중앙값. 2011~2026년 PC 6배, 모바일 9배." },
+  { href: "/knowledge/app", title: "앱: 안드로이드와 아이폰", desc: "휴대폰 OS 중 아이폰 비율, 한국 일본 미국 2012~2025. 앱 인수 시 계정과 서명 키, 스토어 요구." },
+  { href: "/knowledge/search-optimization", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", desc: "야후 디렉터리와 메타 키워드에서 PageRank, 판다와 펭귄, 모바일 업데이트와 네이버 C-Rank를 거쳐 AI 개요와 AI 브리핑까지. 시대마다 검색엔진이 본 것과 꼼수." },
+  { href: "/knowledge/ai-readable-web", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", desc: "AX, GEO, llms.txt, MCP, NLWeb 같은 새 용어와 제로 클릭, 에이전트 커머스. AI 요약이 뜨면 링크 클릭이 15%에서 8%로 주는 변화와 홈페이지가 준비할 것." },
+  { href: "/knowledge/ai-and-homepage", title: "AI 도구와 홈페이지: 산업 변화와 보안, 유출 사례와 전망", desc: "AI 빌더의 성장과 AI가 만든 코드의 보안. Tea와 Moltbook, 쿠팡과 SK텔레콤 유출 사례. 개정 개인정보 보호법과 구글 2027 보안 전망." },
+  { href: "/knowledge/company-homepage", title: "기업 홈페이지: 회사 소개서 화면에서 플래시와 모바일을 거쳐 빌더까지", desc: "\"홈페이지 제작\" 검색 관심도 2004~2026과 한국 기업 홈페이지 연표. 플래시와 m. 사이트에서 개인정보 보호법과 웹 접근성, 빌더까지." },
+  { href: "/knowledge/public-homepage", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", desc: "공공기관 홈페이지 연표 1996~2025. 전자정부법과 웹 접근성 의무, 표준프레임워크에서 공인인증서 폐지와 KRDS, 국정자원 화재까지." },
+  { href: "/knowledge/personal-homepage", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", desc: "한국과 일본 연표 1997~2019. 무료 계정과 나모 웹에디터, 테크노트와 제로보드, KENT WEB 무료 CGI. 미니홈피와 블로그, 지오시티즈 종료." },
+  { href: "/knowledge/server-language", title: "개발 언어: Perl CGI에서 Next.js까지", desc: "서버 언어 비율 2015~2026(PHP, ASP.NET, Java, Node.js). Perl CGI 게시판과 PHP 공유 호스팅, 공공의 Java, 화면과 서버를 함께 쓰는 Next.js." },
+  { href: "/knowledge/php", title: "PHP 버전과 유지보수", desc: "PHP 사이트 중 버전 비율 2015~2026과 공식 지원 종료일, 서버 앞단 CDN의 확산." },
+  { href: "/knowledge/infra-cloud", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", desc: "사이트 앞단 CDN 비율 2016~2026. 전산실과 웹호스팅에서 2006년 AWS와 국내 리전까지. 공공 클라우드 전환 2030년 연기와 국정자원 화재, 클라우드 탈출과 하이브리드." },
 ];
 export const trendDocs: TrendDoc[] = [...designDocs, ...techDocs];
 
@@ -269,14 +269,14 @@ export const takeover: Record<string, { b: string; t: string }[]> = {
 
 /** 화면 예시: 페이지 종류별로 용어 묶음의 와이어프레임을 모은다(11-21) */
 export const screenTypes: { id: string; title: string; desc: string; groups: string[] }[] = [
-  { id: "home", title: "첫 화면과 전체 구성", desc: "머리글, 첫 화면, 바닥글, 단 나누기, 공공기관 첫 화면", groups: ["g16", "g18", "g37", "g17"] },
-  { id: "company", title: "회사 소개", desc: "인사말, 연혁, 조직도, 신뢰를 주는 장치", groups: ["g41", "g42"] },
-  { id: "board", title: "게시판과 글쓰기", desc: "목록, 공지 고정, 비밀글, 에디터, 첨부", groups: ["g27", "g28", "g32"] },
-  { id: "member", title: "로그인과 회원가입", desc: "소셜 로그인, 인증, 약관 동의, 단계 표시", groups: ["g23", "g24"] },
+  { id: "home", title: "첫 화면과 전체 구성", desc: "머리글과 첫 화면, 바닥글, 단 나누기와 공공기관 첫 화면", groups: ["g16", "g18", "g37", "g17"] },
+  { id: "company", title: "회사 소개", desc: "인사말과 연혁, 조직도와 신뢰를 주는 장치", groups: ["g41", "g42"] },
+  { id: "board", title: "게시판과 글쓰기", desc: "목록과 공지 고정, 비밀글, 에디터와 첨부", groups: ["g27", "g28", "g32"] },
+  { id: "member", title: "로그인과 회원가입", desc: "소셜 로그인과 인증, 약관 동의와 단계 표시", groups: ["g23", "g24"] },
   { id: "shop", title: "상품과 결제", desc: "상품 상세, 장바구니, 결제 단계", groups: ["g21", "g22"] },
-  { id: "booking", title: "예약", desc: "달력, 시간 선택, 기간 선택, 예약 일정", groups: ["g01", "g02", "g03", "g30"] },
+  { id: "booking", title: "예약", desc: "달력과 시간 선택, 기간 선택과 예약 일정", groups: ["g01", "g02", "g03", "g30"] },
   { id: "apply", title: "온라인 접수와 채용", desc: "접수 상태, 신청 내역, 채용 공고와 지원", groups: ["g40", "g43"] },
-  { id: "search", title: "검색과 목록", desc: "검색 결과, 필터, 목록 모양, 페이지 이동", groups: ["g25", "g14", "g09"] },
+  { id: "search", title: "검색과 목록", desc: "검색 결과와 필터, 목록 모양과 페이지 이동", groups: ["g25", "g14", "g09"] },
   { id: "admin", title: "관리자와 대시보드", desc: "통계 카드, 차트, 상태 표시", groups: ["g26", "g31"] },
 ];
 
@@ -351,25 +351,25 @@ function rawTopics(): Topic[] {
   const parts = termGroups.filter((g) => g.sec === "화면 부품");
   const cats = [...new Set(parts.map((g) => g.cat))];
   return [
-    { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기, 견적 질문, 유지비, 웹 변천사", groups: [
+    { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기와 견적 질문, 유지비와 웹 변천사", groups: [
       { title: "웹 변천사", items: ["/knowledge/history", "/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
       { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }] },
     ] },
-    { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
+    { id: "design", label: "디자인", desc: "화면 부품의 이름과 디자인 용어, 페이지 종류별 화면과 시안, 기기에 따라 바뀐 화면", groups: [
       { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
       { title: "디자인 용어", items: ["g33", "g34", "g35", "g36", "g44"].map(term) },
       { title: "화면", items: [{ label: "화면 예시", href: "/knowledge/screens" }] },
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
     ] },
-    { id: "dev", label: "개발", desc: "만드는 도구(CMS), 서버 언어와 버전, 브라우저 호환, 화면 기술(플래시, jQuery), 페이지 무게, 앱, AI로 만든 서비스", groups: [
+    { id: "dev", label: "개발", desc: "만드는 도구(CMS)와 서버 언어 버전, 브라우저 호환과 화면 기술(플래시와 jQuery). 페이지 무게와 앱, AI로 만든 서비스", groups: [
       { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight", "/knowledge/php", "/knowledge/app"].map(doc) },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
     ] },
-    { id: "infra", label: "인프라", desc: "도메인, 서버, 호스팅, https와 인증서", groups: [
+    { id: "infra", label: "인프라", desc: "도메인과 서버, 호스팅, https와 인증서", groups: [
       { title: "문서", items: [doc("/knowledge/infra-cloud"), doc("/knowledge/https"), term("go1")] },
       { title: "운영 노트", items: [note("domain-server-ownership"), note("expiry-calendar"), note("backup-but-no-restore"), note("takeover-first-week-server")] },
     ] },
-    { id: "security", label: "보안", desc: "PHP, 워드프레스, 그누보드, 인증서 보안 경보와 대응", groups: [
+    { id: "security", label: "보안", desc: "PHP와 워드프레스, 그누보드, 인증서 보안 경보와 대응", groups: [
       { title: "점검", items: [note("exposed-files-check"), note("security-headers-check"), note("safari-reader-mode-missing-content")] },
       { title: "보안 경보", items: series("보안 경보") },
     ] },
@@ -377,7 +377,7 @@ function rawTopics(): Topic[] {
       { title: "문서", items: [doc("/knowledge/search-optimization"), doc("/knowledge/ai-readable-web"), term("go4")] },
       { title: "운영 노트", items: [note("homepage-seo-basic-settings"), note("ai-crawler-access-check"), note("ai-search-google-naver")] },
     ] },
-    { id: "ops", label: "운영과 유지보수", desc: "인수인계, 월 점검, 장애 대응, 관리 비용, 점검표", groups: [
+    { id: "ops", label: "운영과 유지보수", desc: "인수인계와 월 점검, 장애 대응과 관리 비용, 점검표", groups: [
       { title: "운영과 유지보수", items: series("운영과 유지보수") },
       { title: "관리 비용", items: series("관리 비용") },
       { title: "운영 용어", items: [term("go2"), term("go3")] },
@@ -435,8 +435,8 @@ export const manualLog: { date: string; kind: string; title: string; href: strin
   { date: "2026-11-22", kind: "인프라", title: "서버 인프라: 온프레미스에서 클라우드, 프라이빗 클라우드까지", href: "/knowledge/infra-cloud" },
   { date: "2026-11-22", kind: "검색", title: "검색 최적화의 역사: 디렉터리 등록에서 SEO, GEO까지", href: "/knowledge/search-optimization" },
   { date: "2026-11-22", kind: "검색", title: "AI가 쓰는 웹사이트: UX 다음의 AX, SEO 다음의 GEO", href: "/knowledge/ai-readable-web" },
-  { date: "2026-11-22", kind: "기획", title: "AI 도구와 홈페이지: 산업 변화, 보안, 유출 사례, 앞으로", href: "/knowledge/ai-and-homepage" },
-  { date: "2026-11-22", kind: "기획", title: "기업 홈페이지: 회사 소개서 화면에서 플래시, 모바일, 빌더까지", href: "/knowledge/company-homepage" },
+  { date: "2026-11-22", kind: "기획", title: "AI 도구와 홈페이지: 산업 변화와 보안, 유출 사례와 전망", href: "/knowledge/ai-and-homepage" },
+  { date: "2026-11-22", kind: "기획", title: "기업 홈페이지: 회사 소개서 화면에서 플래시와 모바일을 거쳐 빌더까지", href: "/knowledge/company-homepage" },
   { date: "2026-11-22", kind: "기획", title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지", href: "/knowledge/public-homepage" },
   { date: "2026-11-22", kind: "기획", title: "개인 홈페이지: 무료 계정과 CGI 게시판에서 미니홈피, 블로그까지", href: "/knowledge/personal-homepage" },
   { date: "2026-11-22", kind: "개발", title: "개발 언어: Perl CGI에서 Next.js까지", href: "/knowledge/server-language" },
