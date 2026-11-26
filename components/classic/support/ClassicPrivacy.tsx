@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PageHead, wrap } from "@/components/classic/ui";
-import { relatedPolicies, privacyVersions, type LabelIcon, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
-import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
+import { privacyArchives, privacyVersions, type Block, type LabelIcon, type PolicyVersion, type Table } from "@/data/classic/privacyPolicy";
+import { NEW_TAB, NewTabMark, isOutside } from "@/components/classic/NewTab";
 
 // 주요 개인정보 처리 표시(라벨링) 아이콘. 개인정보보호위원회 개인정보 포털이 쓰는 공식 라벨 이미지(public/privacy-labels, 11-25)
 const labelIcons: Record<LabelIcon, string> = {
@@ -39,14 +39,47 @@ function SectionIcon({ name }: { name: string }) {
 // 개인정보처리방침 본문(클래식 보기). 내용은 웹툰 쪽과 같은 data/privacyPolicy 를 쓴다.
 const hrefOf = (id: string) => (id === privacyVersions[0].id ? "/privacy" : `/privacy/${id}`);
 
+/** 문장과 표 칸 안의 [글자](주소)를 링크로 그린다. 다른 서비스 주소는 새 창 */
+function Rich({ text }: { text: string }) {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return (
+    <>
+      {parts.map((p, i) => {
+        const m = p.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+        if (!m) return p;
+        const [, label, href] = m;
+        const cls = "font-bold text-[#256ef4] underline underline-offset-4";
+        if (isOutside(href))
+          return (
+            <a key={i} href={href} {...NEW_TAB} className={`inline-flex items-center gap-1 ${cls}`}>
+              {label}
+              <NewTabMark size={14} />
+            </a>
+          );
+        if (href.startsWith("#"))
+          return (
+            <a key={i} href={href} className={cls}>
+              {label}
+            </a>
+          );
+        return (
+          <Link key={i} href={href} className={cls}>
+            {label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
 function DataTable({ head, rows, caption }: Table) {
-  // 좁은 화면에서 가로로 스크롤하는 상자. 키보드로도 스크롤할 수 있게 초점을 받고, 이름을 붙인다.
+  // 넓은 화면은 표, 휴대폰 폭(md 미만)은 줄마다 카드로 쌓는다(11-26 서비스별 표가 좁은 화면에서 가로로 밀리지 않게). 칸 이름은 카드 안에 작은 글씨로 보인다.
   const name = caption ?? head.join(", ");
   return (
-    <div role="region" aria-label={name} tabIndex={0} className="overflow-x-auto border-t-2 border-[#15171c]">
-      <table className="w-full min-w-[480px] border-collapse text-left text-[15px] leading-[1.6]">
+    <div role="region" aria-label={name} className="border-t-2 border-[#15171c]">
+      <table className="w-full border-collapse text-left text-[15px] leading-[1.6] max-md:block">
         <caption className="sr-only">{name}</caption>
-        <thead className="bg-[#f6f7f9] text-[#15171c]">
+        <thead className="bg-[#f6f7f9] text-[#15171c] max-md:hidden">
           <tr>
             {head.map((h) => (
               <th key={h} scope="col" className="border-b border-[#e6e9ee] px-3 py-2.5 font-bold">
@@ -55,12 +88,13 @@ function DataTable({ head, rows, caption }: Table) {
             ))}
           </tr>
         </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r[0]} className="border-b border-[#e6e9ee]">
+        <tbody className="max-md:block">
+          {rows.map((r, ri) => (
+            <tr key={ri} className="border-b border-[#e6e9ee] max-md:block max-md:py-2">
               {r.map((c, i) => (
-                <td key={i} className="whitespace-pre-line px-3 py-2.5 align-top text-[#3d4450]">
-                  {c}
+                <td key={i} className={`whitespace-pre-line px-3 py-2.5 align-top text-[#3d4450] max-md:block max-md:py-1 ${i === 0 ? "max-md:font-bold" : ""}`}>
+                  {i > 0 && <span className="block text-[13px] font-bold text-[#5b6370] md:hidden">{head[i]}</span>}
+                  <Rich text={c} />
                 </td>
               ))}
             </tr>
@@ -71,11 +105,50 @@ function DataTable({ head, rows, caption }: Table) {
   );
 }
 
+/** 조 본문 한 덩어리: 문장, 번호 목록, 표, 서비스 단락(제목과 앵커) */
+function BlockView({ b }: { b: Block }) {
+  if (typeof b === "string") return <p><Rich text={b} /></p>;
+  if (Array.isArray(b))
+    return (
+      <ol className="list-decimal space-y-1 pl-6">
+        {b.map((item) => (
+          <li key={item}>
+            <Rich text={item} />
+          </li>
+        ))}
+      </ol>
+    );
+  if ("heading" in b) {
+    if (b.level === 3)
+      return (
+        <section id={b.id} aria-labelledby={b.id ? `${b.id}-h` : undefined} className="scroll-mt-24 rounded-lg border border-[#e6e9ee] p-4 !mt-6 md:p-6">
+          <h3 id={b.id ? `${b.id}-h` : undefined} className="text-[19px] font-[800] leading-[1.45] tracking-[-0.02em] text-[#15171c] md:text-[20px]">
+            {b.heading}
+          </h3>
+          <div className="mt-3 space-y-3">
+            {b.body.map((x, i) => (
+              <BlockView key={i} b={x} />
+            ))}
+          </div>
+        </section>
+      );
+    return (
+      <div className="space-y-2 pt-2">
+        <h4 className="text-[16px] font-bold text-[#15171c]">{b.heading}</h4>
+        {b.body.map((x, i) => (
+          <BlockView key={i} b={x} />
+        ))}
+      </div>
+    );
+  }
+  return <DataTable {...b} />;
+}
+
 export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
   const isLatest = version.id === privacyVersions[0].id;
   return (
     <>
-      <PageHead en="PRIVACY" ice="개인정보" title="개인정보처리방침" lead="상담에서 처리하는 개인정보의 항목, 목적, 보유 기간, 파기 절차를 안내합니다." trail={[{ href: hrefOf(version.id), label: "개인정보처리방침" }]} />
+      <PageHead en="PRIVACY" ice="개인정보" title="개인정보처리방침" lead="곰파트너가 운영하는 홈페이지 상담과 사이트 지킴이, 거래장부에서 처리하는 개인정보를 안내합니다." trail={[{ href: hrefOf(version.id), label: "개인정보처리방침" }]} />
       <div className={`${wrap} pb-20 pt-8 md:pb-28 md:pt-12`}>
         <div className="max-w-[860px]">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#e6e9ee] pb-5 text-[16px] text-[#5b6370]">
@@ -137,38 +210,35 @@ export function ClassicPrivacy({ version }: { version: PolicyVersion }) {
                   {s.title}
                 </h2>
                 <div className="mt-4 space-y-3 text-[17px] leading-[1.7] text-[#3d4450]">
-                  {s.body.map((b, i) =>
-                    typeof b === "string" ? (
-                      <p key={i}>{b}</p>
-                    ) : Array.isArray(b) ? (
-                      <ol key={i} className="list-decimal space-y-1 pl-6">
-                        {b.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ol>
-                    ) : (
-                      <DataTable key={i} {...b} />
-                    ),
-                  )}
+                  {s.body.map((b, i) => (
+                    <BlockView key={i} b={b} />
+                  ))}
                 </div>
               </section>
             ))}
           </div>
 
-          {/* 곰파트너의 다른 서비스 처리방침 */}
-          <nav aria-label="다른 서비스 개인정보처리방침" className="mt-12 rounded-[8px] border border-[#e6e9ee] bg-[#f6f7f9] px-5 py-4 text-[15px] leading-[1.7]">
-            <p className="font-bold text-[#15171c]">곰파트너의 다른 서비스 개인정보처리방침</p>
-            <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1">
-              {relatedPolicies.map((r) => (
-                <li key={r.href}>
-                  <a href={r.href} {...NEW_TAB} className="inline-flex items-center gap-1 text-[#256ef4] underline underline-offset-4">
-                    {r.name}
-                    <NewTabMark size={14} />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* 변경 이력: 판마다 시행일과 개정 내용, 지난 판 보기. 합치기 전 서비스별 처리방침은 각 서비스에 보관한 원본으로(11-26) */}
+          <section aria-labelledby="privacy-history" className="mt-14">
+            <h2 id="privacy-history" className="text-[21px] font-[800] leading-[1.45] tracking-[-0.03em] md:text-[23px]">
+              변경 이력
+            </h2>
+            <div className="mt-4 text-[17px] leading-[1.7] text-[#3d4450]">
+              <DataTable
+                caption="개인정보처리방침 변경 이력"
+                head={["판", "시행일", "개정 내용", "보기"]}
+                rows={[
+                  ...privacyVersions.map((v) => [
+                    `${v.id}판`,
+                    v.date,
+                    v.change ?? v.note,
+                    v.id === version.id ? "지금 보는 판" : `[보기](${hrefOf(v.id)})`,
+                  ]),
+                  ...privacyArchives.map((a) => [a.name, a.date, a.change, `[보기](${a.href})`]),
+                ]}
+              />
+            </div>
+          </section>
         </div>
       </div>
     </>
