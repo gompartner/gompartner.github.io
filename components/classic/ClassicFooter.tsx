@@ -19,7 +19,7 @@ const groups = [
       { href: "/make", label: "제작" },
       { href: "/maintenance", label: "유지보수" },
       { href: "/pricing", label: "비용" },
-      { href: "/works", label: "카탈로그" },
+      { href: "/works", label: "작업 사례" },
       { href: "/3d", label: "3D 웹" },
     ],
   },
@@ -50,14 +50,40 @@ export const channels: { href: string; label: string; handle: string; icon: Chan
   { href: "https://clip.naver.com/@gompartner", label: "30초 점검", handle: "네이버 클립", icon: "naverClip" },
 ];
 
+// 11-26 사용자 "채널 위치 옮겨 주고": 아래 줄(개인정보처리방침 옆)에서 위쪽 메뉴 칸의 맨 오른쪽으로
+const footChannels: { href: string; label: string; icon: ChannelIconName; gtm: string }[] = [
+  { href: "https://www.youtube.com/@gompartner", label: "유튜브", icon: "youtube", gtm: "classic_footer_youtube" },
+  { href: "https://blog.naver.com/gompartner", label: "네이버 블로그", icon: "naverBlog", gtm: "classic_footer_blog" },
+  { href: KAKAO_CHANNEL_HOME, label: "카카오톡", icon: "kakao", gtm: "classic_footer_kakao" },
+];
+// 11-26 사용자 "채널은 세로로 보여야지": 다른 메뉴 칸과 같이 제목 아래 세로 목록으로
+function FootChannels() {
+  return (
+    <nav aria-label="바닥글 채널 메뉴">
+      <h2 className="text-[14px] font-bold text-white">채널</h2>
+      <ul className="mt-4 grid gap-y-2.5" role="list">
+        {footChannels.map((c) => (
+          <li key={c.href}>
+            <a href={c.href} target="_blank" rel="noopener noreferrer" data-gtm-cta={c.gtm} className="-my-1.5 inline-flex items-center gap-2 py-1.5 hover:text-white">
+              <ChannelIcon name={c.icon} size="h-4 w-4" />
+              {c.label}
+              <NewTabMark size={14} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 const contactRow = "-my-1.5 inline-flex items-center gap-2 py-1.5";
 const contactIcon = "shrink-0 text-[#7d8594]";
 
 export function ClassicFooter() {
   return (
     <footer className="bg-[#15171c] pb-24 text-[15px] text-[#a3abb8] md:pb-0">
-      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-3 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
-        <div className="col-span-2 md:col-span-3 lg:col-span-1">
+      <div className="mx-auto grid w-full max-w-[1248px] grid-cols-2 gap-x-6 gap-y-10 px-4 py-14 md:grid-cols-4 md:px-6 md:py-16 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
+        <div className="col-span-2 md:col-span-4 lg:col-span-1">
           <p className="flex items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             {profile.name}
@@ -98,6 +124,7 @@ export function ClassicFooter() {
             </ul>
           </nav>
         ))}
+        <FootChannels />
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1248px] flex-col gap-2 px-4 py-6 text-[14px] md:flex-row md:justify-between md:px-6">
@@ -105,23 +132,6 @@ export function ClassicFooter() {
             <Link href="/privacy" className="inline-flex min-h-11 items-center self-start font-bold text-white hover:underline">
               개인정보처리방침
             </Link>
-            {/* 11-18 채널 링크는 유튜브 하나만 다시 넣음(사이트 손님과 보는 사람이 같음) */}
-            <a href="https://www.youtube.com/@gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_youtube" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
-              <ChannelIcon name="youtube" />
-              유튜브
-              <NewTabMark size={13} />
-            </a>
-            {/* 11-25 사용자: 유튜브 옆에 네이버 블로그, 카카오톡(11-21에 뺀 블로그 링크를 다시 넣음). 카카오톡은 1:1 채팅이 아니라 채널 홈으로. English 링크는 뺌 */}
-            <a href="https://blog.naver.com/gompartner" target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_blog" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
-              <ChannelIcon name="naverBlog" />
-              네이버 블로그
-              <NewTabMark size={13} />
-            </a>
-            <a href={KAKAO_CHANNEL_HOME} target="_blank" rel="noopener noreferrer" data-gtm-cta="classic_footer_kakao" className="inline-flex min-h-11 items-center gap-1.5 self-start hover:text-white hover:underline">
-              <ChannelIcon name="kakao" />
-              카카오톡
-              <NewTabMark size={13} />
-            </a>
           </div>
           <div className="md:text-right">
             <p>

@@ -20,7 +20,7 @@ const BOARDS = [
   { href: "/3d", label: "3D Web", ko: "3D 웹", big: true },
   { href: "/maintenance", label: "Care", ko: "유지보수" },
   { href: "/pricing", label: "Price", ko: "비용" },
-  { href: "/works", label: "Catalog", ko: "카탈로그", big: true },
+  { href: "/works", label: "Works", ko: "작업 사례", big: true },
   { href: "/knowledge", label: "Wiki", ko: "위키" },
   { href: "/#apply", label: "Contact", ko: "문의" },
 ];

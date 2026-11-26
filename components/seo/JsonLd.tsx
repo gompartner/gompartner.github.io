@@ -27,7 +27,6 @@ const offers = [
   { name: "랜딩페이지 제작", path: "/make" },
   { name: "업무 프로그램 제작", path: "/make" },
   { name: "앱 제작", path: "/make" },
-  { name: "키오스크 화면 제작", path: "/make" },
   { name: "3D 웹 제작", path: "/3d" },
   ...maintenanceServices.map((s) => ({ name: s.h1, path: "/maintenance" })),
 ];

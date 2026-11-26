@@ -8,7 +8,7 @@ import { pageMeta } from "@/lib/seo";
 // 통합검색(11-01). 결과 페이지는 검색에서 뺀다(noindex, follow).
 export const metadata: Metadata = pageMeta({
   title: "통합검색",
-  description: "곰파트너 서비스 안내와 카탈로그, 위키 문서를 한 번에 찾는 통합검색입니다.",
+  description: "곰파트너 서비스 안내와 작업 사례, 위키 문서를 한 번에 찾는 통합검색입니다.",
   path: "/search",
   noindex: true,
 });

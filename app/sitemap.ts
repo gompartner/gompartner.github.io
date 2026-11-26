@@ -41,11 +41,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1.0, files: ["app/(home)/page.tsx", "components/classic/ClassicHome.tsx", "data/seo.ts"] },
     // 11-26 안쪽 한 판: 제작, 유지보수, 비용, 카탈로그
     { path: "/make", priority: 0.9, files: ["app/(classic)/make/page.tsx", "components/classic/make/MakeBoard.tsx", "data/classic/pricing.ts"] },
-    { path: "/works", priority: 0.7, files: ["app/(classic)/works/page.tsx", "components/classic/catalog/CatalogBoard.tsx"] },
+    { path: "/works", priority: 0.7, files: ["app/(classic)/works/page.tsx", "components/classic/works/WorksBoard.tsx", "data/classic/workCases.ts"] },
 
     // 11-03 3D 웹 제작. 본문은 사이트 페이지(11-26 한 판으로), 섬 화면과 3D 화면들은 public/3d 정적 페이지(원본 모션-카탈로그)
     { path: "/3d", priority: 0.8, files: ["app/(classic)/3d/page.tsx", "components/classic/three/ThreeBoard.tsx", "data/classic/three.ts"] },
-    ...["room", "sofa", "configurator", "space", "door", "sign", "hanok"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
+    ...["room", "sofa", "configurator", "space", "door", "sign"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
 
     { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },

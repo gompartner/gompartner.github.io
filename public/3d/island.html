@@ -10,7 +10,24 @@
     else if (/^\/3d\/(island(\.html)?)?$/.test(location.pathname)) location.replace('/3d' + location.hash);
   })();
 </script>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<script>
+  // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
+  // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
+  (function () {
+    var PINCH = true, last = 0;
+    document.addEventListener('touchend', function (e) {
+      var now = Date.now();
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+        e.preventDefault();
+        var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
+        if (b) b.click();
+      }
+      last = now;
+    }, { passive: false });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+  })();
+</script>
 <title>3D 웹 제작 | 곰파트너</title>
 <meta name="description" content="가구, 중문, 간판 제품을 고객이 3D로 직접 구성하고 견적까지 접수하는 화면을 제작합니다. 공간 3D 뷰어 180만 원부터.">
 <meta property="og:type" content="website">
@@ -35,7 +52,8 @@
 <link rel="apple-touch-icon" href="/apple-icon.png">
 <!-- 11-26 글꼴을 외부(jsdelivr) 전체판 749KB에서 사이트와 같은 부분 글꼴(약 250KB)로. 카카오톡 안 브라우저 첫 로딩이 늘어지던 원인 -->
 <link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2" as="font" type="font/woff2" crossorigin>
-<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}</style>
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}  html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
+</style>
 <style>
   :root {
     --bg: #1c1815;
@@ -594,7 +612,6 @@
       <li><a href="space/"><span class="th"><img src="assets/thumb/sm/space.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 시공 사례</b></a></li>
       <li><a href="door/"><span class="th"><img src="assets/thumb/sm/door.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 현관 중문</b></a></li>
       <li><a href="sign/"><span class="th"><img src="assets/thumb/sm/sign.jpg" alt="" width="720" height="450" loading="lazy"></span><b>간판 제작 채널 간판</b></a></li>
-      <li><a href="hanok/"><span class="th"><img src="assets/thumb/sm/hanok.jpg" alt="" width="720" height="450" loading="lazy"></span><b>한옥 찻집</b></a></li>
     </ul>
   </div>
 </section>
@@ -1961,7 +1978,7 @@ const INFO = {
   neru: { name: '가구 쇼룸', kind: '소파와 선반', go: [['모듈 소파 열어 보기', 'sofa/'], ['시스템 선반 열어 보기', 'configurator/']] },
   saevit: { name: '간판 제작', kind: '채널 간판', go: [['열어 보기', 'sign/']] },
   onjib: { name: '인테리어', kind: '거실 상담 화면, 시공 사례, 현관 중문', go: [['거실 상담 화면 열어 보기', 'room/'], ['시공 사례 열어 보기', 'space/'], ['현관 중문 열어 보기', 'door/']] },
-  hanok: { name: '한옥 찻집', kind: '찻집 홈페이지', go: [['열어 보기', 'hanok/']] },
+  hanok: { name: '한옥 찻집', kind: '마을 풍경', go: [] },
   gom: { name: '곰파트너', kind: '3D 웹 제작', go: [['비용 보기', '#price'], ['상담 신청', '/contact']] }
 };
 // 11-04 영문 페이지(/en/3d)가 ?lang=en 으로 끼우면 이름표, 카드, 버튼 이름을 영어로
@@ -1972,7 +1989,7 @@ if (EN) {
     neru: { name: 'Furniture showroom', kind: 'Sofa and shelving', go: [['Open modular sofa', 'sofa/'], ['Open shelving system', 'configurator/']] },
     saevit: { name: 'Sign maker', kind: 'Channel letter sign', go: [['Open', 'sign/']] },
     onjib: { name: 'Interior', kind: 'Project case and entrance door', go: [['Open project case', 'space/'], ['Open entrance door', 'door/']] },
-    hanok: { name: 'Hanok tea house', kind: 'Tea house website', go: [['Open', 'hanok/']] },
+    hanok: { name: 'Hanok tea house', kind: 'Village scenery', go: [] },
     gom: { name: 'GOMPARTNER', kind: '3D web development', go: [['See prices', '#price'], ['Contact', '/contact']] }
   });
   const L = { '아침': 'Morning', '오후': 'Afternoon', '저녁': 'Evening', '밤': 'Night', '닫기': 'Close', '일시 정지': 'Pause' };
@@ -1987,7 +2004,8 @@ for (const id of ORDER) {
   box3.setFromObject(b.g);
   const size = box3.getSize(V(0, 0, 0)), c = box3.getCenter(V(0, 0, 0));
   const h = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.3, size.y + 0.4, size.z + 0.3), new THREE.MeshBasicMaterial({ visible: false }));
-  h.position.copy(c); h.userData.id = id; scene.add(h); hits.push(h);
+  h.position.copy(c); h.userData.id = id; scene.add(h);
+  if (id !== 'hanok') hits.push(h);   // 11-26 한옥 찻집 화면을 내려 한옥은 마을 풍경으로만 둔다(이름표, 누르기 없음)
   const el = document.createElement('button');
   el.type = 'button'; el.className = 'pin';
   el.innerHTML = `<i aria-hidden="true"></i>${INFO[id].name}`;
@@ -1996,6 +2014,7 @@ for (const id of ORDER) {
   el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') setHover(id); });
   el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') setHover(null); });
   $('pins').appendChild(el);
+  if (id === 'hanok') el.style.display = 'none';
   b.pinEl = el;
 }
 let hovered = null, selected = null;

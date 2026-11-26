@@ -7,7 +7,7 @@ import { breadcrumbLd, boardServiceLd, pageMeta } from "@/lib/seo";
 
 const path = "/make";
 // 11-26 검색어 그대로("홈페이지 제작"). 예전 제목 "홈페이지, 랜딩페이지, 앱 제작"은 구글 "홈페이지 제작" 검색에 잡히지 않았다
-const description = "홈페이지 제작 비용과 기간을 종류별로 공개합니다. 소개 홈페이지 29.9만 원(6일)부터이며 랜딩페이지와 앱, 키오스크, 3D 웹도 제작합니다.";
+const description = "홈페이지 제작 비용과 기간을 종류별로 공개합니다. 소개 홈페이지 29.9만 원(6일)부터이며 랜딩페이지와 앱, 3D 웹도 제작합니다.";
 
 export const metadata: Metadata = pageMeta({
   title: "홈페이지 제작",

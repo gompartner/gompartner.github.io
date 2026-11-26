@@ -9,7 +9,8 @@ import { SearchBox } from "./SearchBox";
 import { PickItem } from "@/components/classic/FilterParts";
 import { ORDER, SearchResults } from "./SearchResults";
 
-const SUGGEST = ["홈페이지 제작", "오류 수정", "업체 변경", "워드프레스", "PHP", "예약", "견적 계산", "치과", "학원"];
+// 11-26 카탈로그(업종별 가상 화면)를 내려 업종 이름(치과, 학원) 대신 서비스와 작업 이름으로
+const SUGGEST = ["홈페이지 제작", "유지보수 비용", "오류 수정", "업체 변경", "워드프레스", "PHP", "3D 견적", "거래장부", "작업 사례"];
 
 // 통합검색. 주소의 ?q= 와 ?kind= 를 읽고, 바뀔 때마다 주소도 바꿔 둔다(뒤로 가기, 공유)
 // 11-26 필터(사용자 "통합검색 필요합니다 필터 기능 포함", "필터도 하위 뎁스 체크하게"): 왼쪽에서 종류, 오른쪽에서 그 종류의 하위 분류를 여러 개 고른다.

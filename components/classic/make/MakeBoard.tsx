@@ -70,6 +70,7 @@ export function MakeBoard({ children }: { children?: ReactNode }) {
               </div>
 
               {/* 만든 화면: 눌러 들어가는 데모가 아니라 그림으로 보여 준다(데모, 샘플 주소는 내린다) */}
+              {k.shots.length > 0 ? (
               <ul className={`mt-4 grid gap-4 ${k.shots.length === 1 ? "grid-cols-1 md:grid-cols-2" : k.shots.length === 2 ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3"}`} role="list">
                 {k.shots.map((sh, i) => (
                   <li key={sh.img} className={`bd-in overflow-hidden rounded-[20px] border border-white/12 bg-[#121722] ${k.shots.length === 3 && i === 0 ? "col-span-2 md:col-span-1" : ""}`} style={{ "--d": `${0.04 + i * 0.05}s` } as React.CSSProperties}>
@@ -90,6 +91,7 @@ export function MakeBoard({ children }: { children?: ReactNode }) {
                   </li>
                 ))}
               </ul>
+              ) : null}
 
               {k.plans.length > 0 ? (
                 <ul className="mt-4 grid gap-4 md:grid-cols-3" role="list">

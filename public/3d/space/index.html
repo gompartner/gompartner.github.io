@@ -3,6 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  // 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록", "이 상태면 조정이 안 됨": 아이패드 사파리가 버튼을 빠르게 두 번 누르면 페이지를 키운다.
+  // 두 번째 탭의 기본 동작(확대)만 막고 누른 버튼은 그대로 눌리게 한다. PINCH가 참이면 두 손가락 페이지 확대도 막는다(3D 안 확대는 그대로).
+  (function () {
+    var PINCH = false, last = 0;
+    document.addEventListener('touchend', function (e) {
+      var now = Date.now();
+      if (now - last < 350 && e.changedTouches.length === 1 && !e.target.closest('input, select, textarea, canvas')) {
+        e.preventDefault();
+        var b = e.target.closest('button, a, label, [role="tab"], [role="switch"]');
+        if (b) b.click();
+      }
+      last = now;
+    }, { passive: false });
+    if (PINCH) ['gesturestart', 'gesturechange'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+  })();
+</script>
 <title>인테리어 공간 3D 뷰어 화면 | 곰파트너</title>
 <meta name="description" content="32평 아파트 리모델링 공간을 3D, 평면도, 둘러보기로 전환해 보고 시공 전과 후를 비교하는 인테리어 업체용 3D 화면입니다.">
 <meta property="og:type" content="website">
@@ -270,6 +287,12 @@
   .gp-bar a:focus-visible { outline: 2px solid #8fb4ff; outline-offset: 2px; }
   @media (min-width: 768px) { .gp-bar > div { padding: 0 24px; } }
   .gp-bar { position: relative; }
+  /* 11-26 사용자 "상단 곰파트너 바로가기는 최근 3D(거실 상담 화면)처럼": 곰파트너와 화면 이름을 한 줄에 */
+  .gp-bar { background: #0b0d12 !important; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .gp-bar > div { gap: 10px; min-width: 0; }
+  .gp-bar a { font-size: 16px !important; font-weight: 800 !important; letter-spacing: -0.02em; white-space: nowrap; }
+  .gp-bar .gp-t { font-size: 14px; font-weight: 500; color: #c9d0de; padding-left: 10px; border-left: 1px solid rgba(255,255,255,.22); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  html { touch-action: manipulation; }   /* 11-26 사용자 "3D에서 두 번 터치 확대 안 되도록" */
 </style>
 <script type="importmap">
 { "imports": {
@@ -279,14 +302,13 @@
 </script>
 </head>
 <body>
-<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/">곰파트너 바로가기</a></div></div>
+<div class="gp-bar" role="navigation" aria-label="곰파트너"><div><a href="/3d">곰파트너</a><span class="gp-t">인테리어 공간 3D 뷰어 화면</span></div></div>
 <header>
   <div class="bar">
     <a class="brand" href="#top"><b>인테리어</b></a>
     <nav aria-label="주요 메뉴">
       <a href="#case">시공 사례</a>
       <a href="../door/">중문 견적</a>
-      <a href="#consult">상담 신청</a>
     </nav>
   </div>
 </header>
@@ -366,7 +388,8 @@
     </div>
   </div>
 
-  <section class="consult" id="consult" aria-labelledby="consultTitle">
+  <!-- 11-26 사용자 "작은 3D는 견적 상담은 필요 없고 링크 공유만": 상담 구역은 숨기고 위의 링크 공유만 남긴다 -->
+  <section class="consult" id="consult" aria-labelledby="consultTitle" hidden>
     <div class="wrap">
       <div class="consult-box">
         <div class="consult-intro">

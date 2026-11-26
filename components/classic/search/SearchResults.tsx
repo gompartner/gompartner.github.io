@@ -8,7 +8,7 @@ import { NEW_TAB, NewTabMark, isOutside } from "@/components/classic/NewTab";
 import { useState } from "react";
 import { CatalogDialog, type CatalogItem } from "@/components/classic/catalog/CatalogDialog";
 
-export const ORDER: SearchKind[] = ["바로가기", "서비스", "카탈로그", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
+export const ORDER: SearchKind[] = ["바로가기", "서비스", "작업 사례", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {
@@ -17,7 +17,7 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
   const uniq = items.filter((i) => !seen.has(`${i.href}|${i.title}`) && seen.add(`${i.href}|${i.title}`));
   // 카탈로그 화면은 카탈로그 페이지로 옮겨 가지 않고 이 자리에서 크게 연다. 닫으면 검색어와 필터가 그대로 남는다
   const [open, setOpen] = useState<CatalogItem | null>(null);
-  const groups = grouped ? ORDER.map((k) => ({ k, list: uniq.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "카탈로그" as SearchKind, list: uniq }];
+  const groups = grouped ? ORDER.map((k) => ({ k, list: uniq.filter((i) => i.kind === k) })).filter((g) => g.list.length > 0) : [{ k: "작업 사례" as SearchKind, list: uniq }];
   return (
     <div className="space-y-12">
       <CatalogDialog item={open} onClose={() => setOpen(null)} />
@@ -28,7 +28,7 @@ export function SearchResults({ items, grouped = true }: { items: SearchItem[]; 
               {g.k} <span className="text-[15px] font-bold tabular-nums text-[#5b6370]">{g.list.length}건</span>
             </h2>
           ) : null}
-          {g.k === "카탈로그" ? (
+          {g.k === "작업 사례" ? (
             <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4" role="list">
               {g.list.map((i) => (
                 <li key={`${i.href}-${i.title}`} className="min-w-0">

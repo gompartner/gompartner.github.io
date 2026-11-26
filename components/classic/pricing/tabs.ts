@@ -4,7 +4,6 @@ export const serviceTabs = [
   { href: "/landing-page", label: "랜딩페이지 제작" },
   { href: "/program", label: "업무 프로그램 제작" },
   { href: "/app", label: "앱 제작" },
-  { href: "/kiosk", label: "키오스크 화면 제작" },
   { href: "/3d", label: "3D 웹 제작" },
 ];
 

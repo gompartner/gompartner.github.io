@@ -28,7 +28,6 @@ const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] =
   { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
   { id: "sign", head: "상호를 입력하면 간판이 걸립니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
-  { id: "hanok", head: "첫 화면부터 3D 장면으로 보여 줍니다", wide: true },
 ];
 
 /** 도입이 필요한 경우(threeForWhom)마다 화면이 하는 일. 구현 범위(threeScope)에 있는 기능으로만 답한다 */
@@ -42,7 +41,7 @@ const answers = [
 /** 패키지마다 대표 화면 한 장 */
 const planShot: Record<string, { img: string; alt: string }> = {
   "3d-viewer": { img: "/3d/assets/thumb/space.jpg", alt: "아파트 시공 사례를 3D로 둘러보는 화면" },
-  "3d-brand": { img: "/3d/assets/thumb/hanok.jpg", alt: "3D 장면으로 시작하는 한옥 찻집 홈페이지" },
+  "3d-brand": { img: "/3d/assets/thumb/island.jpg", alt: "3D 마을로 시작하는 곰파트너 홈페이지 첫 화면" },
   "3d-config": { img: "/3d/assets/thumb/configurator.jpg", alt: "시스템 선반을 구성하고 견적을 받는 화면" },
 };
 

@@ -25,8 +25,8 @@ const channels = [
 // 클래식 바닥글(ClassicFooter)도 같은 아이콘을 쓴다
 export type ChannelIconName = "naverBlog" | "tistory" | "instagram" | "youtube" | "naverClip" | "kakao";
 
-export function ChannelIcon({ name }: { name: ChannelIconName }) {
-  const box = "h-5 w-5 shrink-0";
+export function ChannelIcon({ name, size = "h-5 w-5" }: { name: ChannelIconName; size?: string }) {
+  const box = `${size} shrink-0`;
   switch (name) {
     case "naverBlog":
       return (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Check, Minus, Plus } from "lucide-react";
 import { BoardShell } from "@/components/classic/board/ui";
-import { addons, appPlans, formatWon, kioskPlans, landingPlans, manwon, plans, type Plan } from "@/data/classic/pricing";
+import { addons, appPlans, formatWon, landingPlans, manwon, plans, type Plan } from "@/data/classic/pricing";
 import { threePlans } from "@/data/classic/three";
 
 // 11-26 비용 한 판. 방향 셋: (1) 가격표 일곱 장을 한 페이지에 쌓기(지금 페이지) (2) 종류별 시작가만 한 줄씩 (3) 고르는 대로 합계가 나오는 견적판.
@@ -15,7 +15,6 @@ const kinds: { id: string; name: string; plans: Plan[]; addon: boolean }[] = [
   { id: "homepage", name: "홈페이지", plans, addon: true },
   { id: "landing", name: "랜딩페이지", plans: landingPlans, addon: false },
   { id: "app", name: "앱", plans: appPlans, addon: false },
-  { id: "kiosk", name: "키오스크", plans: kioskPlans, addon: false },
   { id: "3d", name: "3D 웹", plans: threePlans, addon: false },
 ];
 

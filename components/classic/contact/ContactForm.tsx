@@ -12,7 +12,7 @@ import { projects } from "@/data/classic/projects";
 
 // 클래식 상담 신청 폼. 보내는 방식과 필드명은 /landing 폼과 같다(같은 Apps Script 시트에 쌓인다).
 
-export const SERVICES = ["홈페이지 제작", "랜딩페이지 제작", "업무 프로그램 제작", "앱 제작", "키오스크 화면 제작", "유지보수", "상담 후 결정"] as const;
+export const SERVICES = ["홈페이지 제작", "랜딩페이지 제작", "업무 프로그램 제작", "앱 제작", "유지보수", "상담 후 결정"] as const;
 // 11-11 신청 종류: 견적서를 받거나, 화면 시안을 먼저 받아 본다. ?type=draft 로 시안 의뢰를 미리 고른다
 export const KINDS = [
   { id: "quote", title: "견적 의뢰", body: "작업 범위, 일정, 비용을 견적서로 받습니다." },

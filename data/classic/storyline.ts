@@ -145,7 +145,7 @@ export const boards = [
   { name: "제작", en: "BUILD", href: "/make", line: "종류를 고르면 만든 화면과 금액, 기간이 나옵니다.", img: shot("08-board-make"), alt: "제작 종류 여섯 가지와 금액이 놓인 제작 페이지" },
   { name: "유지보수", en: "CARE", href: "/maintenance", line: "상황을 고르면 해 드리는 일과 금액이 나옵니다.", img: shot("08-board-care"), alt: "여섯 가지 상황을 고르는 유지보수 페이지" },
   { name: "비용", en: "PRICE", href: "/pricing", line: "고르는 대로 합계와 기간이 바뀝니다.", img: shot("08-board-price"), alt: "종류와 구성을 고르면 합계가 나오는 비용 페이지" },
-  { name: "카탈로그", en: "CATALOG", href: "/works", line: "만든 화면을 종류별로 크게 볼 수 있습니다.", img: shot("08-board-catalog"), alt: "만든 화면을 종류별로 진열한 카탈로그 페이지" },
+  { name: "작업 사례", en: "WORKS", href: "/works", line: "직접 만들어 운영하는 작업을 실제 화면으로 봅니다.", img: shot("08-board-catalog"), alt: "만든 화면을 종류별로 진열한 카탈로그 페이지" },
 ];
 
 // 하는 일. 메인 첫 문장(Build, Run, Care)과 같은 순서
