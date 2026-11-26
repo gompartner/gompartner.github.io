@@ -107,3 +107,43 @@ export function serviceLd(name: string, description: string, path: string, servi
     provider: orgRef,
   };
 }
+
+/**
+ * 판(제작, 유지보수) 한 쪽의 Service. 지역은 대한민국, 가격은 공개한 것만 offers로 넣는다(부가세 별도).
+ * price를 주면 그 금액, minPrice를 주면 "부터" 금액. 금액이 없는 상품(월 유지관리 같은 규모 견적)은 catalog에 이름만 둔다.
+ */
+export function boardServiceLd(opts: {
+  name: string;
+  description: string;
+  path: string;
+  offers: { name: string; price?: number; minPrice?: number; description?: string }[];
+  catalog?: { name: string; description?: string }[];
+}) {
+  return {
+    ...serviceLd(opts.name, opts.description, opts.path),
+    areaServed: { "@type": "Country", name: "대한민국" },
+    offers: opts.offers.map((o) => ({
+      "@type": "Offer",
+      name: o.name,
+      ...(o.description ? { description: o.description } : {}),
+      price: o.price ?? o.minPrice,
+      priceCurrency: "KRW",
+      url: abs(opts.path),
+      priceSpecification: {
+        "@type": "PriceSpecification",
+        ...(o.price != null ? { price: o.price } : { minPrice: o.minPrice }),
+        priceCurrency: "KRW",
+        valueAddedTaxIncluded: false,
+      },
+    })),
+    ...(opts.catalog
+      ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: opts.name,
+            itemListElement: opts.catalog.map((c) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: c.name, ...(c.description ? { description: c.description } : {}) } })),
+          },
+        }
+      : {}),
+  };
+}

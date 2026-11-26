@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { FileText } from "lucide-react";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenance";
@@ -19,12 +19,13 @@ const cases: { q: string; id: string; a: string; price: string; note: string; c:
   { q: "매달 맡아 줄 곳이 필요해요", id: "monthly", a: "월 1회 정기 점검과 수정 요청을 월 단위로 맡습니다. 만료일과 백업도 함께 챙깁니다.", price: "규모 기준 견적", note: "월 방문자 수, 회원 수, 사이트 수로 정합니다", c: "#ffd84d" },
 ];
 
-export function CareBoard() {
+/** children: 판 아래 안내 칸(app/(classic)/maintenance/page.tsx 가 CareGuide를 넣는다) */
+export function CareBoard({ children }: { children?: ReactNode }) {
   const [on, setOn] = useState(0);
   const k = cases[on];
   const s = svc(k.id);
   return (
-    <BoardShell no="02" en="CARE" ice="지금 " title="어떤 상황인가요" lead="상황을 고르면 해 드리는 일과 금액, 받는 문서가 나옵니다.">
+    <BoardShell no="02" en="CARE" kw="홈페이지 유지보수" ice="지금 " title="어떤 상황인가요" lead="상황을 고르면 해 드리는 일과 금액, 받는 문서가 나옵니다.">
       <div role="tablist" aria-label="상황" className="mt-10 grid gap-3 sm:grid-cols-2 md:mt-14 lg:grid-cols-3">
         {cases.map((x, i) => (
           <button
@@ -83,6 +84,7 @@ export function CareBoard() {
         </div>
       </div>
       <p className="mt-4 text-[14px] text-[#8a94a6]">금액은 부가세 별도입니다.</p>
+      {children}
       <BoardClose text="여기에 없는 상황이어도 괜찮습니다. 지금 겪는 일을 한 줄만 남겨 주세요." />
     </BoardShell>
   );
