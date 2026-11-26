@@ -611,7 +611,6 @@
       <li><a href="room/"><span class="th"><img src="assets/thumb/sm/room.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 거실 상담 화면</b></a></li>
       <li><a href="space/"><span class="th"><img src="assets/thumb/sm/space.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 시공 사례</b></a></li>
       <li><a href="door/"><span class="th"><img src="assets/thumb/sm/door.jpg" alt="" width="720" height="450" loading="lazy"></span><b>인테리어 현관 중문</b></a></li>
-      <li><a href="sign/"><span class="th"><img src="assets/thumb/sm/sign.jpg" alt="" width="720" height="450" loading="lazy"></span><b>간판 제작 채널 간판</b></a></li>
     </ul>
   </div>
 </section>
@@ -1976,7 +1975,7 @@ composer.addPass(finalPass);
 // ---------- 건물 정보, 이름표, 카드 ----------
 const INFO = {
   neru: { name: '가구 쇼룸', kind: '소파와 선반', go: [['모듈 소파 열어 보기', 'sofa/'], ['시스템 선반 열어 보기', 'configurator/']] },
-  saevit: { name: '간판 제작', kind: '채널 간판', go: [['열어 보기', 'sign/']] },
+  saevit: { name: '간판 제작', kind: '마을 풍경', go: [] },
   onjib: { name: '인테리어', kind: '거실 상담 화면, 시공 사례, 현관 중문', go: [['거실 상담 화면 열어 보기', 'room/'], ['시공 사례 열어 보기', 'space/'], ['현관 중문 열어 보기', 'door/']] },
   hanok: { name: '한옥 찻집', kind: '마을 풍경', go: [] },
   gom: { name: '곰파트너', kind: '3D 웹 제작', go: [['비용 보기', '#price'], ['상담 신청', '/contact']] }
@@ -1987,7 +1986,7 @@ if (EN) {
   document.documentElement.lang = 'en';
   Object.assign(INFO, {
     neru: { name: 'Furniture showroom', kind: 'Sofa and shelving', go: [['Open modular sofa', 'sofa/'], ['Open shelving system', 'configurator/']] },
-    saevit: { name: 'Sign maker', kind: 'Channel letter sign', go: [['Open', 'sign/']] },
+    saevit: { name: 'Sign maker', kind: 'Village scenery', go: [] },
     onjib: { name: 'Interior', kind: 'Project case and entrance door', go: [['Open project case', 'space/'], ['Open entrance door', 'door/']] },
     hanok: { name: 'Hanok tea house', kind: 'Village scenery', go: [] },
     gom: { name: 'GOMPARTNER', kind: '3D web development', go: [['See prices', '#price'], ['Contact', '/contact']] }
@@ -2005,7 +2004,7 @@ for (const id of ORDER) {
   const size = box3.getSize(V(0, 0, 0)), c = box3.getCenter(V(0, 0, 0));
   const h = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.3, size.y + 0.4, size.z + 0.3), new THREE.MeshBasicMaterial({ visible: false }));
   h.position.copy(c); h.userData.id = id; scene.add(h);
-  if (id !== 'hanok') hits.push(h);   // 11-26 한옥 찻집 화면을 내려 한옥은 마을 풍경으로만 둔다(이름표, 누르기 없음)
+  if (id !== 'hanok' && id !== 'saevit') hits.push(h);   // 11-26 한옥 찻집 화면을 내려 한옥은 마을 풍경으로만 둔다(이름표, 누르기 없음)
   const el = document.createElement('button');
   el.type = 'button'; el.className = 'pin';
   el.innerHTML = `<i aria-hidden="true"></i>${INFO[id].name}`;
@@ -2014,7 +2013,7 @@ for (const id of ORDER) {
   el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') setHover(id); });
   el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') setHover(null); });
   $('pins').appendChild(el);
-  if (id === 'hanok') el.style.display = 'none';
+  if (id === 'hanok' || id === 'saevit') el.style.display = 'none';   // 11-26 간판 화면도 내려 간판 가게는 풍경으로만
   b.pinEl = el;
 }
 let hovered = null, selected = null;

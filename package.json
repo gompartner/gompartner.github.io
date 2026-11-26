@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "prebuild": "node scripts/ops-status.mjs && node scripts/dark-css.mjs > app/.classic-dark.tmp && mv app/.classic-dark.tmp app/classic-dark.css && node scripts/light-css.mjs",
-    "postbuild": "node scripts/check-pages.mjs"
+    "postbuild": "node scripts/protect-3d.mjs && node scripts/check-pages.mjs"
   },
   "dependencies": {
     "@react-three/drei": "10.7.9",

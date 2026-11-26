@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { TownWindow } from "@/components/classic/TownWindow";
 import { BuildGate } from "@/components/classic/BuildGate";
+import { cssMin } from "@/lib/cssMin";
 
 // 11-25 조립형 첫 화면(사용자 "면과 선이 조합되며 완성, 합체 로봇처럼 조립되는 메인"). 시안, ?v=build
 // 3차: "단순 스퀘어라 너무 네모네모, 3D까지 조립, 글자도 포함해 쓸 수 있는 수준으로".
@@ -13,9 +14,16 @@ import { BuildGate } from "@/components/classic/BuildGate";
 
 type V = CSSProperties & Record<`--${string}`, string>;
 
+// 아래 스타일 설명(11-26 점검: 스타일 문자열 안의 주석은 공개 파일에 그대로 실려서 밖으로 뺐다)
+// 11-25 밤 사용자가 보여 준 참고 영상(빛 한 점 > 가는 빛줄기가 엇갈려 그어짐 > 줄 사이에 면이 차오르며 글자가 완성 > 줄이 사라짐)을 따른다
+// 3D를 기다리는 동안 설계선의 지붕이 한 채씩 번갈아 차오른다(조립이 계속되고 있다는 표시)
+// 창 몸통: 틀이 먼저 깔려 있지 않게 가운데 점에서 펼쳐진다
+// 창틀: 둥근 테두리를 원뿔 마스크로 가려 두 모서리에서 자라게 한다
+// 창이 화면에 들어오기 전에는 창 쪽 조립을 멈춰 둔다(휴대폰에서는 창이 아래에 있다)
+// 이미 조립했으면(새로고침 전) 조립 없이 완성된 화면
+// 다시 보일 때: 창틀이 반짝이고 광택이 한 번 훑는다
 const css = `
 @property --gp-a { syntax: "<angle>"; inherits: false; initial-value: 180deg; }
-/* 11-25 밤 사용자가 보여 준 참고 영상(빛 한 점 > 가는 빛줄기가 엇갈려 그어짐 > 줄 사이에 면이 차오르며 글자가 완성 > 줄이 사라짐)을 따른다 */
 @keyframes gp-glint { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); } 30% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); } }
 @keyframes gp-ray { 0% { opacity: 1; stroke-dashoffset: 1; } 34% { opacity: 1; stroke-dashoffset: 0; } 78% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
 @keyframes gp-shard { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)); filter: brightness(2.6); } 55% { opacity: 1; transform: none; filter: brightness(2.2); } 100% { opacity: 1; transform: none; filter: brightness(1); } }
@@ -29,7 +37,6 @@ const css = `
   88% { transform: translate(calc(var(--x) * -0.03), calc(var(--y) * -0.03)) rotate(0deg) scale(0.97); }
   100% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); }
 }
-/* 3D를 기다리는 동안 설계선의 지붕이 한 채씩 번갈아 차오른다(조립이 계속되고 있다는 표시) */
 @keyframes gp-roof { 0%, 100% { fill-opacity: 0; } 30%, 60% { fill-opacity: 0.34; } }
 .gp-roof { fill: #7aa7ff; fill-opacity: 0; animation: gp-roof 1.6s ease-in-out infinite; animation-delay: var(--d); }
 @media (prefers-reduced-motion: reduce) { .gp-roof { animation: none; } }
@@ -53,10 +60,8 @@ const css = `
 .gp-draw { stroke-dasharray: 1; animation: gp-draw 0.6s ease-in-out both; animation-delay: var(--d); }
 .gp-line { transform-origin: left; animation: gp-line 0.4s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-fade { animation: gp-fade 0.4s ease-out both; animation-delay: var(--d); }
-/* 창 몸통: 틀이 먼저 깔려 있지 않게 가운데 점에서 펼쳐진다 */
 .gp-body { animation: gp-body 0.5s cubic-bezier(0.6, 0, 0.2, 1) both; animation-delay: var(--d); }
 .gp-clunk { animation: gp-clunk 0.26s ease-out 1.15s both; }
-/* 창틀: 둥근 테두리를 원뿔 마스크로 가려 두 모서리에서 자라게 한다 */
 .gp-frame {
   --gp-a: 180deg;
   -webkit-mask: conic-gradient(from 225deg, #000 0 var(--gp-a), transparent var(--gp-a) 180deg, #000 180deg calc(180deg + var(--gp-a)), transparent calc(180deg + var(--gp-a)) 360deg);
@@ -66,11 +71,8 @@ const css = `
 .gp-frame::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 1.5px solid #7aa7ff; }
 .gp-scan { transform: translateX(220%); animation: gp-scan 0.7s ease-in-out both; animation-delay: var(--d); }
 
-/* 창이 화면에 들어오기 전에는 창 쪽 조립을 멈춰 둔다(휴대폰에서는 창이 아래에 있다) */
 [data-win]:not([data-win-on]) :is(.gp-body, .gp-frame, .gp-pop, .gp-pill, .gp-chip, .gp-draw, .gp-fade, .gp-scan) { animation-play-state: paused; }
-/* 이미 조립했으면(새로고침 전) 조립 없이 완성된 화면 */
 [data-built] :is(.gp-body, .gp-glint, .gp-ray, .gp-shard, .gp-word, .gp-pill, .gp-pop, .gp-chip, .gp-draw, .gp-line, .gp-fade, .gp-clunk, .gp-frame, .gp-scan) { animation: none; }
-/* 다시 보일 때: 창틀이 반짝이고 광택이 한 번 훑는다 */
 [data-shine] .gp-frame::before { animation: gp-spark 1s ease-out both; }
 [data-built][data-shine] .gp-scan, [data-shine] .gp-scan { animation: gp-scan 0.7s ease-in-out 0.1s both; }
 @media (prefers-reduced-motion: reduce) {
@@ -111,7 +113,7 @@ export function HeroBuild() {
     <BuildGate>
       {/* overflow-clip: hidden이면 날아오는 부품 때문에 구역 안쪽이 스크롤되어 화면이 잠깐 밀린다 */}
       <section aria-labelledby="c-hero" className="relative isolate overflow-clip bg-[#0b0d12] text-white">
-        <style>{css}</style>
+        <style>{cssMin(css)}</style>
         {/* 바탕: 모눈과 큰 원호 */}
         <div aria-hidden className="gp-fade absolute inset-0 -z-10 bg-[linear-gradient(rgba(122,167,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.06)_1px,transparent_1px)] bg-[size:48px_48px]" style={at(0)} />
         <svg aria-hidden viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 -z-10 h-full w-full" fill="none" strokeLinecap="round">

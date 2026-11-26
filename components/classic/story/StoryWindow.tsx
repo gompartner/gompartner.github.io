@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Maximize2, X } from "lucide-react";
 import { Frame } from "@/components/classic/story/Frame";
 import type { Stage } from "@/data/classic/storyline";
+import { cssMin } from "@/lib/cssMin";
 
 // 변천사: 창 하나가 왼쪽에 붙어 있고, 오른쪽 글을 내리면 그 창의 화면이 단계 순서대로 바뀐다(같은 사이트가 여덟 번 바뀐 것을 한 창으로 보여 준다).
 // 넓은 화면(lg)만 창을 붙인다. 휴대폰, 태블릿은 단계마다 캡처를 글 위에 한 장씩 크게 놓는다.
@@ -72,7 +73,7 @@ export function StoryWindow({ stages }: { stages: Stage[] }) {
 
   return (
     <div className="mt-8 md:mt-12 lg:grid lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-12">
-      <style>{css}</style>
+      <style>{cssMin(css)}</style>
 
       {/* 붙어 있는 창(넓은 화면) */}
       <div className="hidden lg:block">

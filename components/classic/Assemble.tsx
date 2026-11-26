@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
 import { SLICES, clear, pieceCss, pieces, rnd } from "@/components/classic/assembleParts";
+import { cssMin } from "@/lib/cssMin";
 
 // 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
 //  - 조립의 단위는 카드 한 장이 아니라 그 안의 작은 부품이다(11-26 "작은 부품 컴포넌트가 조립되는 느낌, 지금은 도장 찍는 느낌").
@@ -196,7 +197,7 @@ export function Assemble({ children }: { children: ReactNode }) {
 
   return (
     <div ref={ref}>
-      <style>{css}</style>
+      <style>{cssMin(css)}</style>
       {children}
     </div>
   );

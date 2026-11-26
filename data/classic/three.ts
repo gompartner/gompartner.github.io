@@ -9,7 +9,7 @@ export const threeMeta = {
   metaDescription:
     "가구나 중문을 고객이 3D로 직접 구성하고 견적까지 접수하는 3D 홈페이지를 제작합니다. 공간 3D 뷰어 180만 원부터.",
   heroTitle: "고객이 직접 구성하는 3D 견적 화면",
-  lead: "가구나 중문, 간판을 고객이 3D로 직접 구성하고 견적까지 받는 화면을 만듭니다",
+  lead: "가구나 중문을 고객이 3D로 직접 구성하고 견적까지 받는 화면을 만듭니다",
   leadNote: "운영 중인 홈페이지(아임웹, 카페24, 워드프레스)에 연동해 드립니다",
 };
 
@@ -73,7 +73,7 @@ export const threePlans: Plan[] = [
     days: 35,
     period: "5주",
     revisions: 0,
-    summary: "가구와 중문, 간판 구성과 견적 접수",
+    summary: "가구와 중문 구성과 견적 접수",
     includes: ["제품 1종, 옵션 4가지", "실시간 견적", "구성 공유와 견적 요청 접수"],
   },
 ];
@@ -86,7 +86,6 @@ export const threePlanNote = "3D 파일을 주시는 기준입니다. 파일이 
 export const threeByIndustry = [
   { name: "가구", price: "480만 원부터", make: "컨피규레이터, 모델링 1종", need: "제품 사진과 치수, 단가표" },
   { name: "중문과 창호", price: "480만 원부터", make: "컨피규레이터, 모델링 1종", need: "도면(DWG, DXF), 단가표" },
-  { name: "간판", price: "450만 원부터", make: "컨피규레이터, 입력한 글자로 간판 생성", need: "단가표와 사용 서체" },
   { name: "인테리어와 숙박", price: "180만 원부터", make: "공간 3D 뷰어, 공간 모델링 별도 견적", need: "평면도와 현장 사진" },
 ];
 
@@ -108,7 +107,7 @@ export const threeCompare = {
     ["견적 자동 계산", "포함", "포함", "없음(별도 개발)"],
     ["기존 홈페이지 연동", "아임웹과 카페24, 워드프레스 포함", "협의", "별도 개발"],
     ["옵션과 가격 수정", "엑셀(CSV) 파일로 직접 수정, 관리자 화면 80만 원", "협의", "다시 의뢰"],
-    ["중문과 간판 견본", "있음", "공개 사례 없음", "해당 없음"],
+    ["거실과 가구 견본", "있음", "공개 사례 없음", "해당 없음"],
     ["원본 소유", "원본 소스와 3D 파일 모두 고객", "계약에 따라 다름", "3D 파일 고객"],
   ],
   note: "3D 전문 제작사는 국내외 모두 금액을 공개하지 않고 상담 뒤 견적합니다(2026년 11월 확인).",
@@ -116,12 +115,11 @@ export const threeCompare = {
 
 /** 카탈로그(public/3d 데모) */
 export const threeDemos = [
-  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=1126", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "상담 신청 접수"] },
+  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=1126", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "거래장부 견적서로 보내기"] },
   { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg?v=1125", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단과 다리 선택", "실시간 견적", "견적 요청 접수"] },
   { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg?v=1125", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸과 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
   { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg?v=1125", category: "인테리어", title: "현관 중문", desc: "문 방식과 프레임 색, 유리를 골라 견적을 받습니다", features: ["3D 구성", "폭과 높이 입력", "프레임 색과 유리 선택", "실시간 견적", "견적 요청 접수"] },
   { href: "/3d/space/", img: "/3d/assets/thumb/space.jpg?v=1125", category: "인테리어", title: "시공 사례", desc: "시공한 공간을 3D와 평면도로 둘러보게 합니다", features: ["공간 3D 뷰어", "평면도", "둘러보기", "시공 사례"] },
-  { href: "/3d/sign/", img: "/3d/assets/thumb/sign.jpg?v=1125", category: "간판 제작", title: "채널 간판", desc: "상호를 입력하면 외벽에 글자가 붙고 간판 견적이 나옵니다", features: ["3D 구성", "상호 입력", "간판 종류와 글자 높이", "실시간 견적", "견적 요청 접수"] },
 ];
 
 export const threeSteps = [

@@ -18,8 +18,9 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 
 export type { CatalogItem, CatalogStoryView, Shot } from "@/components/classic/catalog/CatalogDialog";
 
+// 아래 스타일 설명(11-26 점검: 스타일 문자열 안의 주석은 공개 파일에 그대로 실려서 밖으로 뺐다)
+// 내려가며 볼 때 그림이 제자리로 올라온다. 글자와 그림은 처음부터 다 보이고(투명하게 숨기지 않는다), 지원하지 않는 브라우저에서는 그냥 서 있다
 const css = `
-/* 내려가며 볼 때 그림이 제자리로 올라온다. 글자와 그림은 처음부터 다 보이고(투명하게 숨기지 않는다), 지원하지 않는 브라우저에서는 그냥 서 있다 */
 @keyframes ct-main { from { transform: translateY(26px) scale(.975); } to { transform: none; } }
 @keyframes ct-side { from { transform: translateY(18%); } to { transform: none; } }
 @supports (animation-timeline: view()) {

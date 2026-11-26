@@ -26,7 +26,6 @@ const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] =
   { id: "room", head: "거실 치수에 맞춰 가구를 넣어 봅니다", wide: true, phone: true },
   { id: "configurator", head: "칸과 부속을 붙이면 금액이 바뀝니다" },
   { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
-  { id: "sign", head: "상호를 입력하면 간판이 걸립니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
 ];
 

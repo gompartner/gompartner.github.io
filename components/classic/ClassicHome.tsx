@@ -8,6 +8,7 @@ import { Assemble } from "@/components/classic/Assemble";
 import { appPlans, manwon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
 import { NewTabMark } from "@/components/classic/NewTab";
+import { cssMin } from "@/lib/cssMin";
 
 // 11-25 메인: 조립형 한 페이지(사용자 "면과 선이 조합되며 완성되는, 합체 로봇처럼 조립되는 메인").
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
@@ -24,9 +25,10 @@ const wrap = "mx-auto w-full max-w-[1248px] px-4 md:px-6";
 const h2c = "break-keep text-[32px] font-[800] leading-[1.18] tracking-[-0.05em] md:text-[54px]";
 
 // 다크모드 규칙 중 keep-light를 보지 않는 것(입력 칸 바탕과 글자색)을 메인에서 되돌리고, 진행 방식의 흐르는 선을 정의한다
+// 아래 스타일 설명(11-26 점검: 스타일 문자열 안의 주석은 공개 파일에 그대로 실려서 밖으로 뺐다)
+// 스크롤을 칸마다 붙이는 것(scroll snap)은 넣었다가 뺐다(11-25 밤 사용자 "힘들어 보이는 느낌"). 원래 문제는 휴대폰에서 3D 창이 보이기 전에 지나가는 것이었고, 창을 제목 바로 아래로 올려 해결했다(HeroBuild)
+// 11-25 사용자: 메인의 휴대폰 화면에서는 아래에 떠 있는 전화, 카카오톡 상담 바도 뺀다(카카오톡은 바닥글에, 견적은 맨 아래 신청서에). 바 높이만큼 비워 두던 바닥글 여백도 없앤다
 const homeCss = `
-/* 스크롤을 칸마다 붙이는 것(scroll snap)은 넣었다가 뺐다(11-25 밤 사용자 "힘들어 보이는 느낌"). 원래 문제는 휴대폰에서 3D 창이 보이기 전에 지나가는 것이었고, 창을 제목 바로 아래로 올려 해결했다(HeroBuild) */
-/* 11-25 사용자: 메인의 휴대폰 화면에서는 아래에 떠 있는 전화, 카카오톡 상담 바도 뺀다(카카오톡은 바닥글에, 견적은 맨 아래 신청서에). 바 높이만큼 비워 두던 바닥글 여백도 없앤다 */
 html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none; }
 @media (max-width: 767px) { html:has(.gp-home) footer { padding-bottom: 0; } }
 @keyframes gp-flow { to { stroke-dashoffset: -32; } }
@@ -99,7 +101,7 @@ export function ClassicHome() {
   return (
     // keep-light: 메인은 색을 직접 정한 화면이라 사이트 다크모드(기기 설정을 따라 켜짐)가 흰 부품과 입력 칸을 어둡게 바꾸지 않게 한다
     <div className="keep-light gp-home">
-      <style>{homeCss}</style>
+      <style>{cssMin(homeCss)}</style>
       <div className="bg-[#0b0d12] bg-[linear-gradient(rgba(122,167,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(122,167,255,.05)_1px,transparent_1px)] bg-[size:48px_48px] text-white">
         <HeroBuild />
         <Assemble>

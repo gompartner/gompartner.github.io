@@ -45,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // 11-03 3D 웹 제작. 본문은 사이트 페이지(11-26 한 판으로), 섬 화면과 3D 화면들은 public/3d 정적 페이지(원본 모션-카탈로그)
     { path: "/3d", priority: 0.8, files: ["app/(classic)/3d/page.tsx", "components/classic/three/ThreeBoard.tsx", "data/classic/three.ts"] },
-    ...["room", "sofa", "configurator", "space", "door", "sign"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
+    ...["room", "sofa", "configurator", "space", "door"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
 
     { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },

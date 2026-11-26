@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, Search, X } from "lucide-react";
 import { ThemeSwitch } from "@/components/classic/ThemeSwitch";
 import { cn } from "@/lib/utils";
+import { cssMin } from "@/lib/cssMin";
 
 // 사이트 머리글. 11-26 다시 씀: 메인과 안쪽 판이 모두 같은 어두운 띠 하나를 쓴다.
 //  - 넓은 화면: 어느 페이지에서나 같은 메뉴(Build, Care, Price, Catalog, Wiki, Contact). 오른쪽에 통합검색과 화면 색(다크, 화이트) 버튼
@@ -32,15 +33,16 @@ const MORE: { href: string; label: string; ko: string; big?: boolean }[] = [
   { href: "/faq", label: "FAQ", ko: "자주 묻는 질문" },
 ];
 
+// 아래 스타일 설명(11-26 점검: 스타일 문자열 안의 주석은 공개 파일에 그대로 실려서 밖으로 뺐다)
+// 메뉴와 팝업이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다. 스크롤 막대가 사라진 폭(--sbw)만큼 오른쪽을 채워 화면이 옆으로 밀리지 않게 한다
+// 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로)
+// 11-26 버튼 색. 사이트는 검정과 흰색 두 색이 바탕이고, 색은 Build, Run, Care를 구분하는 면에만 쓴다(사용자 "버튼 색상 저 파란색 쓸 거야? 블랙 화이트 투톤").
+//    그래서 누르는 버튼에는 파랑을 쓰지 않는다. 어두운 화면에서는 흰 버튼, 밝은 화면에서는 검은 버튼(판의 Contact 버튼과 같은 규칙).
+//    primary: 결정하는 버튼, ghost: 검색 칸 안처럼 곁에 붙는 버튼, on: 고른 줄, box-on: 고른 체크 칸
 const css = `
-/* 메뉴와 팝업이 열려 있는 동안 뒤 페이지는 스크롤되지 않는다. 스크롤 막대가 사라진 폭(--sbw)만큼 오른쪽을 채워 화면이 옆으로 밀리지 않게 한다 */
 html:has(dialog[open]) { overflow: hidden; padding-right: var(--sbw, 0px); }
-/* 팝업은 열릴 때 자기 자신에 초점을 둔다. 그 테두리는 그리지 않는다(안의 버튼, 링크 초점 테두리는 그대로) */
 dialog:focus, dialog:focus-visible { outline: none; }
 dialog, dialog * { overscroll-behavior: contain; }
-/* 11-26 버튼 색. 사이트는 검정과 흰색 두 색이 바탕이고, 색은 Build, Run, Care를 구분하는 면에만 쓴다(사용자 "버튼 색상 저 파란색 쓸 거야? 블랙 화이트 투톤").
-   그래서 누르는 버튼에는 파랑을 쓰지 않는다. 어두운 화면에서는 흰 버튼, 밝은 화면에서는 검은 버튼(판의 Contact 버튼과 같은 규칙).
-   primary: 결정하는 버튼, ghost: 검색 칸 안처럼 곁에 붙는 버튼, on: 고른 줄, box-on: 고른 체크 칸 */
 .gp-primary { background: #15171c; color: #fff; }
 .gp-primary:hover { background: #2b2f38; }
 .gp-ghost { background: #e4e8ee; color: #15171c; }
@@ -121,7 +123,7 @@ export function ClassicHeader() {
   return (
     // 11-09 fixed에서 sticky로: 아이패드에서 뒤로 가기 뒤 화면 기준점이 어긋나면 고정 머리가 페이지 제목을 덮고 위로 안 올라갔다(사용자 제보)
     <header className={cn(tablet ? "relative" : "sticky", "top-0 z-50 bg-[#0b0d12]")}>
-      <style>{css}</style>
+      <style>{cssMin(css)}</style>
       <div className="border-b border-white/10">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-4 md:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">

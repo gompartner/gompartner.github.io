@@ -34,20 +34,20 @@
   })();
 </script>
 <title>3D 인테리어 상담 화면 | 곰파트너</title>
-<meta name="description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고, 구성 그대로 상담이 접수됩니다.">
+<meta name="description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="곰파트너">
 <meta property="og:url" content="https://gompartner.co.kr/3d/room/">
 <meta property="og:title" content="3D 인테리어 상담 화면 | 곰파트너">
-<meta property="og:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고, 구성 그대로 상담이 접수됩니다.">
+<meta property="og:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
 <meta property="og:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112602">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="3D 인테리어 상담 화면 | 곰파트너">
-<meta name="twitter:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고, 구성 그대로 상담이 접수됩니다.">
+<meta name="twitter:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
 <meta name="twitter:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112602">
 <meta name="twitter:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <link rel="canonical" href="https://gompartner.co.kr/3d/room/">
@@ -80,6 +80,8 @@
   [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: var(--bg); }
   html { touch-action: manipulation; }   /* 11-26 사용자 "두 번 터치 확대 안 되도록" */
+  /* 11-26 아이폰 화면 녹화: 소파를 끄는 중 길게 누르기로 읽혀 3D 화면이 파랗게 선택되고 '복사하기, 찾아보기' 메뉴가 떴다. 3D 무대와 버튼은 선택, 길게 누르기 메뉴, 누름 반짝임을 끈다 */
+  .stage, .stage *, .tabs, .chips, .bar, .top { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
   body {
     color: var(--ink);
     font-family: Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif;
@@ -141,6 +143,15 @@
   .rs button:hover { background: rgba(255, 255, 255, 0.14); }
   .rs button:disabled { opacity: 0.35; cursor: not-allowed; }
   .type small { margin-top: 4px; }
+  .rs-sum { display: none; pointer-events: auto; align-items: center; gap: 6px; border: 0; background: none; color: #fff; font: inherit; padding: 2px 0; cursor: pointer; }
+  .rs-sum b { font-size: 14px; }
+  .rs-sum svg { width: 16px; height: 16px; transition: transform .2s; }
+  .open > .rs-sum svg { transform: rotate(180deg); }
+  @media (max-width: 699px) {   /* 11-26 사용자 "아직도 공간 개선이 필요": 휴대폰은 거실 크기를 한 줄로 접어 두고 누르면 편다 */
+    .rs-sum { display: flex; }
+    #roomsize { padding: 6px 10px; }
+    #roomsize:not(.open) > :not(.rs-sum) { display: none; }
+  }
   .est { margin: 2px 0 0; font-size: 14px; font-weight: 700; color: var(--yellow); line-height: 1.3; }
   /* 3D 위에서 벽을 끌어 크기를 바꾸는 손잡이. 위치와 화살표 방향은 프레임마다 카메라에 맞춘다 */
   .hdl { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; border: 2px solid #fff; background: var(--blue); color: #fff; display: grid; place-items: center; cursor: grab; touch-action: none; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45); z-index: 3; }
@@ -151,11 +162,15 @@
 
   .tools { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; }
   /* 11-26 사용자 "메뉴는 접었다 펼 수 있게": 접으면 선택지와 견적 내역을 감추고 3D를 넓게. 휴대폰은 품목 이름과 합계 한 줄만, 넓은 화면은 오른쪽 패널을 통째로 */
-  .tog.fold { gap: 4px; }
-  .tog.fold svg { width: 16px; height: 16px; transform: rotate(180deg); transition: transform .2s; }
-  .tog.fold[aria-expanded="false"] svg { transform: none; }
+  .tog.lnk { padding: 0; width: 44px; justify-content: center; }
+  .tog.lnk svg { width: 18px; height: 18px; }
+  .foldtop { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: none; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .foldtop svg { width: 16px; height: 16px; transition: transform .2s; }
+  .foldtop[aria-expanded="false"] svg { transform: rotate(180deg); }
+  @media (min-width: 700px) { .foldtop { margin-left: 14px; } }
   .app.fold .opts, .app.fold .bill { display: none !important; }
-  @media (max-width: 699px) { .hint { bottom: 60px; right: 8px; left: 8px; text-align: center; } }   /* 좁은 화면에서는 안내가 아래 버튼과 겹치지 않게 한 줄 위로 */
+  @media (min-width: 700px) { .stage .hint { max-width: calc(100% - 330px); } }   /* 넓은 화면: 안내가 오른쪽 아래 버튼들과 겹치지 않게 */
+  @media (max-width: 699px) { .stage .hint { top: 52px; bottom: auto; right: 8px; left: 8px; text-align: center; } }   /* 좁은 화면에서는 안내를 위쪽(거실 크기 줄 아래)에 두어 아래 버튼과 겹치지 않게 */
   .seg { display: flex; background: rgba(18, 23, 34, 0.92); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
   .seg button, .tog, .zoom button {
     min-height: 40px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 7px; background: none; color: var(--ink-2); font-size: 15px; font-weight: 600; white-space: nowrap;
@@ -179,6 +194,9 @@
   }
   .tabs { grid-area: tabs; display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }   /* 11-26 소파가 들어와 품목이 여섯이 되어 한 줄로 두고 넘치면 옆으로 민다 */
   .tabs::-webkit-scrollbar { display: none; }
+  /* 11-26 사용자 "드래그됨": 품목이 일곱이 되어 넓은 화면 패널에서도 탭 줄이 옆으로 밀렸다. 넓은 화면은 한 줄에 다 들어가게 줄이고, 휴대폰만 밀어서 본다 */
+  @media (min-width: 700px) { .tabs { overflow-x: hidden; } .tabs button { padding: 0 4px !important; font-size: 14px !important; gap: 4px !important; } }
+  @media (max-width: 699px) { .tabs button { padding: 0 2px !important; font-size: 13.5px !important; gap: 3px !important; } .tabs button i { width: 6px; height: 6px; } }
   .tabs button {
     position: relative; flex: 1 0 auto; min-height: 48px; padding: 0 9px; border: 0; background: none; color: var(--ink-3);
     font-size: 15px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -213,6 +231,9 @@
   .chip u { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.5); flex: none; text-decoration: none; }
   .chip[aria-pressed="true"] { border-color: var(--sky); background: rgba(37, 110, 244, 0.24); color: #fff; box-shadow: inset 0 0 0 1px var(--sky); }
   .chip[aria-pressed="true"] small { color: var(--ink-2); }
+  .chip { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .chip:has(u) { gap: 4px; padding: 4px 3px; }
+  .chip:has(u) u { width: 14px; height: 14px; }
   .chip.act b { font-size: 18px; line-height: 1; font-weight: 700; color: var(--sky); margin-right: 2px; }
   .chip.act[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
   .ihead p.warn { color: #ffcf6b; }
@@ -228,9 +249,6 @@
   .lines .none { display: block; color: var(--ink-3); font-size: 14px; padding: 14px 0; }
   .note { margin-top: 10px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
 
-  /* 11-26 사용자 "견적은 자연스럽게 거래장부로 이어지면 좋겠음, 패밀리잖아": 고른 구성이 거래장부 견적서 품목으로 채워져 열린다 */
-  .tojb { display: flex; align-items: center; justify-content: center; min-height: 44px; margin-top: 12px; border-radius: 10px; border: 1px solid var(--line-2); color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
-  .tojb:hover { background: rgba(255, 255, 255, 0.08); }
   .bar { grid-area: bar; display: flex; align-items: stretch; gap: 10px; padding: 10px 16px calc(10px + var(--bot)); border-top: 1px solid var(--line); background: var(--panel); position: relative; z-index: 3; }
   .sum { flex: 1 1 auto; min-width: 0; border: 0; background: none; padding: 0; text-align: left; display: grid; align-content: center; }
   .sum:disabled { color: inherit; opacity: 1; }
@@ -329,12 +347,14 @@
     <a class="brand" href="/3d">곰파트너</a>
     <h1>3D 인테리어 상담 화면</h1>
     <p class="for">인테리어, 붙박이 가구, 리모델링 업체 홈페이지용</p>
+    <button type="button" class="foldtop" id="foldbtn" aria-expanded="true" aria-controls="panel"><span id="foldtxt">메뉴 접기</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
   </header>
 
   <main class="stage" id="stage">
     <canvas id="gl" tabindex="0" aria-label="거실 3D 화면. 끌면 방이 돌아갑니다."></canvas>
     <div id="labels" aria-hidden="true"></div>
     <div class="type" id="roomsize" role="group" aria-label="거실 크기">
+      <button type="button" class="rs-sum" id="rs-sum" aria-expanded="false"><b id="rs-sumt">거실 4,500 x 4,200</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       <span>거실 크기</span>
       <div class="rs"><em>폭</em><button type="button" data-k="W" data-d="-1" aria-label="거실 폭 줄이기">-</button><b class="num" id="rs-W" aria-live="polite">4,500</b><button type="button" data-k="W" data-d="1" aria-label="거실 폭 늘리기">+</button></div>
       <div class="rs"><em>깊이</em><button type="button" data-k="D" data-d="-1" aria-label="거실 깊이 줄이기">-</button><b class="num" id="rs-D" aria-live="polite">4,200</b><button type="button" data-k="D" data-d="1" aria-label="거실 깊이 늘리기">+</button></div>
@@ -353,7 +373,7 @@
         <button type="button" id="vplan" aria-pressed="false">평면도</button>
       </div>
       <button type="button" class="tog" id="dimbtn" aria-pressed="true"><i></i>치수</button>
-      <button type="button" class="tog fold" id="foldbtn" aria-expanded="true" aria-controls="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg><span>메뉴</span></button>
+      <button type="button" class="tog lnk" id="linkbtn" aria-label="이 구성 링크 복사" title="이 구성 링크 복사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
     </div>
     <p class="nogl" id="nogl" hidden>이 기기에서는 3D 화면을 열 수 없습니다. 아래에서 품목을 고르면 금액은 그대로 계산됩니다.</p>
   </main>
@@ -365,11 +385,10 @@
       <h2 id="bill-h">예상 견적 <button type="button" id="bill-x">닫기</button></h2>
       <ul class="lines" id="lines"></ul>
       <p class="note">금액은 업체 단가표 기준으로 계산됩니다. 부가세 별도이며 실측 뒤 확정합니다.</p>
-      <a class="tojb" id="to-jangbu" href="https://jangbu.gompartner.co.kr/write" target="_blank" rel="noopener">거래장부에서 견적서로 보내기</a>
     </section>
     <div class="bar">
       <button type="button" class="sum" id="sum" aria-expanded="false" aria-controls="bill"><span>예상 합계</span><b id="total">0원</b></button>
-      <a class="cta" id="cta" href="/#apply">이 구성으로 상담 신청</a>
+      <a class="cta" id="cta" href="https://jangbu.gompartner.co.kr/write" target="_blank" rel="noopener">견적서 보내기</a>
     </div>
   </aside>
 </div>
@@ -394,7 +413,10 @@ const PRICE = {
   },
   shelf: {                        // 선반: 폭 800 mm 기준
     wall: { perTier: 55000 },                     // 벽 선반 1단
-    system: { base: 160000, perTier: 45000 },     // 시스템 선반 레일 + 1단
+    // 시스템 선반: 시스템 선반 견적 화면(/3d/configurator) 단가를 부가세 별도로 옮겨 쓴다(합계를 1.1로 나눔)
+    frame: rows => 39000 + rows * 10000,          // 사이드 프레임 1조(칸 수 + 1조)
+    board: { s: 22000, b: 29000, a: 46000 },      // 800 mm 선반 1장: 스틸, 자작나무 합판, 오크 원목
+    acc: { e: 0, d: 98000, o: 129000 },           // 아래 칸 부속(칸마다): 빈칸, 서랍 2단, 양문 도어
   },
   closet: {                       // 붙박이장: 1자(303 mm)당 금액
     perJa: { hinged: 130000, sliding: 170000 },
@@ -407,7 +429,8 @@ const PRICE = {
 
 /* 거실 크기 (처음은 34평 판상형 거실 치수. 손님이 폭과 깊이를 300 mm씩 늘리고 줄인다. 단위 m) */
 // 11-26 사용자 "45평 제한을 두지 말고, 24, 34, 45 평형 버튼은 필요 없음(집마다 구조가 다름)": 큰 쪽 제한을 넓히고 길이에 따라 예상 평형만 보여 준다
-const ROOM = { name: '거실', W: 4.5, D: 4.2, H: 2.3, T: 0.12, min: { W: 3.0, D: 3.0 }, max: { W: 12.0, D: 10.0 }, step: 0.3 };
+// 11-26 사용자 "최대 제약 있어야겠네": 큰 쪽은 아파트 거실로 있을 만한 크기까지(폭 7.2 m, 깊이 6.0 m, 예상 약 78평)
+const ROOM = { name: '거실', W: 4.5, D: 4.2, H: 2.3, T: 0.12, min: { W: 3.0, D: 3.0 }, max: { W: 7.2, D: 6.0 }, step: 0.3 };
 // 예상 평형: 판상형 아파트 거실 넓이(㎡)에 1.8을 곱한 값. 59㎡(24평형) 거실 약 14㎡, 84㎡(34평형) 약 19㎡, 114㎡(45평형) 약 26㎡ 사례를 맞춘 어림값이라 '약'으로만 쓴다
 const estPy = () => Math.round(W * D * 1.8);
 
@@ -422,13 +445,18 @@ const ITEMS = [
     { key: 'mount', label: '설치', opts: [['wall', '벽걸이'], ['stand', '스탠드']] },
   ] },
   { id: 'sofa', name: '소파', desc: 'TV 맞은편에 두는 모듈 소파입니다.', groups: [
-    { key: 'mods', label: '모듈', act: true, opts: st => [['addS', '1인 붙이기', '', '', sofaWhy('addS', st)], ['addL', '카우치 붙이기', '', '', sofaWhy('addL', st)], ['del', '하나 빼기', '', '', sofaWhy('del', st)]] },
-    { key: 'fab', label: '원단', opts: [['w', '생활방수 패브릭'], ['b', '부클레'], ['l', '천연 가죽']] },
+    // 11-26 사용자 "글자가": 칸에 들어가게 짧게. 내역과 견적서에는 FAB_NAME의 전체 이름
+    { key: 'mods', label: '모듈', act: true, opts: st => [['addS', '1인', '', '', sofaWhy('addS', st)], ['addL', '카우치', '', '', sofaWhy('addL', st)], ['del', '빼기', '', '', sofaWhy('del', st)]] },
+    { key: 'fab', label: '원단', opts: [['w', '패브릭'], ['b', '부클레'], ['l', '가죽']] },
     { key: 'color', label: '색상', opts: [['oat', '오트밀', '', '#c9bba4'], ['gray', '그레이', '', '#aeaca6'], ['sage', '세이지', '', '#8d9a80'], ['char', '차콜', '', '#4b4946']] },
   ] },
   { id: 'shelf', name: '선반', desc: 'TV 옆 벽에 설치합니다.', groups: [
     { key: 'kind', label: '종류', opts: [['wall', '벽 선반'], ['system', '시스템 선반']] },
     { key: 'tiers', label: '단 수', opts: st => (st.shelf.kind === 'wall' ? [2, 3, 4] : [3, 4, 5]).map(n => [n, n + '단']) },
+    // 11-26 사용자 "시스템 선반 넣고 구성에 포함": 시스템 선반 화면의 칸, 판재, 부속을 거실 선반으로
+    { key: 'cols', label: '칸 수', show: st => st.shelf.kind === 'system', opts: [[1, '1칸'], [2, '2칸'], [3, '3칸']] },
+    { key: 'mat', label: '판재', show: st => st.shelf.kind === 'system', opts: [['s', '스틸'], ['b', '자작나무'], ['a', '오크']] },
+    { key: 'acc', label: '아래 칸', show: st => st.shelf.kind === 'system', opts: [['e', '빈칸'], ['d', '서랍'], ['o', '도어']] },
   ] },
   { id: 'closet', name: '붙박이장', desc: '복도 쪽 벽에 천장 높이로 설치합니다.', groups: [
     { key: 'width', label: '폭', opts: [[1200, '1,200 mm', '4자'], [1800, '1,800 mm', '6자'], [2400, '2,400 mm', '8자']] },
@@ -438,6 +466,11 @@ const ITEMS = [
     { key: 'type', label: '종류', opts: [['three', '3연동'], ['one', '원슬라이딩'], ['swing', '스윙']] },
     { key: 'glass', label: '유리', opts: [['clear', '투명'], ['fluted', '모루'], ['bronze', '브론즈']] },
   ] },
+  // 11-26 사용자 "셀프 인테리어 쪽으로": 가구만이 아니라 바닥재와 벽 색도 바꿔 본다. 금액은 실측 뒤라 0원(견적서에는 품목으로 남는다)
+  { id: 'finish', name: '마감', desc: '바닥재와 벽 색을 고릅니다. 시공 금액은 실측 뒤 견적입니다.', groups: [
+    { key: 'floor', label: '바닥', opts: [['oak', '오크 마루'], ['light', '밝은 마루'], ['tile', '타일']] },
+    { key: 'wall', label: '벽', opts: [['white', '화이트', '', '#e9e5dc'], ['greige', '그레이지', '', '#cfc6b8'], ['sage', '세이지', '', '#c2cbb9']] },
+  ] },
 ];
 const ITEM = Object.fromEntries(ITEMS.map(it => [it.id, it]));
 
@@ -445,9 +478,10 @@ const state = {
   tvUnit: { on: true, width: 2400, color: 'oak' },
   tv: { on: true, size: 65, mount: 'wall' },
   sofa: { on: true, mods: [{ k: 'S', id: 1 }, { k: 'S', id: 2 }, { k: 'S', id: 3 }], fab: 'w', color: 'oat' },
-  shelf: { on: true, kind: 'wall', tiers: 3 },
+  shelf: { on: true, kind: 'wall', tiers: 3, cols: 1, mat: 'b', acc: 'e' },
   closet: { on: true, width: 1800, door: 'hinged' },
   door: { on: true, type: 'three', glass: 'clear' },
+  finish: { on: true, floor: 'oak', wall: 'white' },
 };
 const ui = { tab: 'tvUnit', view: '3d', dims: true };
 
@@ -458,14 +492,22 @@ const optsOf = (g, st) => (typeof g.opts === 'function' ? g.opts(st) : g.opts);
 const labelOf = (id, key, st) => { const o = optsOf(ITEM[id].groups.find(g => g.key === key), st).find(o => o[0] === st[id][key]); return o ? o[1] : ''; };
 
 /* 품목별 내역 한 줄: 이름, 구성, 금액 */
+// 11-26 사용자 "여기서 세부 가격을 보여 줄 거야?": 손님 화면은 품목별 금액 없이 합계만. 품목별 금액은 견적서(거래장부)에서. 업체가 원하면 true로
+const SHOW_ITEM_PRICE = false;
+const FAB_NAME = { w: '생활방수 패브릭', b: '부클레', l: '천연 가죽' };
 function lineOf(id, st) {
   const s = st[id];
   if (!s.on) return null;
   if (id === 'tvUnit') return { name: '거실장', detail: `폭 ${mm(s.width / 1000)} mm, ${labelOf(id, 'color', st)}`, price: tvUnitPrice(s.width) + PRICE.tvUnit.color[s.color] };
   if (id === 'tv') return { name: 'TV', detail: `${s.size}인치, ${s.mount === 'wall' ? '벽걸이 설치' : '스탠드 배치'}`, price: s.mount === 'wall' ? PRICE.tv.wall[s.size] : PRICE.tv.stand };
-  if (id === 'sofa') { const base = s.mods.reduce((a, m) => a + PRICE.sofa.mod[m.k], 0) + PRICE.sofa.arms; return { name: '소파', detail: `${sofaSetText(s)}, ${labelOf(id, 'fab', st)} ${labelOf(id, 'color', st)}, 폭 ${mm(sofaW(s))} mm`, price: Math.round(base * (1 + PRICE.sofa.fab[s.fab] / 100) / 1000) * 1000 }; }
-  if (id === 'shelf') return { name: '선반', detail: `${labelOf(id, 'kind', st)} ${s.tiers}단, 폭 800 mm`, price: s.kind === 'wall' ? PRICE.shelf.wall.perTier * s.tiers : PRICE.shelf.system.base + PRICE.shelf.system.perTier * s.tiers };
+  if (id === 'sofa') { const base = s.mods.reduce((a, m) => a + PRICE.sofa.mod[m.k], 0) + PRICE.sofa.arms; return { name: '소파', detail: `${sofaSetText(s)}, ${FAB_NAME[s.fab]} ${labelOf(id, 'color', st)}, 폭 ${mm(sofaW(s))} mm`, price: Math.round(base * (1 + PRICE.sofa.fab[s.fab] / 100) / 1000) * 1000 }; }
+  if (id === 'shelf') {
+    if (s.kind === 'wall') return { name: '선반', detail: `벽 선반 ${s.tiers}단, 폭 800 mm`, price: PRICE.shelf.wall.perTier * s.tiers };
+    const P = PRICE.shelf, sum = (s.cols + 1) * P.frame(s.tiers) + s.cols * s.tiers * P.board[s.mat] + s.cols * P.acc[s.acc];
+    return { name: '시스템 선반', detail: `${s.cols}칸 ${s.tiers}단, ${labelOf(id, 'mat', st)}, 아래 칸 ${labelOf(id, 'acc', st)}, 폭 ${mm(s.cols * 0.8)} mm`, price: Math.round(sum / 1.1 / 1000) * 1000 };
+  }
   if (id === 'closet') { const ja = Math.round(s.width / 300); return { name: '붙박이장', detail: `폭 ${labelOf(id, 'width', st)}(${ja}자), ${labelOf(id, 'door', st)} 문`, price: PRICE.closet.perJa[s.door] * ja }; }
+  if (id === 'finish') return { name: '마감(바닥, 벽)', detail: `바닥 ${labelOf(id, 'floor', st)}, 벽 ${labelOf(id, 'wall', st)}, 거실 ${(W * D).toFixed(1)}㎡, 실측 뒤 견적`, price: 0 };
   if (id === 'door') return { name: '중문', detail: `${labelOf(id, 'type', st)}, ${labelOf(id, 'glass', st)} 유리`, price: PRICE.door.type[s.type] + PRICE.door.glass[s.glass] };
   return null;
 }
@@ -479,6 +521,7 @@ function jangbuUrl(items, memo, vat) {
   return `https://jangbu.gompartner.co.kr/write?from=3d-room&q=${b}`;
 }
 // 거실장 폭은 손잡이로 300 mm씩 바꾼다. 단가표의 세 폭 사이는 이어서, 바깥은 끝 구간 기울기로 계산(1,000원 단위)
+const TVU_MAX = 3600;   // 거실장 폭은 1,200~3,600 mm(한 벽 거실장으로 흔한 범위)
 function tvUnitPrice(w) {
   const P = [[1800, PRICE.tvUnit.width[1800]], [2400, PRICE.tvUnit.width[2400]], [3000, PRICE.tvUnit.width[3000]]];
   const seg = w <= 2400 ? [P[0], P[1]] : [P[1], P[2]], k = (seg[1][1] - seg[0][1]) / (seg[1][0] - seg[0][0]);
@@ -507,7 +550,8 @@ const SOFA_MOD = { S: { w: 0.82, dp: 0.95 }, L: { w: 0.82, dp: 1.6 } };
 const SOFA = { arm: 0.16, back: 1.75, h: 0.82, max: 4 };
 // 거실 크기에 따라 다시 잡는 자리: 선반은 오른쪽 벽에서, 문틀과 소파 등은 앞뒤 벽에서 같은 거리
 function layoutRoom() {
-  SHELF.cx = W / 2 - 0.6;
+  SHELF.w = state.shelf.kind === 'system' ? state.shelf.cols * 0.8 : 0.8;
+  SHELF.cx = W / 2 - 0.2 - SHELF.w / 2;
   OPEN.z0 = -D / 2 + 0.45; OPEN.z1 = OPEN.z0 + 1.2;
   SOFA.back = D / 2 - 0.35;
   SOFA.max = Math.min(8, Math.max(1, Math.floor((W - 0.1 - SOFA.arm * 2) / SOFA_MOD.S.w + 1e-6)));   // 소파 견적 화면과 같이 8개까지
@@ -535,7 +579,12 @@ function sofaCount(n) {
 function fitAll(st) {
   const why = {};
   const pick = (opts, max) => opts.filter(v => v / 1000 <= max + 1e-6).pop();
-  const uMax = st.shelf.on ? 2 * Math.min(W / 2 + cxOf(st) - 0.05, SHELF.cx - SHELF.w / 2 - 0.05 - cxOf(st)) : W - 0.1;
+  if (st.shelf.on && st.shelf.kind === 'system') {   // 칸을 늘려도 거실장(최소 1,200 mm)과 왼쪽 여유가 남게
+    const need = Math.max(st.tvUnit.on ? 1.2 : 0, st.tv.on ? TV_SIZE[st.tv.size][0] : 0);   // TV와 거실장이 설 자리는 남긴다
+    const maxC = Math.max(1, Math.floor((W - 0.2 - need - 0.15) / 0.8 + 1e-6));
+    if (st.shelf.cols > maxC) { st.shelf.cols = maxC; layoutRoom(); why.shelf = `거실 폭에는 ${maxC}칸까지 들어갑니다`; }
+  }
+  const uMax = st.shelf.on ? (SHELF.cx - SHELF.w / 2 - 0.05) - (-W / 2 + 0.05) : W - 0.1;   // 왼쪽 벽과 선반 사이 빈 벽 전체(가운데 자리는 cxOf가 잡는다)
   if (st.tvUnit.width / 1000 > uMax + 1e-6) { const v = Math.max(1200, Math.floor(uMax * 1000 / 300 + 1e-6) * 300); st.tvUnit.width = v; why.tvUnit = `거실 폭에는 ${mm(v / 1000)} mm까지 들어갑니다`; }
   const cMax = (D / 2 - 0.02) - OPEN.z1 - 0.05;
   if (st.closet.width / 1000 > cMax + 1e-6) { const v = pick([1200, 1800, 2400], cMax); if (v) { st.closet.width = v; why.closet = `거실 깊이에는 ${mm(v / 1000)} mm까지 들어갑니다`; } }
@@ -554,14 +603,17 @@ function setRoomSize(k, val, k2, val2) {
   fitWhy = fitAll(state);
   renderRoomSize(); renderPanel();
   if (scene3d) scene3d.relayout();
+  saveLink();
 }
 function renderRoomSize() {
   $('rs-W').textContent = mm(W); $('rs-D').textContent = mm(D);
   const area = W * D;
   $('rs-area').textContent = `거실 ${area.toFixed(1)}㎡(${(area / 3.3058).toFixed(1)}평), 천장 ${mm(H)} mm`;
   $('rs-est').textContent = `예상 평형 약 ${estPy()}평`;
+  $('rs-sumt').textContent = `거실 ${mm(W)} x ${mm(D)}, 약 ${estPy()}평`;
   document.querySelectorAll('#roomsize button').forEach(b => { const k = b.dataset.k, up = b.dataset.d === '1', v = k === 'W' ? W : D; b.disabled = up ? v >= ROOM.max[k] - 1e-6 : v <= ROOM.min[k] + 1e-6; });
 }
+$('rs-sum').addEventListener('click', () => { const o = $('roomsize').classList.toggle('open'); $('rs-sum').setAttribute('aria-expanded', String(o)); });
 $('roomsize').addEventListener('click', e => {
   const b = e.target.closest('button[data-k]'); if (b && !b.disabled) resizeRoom(b.dataset.k, Number(b.dataset.d));
 });
@@ -574,9 +626,17 @@ function sofaAct(act) {
   change('sofa', { mods: m, on: true });
 }
 // 소파 가운데: TV 축을 따르되 양쪽 벽에서 50 mm 안으로
-const sofaX = st => { const w = sofaW(st.sofa), lim = W / 2 - w / 2 - 0.05; return Math.max(-lim, Math.min(lim, cxOf(st))); };
+const sofaX = st => { const w = sofaW(st.sofa), lim = Math.max(0, W / 2 - w / 2 - 0.05); return Math.max(-lim, Math.min(lim, place.sx != null ? place.sx : cxOf(st))); };
+const sofaDp = st => Math.max(...st.sofa.mods.map(m => SOFA_MOD[m.k].dp));
+const sofaBack = st => { const lo = -D / 2 + sofaDp(st) + 0.3, hi = D / 2 - 0.05; return place.sz == null ? SOFA.back : Math.max(Math.min(lo, hi), Math.min(hi, place.sz)); };
+const closetZ1 = st => { const w = st.closet.width / 1000, lo = OPEN.z1 + 0.05 + w, hi = D / 2 - 0.02; return place.cz == null || lo > hi ? hi : Math.max(lo, Math.min(hi, place.cz)); };
 const OPEN = { z0: -1.65, z1: -0.45, h: 2.1 };            // 현관 쪽 문틀 자리
-const cxOf = st => (st.shelf.on ? -0.45 : 0);             // 선반이 들어오면 거실장과 TV를 왼쪽으로 옮겨 자리를 낸다
+// 11-26 사용자 "소파나 TV나 옷장 위치가 안 옮겨짐": 옮긴 자리를 state.place에 둔다(null이면 원래 자동 자리)
+//   axis: TV와 거실장 가운데(TV 벽을 따라 x), sx, sz: 소파 가운데 x와 등받이 z, cz: 붙박이장 앞 끝 z(복도 벽을 따라)
+const place = { axis: null, sx: null, sz: null, cz: null };
+const axisLim = st => { const w = Math.max(st.tvUnit.on ? st.tvUnit.width / 1000 : 0, st.tv.on ? TV_SIZE[st.tv.size][0] : 0) / 2, r = (st.shelf.on ? SHELF.cx - SHELF.w / 2 : W / 2) - 0.05 - w, l = -W / 2 + 0.05 + w; return [l, Math.max(l, r)]; };
+// 11-26 사용자 "선반 3칸 되면 TV 안 밀림": 자동 자리는 왼쪽 벽과 선반 사이 빈 벽의 가운데(선반이 넓어지면 TV와 거실장이 그만큼 왼쪽으로)
+const cxOf = st => { const [l, r] = axisLim(st); if (place.axis == null) return st.shelf.on ? Math.max(l, Math.min(r, (-W / 2 + SHELF.cx - SHELF.w / 2) / 2)) : 0; return Math.max(l, Math.min(r, place.axis)); };   // 선반이 들어오면 자동 자리는 왼쪽으로 비켜 선다
 function tvPlace(st) {
   const [w, h] = TV_SIZE[st.tv.size];
   if (st.tv.mount === 'wall') return { mode: 'wall', w, h, y0: 1.12 - h / 2, z0: -D / 2 + 0.025, z1: -D / 2 + 0.06 };
@@ -589,13 +649,13 @@ function bboxOf(id, st, cx = cxOf(st)) {
   if (!s.on) return null;
   if (id === 'tvUnit') { const w = s.width / 1000; return { min: [cx - w / 2, 0, -D / 2], max: [cx + w / 2, UNIT.h, -D / 2 + UNIT.d], face: 'z' }; }
   if (id === 'tv') { const p = tvPlace(st); return { min: [cx - p.w / 2, p.mode === 'floor' ? 0 : p.mode === 'unit' ? UNIT.h : p.y0, p.z0], max: [cx + p.w / 2, p.y0 + p.h, p.z1], face: 'z' }; }
-  if (id === 'sofa') { const w = sofaW(s), x = sofaX(st), dp = Math.max(...s.mods.map(m => SOFA_MOD[m.k].dp)); return { min: [x - w / 2, 0, SOFA.back - dp], max: [x + w / 2, SOFA.h, SOFA.back], face: 'z' }; }
+  if (id === 'sofa') { const w = sofaW(s), x = sofaX(st), dp = sofaDp(st), zb = sofaBack(st); return { min: [x - w / 2, 0, zb - dp], max: [x + w / 2, SOFA.h, zb], face: 'z' }; }
   if (id === 'shelf') {
     const x0 = SHELF.cx - SHELF.w / 2, x1 = SHELF.cx + SHELF.w / 2;
     if (s.kind === 'wall') return { min: [x0, 0.9, -D / 2], max: [x1, 0.9 + (s.tiers - 1) * 0.35 + 0.035, -D / 2 + 0.22], face: 'z' };
     return { min: [x0, 0.2, -D / 2], max: [x1, 2.05, -D / 2 + 0.34], face: 'z' };
   }
-  if (id === 'closet') { const w = s.width / 1000, z1 = D / 2 - 0.02; return { min: [W / 2 - 0.62, 0, z1 - w], max: [W / 2, H, z1], face: 'x' }; }
+  if (id === 'closet') { const w = s.width / 1000, z1 = closetZ1(st); return { min: [W / 2 - 0.62, 0, z1 - w], max: [W / 2, H, z1], face: 'x' }; }
   if (id === 'door') { const x0 = s.type === 'swing' ? W / 2 - 0.3 : W / 2 - 0.07; return { min: [x0, 0, OPEN.z0], max: [W / 2 + T, OPEN.h, OPEN.z1], face: 'x', dimX: W / 2 }; }
   return null;
 }
@@ -609,8 +669,8 @@ function fitNote(id, st) {
     return st.shelf.on ? `여유: 왼쪽 벽 ${left} mm, 선반 ${mm(SHELF.cx - SHELF.w / 2 - b.max[0])} mm` : `여유: 좌우 벽 ${left} mm씩`;
   }
   if (id === 'tv') { const p = tvPlace(st); return `화면 폭 ${mm(p.w)} mm, 중심 높이 ${mm(p.y0 + p.h / 2)} mm`; }
-  if (id === 'sofa') return `여유: 왼쪽 벽 ${mm(b.min[0] + W / 2)} mm, 오른쪽 벽 ${mm(W / 2 - b.max[0])} mm, TV 벽까지 ${mm(SOFA.back - SOFA_MOD.S.dp + D / 2)} mm`;
-  if (id === 'shelf') return `폭 800 mm, 맨 위 선반 높이 ${mm(s.kind === 'wall' ? b.max[1] : 0.32 + 1.58 + 0.025)} mm`;
+  if (id === 'sofa') return `여유: 왼쪽 벽 ${mm(b.min[0] + W / 2)} mm, 오른쪽 벽 ${mm(W / 2 - b.max[0])} mm, TV 벽까지 ${mm(sofaBack(st) - SOFA_MOD.S.dp + D / 2)} mm`;
+  if (id === 'shelf') return `폭 ${mm(SHELF.w)} mm, 맨 위 선반 높이 ${mm(s.kind === 'wall' ? b.max[1] : 0.32 + 1.58 + 0.025)} mm`;
   if (id === 'closet') return `높이 ${mm(H)} mm, 중문 문틀까지 ${mm(b.min[2] - OPEN.z1)} mm`;
   if (id === 'door') return `문틀 폭 ${mm(OPEN.z1 - OPEN.z0)} mm, 높이 ${mm(OPEN.h)} mm`;
   return ITEM[id].desc;
@@ -625,30 +685,68 @@ function renderOpts() {
   const it = ITEM[ui.tab], s = state[it.id], l = lineOf(it.id, state);
   optsEl.setAttribute('aria-labelledby', 'tab-' + it.id);
   optsEl.classList.toggle('off', !s.on);
-  optsEl.innerHTML = `<div class="ihead"><div><h2>${it.name}<b>${l ? won(l.price) : '배치 안 함'}</b></h2><p${fitWhy[it.id] ? ' class="warn"' : ''}>${fitWhy[it.id] || fitNote(it.id, state)}</p></div><button type="button" class="sw" role="switch" aria-checked="${s.on}" aria-label="${it.name} 배치"></button></div>` +
-    it.groups.map(g => `<div class="grp"><span>${g.label}</span><div class="chips" role="group" aria-label="${it.name} ${g.label}">` +
+  optsEl.innerHTML = `<div class="ihead"><div><h2>${it.name}<b>${l ? (SHOW_ITEM_PRICE ? won(l.price) : '배치함') : '배치 안 함'}</b></h2><p${fitWhy[it.id] ? ' class="warn"' : ''}>${fitWhy[it.id] || fitNote(it.id, state)}</p></div><button type="button" class="sw" role="switch" aria-checked="${s.on}" aria-label="${it.name} 배치"></button></div>` +
+    it.groups.filter(g => !g.show || g.show(state)).map(g => `<div class="grp"><span>${g.label}</span><div class="chips" role="group" aria-label="${it.name} ${g.label}">` +
       optsOf(g, state).map(o => g.act ? `<button type="button" class="chip act" data-act="${o[0]}"${o[4] ? ` aria-disabled="true" title="${o[4]}"` : ''}><b aria-hidden="true">${o[0] === 'del' ? '-' : '+'}</b>${o[1]}</button>` : `<button type="button" class="chip${o[2] ? ' two' : ''}" data-key="${g.key}" data-val="${o[0]}" aria-pressed="${s[g.key] === o[0]}">${o[3] ? `<u style="background:${o[3]}"></u>` : ''}${o[1]}${o[2] ? `<small>${o[2]}</small>` : ''}</button>`).join('') + '</div></div>').join('');
 }
 function renderBill() {
   const L = linesOf(state), total = totalOf(state);
-  $('lines').innerHTML = L.length ? L.map(l => `<li><b>${l.name}</b><span>${won(l.price)}</span><small>${l.detail}</small></li>`).join('') : '<li class="none">품목을 배치하면 금액이 계산됩니다.</li>';
+  $('lines').innerHTML = L.length ? L.map(l => `<li><b>${l.name}</b><span>${SHOW_ITEM_PRICE ? won(l.price) : ''}</span><small>${l.detail}</small></li>`).join('') : '<li class="none">품목을 배치하면 금액이 계산됩니다.</li>';
   $('total').textContent = won(total);
-  const cta = $('cta');
-  cta.href = '/?msg=' + encodeURIComponent(requestText(state)) + '#apply';
-  if (document.documentElement.classList.contains('embed')) cta.target = '_top';
-  $('to-jangbu').href = jangbuUrl(L.map(l => [l.name, l.detail, '식', 1, l.price]), `3D 상담 화면 구성. 거실 폭 ${mm(W)}, 깊이 ${mm(D)} mm`, '');
+  // 11-26 사용자 "이 구성으로 상담 신청을 견적서 보내기로": 맨 아래 버튼이 고른 구성을 거래장부 견적서로 채워 연다(상담 신청 대신)
+  $('cta').href = jangbuUrl(L.map(l => [l.name, l.detail, '식', 1, l.price]), `3D 상담 화면 구성. 거실 폭 ${mm(W)}, 깊이 ${mm(D)} mm`, '');
 }
 function renderPanel() { renderTabs(); renderOpts(); renderBill(); }
 
 let scene3d = null; // 3D가 준비되면 채운다 { apply(id), select(id), setView(v), setDims(b) }
+// 11-26 사용자 "링크 아이콘 넣어서 다시 불러오게": 거실 크기, 품목 구성, 테이블과 러그 자리를 주소(#cfg=)에 담는다. 그 주소를 열면 그대로
+let PENDING_POS = null, MOVE_POS = () => [null, null];
+const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = t => JSON.parse(decodeURIComponent(escape(atob(t.replace(/-/g, '+').replace(/_/g, '/')))));
+function cfgOf() {
+  const st = state, sf = st.sofa;
+  return { v: 1, w: W, d: D, u: [+st.tvUnit.on, st.tvUnit.width, st.tvUnit.color], t: [+st.tv.on, st.tv.size, st.tv.mount], s: [+sf.on, sf.mods.map(m => m.k).join(''), sf.fab, sf.color],
+    h: [+st.shelf.on, st.shelf.kind, st.shelf.tiers, st.shelf.cols, st.shelf.mat, st.shelf.acc], c: [+st.closet.on, st.closet.width, st.closet.door], o: [+st.door.on, st.door.type, st.door.glass], f: [+st.finish.on, st.finish.floor, st.finish.wall], p: MOVE_POS(),
+    q: [place.axis, place.sx, place.sz, place.cz].map(v => (v == null ? null : Math.round(v * 100) / 100)) };
+}
+function saveLink() { clearTimeout(saveLink.t); saveLink.t = setTimeout(() => { try { history.replaceState(null, '', '#cfg=' + b64e(cfgOf())); } catch (_) {} }, 250); }
+function loadLink() {
+  const m = location.hash.match(/cfg=([A-Za-z0-9_-]+)/); if (!m) return;
+  try {
+    const c = b64d(m[1]), num = (x, a, b, def) => (Number.isFinite(+x) ? Math.min(b, Math.max(a, +x)) : def), one = (x, ok, def) => (ok.includes(x) ? x : def);
+    W = Math.round(num(c.w, ROOM.min.W, ROOM.max.W, W) * 10) / 10; D = Math.round(num(c.d, ROOM.min.D, ROOM.max.D, D) * 10) / 10; layoutRoom();
+    if (c.u) Object.assign(state.tvUnit, { on: !!c.u[0], width: Math.round(num(c.u[1], 1200, TVU_MAX, 2400) / 300) * 300, color: one(c.u[2], ['white', 'oak', 'walnut'], 'oak') });
+    if (c.t) Object.assign(state.tv, { on: !!c.t[0], size: one(+c.t[1], [55, 65, 75], 65), mount: one(c.t[2], ['wall', 'stand'], 'wall') });
+    if (c.s) { const ks = String(c.s[1] || 'SSS').replace(/[^SL]/g, '').slice(0, 8) || 'S'; Object.assign(state.sofa, { on: !!c.s[0], mods: [...ks].map(k => ({ k, id: sofaSeq++ })), fab: one(c.s[2], ['w', 'b', 'l'], 'w'), color: one(c.s[3], ['oat', 'gray', 'sage', 'char'], 'oat') }); }
+    if (c.h) Object.assign(state.shelf, { on: !!c.h[0], kind: one(c.h[1], ['wall', 'system'], 'wall'), tiers: num(c.h[2], 2, 5, 3), cols: one(+c.h[3], [1, 2, 3], 1), mat: one(c.h[4], ['s', 'b', 'a'], 'b'), acc: one(c.h[5], ['e', 'd', 'o'], 'e') });
+    layoutRoom();
+    if (c.c) Object.assign(state.closet, { on: !!c.c[0], width: one(+c.c[1], [1200, 1800, 2400], 1800), door: one(c.c[2], ['hinged', 'sliding'], 'hinged') });
+    if (c.o) Object.assign(state.door, { on: !!c.o[0], type: one(c.o[1], ['three', 'one', 'swing'], 'three'), glass: one(c.o[2], ['clear', 'fluted', 'bronze'], 'clear') });
+    if (c.f) Object.assign(state.finish, { on: !!c.f[0], floor: one(c.f[1], ['oak', 'light', 'tile'], 'oak'), wall: one(c.f[2], ['white', 'greige', 'sage'], 'white') });
+    if (Array.isArray(c.q)) ['axis', 'sx', 'sz', 'cz'].forEach((k, i) => { const v = c.q[i]; place[k] = v == null || !Number.isFinite(+v) ? null : Math.max(-20, Math.min(20, +v)); });
+    if (Array.isArray(c.p)) PENDING_POS = c.p.map(q => (Array.isArray(q) && q.length === 2 ? [num(q[0], -20, 20, 0), num(q[1], -20, 20, 0)] : null));
+    fitAll(state);
+  } catch (_) {}
+}
+loadLink();
+$('linkbtn').addEventListener('click', async () => {
+  const url = location.href.split('#')[0] + '#cfg=' + b64e(cfgOf());
+  try { history.replaceState(null, '', url); } catch (_) {}
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) { try { await navigator.share({ title: document.title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  let ok = false; try { await navigator.clipboard.writeText(url); ok = true; } catch (_) {}
+  const h = $('hint'); h.textContent = ok ? '링크를 복사했습니다. 이 주소를 열면 지금 구성 그대로 열립니다' : '주소창의 주소를 복사하면 지금 구성 그대로 열립니다'; h.classList.remove('off');
+  clearTimeout(h.t); h.t = setTimeout(() => h.classList.add('off'), 3500);
+});
 function change(id, patch) {
   const s = state[id];
   Object.assign(s, patch);
-  if (id === 'shelf') { const ok = s.kind === 'wall' ? [2, 3, 4] : [3, 4, 5]; if (!ok.includes(s.tiers)) s.tiers = Math.min(Math.max(s.tiers, ok[0]), ok[2]); }
+  if (id === 'shelf') { const ok = s.kind === 'wall' ? [2, 3, 4] : [3, 4, 5]; if (!ok.includes(s.tiers)) s.tiers = Math.min(Math.max(s.tiers, ok[0]), ok[2]); layoutRoom(); }
   fitWhy = fitAll(state);
+  if (id === 'shelf' && scene3d) scene3d.apply('tvUnit');   // 선반 폭이 바뀌면 거실장과 TV 자리도 다시
   renderPanel();
   for (const k of Object.keys(fitWhy)) if (k !== id && scene3d) scene3d.apply(k);
   if (scene3d) scene3d.apply(id);
+  saveLink();
 }
 function selectTab(id, focus) {
   ui.tab = id;
@@ -692,12 +790,12 @@ wide.addEventListener('change', syncSum); syncSum();
 renderPanel(); renderRoomSize();
 
 const coarse = matchMedia('(pointer: coarse)').matches;
-// 메뉴 접기, 펴기
+// 메뉴 접기, 펴기(11-26 사용자 "메뉴 접고 펼치는 건 위쪽에")
 $('foldbtn').addEventListener('click', () => {
-  const fold = !document.querySelector('.app').classList.toggle('fold') ? false : true;
-  $('foldbtn').setAttribute('aria-expanded', String(!fold));
+  const fold = document.querySelector('.app').classList.toggle('fold');
+  $('foldbtn').setAttribute('aria-expanded', String(!fold)); $('foldtxt').textContent = fold ? '메뉴 펴기' : '메뉴 접기';
 });
-$('hint').textContent = coarse ? '가구를 눌러 고르고 손잡이를 끌어 크기를 바꿉니다' : '가구를 눌러 고르고 손잡이를 끌어 크기를 바꿉니다. 드래그 회전, Ctrl + 휠 확대';
+$('hint').textContent = coarse ? '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다' : '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다. 빈 곳을 끌면 회전, Ctrl + 휠 확대';
 
 /* =====================================================================
    3D
@@ -706,7 +804,8 @@ const THREE = await import('three').catch(() => null);
 const canvas = $('gl'), stage = $('stage');
 let renderer = null;
 if (THREE && document.createElement('canvas').getContext('webgl2')) {
-  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+  // 11-26 사용자 "실제 느림"(아이폰): 화면 배율 2 이상인 휴대폰은 계단 현상이 잘 안 보여 테두리 다듬기(antialias)를 끈다
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: !(coarse && (devicePixelRatio || 1) >= 2), powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
 }
 if (!renderer) {
   $('nogl').hidden = false; canvas.hidden = true;
@@ -740,7 +839,7 @@ if (!renderer) {
   const SUN = { d3: [-6.5, 6.2, 3.2], plan: [-1.4, 9.5, 1.1] };   // 평면도에서는 볕을 위에서 내려 그림자를 짧게
   sun.position.set(...SUN.d3);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(MOBILE ? 1536 : 2048, MOBILE ? 1536 : 2048);
+  sun.shadow.mapSize.set(MOBILE ? 1024 : 2048, MOBILE ? 1024 : 2048);
   function shadowBox() { const k = Math.max(1, Math.hypot(W + 1.4, D) / Math.hypot(5.9, 4.2)); Object.assign(sun.shadow.camera, { left: -5.5 * k, right: 5.5 * k, top: 5 * k, bottom: -5 * k, near: 1, far: 22 * k }); sun.shadow.camera.updateProjectionMatrix(); }
   shadowBox();
   sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
@@ -757,13 +856,13 @@ if (!renderer) {
   }
   const shade = (hex, k) => { const c = new THREE.Color(hex); c.multiplyScalar(k); return '#' + c.getHexString(); };
   // 강마루: 폭 150 mm, 길이 1,200 mm 널. 2.4 m 사방을 한 장으로 그려 반복한다
-  const floorTex = tex(1024, 1024, (g, w, h) => {
-    const r = rnd(7), rows = 16, rh = h / rows, len = w / 2;
+  const plankTex = (base, seed) => tex(1024, 1024, (g, w, h) => {
+    const r = rnd(seed), rows = 16, rh = h / rows, len = w / 2;
     for (let i = 0; i < rows; i++) {
       const off = Math.floor(r() * len), tones = [0.9 + r() * 0.16, 0.9 + r() * 0.16];
       for (let k = -1; k <= 2; k++) {
         const x = off + k * len, tone = tones[((k % 2) + 2) % 2];
-        g.fillStyle = shade('#bd9668', tone); g.fillRect(x, i * rh, len, rh);
+        g.fillStyle = shade(base, tone); g.fillRect(x, i * rh, len, rh);
         const rr = rnd(i * 31 + (((k % 2) + 2) % 2) * 7 + 3);
         for (let n = 0; n < 9; n++) { g.fillStyle = `rgba(96,64,32,${0.04 + rr() * 0.07})`; g.fillRect(x + rr() * len * 0.5, i * rh + rr() * rh, len * (0.3 + rr() * 0.6), 1 + rr() * 1.5); }
         g.fillStyle = 'rgba(60,38,18,0.45)'; g.fillRect(x, i * rh, 1.5, rh);
@@ -771,6 +870,23 @@ if (!renderer) {
       g.fillStyle = 'rgba(60,38,18,0.38)'; g.fillRect(0, i * rh, w, 1.5);
     }
   }, (W + 2 * T) / 2.4, (D + 2 * T) / 2.4);
+  const floorTex = plankTex('#bd9668', 7);
+  // 바닥과 벽: 고른 바닥재 무늬와 벽 색을 공용 재질에 바로 바꿔 넣는다(무늬는 처음 고를 때 한 번 만든다)
+  const FLOOR = { oak: floorTex, light: null, tile: null }, WALL_HEX = { white: '#e9e5dc', greige: '#cfc6b8', sage: '#c2cbb9' };
+  function floorOf(k) {
+    if (!FLOOR[k]) FLOOR[k] = k === 'light' ? plankTex('#dcc7a4', 11) : tex(1024, 1024, (g, w, h) => {   // 600 mm 포세린 타일, 2.4 m 사방에 4장씩
+      g.fillStyle = '#d8d6d1'; g.fillRect(0, 0, w, h); const r = rnd(5), n = 4, t = w / n;
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { g.fillStyle = shade('#d8d6d1', 0.96 + r() * 0.06); g.fillRect(x * t + 2, y * t + 2, t - 4, t - 4); }
+      g.fillStyle = 'rgba(120,116,108,0.5)'; for (let k2 = 0; k2 <= n; k2++) { g.fillRect(k2 * t - 1.5, 0, 3, h); g.fillRect(0, k2 * t - 1.5, w, 3); }
+    });
+    return FLOOR[k];
+  }
+  function applyFinish(f) {
+    const k = f.on ? f.floor : 'oak', t = floorOf(k);
+    t.repeat.set((W + 2 * T) / 2.4, (D + 2 * T) / 2.4); t.needsUpdate = true;
+    if (M.floor.map !== t) { M.floor.map = t; M.floor.roughness = k === 'tile' ? 0.35 : 0.55; M.floor.needsUpdate = true; }
+    M.paint.color.set(WALL_HEX[f.on ? f.wall : 'white']);
+  }
   // TV 벽: 큰 판 타일 줄눈과 바닥, 모서리 쪽 음영
   const artTex = tex(1024, 512, (g, w, h) => {
     g.fillStyle = '#dcd8d0'; g.fillRect(0, 0, w, h);
@@ -939,10 +1055,25 @@ if (!renderer) {
 
   /* ----- 놓여 있는 가구(러그, 테이블): TV 축을 따라 같이 움직인다. 소파는 고를 수 있는 품목(buildSofa) ----- */
   const living = new THREE.Group(); scene.add(living);
+  // 11-26 사용자 "최종 목표는 셀프 인테리어, 테이블 옮기기 가능?": 테이블은 따로 묶어 끌어서 옮긴다. 한 번 옮기면 그 자리에 둔다(거실을 줄이면 벽 안으로만 밀어 넣는다)
+  // 러그도 같은 방식(사용자 "러그는?"). 옮길 수 있는 것: g 묶음, y 잡는 높이, 벽에서 띄울 반폭(x)과 반깊이(z, 러그는 가운데가 0.05 앞)
+  const tableG = new THREE.Group(), rugG = new THREE.Group(); scene.add(tableG, rugG);
+  const MOVE = [{ g: tableG, y: 0.345, hx: 0.45, hz0: 0.43, hz1: 0.47, moved: false }, { g: rugG, y: 0.012, hx: 1.2, hz0: 0.85, hz1: 0.95, moved: false }];
+  MOVE_POS = () => MOVE.map(m => (m.moved ? [Math.round(m.g.position.x * 100) / 100, Math.round(m.g.position.z * 100) / 100] : null));
+  function placeTable() {
+    if (PENDING_POS) { PENDING_POS.forEach((q, i) => { if (q && MOVE[i]) { MOVE[i].moved = true; MOVE[i].g.position.x = q[0]; MOVE[i].g.position.z = q[1]; } }); PENDING_POS = null; }
+    for (const m of MOVE) {
+      if (!m.moved) m.g.position.set(living.position.x, 0, living.position.z);
+      const lx = Math.max(0, W / 2 - m.hx), z0 = -D / 2 + m.hz0, z1 = D / 2 - m.hz1;
+      m.g.position.x = Math.max(-lx, Math.min(lx, m.g.position.x));
+      m.g.position.z = z0 <= z1 ? Math.max(z0, Math.min(z1, m.g.position.z)) : 0;
+    }
+    shadowDirty = true;
+  }
   {
-    const rug = ext(-1.2, 1.2, 0, 0.012, -0.85, 0.95, faces({ py: M.rug }, S({ color: '#cfc7b8', roughness: 1 })), false); living.add(rug);
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.03, 48), M.unit.walnut); top.position.set(0, 0.345, 0.02); top.castShadow = top.receiveShadow = true; living.add(top);
-    for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3 + 0.4; const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.33, 10), M.steel); leg.position.set(Math.cos(a) * 0.28, 0.165, 0.02 + Math.sin(a) * 0.28); leg.castShadow = true; living.add(leg); }
+    const rug = ext(-1.2, 1.2, 0, 0.012, -0.85, 0.95, faces({ py: M.rug }, S({ color: '#cfc7b8', roughness: 1 })), false); rugG.add(rug);
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.03, 48), M.unit.walnut); top.position.set(0, 0.345, 0.02); top.castShadow = top.receiveShadow = true; tableG.add(top);
+    for (let i = 0; i < 3; i++) { const a = i * Math.PI * 2 / 3 + 0.4; const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.33, 10), M.steel); leg.position.set(Math.cos(a) * 0.28, 0.165, 0.02 + Math.sin(a) * 0.28); leg.castShadow = true; tableG.add(leg); }
   }
 
   /* ----- 고를 수 있는 품목 ----- */
@@ -986,6 +1117,11 @@ if (!renderer) {
       g.add(ext(x1 - 0.3, x1 - 0.1, y, y + 0.14, zc - 0.08, zc + 0.08, M.props[1]));
     }
   }
+  const shelfMats = {};
+  function shelfMat(k) {
+    if (!shelfMats[k]) shelfMats[k] = k === 's' ? S({ color: '#2d3036', roughness: 0.45, metalness: 0.5 }) : k === 'b' ? S({ map: woodTex('#e2cfa9', '#a8875a', 9), roughness: 0.6 }) : M.unit.oak;
+    return shelfMats[k];
+  }
   function buildShelf(st) {
     const g = new THREE.Group(), s = st.shelf, x0 = SHELF.cx - SHELF.w / 2, x1 = SHELF.cx + SHELF.w / 2, zb = -D / 2;
     const mat = M.unit[st.tvUnit.color];   // 선반 판은 거실장 색에 맞춘다
@@ -994,19 +1130,29 @@ if (!renderer) {
     if (s.kind === 'wall') {
       for (let i = 0; i < s.tiers; i++) { const p = tier('w' + i, 0.9 + i * 0.35); p.add(ext(x0, x1, 0, 0.035, zb, zb + 0.22, mat)); props(p, x0, x1, 0.035, zb + 0.11, i + 1); }
     } else {
-      const rails = tier('rails', 0);
-      for (const x of [SHELF.cx - 0.28, SHELF.cx + 0.28]) rails.add(ext(x - 0.013, x + 0.013, 0.2, 2.05, zb, zb + 0.016, M.steel));
+      // 시스템 선반: 칸마다 세로 레일, 단마다 판, 맨 아래 칸에 서랍이나 도어. 칸은 key가 있어 늘리면 내려앉는다
+      const bm = shelfMat(s.mat), gap = 1.58 / (s.tiers - 1), xs = [...Array(s.cols + 1)].map((_, i) => x0 + 0.02 + i * (SHELF.w - 0.04) / s.cols);
+      for (let c = 0; c <= s.cols; c++) { const r = tier('rail' + c, 0); r.add(ext(xs[c] - 0.013, xs[c] + 0.013, 0.2, 2.05, zb, zb + 0.016, M.steel)); }
       for (let i = 0; i < s.tiers; i++) {
-        const p = tier('s' + i, 0.32 + i * (1.58 / (s.tiers - 1)));
-        p.add(ext(x0, x1, 0, 0.025, zb + 0.016, zb + 0.34, mat));
-        for (const x of [SHELF.cx - 0.28, SHELF.cx + 0.28]) p.add(ext(x - 0.01, x + 0.01, -0.045, 0, zb + 0.016, zb + 0.3, M.steel));
-        if (i < s.tiers - 1 || s.tiers < 5) props(p, x0, x1, 0.025, zb + 0.17, i + 4);
+        const p = tier('s' + i, 0.32 + i * gap);
+        p.add(ext(x0, x1, 0, 0.025, zb + 0.016, zb + 0.34, bm));
+        for (const x of xs) p.add(ext(x - 0.01, x + 0.01, -0.045, 0, zb + 0.016, zb + 0.3, M.steel));
+        if ((i > 0 || s.acc === 'e') && (i < s.tiers - 1 || s.tiers < 5)) for (let c = 0; c < s.cols; c++) props(p, xs[c] + 0.02, xs[c + 1] - 0.02, 0.025, zb + 0.17, i + 4 + c * 3);
+      }
+      if (s.acc !== 'e') {
+        const a = tier('acc' + s.acc, 0.345), hh = gap - 0.035, fz = zb + 0.335;
+        for (let c = 0; c < s.cols; c++) {
+          const l = xs[c] + 0.02, r = xs[c + 1] - 0.02;
+          a.add(ext(l, r, 0, hh, zb + 0.03, fz - 0.018, bm));
+          if (s.acc === 'd') for (let k = 0; k < 2; k++) { const y0 = k * hh / 2 + 0.006, y1 = (k + 1) * hh / 2 - 0.006; a.add(ext(l + 0.004, r - 0.004, y0, y1, fz - 0.018, fz, bm)); a.add(ext((l + r) / 2 - 0.08, (l + r) / 2 + 0.08, (y0 + y1) / 2 - 0.008, (y0 + y1) / 2 + 0.008, fz, fz + 0.012, M.steel)); }
+          else { const m = (l + r) / 2; for (const [p0, p1, hx] of [[l + 0.004, m - 0.003, m - 0.04], [m + 0.003, r - 0.004, m + 0.04]]) { a.add(ext(p0, p1, 0.006, hh - 0.006, fz - 0.018, fz, bm)); a.add(ext(hx - 0.006, hx + 0.006, hh / 2 - 0.06, hh / 2 + 0.06, fz, fz + 0.012, M.steel)); } }
+        }
       }
     }
     return g;
   }
   function buildCloset(st) {
-    const g = new THREE.Group(), s = st.closet, w = s.width / 1000, z1 = D / 2 - 0.02, z0 = z1 - w, xb = W / 2, xf = xb - (s.door === 'sliding' ? 0.56 : 0.58);
+    const g = new THREE.Group(), s = st.closet, w = s.width / 1000, z1 = closetZ1(st), z0 = z1 - w, xb = W / 2, xf = xb - (s.door === 'sliding' ? 0.56 : 0.58);
     g.add(ext(xf + 0.03, xb, 0, 0.07, z0, z1, M.closet));
     g.add(ext(xf, xb, 0.07, H, z0, z1, M.closet));
     if (s.door === 'hinged') {
@@ -1074,7 +1220,7 @@ if (!renderer) {
   }
   function buildSofa(st) {
     const g = new THREE.Group(), s = st.sofa, mods = s.mods, { body, cush } = sofaMat(st);
-    const w = sofaW(s), x0 = sofaX(st) - w / 2, zb = SOFA.back, leg = 0.11, legMat = M.unit.oak;
+    const w = sofaW(s), x0 = sofaX(st) - w / 2, zb = sofaBack(st), leg = 0.11, legMat = M.unit.oak;
     const piece = (key, x) => { const p = new THREE.Group(); p.position.x = x; p.userData.key = key; g.add(p); return p; };
     const legAt = (p, lx, lz) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.014, leg, 12), legMat); m.position.set(lx, leg / 2, lz); m.castShadow = true; p.add(m); };
     let x = x0 + SOFA.arm;
@@ -1095,7 +1241,7 @@ if (!renderer) {
     }
     return g;
   }
-  const BUILD = { tvUnit: buildTvUnit, tv: buildTv, sofa: buildSofa, shelf: buildShelf, closet: buildCloset, door: buildDoor };
+  const BUILD = { tvUnit: buildTvUnit, tv: buildTv, sofa: buildSofa, shelf: buildShelf, closet: buildCloset, door: buildDoor, finish: () => new THREE.Group() };
   const AXIS = new Set(['tvUnit', 'tv']);     // TV 축을 따라 좌우로 옮겨지는 품목
   const slots = {};
   for (const it of ITEMS) { slots[it.id] = new THREE.Group(); scene.add(slots[it.id]); }
@@ -1123,6 +1269,7 @@ if (!renderer) {
     const slot = slots[id], prev = new Map();
     for (const c of slot.children) c.traverse(o => { if (o.userData.key) prev.set(o.userData.key, o.position.clone()); });
     for (const c of [...slot.children]) { dispose(c); slot.remove(c); }
+    if (id === 'finish') { applyFinish(state.finish); shadowDirty = true; invalidate(); }
     if (!state[id].on) return;
     const g = BUILD[id](state); slot.add(g);
     const parts = g.children.filter(o => o.userData.key);
@@ -1141,11 +1288,12 @@ if (!renderer) {
       return;
     }
     if (settle) {
-      const b = bboxOf(id, state, 0), pv = new THREE.Vector3((b.min[0] + b.max[0]) / 2, b.min[1], (b.min[2] + b.max[2]) / 2);
+      const b = bboxOf(id, state, 0); if (!b) return;   // 바닥과 벽처럼 자리가 없는 품목
+      const pv = new THREE.Vector3((b.min[0] + b.max[0]) / 2, b.min[1], (b.min[2] + b.max[2]) / 2);
       tween(300, t => { const e = easeOut(t), s = 0.95 + 0.05 * e; g.scale.setScalar(s); g.position.copy(pv).multiplyScalar(1 - s); g.position.y += (1 - e) * 0.06; shadowDirty = true; }, 'settle-' + id);
     }
   }
-  function placeAxis(cx) { cxNow = cx; slots.tvUnit.position.x = cx; slots.tv.position.x = cx; living.position.x = cx; shadowDirty = true; }
+  function placeAxis(cx) { cxNow = cx; slots.tvUnit.position.x = cx; slots.tv.position.x = cx; living.position.x = cx; placeTable(); shadowDirty = true; }
 
   /* ----- 카메라 ----- */
   const persp = new THREE.PerspectiveCamera(32, 1, 0.5, 80);
@@ -1161,6 +1309,7 @@ if (!renderer) {
     shelf: [-10, 67, 0.9, [0.2, 0.1, -0.3]],
     closet: [-56, 62, 0.95, [0.2, 0, 0.2]],
     door: [-47, 65, 0.92, [0.3, 0, -0.2]],
+    finish: [-30, 60, 1, [0, 0, 0]],
   };
   let fit = 12, zoomK = 1, planZoom = 1;
   // 한 손가락 회전, 두 손가락 확대. 휠은 Ctrl을 누를 때만 확대해 페이지 스크롤을 막지 않는다
@@ -1192,11 +1341,19 @@ if (!renderer) {
       setCam(L(from[0], v[0]), L(from[1], v[1]), L(from[2], v[2]), [0, 1, 2].map(i => L(from[3][i], v[3][i])));
     }, 'cam');
   }
-  controls.addEventListener('start', () => { for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].key === 'cam') tweens.splice(i, 1); });
+  controls.addEventListener('start', () => { for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].key === 'cam') tweens.splice(i, 1); quality(false); });
+  controls.addEventListener('end', () => quality(true));
   controls.addEventListener('change', () => { zoomK = persp.position.distanceTo(controls.target) / fit; invalidate(); });
 
   // 처음 거실(4,500 x 4,200)에 견준 크기. 카메라 거리와 평면도 범위, 그림자 범위를 같이 늘리고 줄인다
   const roomK = () => Math.max(0.9, Math.hypot(W + 1.4, D) / Math.hypot(5.9, 4.2));
+  // 만지는 동안(돌리기, 끌기)은 해상도를 낮춰 가볍게 그리고, 손을 떼면 0.25초 뒤 다시 선명하게
+  let qT = 0, qLow = false;
+  function quality(high) {
+    clearTimeout(qT);
+    const apply = low => { if (low === qLow) return; qLow = low; renderer.setPixelRatio(low ? Math.min(DPR, MOBILE ? 1.25 : 1) : DPR); renderer.setSize(stage.clientWidth, stage.clientHeight, false); invalidate(); };
+    if (high) qT = setTimeout(() => apply(false), 250); else apply(true);
+  }
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
@@ -1289,14 +1446,14 @@ if (!renderer) {
     W: { el: $('hdl-W'), show: () => true, at: () => V(-W / 2 - T - 0.32, 0.05, -D / 4), ax: V(-1, 0, 0), drag: h => setRoomSize('W', 2 * (-h.x - T - 0.32)), key: d => resizeRoom('W', d) },
     D: { el: $('hdl-D'), show: () => true, at: () => V(W / 4, 0.05, D / 2 + T + 0.32), ax: V(0, 0, 1), drag: h => setRoomSize('D', 2 * (h.z - T - 0.32)), key: d => resizeRoom('D', d) },
     tvUnit: { el: $('hdl-tvUnit'), show: () => ui.tab === 'tvUnit' && state.tvUnit.on, at: () => V(cxNow + state.tvUnit.width / 2000 + 0.16, UNIT.h, -D / 2 + UNIT.d / 2), ax: V(1, 0, 0),
-      drag: h => { const w = Math.max(1200, Math.round((2 * (h.x - cxNow) - 0.32) / 0.3) * 300); if (w !== state.tvUnit.width) change('tvUnit', { width: w, on: true }); },
-      key: d => change('tvUnit', { width: Math.max(1200, state.tvUnit.width + d * 300), on: true }) },
-    sofa: { el: $('hdl-sofa'), show: () => ui.tab === 'sofa' && state.sofa.on, at: () => V(sofaX(state) + sofaWNow() / 2 + 0.18, 0.45, SOFA.back - 0.45), ax: V(1, 0, 0),
+      drag: h => { const w = Math.min(TVU_MAX, Math.max(1200, Math.round((2 * (h.x - cxNow) - 0.32) / 0.3) * 300)); if (w !== state.tvUnit.width) change('tvUnit', { width: w, on: true }); },
+      key: d => change('tvUnit', { width: Math.min(TVU_MAX, Math.max(1200, state.tvUnit.width + d * 300)), on: true }) },
+    sofa: { el: $('hdl-sofa'), show: () => ui.tab === 'sofa' && state.sofa.on, at: () => V(sofaX(state) + sofaWNow() / 2 + 0.18, 0.45, sofaBack(state) - 0.45), ax: V(1, 0, 0),
       drag: h => sofaCount(Math.round((2 * (h.x - sofaX(state)) - 0.36 - SOFA.arm * 2) / SOFA_MOD.S.w)),
       key: d => sofaCount(state.sofa.mods.length + d) },
   };
   const hp = new THREE.Vector3(), hq = new THREE.Vector3();
-  let hdlDrag = false;
+  let hdlDrag = false, itemDrag = false;
   function placeHandles() {
     const w = stage.clientWidth, h = stage.clientHeight;
     for (const k of Object.keys(HDL)) {
@@ -1316,7 +1473,7 @@ if (!renderer) {
     const H0 = HDL[k], el = H0.el;
     el.addEventListener('pointerdown', e => {
       e.preventDefault(); e.stopPropagation(); el.setPointerCapture(e.pointerId); el.classList.add('drag');
-      controls.enabled = false; hdlDrag = true; $('hint').classList.add('off');
+      controls.enabled = false; hdlDrag = true; quality(false); $('hint').classList.add('off');
     });
     el.addEventListener('pointermove', e => {
       if (!el.classList.contains('drag')) return;
@@ -1328,13 +1485,111 @@ if (!renderer) {
       if (!ray.ray.intersectPlane(floorPl, hit)) return;
       H0.drag(hit);
     });
-    const end = e => { if (!el.classList.contains('drag')) return; el.classList.remove('drag'); hdlDrag = false; resize(); controls.enabled = ui.view === '3d'; try { el.releasePointerCapture(e.pointerId); } catch (_) {} };
+    const end = e => { if (!el.classList.contains('drag')) return; el.classList.remove('drag'); hdlDrag = false; quality(true); resize(); controls.enabled = ui.view === '3d'; try { el.releasePointerCapture(e.pointerId); } catch (_) {} };
     el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
     el.addEventListener('keydown', e => {   // 키보드: 화살표로 한 칸씩
       const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
       if (d) { H0.key(d); e.preventDefault(); }
     });
   }
+
+  // 테이블 끌기: 무대(stage)에서 캔버스보다 먼저 받아, 테이블을 잡으면 방을 돌리지 않고 테이블만 바닥 위로 옮긴다
+  // 11-26 사용자 "가구끼리 겹치지 않게": 바닥에 놓이는 가구의 자리(위에서 본 네모)끼리 겹치면 그 방향으로는 움직이지 않는다
+  // (벽걸이 TV와 벽 선반은 바닥을 차지하지 않고, 러그는 밑에 깔리는 것이라 뺀다)
+  const FLOOR_ITEMS = ['tvUnit', 'sofa', 'closet', 'shelf', 'table'];
+  function foot(k) {
+    if (k === 'table') { const q = tableG.position; return [q.x - 0.4, q.x + 0.4, q.z - 0.38, q.z + 0.42]; }
+    if (!state[k].on || (k === 'shelf' && state.shelf.kind !== 'system')) return null;
+    const b = bboxOf(k, state); return b && [b.min[0], b.max[0], b.min[2], b.max[2]];
+  }
+  function hitsOther(k) {
+    const a = foot(k); if (!a) return false;
+    return FLOOR_ITEMS.some(o => { if (o === k) return false; const b = foot(o); return !!b && a[0] < b[1] - 0.005 && a[1] > b[0] + 0.005 && a[2] < b[3] - 0.005 && a[3] > b[2] + 0.005; });
+  }
+  // 새 자리를 시험해 겹치면 x만, z만 바꿔 본다(벽 타듯 미끄러지게). 다 겹치면 제자리. 처음부터 겹쳐 있던 가구는 빠져나올 수 있게 막지 않는다
+  // 손가락이 빨리 움직여도 가구를 건너뛰지 않게 4 cm씩 나눠 옮기며 막히는 곳에서 멈춘다
+  function tryMove(k, get, set, nx, nz) {
+    let [cx0, cz0] = get();
+    if (hitsOther(k)) { set(nx, nz); return true; }
+    const n = Math.max(1, Math.ceil(Math.hypot(nx - cx0, nz - cz0) / 0.04));
+    let moved = false;
+    for (let i = 1; i <= n; i++) {
+      const tx = cx0 + (nx - cx0) / (n - i + 1), tz = cz0 + (nz - cz0) / (n - i + 1);
+      let ok = false;
+      for (const [x, z] of [[tx, tz], [tx, cz0], [cx0, tz]]) { set(x, z); if (!hitsOther(k)) { ok = true; break; } }
+      if (!ok) { set(cx0, cz0); break; }
+      const [ax, az] = get();
+      if (Math.abs(ax - cx0) < 1e-4 && Math.abs(az - cz0) < 1e-4) break;   // 더 못 가면 여기서 멈춘다(남은 거리를 한 번에 건너뛰지 않게)
+      cx0 = ax; cz0 = az; moved = true;
+    }
+    return moved;
+  }
+  const tablePl = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.345), grab = new THREE.Vector3();
+  let tableDrag = null;   // { id, m, dx, dz } 또는 { id, item, dx, dz }
+  // 옮길 수 있는 품목: 소파는 바닥 어디로나, TV와 거실장은 TV 벽을 따라, 붙박이장은 복도 벽을 따라
+  const ITEM_MOVE = {
+    sofa: { y: 0.3, get: () => [sofaX(state), sofaBack(state)], set: (x, z) => { place.sx = x; place.sz = z; } },
+    tvUnit: { y: 0.3, get: () => [cxOf(state), 0], set: x => { place.axis = x; } },
+    tv: { y: 1.1, get: () => [cxOf(state), 0], set: x => { place.axis = x; } },
+    closet: { y: 1.0, get: () => [0, closetZ1(state)], set: (x, z) => { place.cz = z; } },
+  };
+  const pick = e => { const r = stage.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, cam); };
+  stage.addEventListener('pointerdown', e => {
+    if (e.target !== canvas) return;
+    pick(e);
+    const m = MOVE.find(x => ray.intersectObjects(x.g.children, false).length);   // 테이블이 러그 위라 먼저 본다
+    if (!m) {
+      // 품목: 맞은 것 가운데 가장 가까운 품목(감춘 벽과 함께 숨긴 붙박이장은 빼고)
+      const hits = ray.intersectObjects(Object.keys(ITEM_MOVE).filter(k => slots[k].visible && state[k].on).map(k => slots[k]), true);
+      if (!hits.length) return;
+      let o = hits[0].object; while (o && !Object.values(slots).includes(o)) o = o.parent;
+      const id = o && Object.keys(slots).find(k => slots[k] === o), it = ITEM_MOVE[id];
+      if (!it) return;
+      tablePl.constant = -it.y;
+      if (!ray.ray.intersectPlane(tablePl, grab)) return;
+      e.stopPropagation(); e.preventDefault();
+      const [gx, gz] = it.get();
+      tableDrag = { id: e.pointerId, item: id, dx: gx - grab.x, dz: gz - grab.z, x0: e.clientX, y0: e.clientY, moved: false };
+      itemDrag = true; quality(false); stage.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; controls.enabled = false; $('hint').classList.add('off');
+      return;
+    }
+    tablePl.constant = -m.y;
+    if (!ray.ray.intersectPlane(tablePl, grab)) return;
+    e.stopPropagation(); e.preventDefault();
+    tableDrag = { id: e.pointerId, m, dx: m.g.position.x - grab.x, dz: m.g.position.z - grab.z }; quality(false);
+    stage.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; controls.enabled = false; $('hint').classList.add('off');
+  }, true);
+  stage.addEventListener('pointermove', e => {
+    if (!tableDrag || e.pointerId !== tableDrag.id) return;
+    pick(e); if (!ray.ray.intersectPlane(tablePl, grab)) return;
+    if (tableDrag.item) {
+      if (!tableDrag.moved && Math.hypot(e.clientX - tableDrag.x0, e.clientY - tableDrag.y0) < 6) return;   // 살짝 누른 것은 고르기로
+      // 11-26 사용자 "움직이게 하니까 자연스럽지 못하고 끊긴다": 끄는 동안은 가구를 다시 만들지 않고 이미 만든 묶음을 밀기만 한다. 놓을 때 한 번 다시 만든다
+      if (!tableDrag.moved) { tableDrag.moved = true; tableDrag.base = { sx: sofaX(state), sz: sofaBack(state), cz: closetZ1(state) }; }
+      const id = tableDrag.item, it = ITEM_MOVE[id], bs = tableDrag.base;
+      tryMove(id === 'tv' ? 'tvUnit' : id, it.get, (x, z) => it.set(x, z), grab.x + tableDrag.dx, grab.z + tableDrag.dz);
+      if (id === 'tv' || id === 'tvUnit') placeAxis(cxOf(state));
+      slots.sofa.position.set(sofaX(state) - bs.sx, 0, sofaBack(state) - bs.sz);   // 소파는 TV 축을 따라가기도 해서 늘 맞춘다
+      slots.closet.position.z = closetZ1(state) - bs.cz;
+      shadowDirty = true; rebuildDimsSoon(); invalidate();
+      return;
+    }
+    const m = tableDrag.m; m.moved = true;
+    if (m.g === tableG) tryMove('table', () => [tableG.position.x, tableG.position.z], (x, z) => { tableG.position.x = x; tableG.position.z = z; placeTable(); }, grab.x + tableDrag.dx, grab.z + tableDrag.dz);
+    else { m.g.position.x = grab.x + tableDrag.dx; m.g.position.z = grab.z + tableDrag.dz; placeTable(); }   // 러그는 가구 밑에 깔려 겹쳐도 된다
+    invalidate();
+  });
+  const tableEnd = e => { if (!tableDrag) return; const t = tableDrag; tableDrag = null; saveLink();
+    if (t.item && !t.moved && t.item !== ui.tab) selectTab(t.item);   // 끌지 않고 누르기만 했으면 그 품목을 고른다
+    if (t.item && t.moved) {   // 놓은 자리에서 한 번만 다시 만든다(밀어 둔 묶음 자리는 되돌리고, 튕김 연출 없이)
+      slots.sofa.position.set(0, 0, 0); slots.closet.position.set(0, 0, 0);
+      fitWhy = fitAll(state);
+      for (const k of ['tvUnit', 'sofa', 'closet']) rebuild(k, false);
+      if (state.shelf.on) rebuild('shelf', false);
+      renderPanel(); rebuildDims(); shadowDirty = true; invalidate();
+    }
+    itemDrag = false; quality(true); canvas.style.cursor = ''; controls.enabled = ui.view === '3d'; try { stage.releasePointerCapture(e.pointerId); } catch (_) {} };
+  stage.addEventListener('pointerup', tableEnd); stage.addEventListener('pointercancel', tableEnd);
 
   // 가구를 누르면 그 품목을 고른다(끌어서 돌린 것은 누른 것으로 보지 않는다)
   let tapAt = null;
@@ -1353,7 +1608,7 @@ if (!renderer) {
   });
 
   /* ----- 그리기: 바뀔 때만 ----- */
-  let raf = 0, shadowDirty = true, lastT = 0, acc = 0, cnt = 0;
+  let raf = 0, shadowDirty = true, lastT = 0, acc = 0, cnt = 0, lastShadow = 0;
   window.__fps = 0;
   function invalidate() { if (!raf) raf = requestAnimationFrame(frame); }
   function frame(now) {
@@ -1361,7 +1616,8 @@ if (!renderer) {
     let again = runTweens(now);
     if (ui.view === '3d') { if (controls.update()) again = true; wallsFor(persp.position); }
     else { for (const w of Object.values(WALL)) showWall(w, true); slots.closet.visible = true; }
-    if (shadowDirty) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; }
+    if (shadowDirty && (!itemDrag && !tableDrag || now - lastShadow > 100)) { renderer.shadowMap.needsUpdate = true; shadowDirty = false; lastShadow = now; }
+    else if (shadowDirty) again = true;   // 끄는 동안 건너뛴 그림자는 다음 장면에서
     renderer.render(scene, cam);
     placeLabels(); placeHandles();
     const dt = now - lastT; lastT = now;
@@ -1372,10 +1628,10 @@ if (!renderer) {
   /* ----- 화면에서 부르는 것 ----- */
   scene3d = {
     apply(id) {
-      rebuild(id, id === 'sofa' || !hdlDrag);
+      rebuild(id, !itemDrag && (id === 'sofa' || !hdlDrag));
       if (id === 'tvUnit') { rebuild('tv', false); if (state.shelf.on) rebuild('shelf', false); }   // 스탠드 TV는 거실장 위에, 선반 판은 거실장 색에 맞춘다
       const cx = cxOf(state);
-      if (cx !== cxNow) { const from = cxNow; tween(360, t => { placeAxis(from + (cx - from) * easeOut(t)); rebuildDimsSoon(); }, 'axis'); if (id !== 'sofa') rebuild('sofa', false); }   // 선반이 들고 나면 소파도 가운데를 다시 잡는다
+      if (cx !== cxNow) { if (itemDrag) placeAxis(cx); else { const from = cxNow; tween(360, t => { placeAxis(from + (cx - from) * easeOut(t)); rebuildDimsSoon(); }, 'axis'); } if (id !== 'sofa') rebuild('sofa', false); }   // 끄는 중에는 손가락을 바로 따라가게   // 선반이 들고 나면 소파도 가운데를 다시 잡는다
       shadowDirty = true; rebuildDims();
     },
     select(id) { rebuildDims(); if (ui.view === '3d') flyTo(VIEW[id]); },
@@ -1384,6 +1640,7 @@ if (!renderer) {
       for (const it of ITEMS) rebuild(it.id, false);
       placeAxis(cxOf(state));
       living.position.z = Math.min(0, SOFA.back - 1.52);   // 깊이가 얕으면 러그와 테이블을 TV 쪽으로 당겨 소파와 겹치지 않게
+      placeTable();
       if (!hdlDrag) resize();   // 손잡이를 끄는 동안 카메라가 물러나면 손가락 아래 바닥 자리가 바뀌어 크기가 끝까지 튄다. 놓을 때 맞춘다
       shadowDirty = true; rebuildDims();
     },
