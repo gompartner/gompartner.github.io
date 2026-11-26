@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
+import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 import { appPlans, kioskPlans, landingPlans, manwon, plans, type Plan } from "@/data/classic/pricing";
 import { threePlans } from "@/data/classic/three";
 
@@ -13,15 +14,17 @@ import { threePlans } from "@/data/classic/three";
 // (1)은 여전히 따로 노는 긴 문서, (3)은 메인이 길어져서 (2)로 했다. 메인과 같은 바탕, 같은 글자, 같은 색 판.
 // 금액과 구성은 비용 데이터(data/classic/pricing, three)를 그대로 읽는다. 자세한 조건은 각 상세 페이지로 잇는다.
 
-type Shot = { img: string; name: string };
+// 11-26 사용자 "첫 번째는 우리 것이 나와야, 모바일에서는 우리가 먼저 보이게": 종류마다 첫 그림은 곰파트너가 직접 만들어 운영하는 것(ours)을 둔다.
+// 홈페이지는 이 사이트, 랜딩페이지는 사이트 지킴이, 업무 시스템은 거래장부. 3D 웹과 앱은 가장 최근에 만든 화면부터. href가 있으면 그 서비스를 새 창으로 연다.
+type Shot = { img: string; name: string; ours?: boolean; href?: string };
 type Kind = { id: string; name: string; en: string; line: string; who: string[]; plans: Plan[]; href: string; c: string; shots: Shot[] };
 const kinds: Kind[] = [
-  { id: "homepage", name: "홈페이지", en: "Website", line: "병원, 매장, 전문직, 기업, 학원의 얼굴이 되는 사이트", who: ["처음 홈페이지를 만드는 사업장", "오래된 사이트를 새로 바꾸려는 곳", "문의와 예약을 홈페이지로 받고 싶은 곳"], plans, href: "/homepage", c: "#7aa7ff", shots: [{ img: "/images/demos/dental-homepage.jpg", name: "치과" }, { img: "/images/demos/bakery-cafe.jpg", name: "베이커리 카페" }, { img: "/images/demos/tax-office.jpg", name: "세무사무소" }] },
-  { id: "landing", name: "랜딩페이지", en: "Landing", line: "광고로 들어온 손님을 신청으로 잇는 한 장", who: ["광고를 돌리는데 신청이 적은 곳", "행사, 모집, 분양처럼 기간이 정해진 일", "신청 내역을 한곳에 모으고 싶은 곳"], plans: landingPlans, href: "/landing-page", c: "#ffd84d", shots: [{ img: "/images/demos/landing-move-clean.jpg", name: "입주 청소 상담 신청" }, { img: "/images/demos/landing-water-rental.jpg", name: "정수기 렌탈 상담" }, { img: "/images/demos/landing-coding-camp.jpg", name: "코딩 캠프 모집" }] },
-  { id: "program", name: "업무 시스템", en: "System", line: "엑셀로 하던 정산, 재고, 접수, 견적을 웹 화면 하나로", who: ["엑셀 파일이 사람마다 다른 곳", "같은 내용을 여러 번 옮겨 적는 곳", "담당자가 바뀌면 일이 멈추는 곳"], plans: [], href: "/program", c: "#ffffff", shots: [{ img: "/images/products/jangbu.jpg", name: "거래명세서와 미수금 관리(운영 중인 거래장부)" }] },
+  { id: "homepage", name: "홈페이지", en: "Website", line: "병원, 매장, 전문직, 기업, 학원의 얼굴이 되는 사이트", who: ["처음 홈페이지를 만드는 사업장", "오래된 사이트를 새로 바꾸려는 곳", "문의와 예약을 홈페이지로 받고 싶은 곳"], plans, href: "/homepage", c: "#7aa7ff", shots: [{ img: "/images/history/08-main.jpg", name: "곰파트너 홈페이지", ours: true }, { img: "/images/demos/dental-homepage.jpg", name: "치과" }, { img: "/images/demos/bakery-cafe.jpg", name: "베이커리 카페" }] },
+  { id: "landing", name: "랜딩페이지", en: "Landing", line: "광고로 들어온 손님을 신청으로 잇는 한 장", who: ["광고를 돌리는데 신청이 적은 곳", "행사, 모집, 분양처럼 기간이 정해진 일", "신청 내역을 한곳에 모으고 싶은 곳"], plans: landingPlans, href: "/landing-page", c: "#ffd84d", shots: [{ img: "/images/products/jikimi.jpg", name: "사이트 지킴이", ours: true, href: "https://jikimi.gompartner.co.kr/" }, { img: "/images/demos/landing-move-clean.jpg", name: "입주 청소 상담 신청" }, { img: "/images/demos/landing-water-rental.jpg", name: "정수기 렌탈 상담" }] },
+  { id: "program", name: "업무 시스템", en: "System", line: "엑셀로 하던 정산, 재고, 접수, 견적을 웹 화면 하나로", who: ["엑셀 파일이 사람마다 다른 곳", "같은 내용을 여러 번 옮겨 적는 곳", "담당자가 바뀌면 일이 멈추는 곳"], plans: [], href: "/program", c: "#ffffff", shots: [{ img: "/images/products/jangbu.jpg", name: "거래장부(거래명세서와 미수금 관리)", ours: true, href: "https://jangbu.gompartner.co.kr/" }] },
   { id: "app", name: "앱", en: "App", line: "예약, 주문, 적립, 현장 보고를 손안에서", who: ["단골이 자주 쓰는 예약, 주문이 있는 곳", "현장에서 바로 기록해야 하는 일", "스토어에 내 앱을 올리고 싶은 곳"], plans: appPlans, href: "/app", c: "#7aa7ff", shots: [{ img: "/images/demos/app-pilates.jpg", name: "필라테스 예약과 회원권" }, { img: "/images/demos/app-academy.jpg", name: "학원 출결과 알림" }] },
   { id: "kiosk", name: "키오스크", en: "Kiosk", line: "접수, 출결, 안내를 터치 화면으로", who: ["접수 창구가 붐비는 병원, 학원", "안내 인력이 부족한 시설", "출결과 방문 기록을 남겨야 하는 곳"], plans: kioskPlans, href: "/kiosk", c: "#ffd84d", shots: [{ img: "/images/demos/kiosk-clinic.jpg", name: "병원 접수" }, { img: "/images/demos/kiosk-academy.jpg", name: "학원 출결" }] },
-  { id: "3d", name: "3D 웹", en: "3D Web", line: "제품과 공간을 고객이 직접 돌려 보고 고르게", who: ["옵션이 많아 설명이 긴 제품", "직접 와 봐야 아는 공간", "견적 문의를 미리 걸러 받고 싶은 곳"], plans: threePlans, href: "/3d", c: "#ffffff", shots: [{ img: "/3d/assets/og/configurator.jpg", name: "옵션을 고르는 3D 견적" }, { img: "/3d/assets/og/space.jpg", name: "공간 둘러보기" }, { img: "/3d/assets/og/sofa.jpg", name: "모듈 소파 구성" }] },
+  { id: "3d", name: "3D 웹", en: "3D Web", line: "제품과 공간을 고객이 직접 돌려 보고 고르게", who: ["옵션이 많아 설명이 긴 제품", "직접 와 봐야 아는 공간", "견적 문의를 미리 걸러 받고 싶은 곳"], plans: threePlans, href: "/3d", c: "#ffffff", shots: [{ img: "/3d/assets/thumb/room.jpg", name: "34평 거실 상담 화면" }, { img: "/3d/assets/og/configurator.jpg", name: "시스템 선반 3D 견적" }, { img: "/3d/assets/og/sofa.jpg", name: "모듈 소파 구성" }] },
 ];
 
 
@@ -86,7 +89,17 @@ export function MakeBoard() {
                     <span className="relative block aspect-[16/10]">
                       <Image src={sh.img} alt={`${sh.name} 화면`} fill sizes="(min-width: 1024px) 300px, 50vw" className="object-cover object-top" />
                     </span>
-                    <span className="block px-4 py-3 text-[14px] font-bold text-[#c9ced6] md:text-[15px]">{sh.name}</span>
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-[14px] font-bold text-[#c9ced6] md:text-[15px]">
+                      {sh.ours ? <span className="rounded-full border border-white/40 px-2 py-0.5 text-[12px] font-[800] text-white">운영 중</span> : null}
+                      {sh.href ? (
+                        <a href={sh.href} {...NEW_TAB} className="inline-flex items-center gap-1 text-white underline underline-offset-4">
+                          {sh.name}
+                          <NewTabMark size={13} />
+                        </a>
+                      ) : (
+                        sh.name
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>
