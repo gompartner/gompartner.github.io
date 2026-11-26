@@ -191,9 +191,10 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
           );
   };
 
-  // 제목 뒷부분은 줄바꿈 없는 공백으로 묶었다. 휴대폰에서 "찾는 것을 / 첫 화면에 둡니다" 두 줄로 나뉜다
+  // 11-26 제목 "찾는 것을 첫 화면에 둡니다"는 무엇을 두는지 알 수 없어(사용자 "문구 점검") 페이지 이름 그대로 "업종별 화면 카탈로그". 공유 카드, 메타 제목과 같다
+  // 제목 뒷부분은 줄바꿈 없는 공백으로 묶었다. 휴대폰에서 "업종별 / 화면 카탈로그" 두 줄로 나뉜다
   return (
-    <BoardShell no="04" en="CATALOG" ice="찾는 것을 " title={"첫\u00a0화면에\u00a0둡니다"} lead="업종마다 방문자가 무엇을 찾는지 조사하고, 그 답이 먼저 보이게 만든 화면입니다.">
+    <BoardShell no="04" en="CATALOG" ice="업종별 " title={"화면\u00a0카탈로그"} lead="업종마다 방문자가 찾는 정보를 조사해 첫 화면에 먼저 보이게 만들었습니다.">
       <style>{css}</style>
 
       <div className="-mx-4 mt-10 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:mt-14 md:flex-wrap md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden" role="group" aria-label="종류">
@@ -213,11 +214,11 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
       <form role="search" onSubmit={find} className="mt-4 flex h-12 max-w-[460px] items-center gap-2.5 overflow-hidden rounded-full border border-white/30 bg-[#121722] pl-4 pr-1.5 text-white focus-within:border-white/70 md:mt-5">
         <Search size={18} aria-hidden className="shrink-0 text-[#aab2bf]" />
         <label htmlFor="ct-q" className="sr-only">
-          카탈로그 화면 찾기
+          카탈로그 검색
         </label>
         <input id="ct-q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="업종이나 화면 이름 (예: 치과, 랜딩)" autoComplete="off" enterKeyHint="search" className="on-dark h-full min-w-0 flex-1 bg-transparent text-[16px] text-white outline-none placeholder:text-[#8a94a6] [&::-webkit-search-cancel-button]:hidden" />
         <button type="submit" className="gp-ghost h-9 shrink-0 rounded-full px-4 text-[14px] font-bold">
-          찾기
+          검색
         </button>
       </form>
 
@@ -281,7 +282,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
 
       <CatalogDialog item={open} start={openView} onClose={() => setOpen(null)} />
 
-      <BoardClose text="비슷한 화면이 필요하면 업종과 하려는 일을 한 줄만 남겨 주세요." />
+      <BoardClose text="비슷한 화면이 필요하시면 업종과 요청 사항을 남겨 주세요." />
     </BoardShell>
   );
 }
