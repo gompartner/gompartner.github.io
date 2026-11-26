@@ -35,17 +35,14 @@ html.gp-dark .cl .bg-\[\#e8f5e9\]:not(.keep-light *:not(.use-dark):not(.use-dark
 html.gp-dark .cl .bg-\[\#e8f5eb\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #1a261d; }
 html.gp-dark .cl .bg-\[\#e9edf3\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .bg-\[\#eee\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #181e2c; }
-html.gp-dark .cl .bg-\[\#e9f6ef\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #1a251f; }
 html.gp-dark .cl .bg-\[\#eef0f3\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .bg-\[\#eef1f3\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #171d2b; }
 html.gp-dark .cl .bg-\[\#eef1f5\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .hover\:bg-\[\#eef1f5\]:hover:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #171d2a; }
 html.gp-dark .cl .bg-\[\#eef2f7\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .bg-\[\#f1f3f6\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #161c29; }
-html.gp-dark .cl .bg-\[\#eef3ff\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #0f1728; }
 html.gp-dark .cl .bg-\[\#eef4ff\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #0f1828; }
 html.gp-dark .cl .bg-\[\#f1f4f9\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #151b28; }
-html.gp-dark .cl .bg-\[\#f3effc\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #191425; }
 html.gp-dark .cl .bg-\[\#f4f6f9\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #151a27; }
 html.gp-dark .cl .bg-\[\#f4f6fa\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .hover\:bg-\[\#f4f6fa\]:hover:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { background-color: #151a26; }
@@ -100,7 +97,6 @@ html.gp-dark .cl .border-l-white:not(.keep-light *:not(.use-dark):not(.use-dark 
 html.gp-dark .cl .border-white:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .group:hover .group-hover\:border-white:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .hover\:border-white:hover:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { border-color: #262c38; }
-html.gp-dark .cl .border-\[\#dfe3ea\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { border-color: #3a3d42; }
 html.gp-dark .cl .border-\[\#e1e5eb\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { border-color: #393c41; }
 html.gp-dark .cl .border-\[\#e2e3e3\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { border-color: #3e3f3f; }
 html.gp-dark .cl .border-\[\#e6eaf1\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { border-color: #35393f; }
@@ -127,12 +123,10 @@ html.gp-dark .cl .text-\[\#0b50d0\]:not(.keep-light *:not(.use-dark):not(.use-da
 html.gp-dark .cl .text-\[\#0c43b7\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #5a87e7; }
 html.gp-dark .cl .text-\[\#0d652d\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #36e275; }
 html.gp-dark .cl .text-\[\#1552cc\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #5183e6; }
-html.gp-dark .cl .text-\[\#17734a\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #40d995; }
 html.gp-dark .cl .text-\[\#188038\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #3edb6e; }
 html.gp-dark .cl .text-\[\#1a0dab\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #877eed; }
 html.gp-dark .cl .text-\[\#1b6b2d\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #48d167; }
 html.gp-dark .cl .text-\[\#1b7a3e\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #43d579; }
-html.gp-dark .cl .text-\[\#1d1916\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #9c8a7d; }
 html.gp-dark .cl .text-\[\#1d1d1f\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #888890; }
 html.gp-dark .cl .text-\[\#1f5fe0\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #5a89e7; }
 html.gp-dark .cl .text-\[\#202124\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #868993; }
@@ -148,10 +142,8 @@ html.gp-dark .cl .text-\[\#3c4043\]:not(.keep-light *:not(.use-dark):not(.use-da
 html.gp-dark .cl .text-\[\#404040\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #8c8c8c; }
 html.gp-dark .cl .text-\[\#4b5563\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #7c8a9c; }
 html.gp-dark .cl .text-\[\#4d5156\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #868c93; }
-html.gp-dark .cl .text-\[\#5b3fb0\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #907cd0; }
 html.gp-dark .cl .text-\[\#8a4b08\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #e28f36; }
 html.gp-dark .cl .text-\[\#8a5a00\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #e2a636; }
-html.gp-dark .cl .text-\[\#9a5300\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #e29336; }
 html.gp-dark .cl .text-\[\#a50e0e\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *),
 html.gp-dark .cl .text-\[\#cc0000\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #e75a5a; }
 html.gp-dark .cl .text-\[\#b42318\]:not(.keep-light *:not(.use-dark):not(.use-dark *)):not(.cl > footer *) { color: #e65b51; }

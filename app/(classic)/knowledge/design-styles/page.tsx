@@ -32,14 +32,14 @@ export default function TrendDesign() {
       lead="2008년 홈페이지는 광택 나는 메뉴와 반사되는 사진이 많았습니다. 2013년 iOS 7과 2014년 Material Design 전후로 화면이 평평해졌고, 지금은 크기가 다른 칸을 한 판에 섞는 배치가 흔합니다."
       chartTitle="디자인 흐름을 바꾼 날짜"
       chart={
-        <ol className="mt-4 border-l-2 border-[#e6e9ee] pl-5">
-          {timeline.map(([d, t, desc, href]) => (
+        <ol className="mt-5 border-l border-[#e6e9ee] pl-5">
+          {/* 11-26 줄마다 붙던 출처 링크는 맨 아래 참고 자료로 모았다(sources에 같은 주소가 있다) */}
+          {timeline.map(([d, t, desc]) => (
             <li key={t} className="relative pb-5 last:pb-0">
-              <span aria-hidden className="absolute -left-[27px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-[#2a78d6]" />
-              <p className="text-[13px] font-bold tabular-nums text-[#256ef4]">{d}</p>
-              <p className="text-[16px] font-[800]">{t}</p>
-              <p className="mt-0.5 text-[14.5px] leading-[1.6] text-[#3d4450]">{desc}</p>
-              <a href={href} target="_blank" rel="noopener noreferrer" className="mt-0.5 inline-block text-[12.5px] text-[#5b6370] underline underline-offset-2 hover:text-[#15171c]">출처</a>
+              <span aria-hidden className="absolute -left-[26px] top-2 h-2.5 w-2.5 rounded-full bg-[#9aa3b0]" />
+              <p className="text-[13.5px] font-bold tabular-nums text-[#5b6370]">{d}</p>
+              <p className="text-[17px] font-[800]">{t}</p>
+              <p className="mt-0.5 text-[15.5px] leading-[1.65] text-[#3d4450]">{desc}</p>
             </li>
           ))}
         </ol>

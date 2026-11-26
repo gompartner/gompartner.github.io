@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { screenTypes, shortTitle, termHref } from "@/data/classic/archive";
 import { termGroups } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
@@ -16,8 +16,7 @@ export const metadata: Metadata = pageMeta({
 export default function ArchiveScreens() {
   const total = screenTypes.reduce((a, t) => a + t.groups.flatMap((id) => termGroups.find((g) => g.id === id)?.terms ?? []).filter((x) => termImages[x.id]).length, 0);
   return (
-    <ArchiveShell section="screens" active="/knowledge/screens" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/screens", label: "화면 예시" }]} toc={screenTypes.map((t) => ({ id: t.id, label: t.title }))}>
-      <DocHead title="화면 예시" meta={[["페이지 종류", `${screenTypes.length}가지`], ["와이어프레임", `${total}장`]]} lead="만들 페이지의 종류부터 고르면, 그 페이지에 흔히 들어가는 부품을 그림으로 한 번에 볼 수 있습니다. 그림을 누르면 이름, 쓰임, 요청 문장이 있는 용어 문서로 갑니다." />
+    <ArchiveShell section="screens" active="/knowledge/screens" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/screens", label: "화면 예시" }]} toc={screenTypes.map((t) => ({ id: t.id, label: t.title }))} head={{ title: "화면 예시", meta: [["페이지 종류", `${screenTypes.length}가지`], ["와이어프레임", `${total}장`]], lead: "만들 페이지의 종류부터 고르면, 그 페이지에 흔히 들어가는 부품을 그림으로 한 번에 볼 수 있습니다. 그림을 누르면 이름, 쓰임, 요청 문장이 있는 용어 문서로 갑니다." }} related={false}>
       {screenTypes.map((t) => {
         const gs = t.groups.map((id) => termGroups.find((g) => g.id === id)!).filter(Boolean);
         return (
@@ -29,7 +28,7 @@ export default function ArchiveScreens() {
                 <p className="text-[14px] font-[800]">
                   <Link href={termHref(g)} className="hover:text-[#256ef4] hover:underline underline-offset-4">{shortTitle(g)}</Link>
                 </p>
-                <ul role="list" className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                <ul role="list" className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-3">
                   {g.terms.filter((x) => termImages[x.id]).map((x) => (
                     <li key={x.id}>
                       <Link href={`${termHref(g)}#${x.id}`} className="group block">

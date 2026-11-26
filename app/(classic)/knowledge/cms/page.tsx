@@ -34,7 +34,7 @@ export default function TrendCms() {
       introTitle="CMS란"
       intro={
         <>
-          <p className="mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]">
+          <p className="mt-4 max-w-[760px] text-[17px] leading-[1.8] text-[#2b313b]">
             CMS(Content Management System, 콘텐츠 관리 시스템)는 개발자 없이 관리자 화면에서 글, 사진, 메뉴, 상품을 올리고 고치게 해 주는 홈페이지 관리 프로그램입니다. 게시판에 글을 쓰듯 홈페이지 내용을 바꿀 수 있습니다. CMS가 없으면 문구 하나를 바꿀 때도 개발자가 코드를 고쳐야 합니다.
           </p>
           <div className="mt-4 overflow-hidden rounded-[10px] border border-[#e6e9ee]">

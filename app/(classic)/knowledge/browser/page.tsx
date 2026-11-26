@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { SourceFold } from "@/components/classic/archive/SourceFold";
-import Link from "next/link";
-import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
-import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { Wireframes2012 } from "@/components/classic/archive/Wireframes2012";
 import { TREND_CHECKED, examples2012, ieShare } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
@@ -16,7 +13,8 @@ export const metadata: Metadata = pageMeta({
   article: true,
 });
 
-const p = "mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]";
+const LEAD = "2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다.";
+const p = "mt-4 text-[17px] leading-[1.8] text-[#2b313b]";
 
 export default function TrendKoreaIe() {
   return (
@@ -24,15 +22,16 @@ export default function TrendKoreaIe() {
       section="tech"
       active="/knowledge/browser"
       crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/dev", label: "개발" }, { href: "/knowledge/browser", label: "브라우저 호환" }]}
-      toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
-      article={{ title: "브라우저 호환", description: "2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다.", modified: TREND_CHECKED }}
+      toc={[{ id: "chart", label: "PC 브라우저 중 IE 비율" }, { id: "why", label: "한국에만 있던 이유" }, { id: "wf", label: "2012년 무렵 첫 화면" }, { id: "take", label: "인수 시 확인 사항" }]}
+      head={{ title: "브라우저 호환", meta: [["최종 수정일", TREND_CHECKED]], lead: LEAD }}
+      sources={[
+        { label: "StatCounter Global Stats, Desktop Browser Market Share", href: "https://gs.statcounter.com/browser-market-share/desktop", note: `한국, 일본, 미국 연간 값(확인 ${TREND_CHECKED})` },
+        ...examples2012.map((ex) => ({ label: `인터넷 아카이브, ${ex.site} ${ex.date} 보관본`, href: ex.url, note: `실제 사례(확인 ${ex.checked})` })),
+        { label: "보안뉴스, 10일부터 공인인증서 폐지(2020-12)", href: "https://m.boannews.com/html/detail.html?idx=93269", note: "전자서명법 전부개정법 2020년 12월 10일 시행" },
+        { label: "Microsoft Learn, Internet Explorer 11 desktop app support ended for certain versions of Windows 10", href: "https://learn.microsoft.com/en-us/lifecycle/announcements/internet-explorer-11-end-of-support-windows-10", note: "2022년 6월 15일 지원 종료(LTSC, Windows Server 제외)" },
+      ]}
+      article={{ title: "브라우저 호환", description: LEAD, modified: TREND_CHECKED }}
     >
-      <DocHead
-        title="브라우저 호환"
-        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["최종 수정일", TREND_CHECKED]]}
-        lead="2009년에는 세 나라 모두 인터넷 익스플로러(IE)가 PC 브라우저의 절반이 넘었습니다. 미국은 2015년에 28%까지 내려왔지만, 한국은 같은 해에도 68%였습니다."
-      />
-
       <h2 id="chart" className={docH2}>PC 브라우저 중 IE 비율</h2>
       <LineChart
         title="PC 브라우저 중 IE 비율, 연도별"
@@ -40,10 +39,8 @@ export default function TrendKoreaIe() {
         series={ieShare}
         labelYear={2015}
         source={{ label: "StatCounter Global Stats, Desktop Browser Market Share(연간)", href: "https://gs.statcounter.com/browser-market-share/desktop", note: "방문 표본 기반이라 해마다 튀는 값이 있습니다" }}
+        csv="/knowledge/data#ie-share"
       />
-      <p className="mt-2 text-[13.5px]">
-        <Link href="/knowledge/data#ie-share" className="font-bold text-[#256ef4] hover:underline underline-offset-4">원본 데이터(CSV) 받기</Link>
-      </p>
 
       <h2 id="why" className={docH2}>한국에만 있던 이유</h2>
       <p className={p}>
@@ -65,26 +62,6 @@ export default function TrendKoreaIe() {
           { b: "jQuery 1.x", t: "IE 지원 때문에 jQuery 1 버전을 그대로 둔 경우가 많습니다. 알려진 보안 경고가 있는 버전입니다." },
         ]}
       />
-
-      <h2 id="src" className={docH2}>출처</h2>
-      <SourceFold>
-        <li>
-          <a href="https://gs.statcounter.com/browser-market-share/desktop" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">StatCounter Global Stats, Desktop Browser Market Share</a>: 한국, 일본, 미국 연간 값(확인 {TREND_CHECKED})
-        </li>
-        {examples2012.map((ex) => (
-          <li key={ex.url}>
-            <a href={ex.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">인터넷 아카이브, {ex.site} {ex.date} 보관본</a>: 실제 사례(확인 {ex.checked})
-          </li>
-        ))}
-        <li>
-          <a href="https://m.boannews.com/html/detail.html?idx=93269" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">보안뉴스, 10일부터 공인인증서 폐지(2020-12)</a>: 전자서명법 전부개정법 2020년 12월 10일 시행
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/lifecycle/announcements/internet-explorer-11-end-of-support-windows-10" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-[#256ef4]">Microsoft Learn, Internet Explorer 11 desktop app support ended for certain versions of Windows 10</a>: 2022년 6월 15일 지원 종료(LTSC, Windows Server 제외)
-        </li>
-      </SourceFold>
-
-      <TrendNav current="/knowledge/browser" />
     </ArchiveShell>
   );
 }

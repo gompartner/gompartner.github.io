@@ -60,19 +60,20 @@ export function ReadTracker({ href, ver }: { href: string; ver?: string }) {
   const resume = prev && prev.p >= 10 && prev.p < 90 && prev.y > 400 && !hideResume;
   return (
     <>
-      <div aria-hidden className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
-        <div className="h-full bg-[#256ef4] transition-[width] duration-150" style={{ width: `${p}%` }} />
+      {/* 11-26 진행 막대와 이어 읽기 안내는 본문보다 눈에 띄지 않게: 가는 흰 선, 글자 한 줄 */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px]">
+        <div className="h-full bg-white/50 transition-[width] duration-150 motion-reduce:transition-none" style={{ width: `${p}%` }} />
       </div>
       {slot && resume ? createPortal(
-        <div className="mt-5 flex max-w-[820px] flex-wrap items-center gap-3 rounded-md bg-[#f4f6f9] px-4 py-3 text-[14.5px]">
-          <span className="text-[#3d4450]">{prev!.d}에 {prev!.p}%까지 읽었습니다.</span>
-          <button type="button" onClick={() => { scrollTo({ top: prev!.y }); setHideResume(true); }} className="min-h-[36px] rounded-md bg-[#15171c] px-3.5 text-[14px] font-bold text-white">
+        <p className="mt-6 flex flex-wrap items-center gap-x-4 text-[14px] text-[#aab2bf]">
+          <span>{prev!.d}에 {prev!.p}%까지 읽었습니다.</span>
+          <button type="button" onClick={() => { scrollTo({ top: prev!.y }); setHideResume(true); }} className="min-h-11 font-bold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white/90">
             이어 읽기
           </button>
-          <button type="button" onClick={() => setHideResume(true)} className="min-h-[36px] px-1 text-[13.5px] text-[#5b6370] underline underline-offset-4">
+          <button type="button" onClick={() => setHideResume(true)} className="min-h-11 underline decoration-white/30 underline-offset-4 hover:text-white">
             처음부터
           </button>
-        </div>,
+        </p>,
         slot,
       ) : null}
     </>

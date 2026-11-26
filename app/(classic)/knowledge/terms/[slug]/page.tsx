@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { TrendNav } from "@/components/classic/archive/TrendNav";
-import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { groupBySlug, shortTitle, takeover, termHref, termSlugs } from "@/data/classic/archive";
 import { termGroups, termLabels } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
@@ -39,7 +37,6 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
   if (!g) notFound();
   const take = takeover[g.id];
   const labels = termLabels[g.sec];
-  const imgCount = g.terms.filter((t) => termImages[t.id]).length;
   const toc = [{ id: "cmp", label: "한눈에 비교" }, { id: "terms", label: "용어별로 보기" }, ...(take ? [{ id: "take", label: "인수 시 확인 사항" }] : [])];
 
   return (
@@ -48,13 +45,9 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       active={termHref(g)}
       crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }, { href: termHref(g), label: shortTitle(g) }]}
       toc={toc}
+      head={{ title: g.title, meta: [["주제", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ["최종 수정일", CHECKED]] }}
       article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: CHECKED, image: termImages[g.terms[0].id] ? `/images/glossary/${g.terms[0].id}.webp` : undefined }}
     >
-      <DocHead
-        title={g.title}
-        meta={[["분류", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ...(imgCount ? ([["와이어프레임", `${imgCount}장`]] as [string, string][]) : []), ["최종 수정일", CHECKED]]}
-      />
-
       <h2 id="cmp" className={docH2}>한눈에 비교</h2>
       {/* 휴대폰: 표 대신 용어마다 세로 칸(11-21 사용자: 가로 스크롤 말고 세로로) */}
       <ul role="list" className="mt-4 border-t-2 border-[#15171c] md:hidden">
@@ -111,8 +104,8 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
                 <dd>{t.use}</dd>
               </dl>
               {t.say ? (
-                <p className="mt-4 rounded-md bg-[#eef3ff] px-3.5 py-3 text-[15px] leading-[1.6]">
-                  <span className="mb-0.5 block text-[12px] font-bold text-[#1d5fd6]">이렇게 요청하세요</span>&quot;{t.say}&quot;
+                <p className="mt-4 border-l-2 border-[#15171c] py-0.5 pl-4 text-[15.5px] leading-[1.65]">
+                  <span className="mb-0.5 block text-[13px] font-bold text-[#5b6370]">이렇게 요청하세요</span>&quot;{t.say}&quot;
                 </p>
               ) : null}
             </div>
@@ -122,8 +115,6 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
 
       {take ? <TakeoverBox sub={`다른 업체가 만든 사이트의 ${shortTitle(g)}${eulReul(shortTitle(g))} 인수했다면`} items={take} /> : null}
 
-
-      <TrendNav current={termHref(g)} />
     </ArchiveShell>
   );
 }

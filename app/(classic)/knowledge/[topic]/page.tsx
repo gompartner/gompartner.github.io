@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArchiveShell, DocHead } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell } from "@/components/classic/archive/ArchiveShell";
 import { TopicList, type TopicRow } from "@/components/classic/archive/TopicList";
 import { docUpdated, kindOf, kinds, topics } from "@/data/classic/archive";
 import { pageMeta } from "@/lib/seo";
@@ -30,8 +30,7 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
     .map(({ n, group }) => ({ label: n.label, href: n.href, kind: kindOf(n.href), group, ver: n.href ? docUpdated(n.href) : undefined, children: n.children?.map((c) => ({ label: c.label, href: c.href! })) }))
     .sort((a, b) => kinds.indexOf(a.kind as never) - kinds.indexOf(b.kind as never));
   return (
-    <ArchiveShell section={t.id} active={`/knowledge/${t.id}`} crumbs={[{ href: `/knowledge/${t.id}`, label: t.label }]}>
-      <DocHead title={t.label} leadLabel="이 주제는" lead={t.desc} />
+    <ArchiveShell section={t.id} active={`/knowledge/${t.id}`} crumbs={[{ href: `/knowledge/${t.id}`, label: t.label }]} head={{ title: t.label, lead: t.desc }}>
       <TopicList rows={rows} kinds={[...kinds]} />
     </ArchiveShell>
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { insights } from "@/data/classic/insights";
 import { pageMeta } from "@/lib/seo";
 
@@ -15,8 +15,7 @@ const series = [...new Set(insights.map((n) => n.series))].map((s) => ({ name: s
 
 export default function ArchiveNotes() {
   return (
-    <ArchiveShell section="notes" active="/knowledge/notes" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/notes", label: "운영 노트" }]} toc={series.map((s) => ({ id: encodeURIComponent(s.name), label: s.name }))}>
-      <DocHead title="운영 노트" meta={[["주제", `${series.length}개`], ["글", `${insights.length}개`]]} lead="홈페이지를 넘겨받고 운영하며 겪는 일을 주제별로 정리했습니다. 글마다 따로 읽어도 되게 썼습니다." />
+    <ArchiveShell section="notes" active="/knowledge/notes" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/notes", label: "운영 노트" }]} toc={series.map((s) => ({ id: encodeURIComponent(s.name), label: s.name }))} head={{ title: "운영 노트", meta: [["주제", `${series.length}개`], ["글", `${insights.length}개`]], lead: "홈페이지를 넘겨받고 운영하며 겪는 일을 주제별로 정리했습니다. 글마다 따로 읽어도 되게 썼습니다." }} related={false}>
       {series.map((s) => (
         <section key={s.name} aria-labelledby={encodeURIComponent(s.name)}>
           <h2 id={encodeURIComponent(s.name)} className={docH2}>

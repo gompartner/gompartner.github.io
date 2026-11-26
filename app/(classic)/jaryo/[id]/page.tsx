@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { TrendNav } from "@/components/classic/archive/TrendNav";
-import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, docH2, docH2Base } from "@/components/classic/archive/ArchiveShell";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { JaryoButtons, JaryoList, JaryoPreview } from "@/components/classic/JaryoParts";
@@ -42,16 +41,15 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
         { href: "/knowledge/checklists", label: "점검표와 기록표" },
         { href: `/jaryo/${it.id}`, label: it.title },
       ]}
-      toc={[{ id: "inside", label: "들어 있는 것" }, { id: "view", label: "자료 보기" }, { id: "rel", label: "관련 문서" }]}
+      head={{ title: it.title, meta: [["쓰는 때", it.when], ["분량", `PDF ${it.pages ?? 2}쪽`]] }}
     >
-      <DocHead title={it.title} meta={[["쓰는 때", it.when], ["분량", `PDF ${it.pages ?? 2}쪽`]]} />
 
       <div id="inside" className="mt-8 grid scroll-mt-24 grid-cols-[minmax(0,1fr)] overflow-hidden rounded-lg border border-[#d9dee5] bg-white xl:grid-cols-[1fr_1fr]">
         <div className="min-w-0 border-b border-[#d9dee5] xl:border-b-0 xl:border-r">
           <JaryoPreview it={it} size="lg" priority />
         </div>
         <div className="flex flex-col p-6 md:p-8">
-          <h2 className={docH2 + " !mt-0"}>들어 있는 것</h2>
+          <h2 className={docH2Base}>들어 있는 것</h2>
           <div className="mt-5">
             <JaryoList it={it} />
           </div>
@@ -76,8 +74,6 @@ export default async function ClassicJaryoItemPage({ params }: { params: Promise
           </li>
         ))}
       </ol>
-
-      <TrendNav current={`/jaryo/${it.id}`} />
     </ArchiveShell>
   );
 }

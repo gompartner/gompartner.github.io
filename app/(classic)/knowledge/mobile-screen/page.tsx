@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import { SourceFold } from "@/components/classic/archive/SourceFold";
-import Link from "next/link";
-import { ArchiveShell, DocHead, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { LineChart } from "@/components/classic/archive/LineChart";
 import { MobileWireframes2012 } from "@/components/classic/archive/MobileWireframes2012";
-import { TrendNav } from "@/components/classic/archive/TrendNav";
 import { TREND_CHECKED, examplesMobile2012, mobileShare } from "@/data/classic/trendData";
 import { pageMeta } from "@/lib/seo";
 
@@ -17,8 +14,9 @@ export const metadata: Metadata = pageMeta({
   article: true,
 });
 
-const p = "mt-4 max-w-[760px] text-[16.5px] leading-[1.8] text-[#2b313b]";
-const a = "underline underline-offset-2 hover:text-[#256ef4]";
+const p = "mt-4 text-[17px] leading-[1.8] text-[#2b313b]";
+const TITLE = "모바일 화면: m. 사이트에서 반응형으로";
+const LEAD = "2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. 한국은 세 나라 중 가장 먼저 휴대폰 화면을 따로 챙겨야 했습니다.";
 
 export default function TrendMobile() {
   return (
@@ -26,15 +24,18 @@ export default function TrendMobile() {
       section="design"
       active={HREF}
       crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/design", label: "디자인 트렌드" }, { href: HREF, label: "모바일" }]}
-      toc={[{ id: "chart", label: "모바일 접속 비율" }, { id: "why", label: "세 나라가 갈린 길" }, { id: "wf", label: "2012년 휴대폰으로 연 화면" }, { id: "take", label: "인수 시 확인 사항" }, { id: "src", label: "출처" }]}
-      article={{ title: "모바일 화면: m. 사이트에서 반응형으로", description: "2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. 한국은 세 나라 중 가장 먼저 휴대폰 화면을 따로 챙겨야 했습니다.", modified: TREND_CHECKED }}
+      toc={[{ id: "chart", label: "모바일 접속 비율" }, { id: "why", label: "세 나라가 갈린 길" }, { id: "wf", label: "2012년 휴대폰으로 연 화면" }, { id: "take", label: "인수 시 확인 사항" }]}
+      head={{ title: TITLE, meta: [["최종 수정일", TREND_CHECKED]], lead: LEAD }}
+      sources={[
+        { label: "StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet", note: `한국, 일본, 미국 연간 값(확인 ${TREND_CHECKED})` },
+        { label: "서울신문, 스마트폰 2천만 시대(2011-10-30)", href: "https://m.seoul.co.kr/news/2011/10/30/20111030800026", note: "방송통신위원회 발표, 2011년 10월 28일 2천만 명" },
+        { label: "경향신문(2012-08-21)", href: "https://www.khan.co.kr/article/201208212210115", note: "스마트폰 가입자 3천만 명, 1천만 명은 2011년 3월 말" },
+        { label: "Jeffrey Zeldman, Boston Globe's responsive redesign(2011-09-15)", href: "https://zeldman.com/2011/09/15/boston-globes-responsive-redesign-discuss/" },
+        { label: "Google Search Central Blog, Rolling out the mobile-friendly update(2015-04-21)", href: "https://developers.google.com/search/blog/2015/04/rolling-out-mobile-friendly-update" },
+        ...examplesMobile2012.map((ex) => ({ label: `인터넷 아카이브, ${ex.site} ${ex.date} 보관본`, href: ex.url, note: `실제 사례(확인 ${ex.checked})` })),
+      ]}
+      article={{ title: TITLE, description: LEAD, modified: TREND_CHECKED }}
     >
-      <DocHead
-        title="모바일 화면: m. 사이트에서 반응형으로"
-        meta={[["비교", "한국, 일본, 미국"], ["기간", "2009~2025"], ["데이터", "StatCounter"], ["최종 수정일", TREND_CHECKED]]}
-        lead="2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. 한국은 세 나라 중 가장 먼저 휴대폰 화면을 따로 챙겨야 했습니다."
-      />
-
       <h2 id="chart" className={docH2}>전체 접속 중 모바일 비율</h2>
       <LineChart
         title="전체 접속 중 모바일 비율, 연도별"
@@ -42,10 +43,8 @@ export default function TrendMobile() {
         series={mobileShare}
         labelYear={2012}
         source={{ label: "StatCounter Global Stats, Desktop vs Mobile vs Tablet(연간)", href: "https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet", note: "방문 표본 기반이라 해마다 튀는 값이 있습니다(예: 미국 2023년)" }}
+        csv="/knowledge/data#mobile-share"
       />
-      <p className="mt-2 text-[13.5px]">
-        <Link href="/knowledge/data#mobile-share" className="font-bold text-[#256ef4] hover:underline underline-offset-4">원본 데이터(CSV) 받기</Link>
-      </p>
 
       <h2 id="why" className={docH2}>세 나라가 갈린 길</h2>
       <p className={p}>
@@ -70,19 +69,6 @@ export default function TrendMobile() {
           { b: "검색에 두 주소가 같이 나오는지", t: "PC 주소와 m. 주소가 따로 색인되면 검색 점수가 나뉩니다. 서로를 가리키는 태그(canonical, alternate)나 301 이동이 있는지 봅니다." },
         ]}
       />
-
-      <h2 id="src" className={docH2}>출처</h2>
-      <SourceFold>
-        <li><a href="https://gs.statcounter.com/platform-market-share/desktop-mobile-tablet" target="_blank" rel="noopener noreferrer" className={a}>StatCounter Global Stats, Desktop vs Mobile vs Tablet Market Share</a>: 한국, 일본, 미국 연간 값(확인 {TREND_CHECKED})</li>
-        <li><a href="https://m.seoul.co.kr/news/2011/10/30/20111030800026" target="_blank" rel="noopener noreferrer" className={a}>서울신문, 스마트폰 2천만 시대(2011-10-30)</a>: 방송통신위원회 발표, 2011년 10월 28일 2천만 명</li>
-        <li><a href="https://www.khan.co.kr/article/201208212210115" target="_blank" rel="noopener noreferrer" className={a}>경향신문(2012-08-21)</a>: 스마트폰 가입자 3천만 명, 1천만 명은 2011년 3월 말</li>
-        <li><a href="https://zeldman.com/2011/09/15/boston-globes-responsive-redesign-discuss/" target="_blank" rel="noopener noreferrer" className={a}>Jeffrey Zeldman, Boston Globe&apos;s responsive redesign(2011-09-15)</a></li>
-        <li><a href="https://developers.google.com/search/blog/2015/04/rolling-out-mobile-friendly-update" target="_blank" rel="noopener noreferrer" className={a}>Google Search Central Blog, Rolling out the mobile-friendly update(2015-04-21)</a></li>
-        {examplesMobile2012.map((ex) => (
-          <li key={ex.url}><a href={ex.url} target="_blank" rel="noopener noreferrer" className={a}>인터넷 아카이브, {ex.site} {ex.date} 보관본</a>: 실제 사례(확인 {ex.checked})</li>
-        ))}
-      </SourceFold>
-      <TrendNav current={HREF} />
     </ArchiveShell>
   );
 }

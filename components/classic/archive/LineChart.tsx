@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import type { Series } from "@/data/classic/trendData";
 
 // 아카이브 선 차트(11-21). 2px 선, 한 축, 범례 + 한 해 직접 라벨, 마우스를 올리면 그해 값, 표로 보기.
 // 폭에 맞춰 다시 그려 휴대폰에서도 글자 크기가 유지된다.
-export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100, source }: { title: string; sub?: string; series: Series[]; labelYear?: number; unit?: string; max?: number; source: { label: string; href: string; note?: string } }) {
+// 11-26 그림 아래는 출처 한 줄(숫자 바로 옆 근거라 남긴다)과 표로 보기, 원본 데이터 링크 한 줄로 줄였다. 파란 글자 대신 밑줄.
+export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100, source, csv }: { title: string; sub?: string; series: Series[]; labelYear?: number; unit?: string; max?: number; source: { label: string; href: string; note?: string }; /** 원본 데이터(CSV)를 받는 곳 */ csv?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [W, setW] = useState(760);
   const [hover, setHover] = useState<{ year: number; x: number; y: number } | null>(null);
+  const [table, setTable] = useState(false);
+  const tableId = useId();
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -42,7 +47,7 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
   }
 
   return (
-    <figure className="relative mt-4 rounded-[10px] border border-[#e6e9ee] px-4 pb-8 pt-4 md:px-5">
+    <figure className="relative mt-5 rounded-[10px] border border-[#e6e9ee] px-4 pb-7 pt-4 md:px-5">
       <figcaption>
         <span className="block text-[16px] font-[800] tracking-[-0.02em]">{title}</span>
         {sub ? <span className="block text-[13px] text-[#5b6370]">{sub}</span> : null}
@@ -115,31 +120,39 @@ export function LineChart({ title, sub, series, labelYear, unit = "%", max = 100
         </a>
         {source.note ? `. ${source.note}` : ""}
       </p>
-      <details className="mt-2 text-[14px]">
-        <summary className="cursor-pointer list-none font-bold text-[#256ef4] [&::-webkit-details-marker]:hidden">표로 보기</summary>
-        <div className="mt-2 max-h-[320px] overflow-y-auto">
-          <table className="w-full border-collapse text-right tabular-nums">
-            <thead>
-              <tr className="border-b border-[#d9dee5] text-[#5b6370]">
-                <th scope="col" className="py-1.5 pr-2 text-left font-bold">연도</th>
+      <p className="mt-1 flex flex-wrap items-center gap-x-5 text-[14px]">
+        <button type="button" aria-expanded={table} aria-controls={tableId} onClick={() => setTable(!table)} className="inline-flex min-h-11 items-center gap-1 font-bold text-[#15171c] underline underline-offset-4">
+          표로 보기
+          <ChevronDown size={16} aria-hidden className={`transition-transform motion-reduce:transition-none ${table ? "rotate-180" : ""}`} />
+        </button>
+        {csv ? (
+          <Link href={csv} className="inline-flex min-h-11 items-center font-bold text-[#15171c] underline underline-offset-4">
+            원본 데이터(CSV) 받기
+          </Link>
+        ) : null}
+      </p>
+      <div id={tableId} hidden={!table} tabIndex={0} className="mb-3 max-h-[320px] overflow-y-auto text-[14px]">
+        <table className="w-full border-collapse text-right tabular-nums">
+          <thead>
+            <tr className="border-b border-[#d9dee5] text-[#5b6370]">
+              <th scope="col" className="py-1.5 pr-2 text-left font-bold">연도</th>
+              {series.map((s) => (
+                <th key={s.key} scope="col" className="px-2 py-1.5 font-bold">{s.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {years.map((yr) => (
+              <tr key={yr} className="border-b border-[#eef0f3]">
+                <th scope="row" className="py-1.5 pr-2 text-left font-normal">{yr}</th>
                 {series.map((s) => (
-                  <th key={s.key} scope="col" className="px-2 py-1.5 font-bold">{s.label}</th>
+                  <td key={s.key} className="px-2 py-1.5">{valueAt(s, yr) ?? "-"}</td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {years.map((yr) => (
-                <tr key={yr} className="border-b border-[#eef0f3]">
-                  <th scope="row" className="py-1.5 pr-2 text-left font-normal">{yr}</th>
-                  {series.map((s) => (
-                    <td key={s.key} className="px-2 py-1.5">{valueAt(s, yr) ?? "-"}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/* 출처 표시: 그림과 같은 오른쪽 아래 */}
       <p aria-hidden className="pointer-events-none absolute bottom-2.5 right-4 text-[11px] text-[#6b7380] md:right-5">곰파트너 gompartner.co.kr</p>
     </figure>

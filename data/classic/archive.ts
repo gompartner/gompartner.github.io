@@ -404,12 +404,19 @@ export function topicOf(href: string): Topic | undefined {
   return topics().find((t) => t.groups.some((g) => g.items.some(has)));
 }
 
-/** 같은 주제의 다른 문서(관련 문서) */
-export function relatedOf(href: string, limit = 6): TreeNode[] {
+/** 관련 문서: 같은 묶음에서 지금 문서 바로 다음 것부터, 모자라면 같은 주제의 다른 묶음에서. 글 아래에 세 개까지만 둔다(11-26) */
+export function relatedOf(href: string, limit = 3): TreeNode[] {
   const t = topicOf(href);
   if (!t) return [];
   const flat = (n: TreeNode): TreeNode[] => (n.children ? n.children.flatMap(flat) : n.href ? [n] : []);
-  return t.groups.flatMap((g) => g.items.flatMap(flat)).filter((n) => n.href !== href).slice(0, limit);
+  const groups = t.groups.map((g) => g.items.flatMap(flat));
+  const gi = groups.findIndex((g) => g.some((n) => n.href === href));
+  const own = groups[gi] ?? [];
+  const at = own.findIndex((n) => n.href === href);
+  const near = [...own.slice(at + 1), ...own.slice(0, at)];
+  const rest = groups.filter((_, i) => i !== gi).flat();
+  const seen = new Set([href]);
+  return [...near, ...rest].filter((n) => !seen.has(n.href!) && !!seen.add(n.href!)).slice(0, limit);
 }
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */

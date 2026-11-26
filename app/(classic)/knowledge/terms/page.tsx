@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArchiveShell, DocHead, docH2 } from "@/components/classic/archive/ArchiveShell";
+import { ArchiveShell, docH2 } from "@/components/classic/archive/ArchiveShell";
 import { counts, shortTitle, termHref } from "@/data/classic/archive";
 import { termGroups, termSections } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
@@ -28,12 +28,7 @@ const rows: TermRow[] = termGroups.flatMap((g) => g.terms.map((t) => ({ id: t.id
 
 export default function ArchiveTerms() {
   return (
-    <ArchiveShell section="terms" active="/knowledge/terms" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }]} toc={termSections.map((s, i) => ({ id: `sec-${i}`, label: s }))}>
-      <DocHead
-        title="용어"
-        meta={[["묶음", `${counts.groups}개`], ["용어", `${counts.terms}개`]]}
-        lead="이름을 정확히 말하면 업체와 AI에 요청이 한 번에 전달됩니다. 묶음마다 비교 표, 와이어프레임, 요청 문장을 함께 둡니다."
-      />
+    <ArchiveShell section="terms" active="/knowledge/terms" crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }]} toc={termSections.map((s, i) => ({ id: `sec-${i}`, label: s }))} head={{ title: "용어", meta: [["묶음", `${counts.groups}개`], ["용어", `${counts.terms}개`]], lead: "이름을 정확히 말하면 업체와 AI에 요청이 한 번에 전달됩니다. 묶음마다 비교 표, 와이어프레임, 요청 문장을 함께 둡니다." }} related={false}>
       <LdScript data={termSetLd} />
       <TermSearch rows={rows} />
       {termSections.map((sec, i) => {
