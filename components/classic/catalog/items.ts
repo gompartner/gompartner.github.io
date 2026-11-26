@@ -76,7 +76,7 @@ export function buildCatalog() {
     const vm = `/videos/catalog/${t.id}-m.mp4`;
     const main: Shot = { src: pc, frame: "browser", ratio: "16/10", alt: `${base.title} ${t.tag} PC 화면`, ...(lg?.pc && exists(lg.pc.src) ? { long: lg.pc } : {}), ...(exists(vpc) ? { video: { src: vpc, w: 960, h: 600 } } : {}), live: `/live/${t.id}` };
     const side: Shot | undefined = exists(m) ? { src: m, frame: "phone", ratio: "780/1472", alt: `${base.title} ${t.tag} 휴대폰 화면`, ...(lg?.m && exists(lg.m.src) ? { long: lg.m } : {}), ...(exists(vm) ? { video: { src: vm, w: 390, h: 844 } } : {}), live: `/live/${t.id}` } : undefined;
-    trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "잡은 방향", want: t.want, think: t.think, made: t.made });
+    trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "적용한 트렌드", want: t.want, think: t.think, made: t.made });
   }
 
   const told = new Set(stories.map((s) => s.id));

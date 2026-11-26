@@ -204,21 +204,28 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
         </button>
       </form>
 
-      {/* 이야기와 함께 보는 화면: 화면 하나에 판 하나 */}
-      <div key={cat} className="mt-6 space-y-4 md:space-y-5">
-        {told.map((s, i) => board(s, i))}
-      </div>
-
-      {/* 그 해의 연출 기법으로 만든 화면: 같은 업종 홈페이지를 연도별 연출로 */}
+      {/* 웹 트렌드를 반영한 화면을 맨 위에 둔다(11-26 사용자 "문구도 이상하고, 고친 후 위로 올려 줘"). 같은 병원 홈페이지를 그 해의 트렌드로 만든 다섯 장 */}
       {byYear.length > 0 && (
-        <section className="mt-14 md:mt-20" aria-labelledby="ct-year">
+        <section className="mt-10 md:mt-14" aria-labelledby="ct-year">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
             <h2 id="ct-year" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
-              그 해의 연출로 만든 화면
+              웹 트렌드를 반영한 화면
             </h2>
-            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">같은 병원 홈페이지를 2026년, 2027년의 연출 기법으로 만들었습니다.</p>
+            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">2026년, 2027년 웹 디자인 트렌드를 반영해 제작한 병원 홈페이지입니다.</p>
           </div>
           <div className="mt-5 space-y-4 md:mt-6 md:space-y-5">{byYear.map((s, i) => board(s, i))}</div>
+        </section>
+      )}
+
+      {/* 이야기와 함께 보는 화면: 화면 하나에 판 하나 */}
+      {told.length > 0 && (
+        <section className={byYear.length > 0 ? "mt-14 md:mt-20" : "mt-6"} aria-labelledby="ct-told">
+          <h2 id="ct-told" className={byYear.length > 0 ? "text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]" : "sr-only"}>
+            업종별 대표 화면
+          </h2>
+          <div key={cat} className={`space-y-4 md:space-y-5 ${byYear.length > 0 ? "mt-5 md:mt-6" : ""}`}>
+            {told.map((s, i) => board(s, i))}
+          </div>
         </section>
       )}
 
