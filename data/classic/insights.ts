@@ -118,7 +118,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -198,7 +198,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -281,7 +281,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드",
     },
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
   },
@@ -351,7 +351,7 @@ const allInsights: Insight[] = [
     ],
     next: "명의를 정리했다면 서버 안을 볼 차례입니다. 인수 첫 주에 서버에서 실제로 열어 보는 것을 다룹니다.",
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
     image: {
@@ -446,7 +446,7 @@ const allInsights: Insight[] = [
     ],
     next: "서버를 열어 봤는데 소스가 없다는 답을 듣는 경우가 있습니다. 서버에서 회수할 수 있는 것과 재구축으로 넘어가는 선을 다룹니다.",
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
     image: {
@@ -587,7 +587,7 @@ const allInsights: Insight[] = [
     ],
     next: "서버, 소스, 자료를 확인했다면 한 장으로 정리할 차례입니다. 인수 보고서에 들어가야 할 항목을 다룹니다.",
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
     image: {
@@ -670,7 +670,7 @@ const allInsights: Insight[] = [
     ],
     next: "추가 조치 사항에는 늘 같은 질문이 남습니다. 지금 사이트를 보수해 쓸지, 새로 만들지 판단하는 기준을 다룹니다.",
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
     image: {
@@ -737,7 +737,7 @@ const allInsights: Insight[] = [
       },
     ],
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기",
     },
     image: {
@@ -907,7 +907,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -1132,7 +1132,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -1253,7 +1253,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -1421,7 +1421,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -1579,7 +1579,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -1714,7 +1714,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -1866,7 +1866,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -2055,7 +2055,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -2215,7 +2215,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -2353,7 +2353,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -2556,7 +2556,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -2713,7 +2713,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -2861,7 +2861,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -3116,7 +3116,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -3231,7 +3231,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기"
     }
   },
@@ -3420,7 +3420,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -3590,7 +3590,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -3768,7 +3768,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -3866,7 +3866,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -4056,7 +4056,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -4246,7 +4246,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -4457,7 +4457,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -4578,7 +4578,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -4761,7 +4761,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -4900,7 +4900,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -5100,7 +5100,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -5219,7 +5219,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -5406,7 +5406,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -5532,7 +5532,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -5775,7 +5775,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -5905,7 +5905,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -6047,7 +6047,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -6176,7 +6176,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -6367,7 +6367,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -6490,7 +6490,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -6698,7 +6698,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -6837,7 +6837,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기"
     }
   },
@@ -6936,7 +6936,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -7145,7 +7145,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -7255,7 +7255,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -7421,7 +7421,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -7567,7 +7567,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   },
@@ -7774,7 +7774,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기"
     }
   },
@@ -7955,7 +7955,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/takeover",
+      href: "/maintenance",
       label: "업체 이관 서비스 보기"
     }
   },
@@ -8082,7 +8082,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -8226,7 +8226,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -8347,7 +8347,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -8461,7 +8461,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/monthly",
+      href: "/maintenance",
       label: "월 유지보수 서비스 보기"
     }
   },
@@ -8604,7 +8604,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -8730,7 +8730,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/update",
+      href: "/maintenance",
       label: "보안 업데이트 서비스 보기"
     }
   },
@@ -8831,7 +8831,7 @@ const allInsights: Insight[] = [
       alt: "곰파트너 인사이트 제목 카드"
     },
     service: {
-      href: "/maintenance/fix",
+      href: "/maintenance",
       label: "오류 수정 서비스 보기"
     }
   }

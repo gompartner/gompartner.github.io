@@ -22,13 +22,14 @@ export function LdScript({ data }: { data: object }) {
 }
 
 const offers = [
-  { name: "홈페이지 제작", path: "/homepage" },
-  { name: "랜딩페이지 제작", path: "/landing-page" },
-  { name: "업무 프로그램 제작", path: "/program" },
-  { name: "앱 제작", path: "/app" },
-  { name: "키오스크 화면 제작", path: "/kiosk" },
+  // 11-26 제작 상세 5종(/homepage 등)과 유지보수 하위 주소를 내리고 판 하나씩으로 모았다. 상품 주소도 지금 열리는 판으로 맞춘다
+  { name: "홈페이지 제작", path: "/make" },
+  { name: "랜딩페이지 제작", path: "/make" },
+  { name: "업무 프로그램 제작", path: "/make" },
+  { name: "앱 제작", path: "/make" },
+  { name: "키오스크 화면 제작", path: "/make" },
   { name: "3D 웹 제작", path: "/3d" },
-  ...maintenanceServices.map((s) => ({ name: s.h1, path: `/maintenance/${s.id}` })),
+  ...maintenanceServices.map((s) => ({ name: s.h1, path: "/maintenance" })),
 ];
 
 // 전역 구조화 데이터. 회사 개체 하나(@id .../#org)와 사이트 개체. 첫 화면(/)과 app/(classic) 레이아웃이 넣는다.
