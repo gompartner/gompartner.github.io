@@ -17,15 +17,17 @@ import { cn } from "@/lib/utils";
 const BOARDS = [
   { href: "/make", label: "Build", ko: "제작" },
   // 11-26 사용자 "상단 메뉴에 3D 웹이 없어": 소개 페이지를 새로 만들었는데 가는 길이 바닥글과 제작 판 안에만 있었다
-  { href: "/3d", label: "3D Web", ko: "3D 웹" },
+  { href: "/3d", label: "3D Web", ko: "3D 웹", big: true },
   { href: "/maintenance", label: "Care", ko: "유지보수" },
   { href: "/pricing", label: "Price", ko: "비용" },
-  { href: "/works", label: "Catalog", ko: "카탈로그" },
+  { href: "/works", label: "Catalog", ko: "카탈로그", big: true },
   { href: "/knowledge", label: "Wiki", ko: "위키" },
   { href: "/#apply", label: "Contact", ko: "문의" },
 ];
+// 11-26 big: 미리받기(prefetch)가 큰 페이지(/3d 약 89KB, /works 약 57KB, 압축 전). 화면에 보이기만 해도 받지 않고 손을 올렸을 때 받는다.
+// 카카오톡 안 브라우저에서 메인 첫 로딩이 안 되고 두 번째부터 열린다는 제보로, 첫 방문에 받는 양을 줄였다
 // 햄버거 메뉴에만 더 나오는 것
-const MORE = [
+const MORE: { href: string; label: string; ko: string; big?: boolean }[] = [
   { href: "/story", label: "About", ko: "회사소개" },
   { href: "/faq", label: "FAQ", ko: "자주 묻는 질문" },
 ];
@@ -131,13 +133,14 @@ export function ClassicHeader() {
               {BOARDS.map((a) => (
                 <li key={a.href}>
                   {/* 페이지 안 이동(#)도 next/link로 건다. 그냥 a 태그는 다른 페이지에 갔다가 뒤로 오면 주소만 바뀌고 화면이 안 바뀐다 */}
-                  <Link href={a.href} aria-current={pathname === a.href ? "page" : undefined} className="inline-flex h-11 items-center rounded-md px-2.5 text-[15px] font-bold text-[#c9ced6] hover:text-white aria-[current=page]:text-white lg:px-3 lg:text-[16px]">
+                  <Link href={a.href} prefetch={a.big ? false : undefined} aria-current={pathname === a.href ? "page" : undefined} className="inline-flex h-11 items-center rounded-md px-2.5 text-[15px] font-bold text-[#c9ced6] hover:text-white aria-[current=page]:text-white lg:px-3 lg:text-[16px]">
                     {a.label}
                   </Link>
                 </li>
               ))}
             </ul>
-            <Link href="/search" aria-label="통합검색" title="통합검색" aria-current={pathname === "/search" ? "page" : undefined} className={cn(icon, "aria-[current=page]:text-white")}>
+            {/* 통합검색 페이지 데이터는 약 690KB(압축 약 185KB)라 미리받지 않는다. 휴대폰 첫 화면에도 보이는 아이콘이라 메인 첫 방문마다 받고 있었다 */}
+            <Link href="/search" prefetch={false} aria-label="통합검색" title="통합검색" aria-current={pathname === "/search" ? "page" : undefined} className={cn(icon, "aria-[current=page]:text-white")}>
               <Search size={20} aria-hidden />
             </Link>
             <ThemeSwitch className={cn(icon, "hidden md:grid")} />
@@ -174,7 +177,7 @@ export function ClassicHeader() {
             <ul className="mt-4" role="list">
               {[...BOARDS, ...MORE].map((a) => (
                 <li key={a.href} className="border-b border-white/10">
-                  <Link href={a.href} onClick={() => setOpen(false)} aria-current={pathname === a.href ? "page" : undefined} className="group flex min-h-[60px] items-baseline justify-between gap-3 py-4">
+                  <Link href={a.href} prefetch={a.big ? false : undefined} onClick={() => setOpen(false)} aria-current={pathname === a.href ? "page" : undefined} className="group flex min-h-[60px] items-baseline justify-between gap-3 py-4">
                     <span className="text-[26px] font-[800] leading-none tracking-[-0.04em] text-white group-aria-[current=page]:text-[#7aa7ff]">{a.label}</span>
                     <span className="text-[15px] font-bold text-[#aab2bf]">{a.ko}</span>
                   </Link>
