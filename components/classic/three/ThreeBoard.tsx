@@ -21,9 +21,8 @@ import { threeByIndustry, threeCommon, threeCompare, threeDeliver, threeDemos, t
 const V = "/videos/3d";
 const demo = (id: string) => threeDemos.find((d) => d.href === `/3d/${id}/`)!;
 
-/** 영상으로 보여 주는 화면(맨 위에서 직접 만지는 모듈 소파는 여기서 뺀다). head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
+/** 영상으로 보여 주는 화면(맨 위에서 직접 만지는 거실 상담 화면은 여기서 뺀다). head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
 const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] = [
-  { id: "room", head: "거실 치수에 맞춰 가구를 넣어 봅니다", wide: true, phone: true },
   { id: "configurator", head: "칸과 부속을 붙이면 금액이 바뀝니다" },
   { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
@@ -64,26 +63,27 @@ function Fold({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function ThreeBoard() {
-  const sofa = demo("sofa");
+  // 11-26 사용자 "썸네일 교체하고 이 기준으로": 맨 위 첫 체험을 모듈 소파에서 3D 거실 상담 화면으로(소파, 선반, 붙박이장을 한 화면에서)
+  const room = demo("room");
   return (
     <BoardShell no="01" en="3D WEB" kw="3D 홈페이지 제작" ice="고객이 직접 구성하는 " title={"3D 견적 화면"} lead={`${threeMeta.lead}.`}>
       {/* 1. 그 자리에서 만져 보는 실제 3D */}
       <section aria-labelledby="t3d-live" className="mt-10 md:mt-14">
         <LiveStage
-          src={`${sofa.href}?embed=1`}
-          href={sofa.href}
-          title="모듈 소파 3D 구성 화면. 모듈을 붙이고 원단을 바꾸면 폭과 금액이 바뀝니다."
-          poster={`${V}/sofa-stage.jpg`}
-          preview={{ src: `${V}/sofa-stage-m.mp4`, poster: `${V}/sofa-stage-m.jpg`, w: 712, h: 1120, alt: "모듈 소파에 1인 모듈과 스툴을 붙이고 원단을 가죽으로 바꾸는 화면" }}
-          hint="모듈을 붙이거나 원단을 바꾸면 위쪽 금액이 같이 바뀝니다. 끌면 소파가 돌아갑니다."
+          src={`${room.href}?embed=1`}
+          href={room.href}
+          title="3D 거실 상담 화면. 거실 크기를 정하고 가구를 놓고 옮기면 합계가 바뀝니다."
+          poster={`${V}/room.jpg?v=1127`}
+          preview={{ src: `${V}/room-m.mp4?v=1127`, poster: `${V}/room-m.jpg?v=1127`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
+          hint="가구를 눌러 고르고 끌어서 옮기면 합계가 같이 바뀝니다. 고른 구성은 견적서로 보낼 수 있습니다."
         >
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
-            <span className="text-[#7aa7ff]">{sofa.category}</span>
+            <span className="text-[#7aa7ff]">{room.category}</span>
             <span aria-hidden className="h-3 w-px bg-white/25" />
-            <span className="text-[#c9ced6]">{sofa.title}</span>
+            <span className="text-[#c9ced6]">{room.title}</span>
           </p>
           <h2 id="t3d-live" className="mt-2 break-keep text-[24px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[32px]">
-            모듈을 붙이고 원단을 바꾸는 대로 견적이 나옵니다
+            우리 집 거실에 놓아 보고 견적서까지 받습니다
           </h2>
         </LiveStage>
       </section>
@@ -101,10 +101,10 @@ export function ThreeBoard() {
               return (
                 <li key={s.id} className={`${card} flex w-[86%] shrink-0 snap-center flex-col gap-5 p-4 md:w-auto md:p-6 ${s.wide ? "md:col-span-2 md:grid md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] md:items-center md:gap-9 md:p-8" : ""}`}>
                   <div className={`relative ${s.phone ? "md:pb-[7%] md:pr-[8%]" : ""}`}>
-                    <Frame shot={{ src: `${V}/${s.id}.jpg`, frame: "browser", ratio: "16/10", alt: `${name} 화면을 조작하는 영상`, video: { src: `${V}/${s.id}.mp4`, w: 960, h: 600 } }} sizes="(min-width: 768px) 600px, 86vw" />
+                    <Frame shot={{ src: `${V}/${s.id}.jpg?v=1127`, frame: "browser", ratio: "16/10", alt: `${name} 화면을 조작하는 영상`, video: { src: `${V}/${s.id}.mp4?v=1127`, w: 960, h: 600 } }} sizes="(min-width: 768px) 600px, 86vw" />
                     {s.phone && (
                       <div className="absolute bottom-0 right-0 hidden w-[21%] md:block">
-                        <Frame shot={{ src: `${V}/${s.id}-m.jpg`, frame: "phone", ratio: "390/844", alt: `${name} 휴대폰 화면을 조작하는 영상`, video: { src: `${V}/${s.id}-m.mp4`, w: 390, h: 844 } }} sizes="160px" />
+                        <Frame shot={{ src: `${V}/${s.id}-m.jpg?v=1127`, frame: "phone", ratio: "390/844", alt: `${name} 휴대폰 화면을 조작하는 영상`, video: { src: `${V}/${s.id}-m.mp4?v=1127`, w: 390, h: 844 } }} sizes="160px" />
                       </div>
                     )}
                   </div>

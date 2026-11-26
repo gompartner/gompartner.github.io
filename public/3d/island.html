@@ -1245,37 +1245,10 @@ const showSofaMat = new THREE.MeshStandardMaterial({ color: 0xc9bba4, roughness:
 // 2. 간판 제작 상가 (낮에 간판 글자가 하나씩 붙습니다)
 const letterSlots = [];
 {
-  const g = building('saevit', -1.6, -2.45);
-  const k = Kit(), W = 5, D = 3.6, H = 4.7;
-  k.box(W - 0.2, 0.1, D - 0.2, mat.floorT, 0, 0, -D / 2);
-  k.box(W, H, 0.16, mat.brick, 0, 0, -D + 0.08);
-  k.box(0.16, H, D - 0.17, mat.brick, -W / 2 + 0.08, 0, -D / 2 - 0.085);
-  k.box(0.16, H, D - 0.17, mat.brick, W / 2 - 0.08, 0, -D / 2 - 0.085);
-  k.box(W + 0.1, 0.14, D + 0.1, mat.roof, 0, H, -D / 2);
-  for (const [w, d, x, zz] of [[W + 0.1, 0.08, 0, 0], [W + 0.1, 0.08, 0, -D - 0.05], [0.08, D, -W / 2, -D / 2], [0.08, D, W / 2, -D / 2]]) k.box(w, 0.22, d, mat.stone, x, H + 0.14, zz);
-  const fz = -0.08, ft = 0.16;
-  k.box(3.1, 0.25, ft, mat.stone, -0.65, 0, fz);
-  k.box(0.3, 2.35, ft, mat.stone, -2.35, 0, fz);
-  k.box(0.4, 2.35, ft, mat.stone, 1.1, 0, fz);
-  k.box(0.35, 2.35, ft, mat.stone, 2.33, 0, fz);
-  k.box(W, 0.15, ft, mat.stone, 0, 2.35, fz);
-  k.box(W, H - 2.5, ft, mat.brick, 0, 2.5, fz);
-  for (const [w, h, xx, y] of [[3.1, 0.05, -0.65, 0.23], [3.1, 0.05, -0.65, 2.3], [0.05, 2.1, -2.2, 0.25], [0.05, 2.1, 0.9, 0.25], [0.05, 2.35, 1.3, 0], [0.05, 2.35, 2.15, 0]]) k.box(w, h, 0.08, mat.dark, xx, y, 0);
-  k.box(3.05, 2.05, 0.02, mat.glass, -0.65, 0.27, -0.03);
-  k.box(0.82, 2.3, 0.02, mat.glass, 1.72, 0, -0.03);
-  // 간판 판 (글자 자리)
-  k.box(W - 0.3, 0.78, 0.1, mat.dark, 0, 2.5, 0.05);
-  // 2층 창
-  for (const xx of [-1.6, 0, 1.6]) win(k, xx, 3.55, 0, 0.9, 0.8, { frame: mat.cream, sill: true, box: xx !== 0, glass: xx === 0 ? mat.win2 : mat.win });
-  k.cyl(0.04, 0.04, H, mat.metal, 2.42, 0, 0.06, 6);
-  // 옥상 물탱크
-  for (const dx of [-0.3, 0.3]) k.box(0.06, 0.4, 0.06, mat.dark, 1.4 + dx, H + 0.14, -2.3);
-  k.cyl(0.45, 0.45, 0.75, mat.white, 1.4, H + 0.54, -2.3, 18);
-  // 안: 막 들어온 상자들과 사다리
-  for (const [xx, zz, s] of [[-1.6, -2.4, 0.5], [-1.1, -2.6, 0.4], [-1.45, -2.5, 0.35], [0.2, -2.8, 0.45]]) k.box(s, s * 0.8, s, mat.wood2, xx, 0.1 + (s === 0.35 ? 0.4 : 0), zz);
-  k.flush(g);
+  // 11-26 사용자 "건물을 바꾸긴 어려워?": 벽돌 가게 몸체 대신 원래 곰파트너 사옥(유리 커튼월)을 이 자리에 세운다. 몸체는 아래 사옥 재질을 만든 뒤에 붙인다
+  building('saevit', -1.6, -2.45);
   B.saevit.pin = V(-1.6, 5.6, -4.2); B.saevit.view = { t: V(-1.6, 2.3, -3.0), az: 0.14, el: 0.36, fw: 9.4, fh: 7.4 };
-  B.saevit.signY = 2.89; B.saevit.signZ = 0.1;
+  B.saevit.signY = 2.89; B.saevit.signZ = 0.14;   // 사옥 앞 간판 띠(앞면 0.13) 바로 앞
 }
 
 // 3. 인테리어 모델하우스 (앞벽과 지붕을 잘라 안이 보입니다)
@@ -1481,8 +1454,9 @@ const panelMat = M(0x3a3e44, { roughness: 0.45, metalness: 0.6 }), whiteMetal = 
 const solarMat = M(0x23324a, { roughness: 0.2, metalness: 0.6 }), beacon = M(0x9a1f1a, { emissive: new THREE.Color(0xff3020), emissiveIntensity: 0.6 });
 const cwGlass = new THREE.MeshPhysicalMaterial({ color: 0xb9d4e2, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.28, depthWrite: false, envMapIntensity: 1.6 });
 {
-  const g = building('gom', 7.6, 7.7);
-  const k = Kit(), W = 4.4, D = 3.2, H = 4.3, F1 = 0.12, F2 = 2.3;
+// 곰파트너 사옥: 간판 가게 자리(saevit)에
+{
+  const g = B.saevit.g, k = Kit(), W = 4.4, D = 3.2, H = 4.3, F1 = 0.12, F2 = 2.3;
   k.box(W + 0.3, F1, D + 0.3, mat.stone, 0, 0, -D / 2);
   k.box(W - 0.2, 0.02, D - 0.2, mat.floorT, 0, F1, -D / 2);
   k.box(W, H, 0.14, panelMat, 0, F1, -D + 0.07);
@@ -1525,11 +1499,39 @@ const cwGlass = new THREE.MeshPhysicalMaterial({ color: 0xb9d4e2, roughness: 0.0
   for (const [x, z] of [[-1.7, -0.5], [-0.5, -3.0]]) { k.box(0.4, 0.3, 0.4, mat.woodD, x, R0, z); k.add(ico1, mat.leaf3, x, R0 + 0.5, z, 0, 0, 0, 0.26, 0.3, 0.26); }
   k.box(1.0, 0.06, 0.4, mat.wood2, -1.0, R0 + 0.4, -1.8); for (const dx of [-0.4, 0.4]) k.box(0.05, 0.4, 0.35, mat.dark, -1.0 + dx, R0, -1.8);
   k.cyl(0.025, 0.035, 1.5, mat.metal, W / 2 - 0.3, R0, -D + 0.3, 8); k.add(sph, beacon, W / 2 - 0.3, R0 + 1.55, -D + 0.3, 0, 0, 0, 0.06, 0.06, 0.06);
+  k.flush(g);
+}
+  // 11-26 사용자 "곰파트너 위치는 광장 분위기로": 사옥 자리를 광장으로. 곰파트너는 간판 가게(베이커리 자리)로 옮겨 간다
+  const g = building('gom', 7.6, 7.7);
+  const k = Kit();
+  k.box(4.8, 0.06, 3.8, mat.stone, 0, 0, -1.6);                         // 돌 포장
+  k.box(2.6, 0.065, 2.6, mat.walk, 0, 0, -1.6);                         // 가운데 밝은 판
+  for (const z of [-0.3, -2.9]) k.box(2.6, 0.068, 0.05, mat.seam, 0, 0, z);
+  for (const x of [-1.3, 1.3]) k.box(0.05, 0.068, 2.6, mat.seam, x, 0, -1.6);
+  // 퍼걸러: 기둥 넷, 보 둘, 살대
+  for (const x of [-1.05, 1.05]) for (const z of [-0.55, -2.65]) k.box(0.1, 2.3, 0.1, mat.woodD, x, 0.06, z);
+  for (const z of [-0.55, -2.65]) k.box(2.4, 0.1, 0.12, mat.woodD, 0, 2.36, z);
+  for (let x = -1.05; x <= 1.051; x += 0.3) k.box(0.06, 0.07, 2.4, mat.wood2, x, 2.46, -1.6);
+  // 퍼걸러 밑 벤치 둘
+  for (const z of [-0.95, -2.25]) { k.box(1.3, 0.06, 0.38, mat.wood2, 0, 0.42, z); for (const dx of [-0.55, 0.55]) k.box(0.06, 0.38, 0.32, mat.dark, dx, 0.06, z); }
+  // 모서리 화분과 나무
+  for (const [x, z] of [[-2.0, -0.35], [2.0, -0.35], [-2.0, -2.85], [2.0, -2.85]]) {
+    k.box(0.62, 0.42, 0.62, mat.stone2, x, 0.06, z);
+    k.cyl(0.05, 0.07, 0.7, mat.trunk, x, 0.48, z, 8);
+    k.add(ico1, x > 0 ? mat.leaf : mat.leaf3, x, 1.45, z, 0, 0, 0, 0.5, 0.6, 0.5);
+  }
+  // 가로등 둘(밤에 켜짐)
+  for (const [x, z] of [[-2.2, -1.6], [2.2, -1.6]]) { k.cyl(0.03, 0.045, 2.6, mat.dark, x, 0.06, z, 8); k.add(sph, mat.lamp, x, 2.72, z, 0, 0, 0, 0.13, 0.13, 0.13); }
+  // 퍼걸러에 걸린 줄 전구
+  for (let i = 0; i < 8; i++) { const x = -0.95 + i * 0.27, sag = Math.sin((i / 7) * Math.PI) * 0.16; for (const z of [-0.6, -2.6]) k.add(sph, mat.lamp, x, 2.3 - sag, z, 0, 0, 0, 0.04, 0.04, 0.04); }
+  // 화단 꽃
+  for (let i = 0; i < 6; i++) k.add(sph, [mat.flowerR, mat.flowerY, mat.flowerW][i % 3], -0.9 + i * 0.36, 0.1, -3.2, 0, 0, 0, 0.07, 0.07, 0.07);
   // 출입구 쪽 디딤돌
   k.flush(g);
   const st = Kit(); for (let i = 0; i < 5; i++) st.cyl(0.22, 0.22, 0.04, mat.stone, 10.25, 0, 2.6 + i * 0.85, 10); st.flush(world);
+  B.gom.built = true;   // 11-26 사용자 "광장 조립되지 않게": 첫 화면 조립 연출(?build=1)에서 광장은 하늘에서 내려오지 않고 처음부터 그 자리에
   B.gom.pin = V(7.6, 5.7, 6.1); B.gom.view = { t: V(7.8, 2.4, 6.0), az: 0.5, el: 0.36, fw: 9.5, fh: 7.6 };
-  B.gom.signY = F1 + H - 0.3; B.gom.signZ = 0.065;
+  B.gom.signY = 2; B.gom.signZ = 0;
 }
 // 가구 쇼룸 진열창 화면: 곰파트너에 다녀온 뒤 3D 화면으로 바뀝니다
 const neruScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.42), screenMat(flatTex));
@@ -1877,7 +1879,9 @@ function glyphGlow(ch, k) {
   const tex = new THREE.CanvasTexture(c);
   return { tex, w, h, ox: pad + L, oy: pad + A, k: FS / GF };
 }
-const SIGN_TXT = '베이커리';
+// 11-26 사용자 "베이커리를 곰파트너로", "건물을 바꾸긴 어려워?": 이 자리는 곰파트너 사옥이 되어 옥상 아래 띠에 이름이 늘 있다.
+// 오후에 사다리차가 간판 글자를 붙이던 장면은 같은 이름이 두 번 붙어 뺐다(글자 없음, 사다리차 안 옴)
+const SIGN_TXT = '';
 const letters = [];
 let lettersReady = false;
 const letterSide = M(0x2e2b28, { roughness: 0.4, metalness: 0.7 });
@@ -1921,7 +1925,7 @@ async function buildLetters() {
     sg.add(grp);
     letters.push({ grp, face, halo, slot });
   }
-  buildGomSign();
+  buildGomSign();   // 옥상 아래 띠의 곰파트너 이름은 늘 보이게(오후 장면의 큰 간판 글자와 따로)
   lettersReady = true;
 }
 const gomLetters = [];
@@ -1939,8 +1943,8 @@ function buildGomSign() {
     const geo = new THREE.ExtrudeGeometry(shapes, { depth: 0.05 / s, bevelEnabled: false, curveSegments: 1 });
     geo.scale(s, s, s);
     const m = new THREE.Mesh(geo, [face, letterSide]); m.castShadow = true;
-    m.position.set((p.x - cx) * s - 0.3, B.gom.signY - cy * s, B.gom.signZ);
-    B.gom.g.add(m);
+    m.position.set((p.x - cx) * s - 0.3, 4.12 - cy * s, 0.065);   // 사옥(이제 간판 가게 자리) 옥상 아래 띠
+    B.saevit.g.add(m);
   }
   gomLetters.push(face);
 }
@@ -1975,10 +1979,10 @@ composer.addPass(finalPass);
 // ---------- 건물 정보, 이름표, 카드 ----------
 const INFO = {
   neru: { name: '가구 쇼룸', kind: '소파와 선반', go: [['모듈 소파 열어 보기', 'sofa/'], ['시스템 선반 열어 보기', 'configurator/']] },
-  saevit: { name: '간판 제작', kind: '마을 풍경', go: [] },
+  saevit: { name: '곰파트너', kind: '3D 웹 제작', go: [['비용 보기', '#price'], ['상담 신청', '/contact']] },
   onjib: { name: '인테리어', kind: '거실 상담 화면, 시공 사례, 현관 중문', go: [['거실 상담 화면 열어 보기', 'room/'], ['시공 사례 열어 보기', 'space/'], ['현관 중문 열어 보기', 'door/']] },
   hanok: { name: '한옥 찻집', kind: '마을 풍경', go: [] },
-  gom: { name: '곰파트너', kind: '3D 웹 제작', go: [['비용 보기', '#price'], ['상담 신청', '/contact']] }
+  gom: { name: '광장', kind: '마을 풍경', go: [] }
 };
 // 11-04 영문 페이지(/en/3d)가 ?lang=en 으로 끼우면 이름표, 카드, 버튼 이름을 영어로
 const EN = new URLSearchParams(location.search).get('lang') === 'en';
@@ -1986,10 +1990,10 @@ if (EN) {
   document.documentElement.lang = 'en';
   Object.assign(INFO, {
     neru: { name: 'Furniture showroom', kind: 'Sofa and shelving', go: [['Open modular sofa', 'sofa/'], ['Open shelving system', 'configurator/']] },
-    saevit: { name: 'Sign maker', kind: 'Village scenery', go: [] },
+    saevit: { name: 'GOMPARTNER', kind: '3D web development', go: [['See prices', '#price'], ['Contact', '/contact']] },
     onjib: { name: 'Interior', kind: 'Project case and entrance door', go: [['Open project case', 'space/'], ['Open entrance door', 'door/']] },
     hanok: { name: 'Hanok tea house', kind: 'Village scenery', go: [] },
-    gom: { name: 'GOMPARTNER', kind: '3D web development', go: [['See prices', '#price'], ['Contact', '/contact']] }
+    gom: { name: 'Plaza', kind: 'Village scenery', go: [] }
   });
   const L = { '아침': 'Morning', '오후': 'Afternoon', '저녁': 'Evening', '밤': 'Night', '닫기': 'Close', '일시 정지': 'Pause' };
   document.querySelectorAll('[aria-label]').forEach(el => { const t = L[el.getAttribute('aria-label')]; if (t) el.setAttribute('aria-label', t); });
@@ -2004,7 +2008,7 @@ for (const id of ORDER) {
   const size = box3.getSize(V(0, 0, 0)), c = box3.getCenter(V(0, 0, 0));
   const h = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.3, size.y + 0.4, size.z + 0.3), new THREE.MeshBasicMaterial({ visible: false }));
   h.position.copy(c); h.userData.id = id; scene.add(h);
-  if (id !== 'hanok' && id !== 'saevit') hits.push(h);   // 11-26 한옥 찻집 화면을 내려 한옥은 마을 풍경으로만 둔다(이름표, 누르기 없음)
+  if (id !== 'hanok' && id !== 'gom') hits.push(h);   // 11-26 한옥 찻집 화면을 내려 한옥은 마을 풍경으로만 둔다(이름표, 누르기 없음)
   const el = document.createElement('button');
   el.type = 'button'; el.className = 'pin';
   el.innerHTML = `<i aria-hidden="true"></i>${INFO[id].name}`;
@@ -2013,7 +2017,7 @@ for (const id of ORDER) {
   el.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') setHover(id); });
   el.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') setHover(null); });
   $('pins').appendChild(el);
-  if (id === 'hanok' || id === 'saevit') el.style.display = 'none';   // 11-26 간판 화면도 내려 간판 가게는 풍경으로만
+  if (id === 'hanok' || id === 'gom') el.style.display = 'none';   // 한옥과 광장은 풍경으로만   // 11-26 간판 화면도 내려 간판 가게는 풍경으로만
   b.pinEl = el;
 }
 let hovered = null, selected = null;
@@ -2336,7 +2340,7 @@ function story(t, dt, time) {
   const sk = sm(range(t, 0.5, 0.515)) * (t < 0.99 ? 1 : 0);
   homeSofa.visible = sk > 0.001 && t < 0.995; homeSofa.scale.setScalar(Math.max(0.0001, sk));
   // 4. 오후: 사다리차가 서고 간판 글자가 하나씩 붙습니다
-  const lp = ladderPose(t);
+  const lp = SIGN_TXT ? ladderPose(t) : null;
   ladderTruck.g.visible = !!lp;
   if (lp) {
     ladderTruck.sx = lp.x; ladderTruck.z = lp.z;

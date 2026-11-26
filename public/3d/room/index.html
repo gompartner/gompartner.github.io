@@ -41,14 +41,14 @@
 <meta property="og:url" content="https://gompartner.co.kr/3d/room/">
 <meta property="og:title" content="3D 인테리어 상담 화면 | 곰파트너">
 <meta property="og:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
-<meta property="og:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112602">
+<meta property="og:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112701">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="3D 인테리어 상담 화면 | 곰파트너">
 <meta name="twitter:description" content="거실 폭과 깊이를 정하고 거실장, TV, 소파, 선반, 붙박이장, 중문을 실제 치수로 배치하면 예상 금액이 계산되고 구성 그대로 견적서로 보낼 수 있습니다.">
-<meta name="twitter:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112602">
+<meta name="twitter:image" content="https://gompartner.co.kr/3d/room/og.jpg?v=2026112701">
 <meta name="twitter:image:alt" content="거실에 가구를 배치한 3D 인테리어 상담 화면">
 <link rel="canonical" href="https://gompartner.co.kr/3d/room/">
 <meta name="theme-color" content="#0b0d12">
@@ -147,7 +147,7 @@
   .rs-sum b { font-size: 14px; }
   .rs-sum svg { width: 16px; height: 16px; transition: transform .2s; }
   .open > .rs-sum svg { transform: rotate(180deg); }
-  @media (max-width: 699px) {   /* 11-26 사용자 "아직도 공간 개선이 필요": 휴대폰은 거실 크기를 한 줄로 접어 두고 누르면 편다 */
+  @media (max-width: 699px), (max-height: 500px) {   /* 11-26 사용자 "아직도 공간 개선이 필요"(눕힌 휴대폰도): 휴대폰은 거실 크기를 한 줄로 접어 두고 누르면 편다 */
     .rs-sum { display: flex; }
     #roomsize { padding: 6px 10px; }
     #roomsize:not(.open) > :not(.rs-sum) { display: none; }
@@ -158,16 +158,17 @@
   .hdl svg { width: 22px; height: 22px; }
   .hdl.drag { cursor: grabbing; background: var(--yellow); color: #14161c; }
   .hdl[hidden] { display: none; }
+  .stage.moving #labels, .stage.moving .hdl { visibility: hidden; }
   .hdl.item { background: #fff; color: #14161c; border-color: var(--blue); }   /* 가구 손잡이: 고른 품목에만 흰 손잡이 */
 
   .tools { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; }
   /* 11-26 사용자 "메뉴는 접었다 펼 수 있게": 접으면 선택지와 견적 내역을 감추고 3D를 넓게. 휴대폰은 품목 이름과 합계 한 줄만, 넓은 화면은 오른쪽 패널을 통째로 */
   .tog.lnk { padding: 0; width: 44px; justify-content: center; }
   .tog.lnk svg { width: 18px; height: 18px; }
-  .foldtop { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-2); background: none; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
-  .foldtop svg { width: 16px; height: 16px; transition: transform .2s; }
-  .foldtop[aria-expanded="false"] svg { transform: rotate(180deg); }
-  @media (min-width: 700px) { .foldtop { margin-left: 14px; } }
+  /* 11-26 사용자 "메뉴 접기만 원래 위치로, 모바일에서 위에 있으니 불편": 3D 아래 버튼 줄(엄지 닿는 곳)로 되돌림 */
+  .tog.fold { gap: 4px; }
+  .tog.fold svg { width: 16px; height: 16px; transition: transform .2s; }
+  .tog.fold[aria-expanded="false"] svg { transform: rotate(180deg); }
   .app.fold .opts, .app.fold .bill { display: none !important; }
   @media (min-width: 700px) { .stage .hint { max-width: calc(100% - 330px); } }   /* 넓은 화면: 안내가 오른쪽 아래 버튼들과 겹치지 않게 */
   @media (max-width: 699px) { .stage .hint { top: 52px; bottom: auto; right: 8px; left: 8px; text-align: center; } }   /* 좁은 화면에서는 안내를 위쪽(거실 크기 줄 아래)에 두어 아래 버튼과 겹치지 않게 */
@@ -311,7 +312,8 @@
   @media (min-width: 700px) and (pointer: coarse) { .zoom { display: none; } }
 
   /* PC: 오른쪽 패널 */
-  @media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
+  /* 11-26 녹화 중 발견: 높이가 낮은 가로 화면(휴대폰 눕힘, 작은 창)은 아래 메뉴가 화면을 다 차지해 3D가 0이 됐다. 이런 화면도 오른쪽 패널로 */
+  @media (min-width: 1024px) and (min-aspect-ratio: 1/1), (min-width: 640px) and (orientation: landscape) and (max-height: 760px) {
     .app { grid-template-columns: minmax(0, 1fr) 408px; grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "top top" "stage panel"; }
     .app.fold { grid-template-columns: minmax(0, 1fr) 0; }
     .app.fold .panel { display: none; }
@@ -330,6 +332,13 @@
     .zoom { right: 20px; top: 20px; }
     .hint { left: 20px; bottom: 20px; }
   }
+  @media (min-width: 640px) and (orientation: landscape) and (max-height: 760px) {   /* 낮은 가로 화면: 패널을 조금 좁히고, 선택지는 패널 안에서 넘기며, 견적 내역은 합계로 대신 */
+    .app { grid-template-columns: minmax(0, 1fr) 360px; }
+    .opts { flex: 1 1 auto; overflow-y: auto; padding: 12px 18px; }
+    .bill { display: none; }
+    .bar { padding: 8px 18px 12px; }
+    .cta { min-height: 46px; font-size: 16px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     #gl, .sw, .sw::after, .hint { transition: none; }
   }
@@ -346,8 +355,6 @@
   <header class="top">
     <a class="brand" href="/3d">곰파트너</a>
     <h1>3D 인테리어 상담 화면</h1>
-    <p class="for">인테리어, 붙박이 가구, 리모델링 업체 홈페이지용</p>
-    <button type="button" class="foldtop" id="foldbtn" aria-expanded="true" aria-controls="panel"><span id="foldtxt">메뉴 접기</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
   </header>
 
   <main class="stage" id="stage">
@@ -373,6 +380,7 @@
         <button type="button" id="vplan" aria-pressed="false">평면도</button>
       </div>
       <button type="button" class="tog" id="dimbtn" aria-pressed="true"><i></i>치수</button>
+      <button type="button" class="tog fold" id="foldbtn" aria-expanded="true" aria-controls="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg><span id="foldtxt">메뉴</span></button>
       <button type="button" class="tog lnk" id="linkbtn" aria-label="이 구성 링크 복사" title="이 구성 링크 복사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
     </div>
     <p class="nogl" id="nogl" hidden>이 기기에서는 3D 화면을 열 수 없습니다. 아래에서 품목을 고르면 금액은 그대로 계산됩니다.</p>
@@ -748,12 +756,13 @@ function change(id, patch) {
   if (scene3d) scene3d.apply(id);
   saveLink();
 }
-function selectTab(id, focus) {
+// 11-26 사용자 "편의성 최선으로": 3D에서 가구를 눌러 고를 때는 카메라를 돌리지 않는다(배치하던 시점 그대로). 탭으로 고를 때만 그 가구 쪽으로 돈다
+function selectTab(id, focus, fly = true) {
   ui.tab = id;
   renderTabs(); renderOpts();
   if (focus) $('tab-' + id).focus();
-  $('tab-' + id).scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  if (scene3d) scene3d.select(id);
+  if (tabsEl.scrollWidth > tabsEl.clientWidth + 1) $('tab-' + id).scrollIntoView({ block: 'nearest', inline: 'nearest' });   // 탭이 넘칠 때만(괜히 페이지가 움직이지 않게)
+  if (scene3d) scene3d.select(id, fly);
 }
 tabsEl.addEventListener('click', e => { const b = e.target.closest('button[data-id]'); if (b) selectTab(b.dataset.id); });
 tabsEl.addEventListener('keydown', e => {
@@ -793,7 +802,7 @@ const coarse = matchMedia('(pointer: coarse)').matches;
 // 메뉴 접기, 펴기(11-26 사용자 "메뉴 접고 펼치는 건 위쪽에")
 $('foldbtn').addEventListener('click', () => {
   const fold = document.querySelector('.app').classList.toggle('fold');
-  $('foldbtn').setAttribute('aria-expanded', String(!fold)); $('foldtxt').textContent = fold ? '메뉴 펴기' : '메뉴 접기';
+  $('foldbtn').setAttribute('aria-expanded', String(!fold)); $('foldbtn').setAttribute('aria-label', fold ? '메뉴 펴기' : '메뉴 접기');
 });
 $('hint').textContent = coarse ? '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다' : '가구를 눌러 고르고, 끌어서 옮기고, 손잡이로 크기를 바꿉니다. 빈 곳을 끌면 회전, Ctrl + 휠 확대';
 
@@ -1341,19 +1350,12 @@ if (!renderer) {
       setCam(L(from[0], v[0]), L(from[1], v[1]), L(from[2], v[2]), [0, 1, 2].map(i => L(from[3][i], v[3][i])));
     }, 'cam');
   }
-  controls.addEventListener('start', () => { for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].key === 'cam') tweens.splice(i, 1); quality(false); });
-  controls.addEventListener('end', () => quality(true));
+  controls.addEventListener('start', () => { for (let i = tweens.length - 1; i >= 0; i--) if (tweens[i].key === 'cam') tweens.splice(i, 1); });
   controls.addEventListener('change', () => { zoomK = persp.position.distanceTo(controls.target) / fit; invalidate(); });
 
   // 처음 거실(4,500 x 4,200)에 견준 크기. 카메라 거리와 평면도 범위, 그림자 범위를 같이 늘리고 줄인다
   const roomK = () => Math.max(0.9, Math.hypot(W + 1.4, D) / Math.hypot(5.9, 4.2));
-  // 만지는 동안(돌리기, 끌기)은 해상도를 낮춰 가볍게 그리고, 손을 떼면 0.25초 뒤 다시 선명하게
-  let qT = 0, qLow = false;
-  function quality(high) {
-    clearTimeout(qT);
-    const apply = low => { if (low === qLow) return; qLow = low; renderer.setPixelRatio(low ? Math.min(DPR, MOBILE ? 1.25 : 1) : DPR); renderer.setSize(stage.clientWidth, stage.clientHeight, false); invalidate(); };
-    if (high) qT = setTimeout(() => apply(false), 250); else apply(true);
-  }
+  // 11-26 사용자 "끄는 동안 퀄리티 낮추지 마": 만지는 동안 해상도를 낮추던 것을 뺐다(가벼움은 다시 만들지 않기, 그림자 0.1초 간격으로 챙긴다)
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
     if (!w || !h) return;
@@ -1473,7 +1475,7 @@ if (!renderer) {
     const H0 = HDL[k], el = H0.el;
     el.addEventListener('pointerdown', e => {
       e.preventDefault(); e.stopPropagation(); el.setPointerCapture(e.pointerId); el.classList.add('drag');
-      controls.enabled = false; hdlDrag = true; quality(false); $('hint').classList.add('off');
+      controls.enabled = false; hdlDrag = true; $('hint').classList.add('off');
     });
     el.addEventListener('pointermove', e => {
       if (!el.classList.contains('drag')) return;
@@ -1485,7 +1487,7 @@ if (!renderer) {
       if (!ray.ray.intersectPlane(floorPl, hit)) return;
       H0.drag(hit);
     });
-    const end = e => { if (!el.classList.contains('drag')) return; el.classList.remove('drag'); hdlDrag = false; quality(true); resize(); controls.enabled = ui.view === '3d'; try { el.releasePointerCapture(e.pointerId); } catch (_) {} };
+    const end = e => { if (!el.classList.contains('drag')) return; el.classList.remove('drag'); hdlDrag = false; resize(); controls.enabled = ui.view === '3d'; try { el.releasePointerCapture(e.pointerId); } catch (_) {} };
     el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
     el.addEventListener('keydown', e => {   // 키보드: 화살표로 한 칸씩
       const d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
@@ -1507,6 +1509,14 @@ if (!renderer) {
     return FLOOR_ITEMS.some(o => { if (o === k) return false; const b = foot(o); return !!b && a[0] < b[1] - 0.005 && a[1] > b[0] + 0.005 && a[2] < b[3] - 0.005 && a[3] > b[2] + 0.005; });
   }
   // 새 자리를 시험해 겹치면 x만, z만 바꿔 본다(벽 타듯 미끄러지게). 다 겹치면 제자리. 처음부터 겹쳐 있던 가구는 빠져나올 수 있게 막지 않는다
+  // 11-26 사용자 "끄는 동안 치수나 이런 게 안 나와야 할 듯": 가구를 옮기는 동안은 치수선, 치수 글자, 손잡이를 감추고 놓으면 다시 그린다
+  let isMoving = false;
+  function moving(on) {
+    if (on === isMoving) return; isMoving = on;
+    stage.classList.toggle('moving', on); dimG.visible = !on;
+    if (!on) rebuildDims();
+    invalidate();
+  }
   // 손가락이 빨리 움직여도 가구를 건너뛰지 않게 4 cm씩 나눠 옮기며 막히는 곳에서 멈춘다
   function tryMove(k, get, set, nx, nz) {
     let [cx0, cz0] = get();
@@ -1550,13 +1560,13 @@ if (!renderer) {
       e.stopPropagation(); e.preventDefault();
       const [gx, gz] = it.get();
       tableDrag = { id: e.pointerId, item: id, dx: gx - grab.x, dz: gz - grab.z, x0: e.clientX, y0: e.clientY, moved: false };
-      itemDrag = true; quality(false); stage.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; controls.enabled = false; $('hint').classList.add('off');
+      itemDrag = true; stage.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; controls.enabled = false; $('hint').classList.add('off');
       return;
     }
     tablePl.constant = -m.y;
     if (!ray.ray.intersectPlane(tablePl, grab)) return;
     e.stopPropagation(); e.preventDefault();
-    tableDrag = { id: e.pointerId, m, dx: m.g.position.x - grab.x, dz: m.g.position.z - grab.z }; quality(false);
+    tableDrag = { id: e.pointerId, m, dx: m.g.position.x - grab.x, dz: m.g.position.z - grab.z };
     stage.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; controls.enabled = false; $('hint').classList.add('off');
   }, true);
   stage.addEventListener('pointermove', e => {
@@ -1565,22 +1575,22 @@ if (!renderer) {
     if (tableDrag.item) {
       if (!tableDrag.moved && Math.hypot(e.clientX - tableDrag.x0, e.clientY - tableDrag.y0) < 6) return;   // 살짝 누른 것은 고르기로
       // 11-26 사용자 "움직이게 하니까 자연스럽지 못하고 끊긴다": 끄는 동안은 가구를 다시 만들지 않고 이미 만든 묶음을 밀기만 한다. 놓을 때 한 번 다시 만든다
-      if (!tableDrag.moved) { tableDrag.moved = true; tableDrag.base = { sx: sofaX(state), sz: sofaBack(state), cz: closetZ1(state) }; }
+      if (!tableDrag.moved) { tableDrag.moved = true; tableDrag.base = { sx: sofaX(state), sz: sofaBack(state), cz: closetZ1(state) }; moving(true); }
       const id = tableDrag.item, it = ITEM_MOVE[id], bs = tableDrag.base;
       tryMove(id === 'tv' ? 'tvUnit' : id, it.get, (x, z) => it.set(x, z), grab.x + tableDrag.dx, grab.z + tableDrag.dz);
       if (id === 'tv' || id === 'tvUnit') placeAxis(cxOf(state));
       slots.sofa.position.set(sofaX(state) - bs.sx, 0, sofaBack(state) - bs.sz);   // 소파는 TV 축을 따라가기도 해서 늘 맞춘다
       slots.closet.position.z = closetZ1(state) - bs.cz;
-      shadowDirty = true; rebuildDimsSoon(); invalidate();
+      shadowDirty = true; invalidate();
       return;
     }
-    const m = tableDrag.m; m.moved = true;
+    const m = tableDrag.m; moving(true); m.moved = true;
     if (m.g === tableG) tryMove('table', () => [tableG.position.x, tableG.position.z], (x, z) => { tableG.position.x = x; tableG.position.z = z; placeTable(); }, grab.x + tableDrag.dx, grab.z + tableDrag.dz);
     else { m.g.position.x = grab.x + tableDrag.dx; m.g.position.z = grab.z + tableDrag.dz; placeTable(); }   // 러그는 가구 밑에 깔려 겹쳐도 된다
     invalidate();
   });
   const tableEnd = e => { if (!tableDrag) return; const t = tableDrag; tableDrag = null; saveLink();
-    if (t.item && !t.moved && t.item !== ui.tab) selectTab(t.item);   // 끌지 않고 누르기만 했으면 그 품목을 고른다
+    if (t.item && !t.moved && t.item !== ui.tab) selectTab(t.item, false, false);   // 끌지 않고 누르기만 했으면 그 품목을 고른다
     if (t.item && t.moved) {   // 놓은 자리에서 한 번만 다시 만든다(밀어 둔 묶음 자리는 되돌리고, 튕김 연출 없이)
       slots.sofa.position.set(0, 0, 0); slots.closet.position.set(0, 0, 0);
       fitWhy = fitAll(state);
@@ -1588,7 +1598,7 @@ if (!renderer) {
       if (state.shelf.on) rebuild('shelf', false);
       renderPanel(); rebuildDims(); shadowDirty = true; invalidate();
     }
-    itemDrag = false; quality(true); canvas.style.cursor = ''; controls.enabled = ui.view === '3d'; try { stage.releasePointerCapture(e.pointerId); } catch (_) {} };
+    itemDrag = false; moving(false); canvas.style.cursor = ''; controls.enabled = ui.view === '3d'; try { stage.releasePointerCapture(e.pointerId); } catch (_) {} };
   stage.addEventListener('pointerup', tableEnd); stage.addEventListener('pointercancel', tableEnd);
 
   // 가구를 누르면 그 품목을 고른다(끌어서 돌린 것은 누른 것으로 보지 않는다)
@@ -1604,7 +1614,7 @@ if (!renderer) {
     if (!hits.length) return;
     let o = hits[0].object; while (o && !Object.values(slots).includes(o)) o = o.parent;
     const id = o && Object.keys(slots).find(k => slots[k] === o);
-    if (id && id !== ui.tab) selectTab(id);
+    if (id && id !== ui.tab) selectTab(id, false, false);
   });
 
   /* ----- 그리기: 바뀔 때만 ----- */
@@ -1634,7 +1644,7 @@ if (!renderer) {
       if (cx !== cxNow) { if (itemDrag) placeAxis(cx); else { const from = cxNow; tween(360, t => { placeAxis(from + (cx - from) * easeOut(t)); rebuildDimsSoon(); }, 'axis'); } if (id !== 'sofa') rebuild('sofa', false); }   // 끄는 중에는 손가락을 바로 따라가게   // 선반이 들고 나면 소파도 가운데를 다시 잡는다
       shadowDirty = true; rebuildDims();
     },
-    select(id) { rebuildDims(); if (ui.view === '3d') flyTo(VIEW[id]); },
+    select(id, fly) { rebuildDims(); if (fly !== false && ui.view === '3d') flyTo(VIEW[id]); },
     relayout() {   // 거실 크기를 바꿨을 때: 벽을 다시 세우고 품목을 새 자리에, 카메라는 새 크기에 맞춘다
       buildShell(); shadowBox();
       for (const it of ITEMS) rebuild(it.id, false);

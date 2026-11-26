@@ -115,7 +115,7 @@ export const threeCompare = {
 
 /** 카탈로그(public/3d 데모) */
 export const threeDemos = [
-  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=1126", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "거래장부 견적서로 보내기"] },
+  { href: "/3d/room/", img: "/3d/assets/thumb/room.jpg?v=1127", category: "인테리어", title: "거실 상담 화면", desc: "거실 크기를 정하고 가구와 중문을 실제 치수로 넣어 보며 견적을 받습니다", features: ["거실 크기 조절", "3D와 평면도", "치수선", "품목 넣고 빼기", "실시간 견적", "거래장부 견적서로 보내기"] },
   { href: "/3d/sofa/", img: "/3d/assets/thumb/sofa.jpg?v=1125", category: "가구 쇼룸", title: "모듈 소파", desc: "모듈 수, 원단, 다리를 바꾸면 견적이 바로 나옵니다", features: ["3D 구성", "모듈 바꾸기", "원단과 다리 선택", "실시간 견적", "견적 요청 접수"] },
   { href: "/3d/configurator/", img: "/3d/assets/thumb/configurator.jpg?v=1125", category: "가구 쇼룸", title: "시스템 선반", desc: "벽 폭에 맞춰 칸과 서랍, 도어를 붙이고 견적을 받습니다", features: ["3D 구성", "폭 입력", "서랍, 도어, 행거봉", "실시간 견적", "견적 요청 접수"] },
   { href: "/3d/door/", img: "/3d/assets/thumb/door.jpg?v=1125", category: "인테리어", title: "현관 중문", desc: "문 방식과 프레임 색, 유리를 골라 견적을 받습니다", features: ["3D 구성", "폭과 높이 입력", "프레임 색과 유리 선택", "실시간 견적", "견적 요청 접수"] },
