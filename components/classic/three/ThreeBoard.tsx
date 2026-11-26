@@ -68,7 +68,7 @@ function Fold({ title, children }: { title: string; children: ReactNode }) {
 export function ThreeBoard() {
   const sofa = demo("sofa");
   return (
-    <BoardShell no="01" en="3D WEB" ice="고객이 직접 구성하는 " title={"3D 견적 화면"} lead={`${threeMeta.lead}.`}>
+    <BoardShell no="01" en="3D WEB" kw="3D 홈페이지 제작" ice="고객이 직접 구성하는 " title={"3D 견적 화면"} lead={`${threeMeta.lead}.`}>
       {/* 1. 그 자리에서 만져 보는 실제 3D */}
       <section aria-labelledby="t3d-live" className="mt-10 md:mt-14">
         <LiveStage
