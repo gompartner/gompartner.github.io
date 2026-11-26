@@ -6,23 +6,23 @@ import { MotionShot } from "@/components/classic/board/MotionShot";
 
 // 11-26 3D 웹 판의 첫 칸. 영상이 아니라 실제 3D 화면(public/3d 정적 페이지)을 그 자리에 끼워, 방문자가 직접 돌리고 눌러 본다
 // (사용자 "영상 플레이가 아닌 효과도 할 수 있나". 이 상품은 직접 만져 봐야 팔린다).
-// 맨 위에 둘 화면은 시스템 선반으로 골랐다. 한 화면에서 끝나고, 칸이나 서랍을 하나 붙일 때마다 위쪽 금액이 바뀌어 사는 이유가 바로 보인다.
+// 맨 위에 둘 화면은 모듈 소파다(11-26 사용자 "3D 첫 번째 체험은 소파로". 처음에는 시스템 선반이었다). 한 화면에서 끝나고, 모듈을 붙이거나 원단을 바꿀 때마다 위쪽 금액이 바뀐다.
 //  - PC(마우스): 페이지가 열리면 3D 라이브러리를 미리 받고 바로 켠다. 그리기 전에는 첫 화면 그림이 서 있다.
 //    3D 위에서 휠을 굴리면 3D가 확대되지 않고 페이지가 내려간다(스크롤을 붙잡지 않는다). 확대는 Ctrl + 휠.
 //  - 휴대폰, 태블릿(손가락): 3D 위에서는 손가락 끌기가 회전으로 쓰여 페이지가 내려가지 않는다. 그래서 처음에는 조작 영상(태블릿은 그림)만 두고,
 //    "직접 해 보기"를 눌러야 그 자리에서 3D가 켜진다. 다시 끌 수 있고, 켠 동안에도 3D 높이를 화면의 70% 아래로 묶어 위아래에 잡고 내릴 자리를 남긴다.
-// 끼운 화면 안의 곰파트너 바로가기 줄은 가리고(이미 곰파트너 사이트 안이다), 안쪽 링크는 창 전체로 연다. public/3d 파일은 고치지 않는다.
+// 끼운 화면 안의 곰파트너 바로가기 줄은 가리고(이미 곰파트너 사이트 안이다. 소파 화면은 ?embed=1 로 스스로 가리고 위 여백도 줄인다), 안쪽 링크는 창 전체로 연다. public/3d 파일은 고치지 않는다.
 
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-/** 시스템 선반 화면의 바탕색 */
+/** 가구 쇼룸 3D 화면(소파, 선반)의 바탕색 */
 const STAGE_BG = "#e6ecea";
 
 /** auto: 바로 켠다(마우스), video: 눌러서 켠다, 그 전에는 조작 영상(휴대폰), still: 눌러서 켠다, 그 전에는 그림(태블릿) */
 type Mode = "auto" | "video" | "still";
 
-/** children은 3D 아래에 두는 이름표와 제목, hint는 그 아래 한 줄. poster는 넓은 화면의 첫 그림, preview는 휴대폰의 조작 영상 */
-export function LiveStage({ src, title, poster, preview, hint, children }: { src: string; title: string; poster: string; preview: { src: string; poster: string; w: number; h: number; alt: string }; hint: string; children: ReactNode }) {
+/** src는 끼울 주소, href는 전체 화면으로 열 주소. children은 3D 아래에 두는 이름표와 제목, hint는 그 아래 한 줄. poster는 넓은 화면의 첫 그림, preview는 휴대폰의 조작 영상 */
+export function LiveStage({ src, href, title, poster, preview, hint, children }: { src: string; href: string; title: string; poster: string; preview: { src: string; poster: string; w: number; h: number; alt: string }; hint: string; children: ReactNode }) {
   // 서버와 첫 그리기에서는 어떤 기기인지 모른다(null): 그동안은 첫 화면 그림만 보인다
   const [mode, setMode] = useState<Mode | null>(null);
   const [on, setOn] = useState(false);
@@ -120,7 +120,7 @@ export function LiveStage({ src, title, poster, preview, hint, children }: { src
               <Power size={17} aria-hidden /> 3D 끄기
             </button>
           )}
-          <a href={src} className="inline-flex min-h-12 items-center gap-1.5 rounded-full border border-white/25 px-5 text-[16px] font-bold text-white hover:border-white/90">
+          <a href={href} className="inline-flex min-h-12 items-center gap-1.5 rounded-full border border-white/25 px-5 text-[16px] font-bold text-white hover:border-white/90">
             전체 화면으로 열기 <ArrowUpRight size={17} aria-hidden />
           </a>
         </div>

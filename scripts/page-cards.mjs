@@ -1,6 +1,7 @@
 // 페이지의 공유 미리보기 이미지(1200x630 JPG)를 만든다. 그림체와 틀은 scripts/og-card.mjs (11-26 지금 사이트의 어두운 화면에 맞춰 다시 그림).
-// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all] [--features] [--only <주소 앞부분>]
-//  아무것도 안 주면 아직 없는 카드만 만든다. --all 은 모두 다시, --only /knowledge 는 그 주소로 시작하는 페이지만 다시.
+// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all] [--features] [--only <주소 앞부분>] [--page <주소>]
+//  아무것도 안 주면 아직 없는 카드만 만든다. --all 은 모두 다시, --only /knowledge 는 그 주소로 시작하는 페이지만 다시,
+//  --page /3d 는 딱 그 주소의 카드 한 장만 다시(--only /3d 는 /3d/sofa/ 같은 아래 화면 그림까지 다시 만든다).
 //  --features 는 화면이 들어가는 주요 페이지 카드만 다시(그 페이지의 화면을 고친 뒤).
 //  CDP=http://127.0.0.1:9333 을 주면 새 크롬을 띄우지 않고 이미 떠 있는 업무용 크롬의 새 탭으로 만든다(끝나면 그 탭만 닫는다)
 // 만드는 것
@@ -15,6 +16,7 @@ import { H, SHOT, W, drawCard, openTab, root } from "./og-card.mjs";
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const all = process.argv.includes("--all");
 const only = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : "";
+const one = process.argv.includes("--page") ? process.argv[process.argv.indexOf("--page") + 1] : "";
 const OUT = `${root}public/og/page`;
 mkdirSync(OUT, { recursive: true });
 const key = (p) => p.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
@@ -26,7 +28,7 @@ const key = (p) => p.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
 const FEATURES = {
   "/": { file: `${root}public/og-image.png`, title: "Build, Run, Care.", ice: "Build, Run, Care.", sub: "홈페이지, 앱 제작과 유지보수", shot: { vw: 1440, sel: 'iframe[title^="3D 마을"]', cw: 590, dy: 64, wait: 9000 } },
   "/make": { label: "BUILD", accent: "build", title: "홈페이지, 앱 제작", sub: "종류별 화면과 금액, 제작 기간", shot: { vw: 1280, sel: "#mk-panel", cw: 892, dx: -16, dy: 196 } },
-  "/3d": { label: "3D WEB", title: "3D 웹 제작", ice: "3D 웹", sub: "고객이 직접 구성하는 3D 견적 화면", shot: { from: "/3d/configurator/", vw: 1140, wait: 7000 } },
+  "/3d": { label: "3D WEB", title: "3D 웹 제작", ice: "3D 웹", sub: "고객이 직접 구성하는 3D 견적 화면", shot: { from: "/3d/sofa/?embed=1", vw: 1140, wait: 7000 } },
   "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 1280, sel: '[role=tablist][aria-label="상황"]', cw: 1264, dx: -16, dy: -20 } },
   "/pricing": { label: "PRICE", title: "제작, 유지보수 비용", ice: "제작,", sub: "홈페이지 제작 29.9만 원부터", shot: { vw: 1280, sel: 'section[aria-labelledby="pr-2"]', cw: 1264, dx: -16, dy: -16 } },
   "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: "main article", cw: 1264, dx: -16, dy: -16 } },
@@ -55,7 +57,7 @@ function labelOf(html) {
 }
 
 const featuresOnly = process.argv.includes("--features");
-const want = (path, file) => (featuresOnly ? !!FEATURES[path] : only ? path.startsWith(only) : all || !existsSync(file));
+const want = (path, file) => (one ? path === one : featuresOnly ? !!FEATURES[path] : only ? path.startsWith(only) : all || !existsSync(file));
 
 const xml = await get("/sitemap.xml");
 const sitemap = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);

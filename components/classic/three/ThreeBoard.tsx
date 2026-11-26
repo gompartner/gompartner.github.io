@@ -11,7 +11,7 @@ import { threeByIndustry, threeCommon, threeCompare, threeDeliver, threeDemos, t
 
 // 11-26 3D 웹 한 판(사용자 "가격만 나와서, 무엇을 할 수 있는지랑 왜 필요한지, 이 상품을 사도록 매력 있게").
 // 옛 페이지는 3D 마을 아래로 표가 이어지는 가격 문서였다. 순서를 이야기로 바꿨다.
-//  1) 무엇을 할 수 있는지: 맨 위는 실제 3D(시스템 선반)를 그 자리에서 만져 보고, 아래는 업종별 화면을 조작하는 영상과 "직접 해 보기"
+//  1) 무엇을 할 수 있는지: 맨 위는 실제 3D(모듈 소파)를 그 자리에서 만져 보고, 아래는 업종별 화면을 조작하는 영상과 "직접 해 보기"
 //  2) 왜 필요한지: 도입이 필요한 경우 넷과 그때 화면이 하는 일, 사장님이 받게 되는 견적 요청
 //  3) 무엇이 납품되고 얼마인지: 패키지, 구현 범위, 진행 절차와 납품물, 업종별 예상 비용, 제작 방식 비교
 //  4) 자주 묻는 질문, 문의
@@ -21,11 +21,11 @@ import { threeByIndustry, threeCommon, threeCompare, threeDeliver, threeDemos, t
 const V = "/videos/3d";
 const demo = (id: string) => threeDemos.find((d) => d.href === `/3d/${id}/`)!;
 
-/** 영상으로 보여 주는 화면. head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
+/** 영상으로 보여 주는 화면(맨 위에서 직접 만지는 모듈 소파는 여기서 뺀다). head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
 const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] = [
   { id: "room", head: "거실 치수에 맞춰 가구를 넣어 봅니다", wide: true, phone: true },
+  { id: "configurator", head: "칸과 부속을 붙이면 금액이 바뀝니다" },
   { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
-  { id: "sofa", head: "모듈과 원단을 바꿔 가며 고릅니다" },
   { id: "sign", head: "상호를 입력하면 간판이 걸립니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
   { id: "hanok", head: "첫 화면부터 3D 장면으로 보여 줍니다", wide: true },
@@ -66,25 +66,26 @@ function Fold({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function ThreeBoard() {
-  const shelf = demo("configurator");
+  const sofa = demo("sofa");
   return (
     <BoardShell no="01" en="3D WEB" ice="고객이 직접 구성하는 " title={"3D 견적 화면"} lead={`${threeMeta.lead}.`}>
       {/* 1. 그 자리에서 만져 보는 실제 3D */}
       <section aria-labelledby="t3d-live" className="mt-10 md:mt-14">
         <LiveStage
-          src={shelf.href}
-          title="시스템 선반 3D 구성 화면. 칸과 부속을 붙이면 폭과 금액이 바뀝니다."
-          poster={`${V}/configurator-stage.jpg`}
-          preview={{ src: `${V}/configurator-stage-m.mp4`, poster: `${V}/configurator-stage-m.jpg`, w: 716, h: 1120, alt: "시스템 선반에 칸, 서랍, 도어를 붙이고 색을 바꾸는 화면" }}
-          hint="칸, 서랍, 도어를 붙이면 위쪽 금액이 같이 바뀝니다. 끌면 선반이 돌아갑니다."
+          src={`${sofa.href}?embed=1`}
+          href={sofa.href}
+          title="모듈 소파 3D 구성 화면. 모듈을 붙이고 원단을 바꾸면 폭과 금액이 바뀝니다."
+          poster={`${V}/sofa-stage.jpg`}
+          preview={{ src: `${V}/sofa-stage-m.mp4`, poster: `${V}/sofa-stage-m.jpg`, w: 712, h: 1120, alt: "모듈 소파에 1인 모듈과 스툴을 붙이고 원단을 가죽으로 바꾸는 화면" }}
+          hint="1인, 카우치, 스툴을 붙이거나 원단을 부클레, 가죽으로 바꾸면 위쪽 금액이 같이 바뀝니다. 끌면 소파가 돌아갑니다."
         >
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
-            <span className="text-[#7aa7ff]">{shelf.category}</span>
+            <span className="text-[#7aa7ff]">{sofa.category}</span>
             <span aria-hidden className="h-3 w-px bg-white/25" />
-            <span className="text-[#c9ced6]">{shelf.title}</span>
+            <span className="text-[#c9ced6]">{sofa.title}</span>
           </p>
           <h2 id="t3d-live" className="mt-2 break-keep text-[24px] font-[800] leading-[1.3] tracking-[-0.045em] md:text-[32px]">
-            칸과 부속을 붙이면 금액이 바로 바뀝니다
+            모듈을 붙이고 원단을 바꾸는 대로 견적이 나옵니다
           </h2>
         </LiveStage>
       </section>
