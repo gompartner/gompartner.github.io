@@ -1,5 +1,5 @@
 // gompartner.co.kr 정적 사이트를 Cloudflare Workers 정적 호스팅으로 올린다.
-// 빌드 결과(out)만 올리는 구성이라 서버 코드는 없다.
+// 빌드 결과(out)를 그대로 올린다. 서버 코드는 영상 조각 요청을 맡는 worker/range.js 하나뿐이고, /videos/* 요청만 그 코드를 거친다.
 {
   "name": "gompartner-site",
   "compatibility_date": "2026-11-01",
@@ -9,8 +9,11 @@
     { "pattern": "gompartner.co.kr", "custom_domain": true },
     { "pattern": "www.gompartner.co.kr", "custom_domain": true }
   ],
+  "main": "worker/range.js",
   "assets": {
     "directory": "./out",
+    "binding": "ASSETS",
+    "run_worker_first": ["/videos/*"],
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page"
   }
