@@ -29,6 +29,10 @@ export function Assemble({ children }: { children: ReactNode }) {
     asm.sections = true;
     if (!root || built || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     root.dataset.asm = "";
+    // 손가락으로 넘기는 기기(휴대폰, 태블릿)는 넘기는 속도가 빨라 조립이 따라가지 못한다(11-26 사용자 "태블릿과 모바일에서는 조립이 선행되어야, 속도가 못 따라감").
+    // 그래서 부품이 화면에 들어오기 조금 전에 미리 시작하고, 조각이 붙는 시간과 부품 사이 간격을 줄인다. PC는 그대로.
+    const fast = coarsePointer();
+    if (fast) root.style.setProperty("--pt", "0.32s");
     const parts = [...root.querySelectorAll<HTMLElement>("[data-part]")];
     const order = new Map(parts.map((el, i) => [el, i]));
     const timers: number[] = [];
@@ -51,11 +55,11 @@ export function Assemble({ children }: { children: ReactNode }) {
           const p = document.createElement("span");
           p.className = "asm-plate asm-piece";
           p.setAttribute("aria-hidden", "true");
-          p.style.cssText = `background:${bg};border-radius:${cs.borderRadius};clip-path:${clip};--px:${[-90, 0, 90][i] + Math.round(rnd(-20, 20))}px;--py:${[40, -70, 50][i] + Math.round(rnd(-15, 15))}px;--pr:${[-7, 4, 8][i]}deg;--ps:1;--pd:${(t + i * 0.07).toFixed(2)}s`;
+          p.style.cssText = `background:${bg};border-radius:${cs.borderRadius};clip-path:${clip};--px:${[-90, 0, 90][i] + Math.round(rnd(-20, 20))}px;--py:${[40, -70, 50][i] + Math.round(rnd(-15, 15))}px;--pr:${[-7, 4, 8][i]}deg;--ps:1;--pd:${(t + i * (fast ? 0.04 : 0.07)).toFixed(2)}s`;
           el.insertBefore(p, el.firstChild);
           return p;
         });
-        t += 0.3;
+        t += fast ? 0.16 : 0.3;
         undo.push(() => {
           plates.forEach((p) => p.remove());
           face.style.backgroundColor = prevBg;
@@ -73,10 +77,10 @@ export function Assemble({ children }: { children: ReactNode }) {
         c.style.setProperty("--py", `${Math.round(Math.sin(a) * far)}px`);
         c.style.setProperty("--pr", `${rnd(-9, 9).toFixed(1)}deg`);
         c.style.setProperty("--ps", rnd(0.8, 1.12).toFixed(2));
-        c.style.setProperty("--pd", `${(t + i * 0.05).toFixed(2)}s`);
+        c.style.setProperty("--pd", `${(t + i * (fast ? 0.028 : 0.05)).toFixed(2)}s`);
         c.classList.add("asm-piece");
       });
-      const end = t + set.length * 0.05 + 0.5;
+      const end = t + set.length * (fast ? 0.028 : 0.05) + (fast ? 0.36 : 0.5);
       undo.push(() =>
         set.forEach((c) => {
           c.classList.remove("asm-piece");
@@ -99,7 +103,8 @@ export function Assemble({ children }: { children: ReactNode }) {
       let end = 0;
       for (const el of els) {
         end = build(el, t);
-        t = Math.max(t, end - 0.45);
+        // PC는 앞 부품이 반쯤 조립됐을 때 다음을 시작하고, 손가락 기기는 기다리지 않고 짧은 간격으로 잇따라 시작한다
+        t = fast ? t + 0.1 : Math.max(t, end - 0.45);
       }
       return end;
     };
@@ -123,7 +128,8 @@ export function Assemble({ children }: { children: ReactNode }) {
         run(fresh.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0)));
       },
       // 부품 윗변이 화면 아래에서 4분의 1쯤 올라왔을 때. 붙잡지 않으니 조금 일찍 시작해야 내려가는 동안 조립되는 것이 보인다
-      { rootMargin: coarsePointer() ? "0px 0px -18% 0px" : "0px 0px -24% 0px" },
+      // 손가락 기기는 화면 아래 끝에 닿기 조금 전(화면 높이의 8% 밖)부터 시작한다. 더 일찍 시작하면 보기도 전에 조립이 끝나 버린다
+      { rootMargin: fast ? "0px 0px 8% 0px" : "0px 0px -24% 0px" },
     );
     parts.forEach((el) => io.observe(el));
     // 페이지 맨 아래에 닿으면 조립선까지 올라오지 못한 나머지도 조립한다
@@ -139,6 +145,7 @@ export function Assemble({ children }: { children: ReactNode }) {
       window.removeEventListener("scroll", onScroll);
       timers.forEach((x) => window.clearTimeout(x));
       delete root.dataset.asm;
+      root.style.removeProperty("--pt");
     };
   }, []);
 

@@ -8,7 +8,7 @@ export const pieceCss = `
   78% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); filter: brightness(1.9); animation-timing-function: ease-out; }
   100% { opacity: 1; transform: translate(0px, 0px) rotate(0deg) scale(1); filter: brightness(1); }
 }
-.asm-piece { animation: asm-piece 0.46s linear both; animation-delay: var(--pd); will-change: transform, opacity; }
+.asm-piece { animation: asm-piece var(--pt, 0.46s) linear both; animation-delay: var(--pd); will-change: transform, opacity; }
 .asm-plate { position: absolute; inset: 0; pointer-events: none; }
 `;
 
