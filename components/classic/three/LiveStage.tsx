@@ -10,7 +10,7 @@ import { MotionShot } from "@/components/classic/board/MotionShot";
 //  - PC(마우스): 페이지가 열리면 3D 라이브러리를 미리 받고 바로 켠다. 그리기 전에는 첫 화면 그림이 서 있다.
 //    3D 위에서 휠을 굴리면 3D가 확대되지 않고 페이지가 내려간다(스크롤을 붙잡지 않는다). 확대는 Ctrl + 휠.
 //  - 휴대폰, 태블릿(손가락): 3D 위에서는 손가락 끌기가 회전으로 쓰여 페이지가 내려가지 않는다. 그래서 처음에는 조작 영상(태블릿은 그림)만 두고,
-//    "직접 해 보기"를 눌러야 그 자리에서 3D가 켜진다. 다시 끌 수 있고, 켠 동안에도 3D 높이를 화면의 70% 아래로 묶어 위아래에 잡고 내릴 자리를 남긴다.
+//    가운데 "체험하기"를 눌러야 그 자리에서 3D가 켜진다. 다시 끌 수 있고, 켠 동안에도 3D 높이를 화면의 70% 아래로 묶어 위아래에 잡고 내릴 자리를 남긴다.
 // 끼운 화면 안의 곰파트너 바로가기 줄은 가리고(이미 곰파트너 사이트 안이다. 소파 화면은 ?embed=1 로 스스로 가리고 위 여백도 줄인다), 안쪽 링크는 창 전체로 연다. public/3d 파일은 고치지 않는다.
 
 const THREE_URL = "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
@@ -97,11 +97,11 @@ export function LiveStage({ src, href, title, poster, preview, hint, children }:
             </picture>
           )}
         </div>
-        {/* 손가락으로 쓰는 기기: 아래쪽(부속 줄 자리)에 켜는 버튼을 얹는다. 손이 가는 자리다 */}
+        {/* 손가락으로 쓰는 기기: 화면 한가운데에 켜는 버튼을 얹는다(11-26 사용자 "가운데에 체험하기로") */}
         {tap && !on && (
-          <p className="absolute inset-x-0 bottom-5 flex justify-center">
-            <button type="button" onClick={() => turn(true)} className="gp-primary inline-flex min-h-[52px] items-center gap-2 rounded-full px-7 text-[17px] font-bold shadow-[0_24px_50px_-12px_rgba(0,0,0,.9)]">
-              <Pointer size={18} aria-hidden /> 직접 해 보기
+          <p className="absolute inset-0 grid place-items-center">
+            <button type="button" onClick={() => turn(true)} className="gp-primary inline-flex min-h-[56px] items-center gap-2 rounded-full px-8 text-[18px] font-[800] shadow-[0_24px_50px_-12px_rgba(0,0,0,.9)]">
+              <Pointer size={19} aria-hidden /> 체험하기
             </button>
           </p>
         )}

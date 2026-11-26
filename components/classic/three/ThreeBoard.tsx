@@ -11,7 +11,7 @@ import { threeByIndustry, threeCommon, threeCompare, threeDeliver, threeDemos, t
 
 // 11-26 3D 웹 한 판(사용자 "가격만 나와서, 무엇을 할 수 있는지랑 왜 필요한지, 이 상품을 사도록 매력 있게").
 // 옛 페이지는 3D 마을 아래로 표가 이어지는 가격 문서였다. 순서를 이야기로 바꿨다.
-//  1) 무엇을 할 수 있는지: 맨 위는 실제 3D(모듈 소파)를 그 자리에서 만져 보고, 아래는 업종별 화면을 조작하는 영상과 "직접 해 보기"
+//  1) 무엇을 할 수 있는지: 맨 위는 실제 3D(모듈 소파)를 그 자리에서 만져 보고, 아래는 업종별 화면을 조작하는 영상과 "체험하기"
 //  2) 왜 필요한지: 도입이 필요한 경우 넷과 그때 화면이 하는 일, 사장님이 받게 되는 견적 요청
 //  3) 무엇이 납품되고 얼마인지: 패키지, 구현 범위, 진행 절차와 납품물, 업종별 예상 비용, 제작 방식 비교
 //  4) 자주 묻는 질문, 문의
@@ -90,7 +90,7 @@ export function ThreeBoard() {
         </LiveStage>
       </section>
 
-      {/* 2. 업종별 화면: 조작하는 영상과 직접 해 보기 */}
+      {/* 2. 업종별 화면: 조작하는 영상과 체험하기 */}
       <section aria-labelledby="t3d-screens" className={sec}>
         <h2 id="t3d-screens" className={h2}>
           업종별 3D 화면
@@ -119,8 +119,8 @@ export function ThreeBoard() {
                     <h3 className={`mt-2 ${s.wide ? "break-keep text-[21px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[30px]" : h3}`}>{s.head}</h3>
                     <p className="mt-2 break-keep text-[15px] leading-[1.65] text-[#aab2bf] md:text-[16px]">{d.desc}.</p>
                     <p className="mt-auto pt-5">
-                      <a href={d.href} aria-label={`${name} 직접 해 보기`} className={pill}>
-                        직접 해 보기 <ArrowUpRight size={17} aria-hidden />
+                      <a href={d.href} aria-label={`${name} 체험하기`} className={pill}>
+                        체험하기 <ArrowUpRight size={17} aria-hidden />
                       </a>
                     </p>
                   </div>
