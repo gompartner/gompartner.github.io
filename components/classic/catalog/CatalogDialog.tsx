@@ -16,7 +16,8 @@ import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 export type Shot = { src: string; frame: "browser" | "scene" | "phone" | "screen"; ratio: string; alt: string; long?: { src: string; w: number; h: number }; video?: { src: string; w: number; h: number }; live?: string };
 /** tag: 연도와 기법처럼 제목 옆에 붙는 이름표(그 해의 연출로 만든 화면) */
 export type CatalogItem = { id: string; cat: string; title: string; thumb: string; main: Shot; side?: Shot; features: string[]; tag?: string };
-export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; think: string; made: string };
+/** wantLinks: 첫 칸(want)을 용어 목록으로 그릴 때. href 가 있는 말은 위키 용어 설명으로 간다(웹 트렌드를 반영한 화면) */
+export type CatalogStoryView = CatalogItem & { headline: string; wantLabel: string; want: string; wantLinks?: { name: string; href?: string }[]; think: string; made: string };
 
 /** 그림 한 장을 브라우저, 휴대폰, 키오스크 틀에 넣는다. scene은 기기를 이미 담은 그림이라 테두리만 둔다 */
 export function Frame({ shot, sizes, full = false }: { shot: Shot; sizes: string; full?: boolean }) {

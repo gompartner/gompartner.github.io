@@ -131,6 +131,8 @@ export const catalogStories: CatalogStory[] = [
 // 11-26 웹 트렌드를 반영한 화면(사용자 "트렌드에 맞춰 작업했던 내용도 카탈로그에", 칸 이름 "그 해의 연출로 만든 화면"은 "문구도 이상하고"로 고침). 11-25에 치과, 피부과 홈페이지를 2026형, 2027형으로 만든 다섯 장.
 // 규칙: want(잡은 방향), think, made는 components/drafts 의 각 화면 머리 주석(사용자가 확인한 장면 순서)과 캡처에 실제로 보이는 것만 쓴다.
 // 연도의 흐름을 사실처럼 단정하지 않고 "그 해 것으로 잡은 방향"으로 적는다. 기법 이름은 lib/variants.ts 의 이름과 같게 둔다.
+// 11-26 want(적용한 트렌드)는 용어 목록이다. term 은 data/classic/glossary.ts 의 용어 id(묶음 g44)이고, 카탈로그 판에서 그 용어 설명으로 가는 링크가 된다.
+// 바깥 자료에서 쓰임을 확인한 말만 쓴다(조사 기록: 위키 /knowledge/design-trends 참고 자료). "페이퍼 디오라마"는 웹 디자인 용어로 쓴 자료가 없어 "패럴랙스 스크롤링"으로 바꿨다.
 export type CatalogTrend = {
   /** 카탈로그 안에서의 id. 긴 캡처는 data/classic/catalogLong.json 의 같은 id */
   id: string;
@@ -139,7 +141,8 @@ export type CatalogTrend = {
   /** 연도와 기법 */
   tag: string;
   headline: string;
-  want: string;
+  /** 적용한 트렌드. term 이 있으면 용어 설명으로 잇는다 */
+  want: { name: string; term?: string }[];
   think: string;
   made: string;
 };
@@ -151,7 +154,7 @@ export const catalogTrends: CatalogTrend[] = [
     of: "dental-homepage",
     tag: "2026 인터랙티브 3D",
     headline: "임플란트를 돌려 보고 부품별로 나눠 봅니다",
-    want: "인터랙티브 3D, 스크롤 인터랙션, 볼드 타이포그래피",
+    want: [{ name: "인터랙티브 3D", term: "t249" }, { name: "스크롤 인터랙션", term: "t250" }, { name: "볼드 타이포그래피", term: "t254" }],
     think: "치과를 대표하는 물건으로 임플란트 하나를 골라, 사진으로는 보이지 않는 잇몸 아래 구조를 직접 보게 했습니다.",
     made: "첫 화면의 임플란트는 손으로 끌어 돌려 볼 수 있습니다. 스크롤하면 크라운, 지대주, 픽스처로 나뉘며 설명이 붙고, 다시 붙은 뒤 진료 과목이 큰 글씨로 지나갑니다.",
   },
@@ -161,7 +164,7 @@ export const catalogTrends: CatalogTrend[] = [
     of: "dental-homepage",
     tag: "2027 키네틱 타이포",
     headline: "병원 이름 글자 속으로 들어갑니다",
-    want: "실사 공간 사진, 키네틱 타이포그래피",
+    want: [{ name: "실사 공간 사진" }, { name: "키네틱 타이포그래피", term: "t255" }],
     think: "3D 라이브러리 없이 CSS와 2D 캔버스만 써서 휴대폰에서도 가볍게 움직이게 했습니다.",
     made: "흰 화면의 큰 병원 이름 속으로 접수대 사진이 보입니다. 스크롤하면 글자가 화면 밖까지 커지며 공간이 펼쳐지고, 대기실, 진료실, 상담 장면이 차례로 열립니다.",
   },
@@ -169,9 +172,9 @@ export const catalogTrends: CatalogTrend[] = [
     // Dental2027Stage.tsx: 공간 사진을 깊이별 세 겹(뒤 벽, 가운데, 앞 물건)으로 오려 흰 종이 테두리와 그림자, 종이 무대처럼 세움. CSS 3D만
     id: "dental-homepage-2027-stage",
     of: "dental-homepage",
-    tag: "2027 페이퍼 디오라마",
+    tag: "2027 패럴랙스 스크롤링",
     headline: "공간 사진을 종이 무대처럼 세웠습니다",
-    want: "실사 공간 사진을 겹으로 세운 페이퍼 디오라마",
+    want: [{ name: "실사 공간 사진" }, { name: "패럴랙스 스크롤링", term: "t251" }],
     think: "사진 한 장을 뒤 벽, 가운데, 앞 물건 세 겹으로 오려 흰 종이 테두리와 그림자를 입혔습니다. CSS만으로 세워 휴대폰에서도 가볍습니다.",
     made: "종이 바탕 위 작은 접수대 무대가 스크롤에 따라 다가와 화면을 채우고, 겹이 벌어지며 대기실, 진료실, 상담 무대로 이어집니다.",
   },
@@ -181,7 +184,7 @@ export const catalogTrends: CatalogTrend[] = [
     of: "clinic-homepage",
     tag: "2026 터치 인터랙션",
     headline: "화면 가득한 피부결을 손으로 쓸어 봅니다",
-    want: "터치 인터랙션 3D, 스크롤 인터랙션, 볼드 타이포그래피",
+    want: [{ name: "인터랙티브 3D", term: "t249" }, { name: "터치 인터랙션", term: "t252" }, { name: "스크롤 인터랙션", term: "t250" }, { name: "볼드 타이포그래피", term: "t254" }],
     think: "의료광고 기준에 맞춰 시술 전후 사진 대신 피부결 표면이 바뀌는 장면으로 시술을 설명했습니다.",
     made: "첫 화면의 피부결은 손으로 쓸면 매끈해집니다. 스크롤하면 레이저 토닝, 리프팅, 보습 관리 장면이 차례로 나오고 원장 소개와 진료 시간으로 이어집니다.",
   },
@@ -191,7 +194,7 @@ export const catalogTrends: CatalogTrend[] = [
     of: "clinic-homepage",
     tag: "2027 리퀴드 글래스",
     headline: "물방울 하나가 병원 안을 확대해 보여 줍니다",
-    want: "실사 공간 사진, 리퀴드 글래스(유리와 물의 재질)",
+    want: [{ name: "실사 공간 사진" }, { name: "리퀴드 글래스", term: "t256" }],
     think: "큰 물방울 하나가 지나가는 곳을 굴절시키고 확대해, 사진을 넘기지 않고도 공간을 차례로 보게 했습니다.",
     made: "라운지 사진 위 물방울이 흘러가며 시술실, 화장품 선반, 세럼을 확대하고 설명이 붙습니다. 물방울 안에 비친 다음 공간이 화면 가득 커지며 넘어갑니다.",
   },

@@ -18,7 +18,7 @@ export const VARIANTS: Record<string, { id: string; label: string }[]> = {
     { id: "b", label: "시안 B 카드형" },
     { id: "2026", label: "시안 C 2026 인터랙티브 3D" },
     { id: "2027-window", label: "시안 D 2027 키네틱 타이포" },
-    { id: "2027-stage", label: "시안 E 2027 페이퍼 디오라마" },
+    { id: "2027-stage", label: "시안 E 2027 패럴랙스 스크롤링" },
   ],
   academy: [
     { id: "a", label: "시안 A 볼드 컬러" },

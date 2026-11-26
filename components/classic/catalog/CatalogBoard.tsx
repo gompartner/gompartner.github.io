@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Maximize2, Search } from "lucide-react";
 import { CatalogDialog, Frame, type CatalogItem, type CatalogStoryView } from "@/components/classic/catalog/CatalogDialog";
@@ -165,7 +166,23 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
                       <p className="text-[14px] font-bold md:text-[15px]" style={{ color: st.c }}>
                         {st.label}
                       </p>
-                      <p className={`mt-1 break-keep text-[16px] leading-[1.68] ${n === 2 ? "text-white" : "text-[#c9ced6]"}`}>{st.text}</p>
+                      <p className={`mt-1 break-keep text-[16px] leading-[1.68] ${n === 2 ? "text-white" : "text-[#c9ced6]"}`}>
+                        {/* 적용한 트렌드: 용어마다 위키 용어 설명으로 잇는다(11-26). 용어집에 없는 말은 글자 그대로 */}
+                        {n === 0 && s.wantLinks
+                          ? s.wantLinks.map((w, k) => (
+                              <Fragment key={w.name}>
+                                {k > 0 ? ", " : null}
+                                {w.href ? (
+                                  <Link href={w.href} className="text-white underline decoration-white/45 underline-offset-4 hover:decoration-white">
+                                    {w.name}
+                                  </Link>
+                                ) : (
+                                  w.name
+                                )}
+                              </Fragment>
+                            ))
+                          : st.text}
+                      </p>
                     </div>
                   </li>
                 ))}

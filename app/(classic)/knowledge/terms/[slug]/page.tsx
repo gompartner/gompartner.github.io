@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArchiveShell, TakeoverBox, docH2 } from "@/components/classic/archive/ArchiveShell";
-import { groupBySlug, shortTitle, takeover, termHref, termSlugs } from "@/data/classic/archive";
+import { docUpdated, groupBySlug, shortTitle, takeover, termHref, termSlugs } from "@/data/classic/archive";
 import { termGroups, termLabels } from "@/data/classic/glossary";
 import { termImages } from "@/data/classic/glossaryImages";
 import { pageMeta } from "@/lib/seo";
 
 // 용어 묶음 문서 한 장. 내용은 data/classic/glossary.ts, 인수 시 확인 사항은 data/classic/archive.ts
 const CHECKED = "2026-11-21";
+// 인수 시 확인 사항의 한 줄 설명을 묶음 이름으로 만들면 어색한 묶음만 따로 적는다
+const TAKE_SUB: Record<string, string> = { g44: "3D와 움직임이 들어간 사이트를 인수했다면" };
 
 /** 을/를: 마지막 글자 받침으로 고른다(영문 UI는 "유아이"라 를) */
 function eulReul(w: string) {
@@ -36,6 +38,8 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
   if (!g) notFound();
   const take = takeover[g.id];
   const labels = termLabels[g.sec];
+  // 나중에 더한 묶음은 더한 날(data/classic/archive.ts 의 manualLog)을 최종 수정일로 쓴다
+  const checked = docUpdated(termHref(g)) ?? CHECKED;
   const toc = [{ id: "cmp", label: "한눈에 비교" }, { id: "terms", label: "용어별로 보기" }, ...(take ? [{ id: "take", label: "인수 시 확인 사항" }] : [])];
 
   return (
@@ -44,8 +48,8 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       active={termHref(g)}
       crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }, { href: termHref(g), label: shortTitle(g) }]}
       toc={toc}
-      head={{ title: g.title, meta: [["주제", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ["최종 수정일", CHECKED]] }}
-      article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: CHECKED }}
+      head={{ title: g.title, meta: [["주제", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ["최종 수정일", checked]] }}
+      article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: checked }}
     >
       <h2 id="cmp" className={docH2}>한눈에 비교</h2>
       {/* 휴대폰: 표 대신 용어마다 세로 칸(11-21 사용자: 가로 스크롤 말고 세로로) */}
@@ -112,7 +116,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
         ))}
       </div>
 
-      {take ? <TakeoverBox sub={`다른 업체가 만든 사이트의 ${shortTitle(g)}${eulReul(shortTitle(g))} 인수했다면`} items={take} /> : null}
+      {take ? <TakeoverBox sub={TAKE_SUB[g.id] ?? `다른 업체가 만든 사이트의 ${shortTitle(g)}${eulReul(shortTitle(g))} 인수했다면`} items={take} /> : null}
 
     </ArchiveShell>
   );

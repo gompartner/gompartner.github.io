@@ -4,6 +4,8 @@ import type { CatalogItem, CatalogStoryView, Shot } from "@/components/classic/c
 import { demoProjects, isLanding, isMaintenance, isProgram, mobileShotOf, thumbOf, threeProjects } from "@/components/classic/works/samples";
 import { catalogStories, catalogTrends } from "@/data/classic/catalogStories";
 import catalogLong from "@/data/classic/catalogLong.json";
+import { termGroups } from "@/data/classic/glossary";
+import { termHref } from "@/data/classic/archive";
 
 // 카탈로그에 올리는 화면 목록을 만든다(서버에서만, public 폴더의 그림이 실제로 있는지 확인한다).
 // 카탈로그 판(app/(classic)/works)과 통합검색(검색 결과에서 그 자리에서 크게 보기)이 함께 쓴다.
@@ -14,6 +16,12 @@ const CATS = ["홈페이지", "랜딩페이지", "업무 시스템", "앱", "키
 const exists = (src: string) => fs.existsSync(path.join(process.cwd(), "public", src.split("?")[0]));
 // 화면에 쓰지 않는 말이 든 설명 줄은 뺀다
 const banned = /시안|샘플|데모|가상/;
+
+/** 용어 id로 그 용어 설명 자리(용어 문서의 #앵커)를 찾는다 */
+function termAnchor(id?: string) {
+  const g = id ? termGroups.find((x) => x.terms.some((t) => t.id === id)) : undefined;
+  return g ? `${termHref(g)}#${id}` : undefined;
+}
 
 type P = (typeof demoProjects)[number];
 const LONGS = catalogLong as Record<string, { pc?: Long; m?: Long }>;
@@ -76,7 +84,7 @@ export function buildCatalog() {
     const vm = `/videos/catalog/${t.id}-m.mp4`;
     const main: Shot = { src: pc, frame: "browser", ratio: "16/10", alt: `${base.title} ${t.tag} PC 화면`, ...(lg?.pc && exists(lg.pc.src) ? { long: lg.pc } : {}), ...(exists(vpc) ? { video: { src: vpc, w: 960, h: 600 } } : {}), live: `/live/${t.id}` };
     const side: Shot | undefined = exists(m) ? { src: m, frame: "phone", ratio: "780/1472", alt: `${base.title} ${t.tag} 휴대폰 화면`, ...(lg?.m && exists(lg.m.src) ? { long: lg.m } : {}), ...(exists(vm) ? { video: { src: vm, w: 390, h: 844 } } : {}), live: `/live/${t.id}` } : undefined;
-    trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "적용한 트렌드", want: t.want, think: t.think, made: t.made });
+    trends.push({ id: t.id, cat: base.cat, title: base.title, tag: t.tag, thumb: pc, main, side, features: [], headline: t.headline, wantLabel: "적용한 트렌드", want: t.want.map((w) => w.name).join(", "), wantLinks: t.want.map((w) => ({ name: w.name, href: termAnchor(w.term) })), think: t.think, made: t.made });
   }
 
   const told = new Set(stories.map((s) => s.id));

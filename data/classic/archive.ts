@@ -14,6 +14,7 @@ export type TrendDoc = { href: string; title: string; desc: string };
 export const designDocs: TrendDoc[] = [
   { href: "/knowledge/web-award", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", desc: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션에서 모바일웹, 웹표준, 반응형, 소셜, AI 서비스로 옮겨 간 심사 축." },
   { href: "/knowledge/design-styles", title: "디자인 흐름: 입체, 플랫, 카드, 벤토", desc: "웹 디자인 흐름을 바꾼 날짜(Bootstrap, iOS 7, Material Design, CSS Grid)와 시대별 첫 화면, 실제 사례." },
+  { href: "/knowledge/design-trends", title: "2026, 2027 웹 디자인 트렌드", desc: "2026년 웹 디자인 트렌드 글 열 곳 비교. 인터랙티브 3D, 볼드와 키네틱 타이포그래피, 스크롤 인터랙션, 마이크로 인터랙션, 리퀴드 글래스의 모습과 맞는 업종, 속도와 접근성 확인 사항, 2027년 전망." },
   { href: "/knowledge/mobile-screen", title: "한국이 모바일 화면으로 먼저 넘어간 길", desc: "전체 접속 중 모바일 비율, 한국 일본 미국 2009~2025. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 길." },
   { href: "/knowledge/screen-size", title: "화면 크기와 해상도", desc: "PC 화면 해상도 비율, 한국 일본 미국 2009~2025. 고정 폭 980px이 사라진 이유." },
 ];
@@ -48,7 +49,7 @@ export const termSlugs: Record<string, string> = {
   g25: "search-results", g26: "dashboard", g27: "board", g28: "editor", g29: "map-address", g30: "booking-schedule",
   g31: "ui-states", g32: "comment-share", g33: "spacing", g34: "responsive", g35: "typography", g36: "image-ratio",
   g37: "public-home", g38: "public-required", g39: "accessibility", g40: "online-application", g41: "company-about", g42: "trust",
-  g43: "careers", go1: "domain-server", go2: "admin-edit", go3: "contract-handover", go4: "search-records",
+  g43: "careers", g44: "trends", go1: "domain-server", go2: "admin-edit", go3: "contract-handover", go4: "search-records",
 };
 
 export const termHref = (g: TermGroup) => `/knowledge/terms/${termSlugs[g.id]}`;
@@ -259,6 +260,11 @@ export const takeover: Record<string, { b: string; t: string }[]> = {
     { b: "마감된 공고", t: "마감일이 지난 공고가 모집 중으로 남아 있지 않은지 봅니다. 자동 마감이 되는지도 확인합니다." },
     { b: "지원서 개인정보", t: "지원서와 이력서 파일을 언제 지우는지, 어디에 쌓이는지 확인합니다. 채용이 끝난 지원서는 정해진 기간 뒤 파기해야 합니다." },
   ],
+  g44: [
+    { b: "움직임 줄이기 설정", t: "기기에서 움직임 줄이기를 켜고 열었을 때 스크롤 연출, 패럴랙스, 글자 움직임이 멈추는지 확인합니다. 그대로 움직이면 prefers-reduced-motion 처리가 빠진 것입니다." },
+    { b: "3D 원본 파일과 라이브러리", t: "3D 모델 원본 파일과 사용권, 화면에 쓴 라이브러리(Three.js 등)와 버전을 받았는지 확인합니다. 원본이 없으면 모양 하나를 고칠 때도 모델을 새로 만들어야 합니다." },
+    { b: "유리 재질 위 글자 대비", t: "반투명 칸 위 글자는 뒤 사진에 따라 대비가 달라집니다. 사진을 바꿔 가며 명도 대비 4.5:1을 넘는지 확인합니다." },
+  ],
 };
 
 /** 화면 예시: 페이지 종류별로 용어 묶음의 와이어프레임을 모은다(11-21) */
@@ -351,7 +357,7 @@ function rawTopics(): Topic[] {
     ] },
     { id: "design", label: "디자인", desc: "화면 부품의 이름, 디자인 용어, 페이지 종류별 화면, 시안, 기기에 따라 바뀐 화면", groups: [
       { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
-      { title: "디자인 용어", items: ["g33", "g34", "g35", "g36"].map(term) },
+      { title: "디자인 용어", items: ["g33", "g34", "g35", "g36", "g44"].map(term) },
       { title: "화면", items: [{ label: "화면 예시", href: "/knowledge/screens" }] },
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
     ] },
@@ -421,6 +427,8 @@ export function relatedOf(href: string, limit = 3): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-26", kind: "디자인", title: "2026, 2027 웹 디자인 트렌드", href: "/knowledge/design-trends" },
+  { date: "2026-11-26", kind: "디자인", title: "웹 디자인 트렌드 용어", href: "/knowledge/terms/trends" },
   { date: "2026-11-22", kind: "디자인", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", href: "/knowledge/web-award" },
   { date: "2026-11-22", kind: "기획", title: "한국 웹 30년: 무료 계정에서 AI 빌더까지", href: "/knowledge/history" },
   { date: "2026-11-22", kind: "개발", title: "만드는 도구(CMS) 비교: CMS란, 설치형과 임대형 추가", href: "/knowledge/cms" },

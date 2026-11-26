@@ -60,7 +60,7 @@ export function buildSearchIndex(): SearchItem[] {
   // 그 해의 연출 기법으로 만든 화면도 카탈로그 결과로 찾는다(이름표의 연도, 기법으로)
   for (const t of catalogTrends) {
     const base = catalogProjects.find((p) => p.id === t.of);
-    if (base) catalogs.push({ kind: "카탈로그", title: `${plain(base.title)} ${t.tag}`, desc: t.made, href: `/works#${t.id}`, hay: [base.category, t.headline, t.want, t.think, "연출 트렌드 3D 인터랙션"].join(" "), thumb: `/images/demos/var/${t.id}.jpg` });
+    if (base) catalogs.push({ kind: "카탈로그", title: `${plain(base.title)} ${t.tag}`, desc: t.made, href: `/works#${t.id}`, hay: [base.category, t.headline, ...t.want.map((w) => w.name), t.think, "연출 트렌드 3D 인터랙션"].join(" "), thumb: `/images/demos/var/${t.id}.jpg` });
   }
   // 카탈로그 결과마다 크게 볼 그림을 붙인다(카탈로그 판과 같은 목록에서)
   const cat = buildCatalog();
