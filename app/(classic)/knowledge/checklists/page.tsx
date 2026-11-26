@@ -11,7 +11,6 @@ export const metadata: Metadata = pageMeta({
   title: "점검표와 기록표 | 위키",
   description: "홈페이지 견적 질문지, 넘겨받은 날 기록표, 매달 점검표를 휴대폰으로 보고 PDF로 내려받습니다.",
   path: "/knowledge/checklists",
-  image: { src: "/og/jaryo.jpg", alt: "곰파트너 점검표와 기록표" },
 });
 
 export default function ArchiveChecklists() {

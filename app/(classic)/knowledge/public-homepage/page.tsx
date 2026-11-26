@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 const HREF = "/knowledge/public-homepage";
 export const metadata: Metadata = pageMeta({
   title: "공공기관 홈페이지: 전자정부법에서 KRDS, 국정자원 화재까지 | 위키",
-  description: "공공기관 홈페이지는 법과 지침을 따라 바뀌었습니다. 2001년 전자정부법, 2009년 웹 접근성 의무와 전자정부 표준프레임워크, 2020년 공인인증서 제도 폐지, 2024년 범정부 디자인 시스템(KRDS). 2025년 9월 국정자원 화재로 시스템 647개가 멈췄습니다.",
+  description: "공공기관 홈페이지 연표입니다. 2001년 전자정부법, 2009년 웹 접근성 의무, 2024년 KRDS, 2025년 국정자원 화재까지 다룹니다.",
   path: HREF,
   article: true,
 });

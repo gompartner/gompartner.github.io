@@ -24,12 +24,14 @@ export interface Insight {
   title: string;
   /** 목록과 검색 설명에 쓰는 한 줄 요약 */
   summary: string;
+  /** 검색, 공유 설명(80자 이내). 요약이 길어 80자에서 문장 중간이 잘리는 글에만 적는다. 화면에는 나오지 않는다 */
+  metaDescription?: string;
   blocks: InsightBlock[];
   /** 다음 편 예고 한두 문장 */
   next?: string;
   /** 글 끝에 잇는 유지보수 메뉴 */
   service: { href: string; label: string };
-  /** 대표 이미지 1200x675. 공유 미리보기, 구글 디스커버, 구조화 데이터용. 새 글을 넣으면 node scripts/insight-cards.mjs 로 만든다 */
+  /** 대표 이미지 1200x630. 공유 미리보기, 구글 디스커버, 구조화 데이터용. 새 글을 넣으면 node scripts/insight-cards.mjs 로 만든다 */
   image: { src: string; alt: string };
 }
 
@@ -44,6 +46,7 @@ const allInsights: Insight[] = [
     no: 1,
     title: "홈페이지 유지보수, 유지관리 업체 추천 전에, 유형별 공개 비용과 맞는 곳 (2026)",
     summary: "호스팅사, 프리랜서 플랫폼, 웹에이전시, 운영 전문 업체의 공개 유지보수 가격을 2026년 11월 기준으로 비교하고 유형별로 맞는 곳과 계약 전 확인할 것을 정리합니다.",
+    metaDescription: "호스팅사, 프리랜서 플랫폼, 웹에이전시, 운영 전문 업체의 공개 유지보수 가격을 2026년 11월 기준으로 비교했습니다.",
     blocks: [
       {
         p: [
@@ -126,6 +129,7 @@ const allInsights: Insight[] = [
     no: 2,
     title: "웹 개발 소방수 업체 추천 전에, 증상별로 먼저 부를 곳과 물어볼 질문",
     summary: "사이트가 멈췄을 때 호스팅사, 유지보수 업체, 프리랜서 중 누구를 먼저 부를지 증상별로 나누고, 긴급 대응 업체에 확인할 여섯 가지를 정리합니다.",
+    metaDescription: "사이트가 멈췄을 때 호스팅사, 유지보수 업체, 프리랜서 중 먼저 연락할 곳을 증상별로 나누고 확인할 여섯 가지를 정리합니다.",
     blocks: [
       {
         p: [
@@ -682,6 +686,7 @@ const allInsights: Insight[] = [
     title: "PHP 보안 경보, 홈페이지 업체에 받아야 할 서면 4가지",
     summary:
       "10월 22일 의료 분야 사이버위기 경보가 PHP 취약점으로 '주의'가 됐습니다. 병원과 치과가 관리업체에 받아 둘 서면 4가지, 버전별 기준, 업체가 없을 때 하는 일.",
+    metaDescription: "10월 22일 의료 분야 사이버위기 경보가 PHP 취약점으로 '주의'가 됐습니다. 병원과 치과가 관리업체에 받아 둘 서면 4가지.",
     blocks: [
       {
         p: [
@@ -8232,6 +8237,7 @@ const allInsights: Insight[] = [
     no: 8,
     title: "ChatGPT와 퍼플렉시티 답변에 홈페이지가 안 나온다면, AI 크롤러 차단부터 확인합니다",
     summary: "AI 검색은 회사마다 검색용과 학습용 크롤러가 따로 있습니다. 학습은 막고 검색은 여는 robots.txt 설정과 클라우드플레어 기본값 변경을 정리했습니다.",
+    metaDescription: "AI 검색의 검색용, 학습용 크롤러를 구분해 학습은 막고 검색은 여는 robots.txt 설정과 클라우드플레어 기본값 변경을 정리했습니다.",
     blocks: [
       {
         p: [
@@ -8352,6 +8358,7 @@ const allInsights: Insight[] = [
     no: 9,
     title: "W3Schools로 배우던 웹 기술, 요즘은 어디서 찾아봅니까",
     summary: "W3Schools는 지금도 운영 중이지만 기준 문서로는 MDN을 먼저 봅니다. 브라우저 지원을 보는 Can I Use와 Baseline, 실무 기준 web.dev까지 쓰임새별로 정리했습니다.",
+    metaDescription: "기준 문서로 먼저 보는 MDN, 브라우저 지원을 보는 Can I Use와 Baseline, 실무 기준 web.dev를 쓰임새별로 정리했습니다.",
     blocks: [
       {
         p: [
@@ -8465,6 +8472,7 @@ const allInsights: Insight[] = [
     no: 17,
     title: "주소 뒤에 붙여 열기만 해도 새는 파일들, .env와 .git과 백업 압축 파일",
     summary: "OWASP 2025 웹 위험 순위에서 설정 실수가 2위로 올랐습니다. 홈페이지 주소 뒤에 붙여 직접 확인할 수 있는 노출 파일 7가지와 막는 방법, 요청 문구를 정리했습니다.",
+    metaDescription: "홈페이지 주소 뒤에 붙여 직접 확인할 수 있는 노출 파일 7가지(.env, .git, 백업 압축 파일)와 막는 방법, 요청 문구를 정리했습니다.",
     blocks: [
       {
         p: [
@@ -8607,6 +8615,7 @@ const allInsights: Insight[] = [
     no: 18,
     title: "보안 헤더 6가지, 우리 홈페이지에 붙어 있는지 1분 만에 확인하는 법",
     summary: "HSTS, CSP 같은 보안 헤더는 화면에 보이지 않아 빠져 있어도 모릅니다. 헤더별 역할과 확인 명령, 곰파트너 사이트에 넣은 값, 업체에 받을 답을 정리했습니다.",
+    metaDescription: "HSTS, CSP 같은 보안 헤더 6가지의 역할과 확인 명령, 곰파트너 사이트에 넣은 값, 업체에 받을 답을 정리했습니다.",
     blocks: [
       {
         p: [
@@ -8732,6 +8741,7 @@ const allInsights: Insight[] = [
     no: 19,
     title: "아이폰 읽기 모드에서 본문이 사라졌습니다, 원인은 클래스 이름 하나였습니다",
     summary: "Safari 읽기 모드에서 문서 제목과 요약만 나오고 본문이 빠졌습니다. 변형 페이지를 하나씩 비교해 원인을 클래스 이름 하나로 좁히고 문서 전체를 고친 기록입니다.",
+    metaDescription: "Safari 읽기 모드에서 본문이 빠진 원인을 변형 페이지 비교로 찾아 클래스 이름 하나로 확인하고 문서 전체를 수정한 기록입니다.",
     blocks: [
       {
         h: "무엇이 문제였습니까?",

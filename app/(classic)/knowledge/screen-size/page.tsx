@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 const HREF = "/knowledge/screen-size";
 export const metadata: Metadata = pageMeta({
   title: "화면 크기와 해상도: 1024에서 1920으로, 모니터가 커진 만큼 바뀐 화면 | 위키",
-  description: "2009년 PC 화면의 30% 안팎이 1024x768이었고, 한국은 2015년 1920x1080이 54%로 일본(24%), 미국(15%)보다 훨씬 빨리 넘어갔습니다. 고정 폭 980px 화면이 사라진 이유와 태블릿이 남긴 것을 정리했습니다.",
+  description: "PC 화면은 2009년 1024x768이 30% 안팎, 한국은 2015년 1920x1080이 54%였습니다. 고정 폭 980px이 사라진 이유.",
   path: HREF,
   article: true,
 });

@@ -28,7 +28,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${g.title} | 위키`,
     description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`,
     path: termHref(g),
-    ...(termImages[g.terms[0].id] ? { image: { src: `/images/glossary/${g.terms[0].id}.webp`, alt: `${g.title} 와이어프레임`, width: termImages[g.terms[0].id][0], height: termImages[g.terms[0].id][1] } } : {}),
   });
 }
 
@@ -46,7 +45,7 @@ export default async function TermDoc({ params }: { params: Promise<{ slug: stri
       crumbs={[{ href: "/knowledge", label: "위키" }, { href: "/knowledge/terms", label: "용어" }, { href: termHref(g), label: shortTitle(g) }]}
       toc={toc}
       head={{ title: g.title, meta: [["주제", `${g.sec}, ${g.cat}`], ["용어", `${g.terms.length}개`], ["최종 수정일", CHECKED]] }}
-      article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: CHECKED, image: termImages[g.terms[0].id] ? `/images/glossary/${g.terms[0].id}.webp` : undefined }}
+      article={{ title: g.title, description: `${g.terms.map((t) => t.name).join(", ")}. 형태와 적용 사례, 와이어프레임, 업체와 AI에 요청하는 문장.`, modified: CHECKED }}
     >
       <h2 id="cmp" className={docH2}>한눈에 비교</h2>
       {/* 휴대폰: 표 대신 용어마다 세로 칸(11-21 사용자: 가로 스크롤 말고 세로로) */}

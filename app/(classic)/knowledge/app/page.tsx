@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 const HREF = "/knowledge/app";
 export const metadata: Metadata = pageMeta({
   title: "앱: 한국은 안드로이드, 일본과 미국은 아이폰, 앱 2012~2025 | 위키",
-  description: "2025년 휴대폰 OS 중 아이폰 비율은 한국 23%, 일본 61%, 미국 58%입니다. 나라마다 다른 휴대폰 구성이 앱을 만들고 넘겨받을 때 무엇을 바꾸는지 정리했습니다.",
+  description: "2025년 휴대폰 OS 중 아이폰 비율은 한국 23%, 일본 61%, 미국 58%입니다. 앱 인수 시 확인할 계정, 서명 키, 스토어 요건.",
   path: HREF,
   article: true,
 });

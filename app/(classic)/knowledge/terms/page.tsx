@@ -20,8 +20,8 @@ const termSetLd = {
   "@context": "https://schema.org",
   "@type": "DefinedTermSet",
   name: "곰파트너 웹 용어",
-  url: `${siteUrl}/archive/terms`,
-  hasDefinedTerm: termGroups.flatMap((g) => g.terms.map((t) => ({ "@type": "DefinedTerm", name: t.name, alternateName: t.alt, description: t.look, url: `${siteUrl}${termHref(g)}#${t.id}`, inDefinedTermSet: `${siteUrl}/archive/terms` }))),
+  url: `${siteUrl}/knowledge/terms`,
+  hasDefinedTerm: termGroups.flatMap((g) => g.terms.map((t) => ({ "@type": "DefinedTerm", name: t.name, alternateName: t.alt, description: t.look, url: `${siteUrl}${termHref(g)}#${t.id}`, inDefinedTermSet: `${siteUrl}/knowledge/terms` }))),
 };
 
 const rows: TermRow[] = termGroups.flatMap((g) => g.terms.map((t) => ({ id: t.id, name: t.name, alt: t.alt, look: t.look, hay: [t.use, t.say, g.cat, g.sec].join(" "), group: shortTitle(g), href: termHref(g) })));

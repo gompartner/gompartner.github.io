@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "공지사항",
-  description: "곰파트너 서비스 운영 안내, 정책 변경, 유지보수 업체 변경 무료 지원 같은 이벤트 소식을 알려 드립니다.",
+  description: "곰파트너의 서비스 운영 안내와 정책 변경, 무료 지원과 할인 이벤트 소식을 공지합니다.",
   path: "/notice",
 });
 

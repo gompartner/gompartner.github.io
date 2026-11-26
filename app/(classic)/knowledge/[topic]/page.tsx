@@ -10,11 +10,14 @@ export function generateStaticParams() {
   return topics().map((t) => ({ topic: t.id }));
 }
 
+// 검색, 공유 설명에만 쓰는 주제 소개(화면의 주제 소개는 data/classic/archive.ts 의 desc 그대로). 지금 그 주제에 있는 문서 묶음을 적는다
+const META_DESC: Record<string, string> = { design: "화면 부품 용어, 디자인 용어, 페이지 종류별 화면 예시, 웹 디자인 흐름" };
+
 export async function generateMetadata({ params }: { params: Promise<{ topic: string }> }): Promise<Metadata> {
   const id = (await params).topic;
   const t = topics().find((x) => x.id === id);
   if (!t) return {};
-  return pageMeta({ title: `${t.label} | 위키`, description: `${t.desc}. 곰파트너 위키의 ${t.label} 문서 모음입니다.`, path: `/knowledge/${t.id}` });
+  return pageMeta({ title: `${t.label} | 위키`, description: `곰파트너 위키의 ${t.label} 문서 모음입니다. ${META_DESC[t.id] ?? t.desc}.`, path: `/knowledge/${t.id}` });
 }
 
 export default async function TopicPage({ params }: { params: Promise<{ topic: string }> }) {

@@ -7,34 +7,50 @@ import { siteUrl } from "@/lib/site";
 export const DESCRIPTION_MAX = 80;
 
 // 공유 미리보기 이미지. 루트 레이아웃과 페이지별 메타가 같이 쓴다.
-export const OG_IMAGE = { url: "/og-image.png?v=20261102", width: 1200, height: 630, alt: "곰파트너" };
+// 11-26 모든 카드를 1200x630 JPG로 맞췄다(카카오톡, 페이스북, X 공통). 그림을 다시 만들면 OG_VERSION 날짜를 올린다:
+// 공유 서비스는 이미지 주소로 그림을 기억해 두기 때문에 주소(?v=)가 바뀌어야 새 그림을 가져간다.
+export const OG_VERSION = "20261126";
+export const OG_SIZE = { width: 1200, height: 630 } as const;
+/** 사이트 안 이미지 주소에 버전 값을 붙인다(이미 ?가 있거나 바깥 주소면 그대로) */
+export const ogSrc = (src: string) => (src.startsWith("/") && !src.includes("?") ? `${src}?v=${OG_VERSION}` : src);
+export const OG_IMAGE = { url: ogSrc("/og-image.png"), ...OG_SIZE, alt: "곰파트너 홈페이지, 앱 제작과 유지보수" };
 
 // 하위 페이지가 openGraph를 따로 정하지 않으면 홈 제목과 설명이 그대로 공유된다.
 // 페이지 제목과 설명으로 openGraph, twitter를 같이 채운다.
 // 11-22 페이지 대표 이미지: 따로 정하지 않은 페이지는 scripts/page-cards.mjs 가 만든 public/og/page/<주소>.jpg 를 쓴다
 export const ogKey = (path: string) => path.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
-/** 만든 페이지 카드 주소(없으면 undefined). 구조화 데이터 image에 쓴다 */
-export function pageCardUrl(path: string) {
+const pageCardFile = (path: string) => {
   const file = `/og/page/${ogKey(path)}.jpg`;
   return existsSync(join(process.cwd(), "public", file)) ? file : undefined;
-}
-function pageCard(path: string, alt: string) {
-  const file = `/og/page/${ogKey(path)}.jpg`;
-  return existsSync(join(process.cwd(), "public", file)) ? { url: file, width: 1200, height: 675, alt } : null;
+};
+/** 만든 페이지 카드 주소(없으면 undefined). 구조화 데이터 image에 쓴다 */
+export function pageCardUrl(path: string) {
+  const file = pageCardFile(path);
+  return file ? ogSrc(file) : undefined;
 }
 
-export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; article?: boolean; noindex?: boolean }) {
+/**
+ * 페이지 메타 한 벌(title, description, canonical, openGraph, twitter).
+ * alt는 대표 이미지 설명(안 주면 "페이지 이름 | 곰파트너"). image를 주면 그 그림을, 안 주면 페이지 카드를, 카드도 없으면 공통 이미지를 쓴다.
+ * noindex는 검색에서만 뺀다(공유 미리보기는 그대로 나온다).
+ */
+export function pageMeta(opts: { title: string; description: string; path: string; image?: { src: string; alt: string; width?: number; height?: number }; alt?: string; article?: boolean; noindex?: boolean }) {
   const description = fitDescription(opts.description);
   const title = `${opts.title} | 곰파트너`;
   const url = opts.path;
-  const image = opts.image ? { url: opts.image.src, width: opts.image.width ?? 1200, height: opts.image.height ?? 675, alt: opts.image.alt } : (pageCard(opts.path, opts.title) ?? OG_IMAGE);
+  const card = pageCardFile(opts.path);
+  const image = opts.image
+    ? { url: ogSrc(opts.image.src), width: opts.image.width ?? OG_SIZE.width, height: opts.image.height ?? OG_SIZE.height, alt: opts.image.alt }
+    : card
+      ? { url: ogSrc(card), ...OG_SIZE, alt: opts.alt ?? title }
+      : { ...OG_IMAGE, alt: opts.alt ?? title };
   return {
     title: opts.title,
     description,
     alternates: { canonical: url },
     ...(opts.noindex ? { robots: { index: false, follow: true } } : {}),
     openGraph: { type: opts.article ? ("article" as const) : ("website" as const), locale: "ko_KR", siteName: "곰파트너", url, title, description, images: [image] },
-    twitter: { card: "summary_large_image" as const, title, description, images: [image.url] },
+    twitter: { card: "summary_large_image" as const, title, description, images: [{ url: image.url, alt: image.alt }] },
   };
 }
 
@@ -47,7 +63,8 @@ export function fitDescription(text: string, max = DESCRIPTION_MAX): string {
     if (next.length > max) break;
     out = next;
   }
-  if (out.length >= 50) return out;
+  // 온전한 문장으로 40자(scripts/check-pages.mjs 의 최소 길이)를 채우면 거기서 끝낸다. 11-26 전에는 50자여서 41~49자 문장 뒤가 쉼표에서 잘려 나갔다
+  if (out.length >= 40) return out;
   // 첫 문장이 짧은 이름표뿐이면 이어지는 나열을 쉼표에서 끊는다.
   const cut = s.slice(0, max);
   const comma = cut.lastIndexOf(", ");

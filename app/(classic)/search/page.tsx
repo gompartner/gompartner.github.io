@@ -3,12 +3,15 @@ import { Suspense } from "react";
 import { PageHead, wrap } from "@/components/classic/ui";
 import { buildSearchIndex } from "@/components/classic/search/index";
 import { SiteSearch } from "@/components/classic/search/SiteSearch";
+import { pageMeta } from "@/lib/seo";
 
 // 통합검색(11-01). 결과 페이지는 검색에서 뺀다(noindex, follow).
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "통합검색",
-  robots: { index: false, follow: true },
-};
+  description: "곰파트너 사이트의 서비스 안내, 카탈로그, 위키 문서, 공지사항 통합검색입니다.",
+  path: "/search",
+  noindex: true,
+});
 
 export default function ClassicSearchPage() {
   const index = buildSearchIndex();

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { LiveScreen } from "@/components/classic/catalog/LiveScreen";
 import { catalogTrends } from "@/data/classic/catalogStories";
 import { demoProjects } from "@/components/classic/works/samples";
+import { pageMeta } from "@/lib/seo";
 
 // 11-26 카탈로그의 "그 해의 연출로 만든 화면" 다섯 장을 실제로 만져 볼 수 있게 여는 주소(사용자 "영상 플레이가 아닌 효과도 할 수 있나", "살려").
 // 데모, 샘플 주소(/work, /demo, /sample)는 내린 그대로이고, 이 다섯 화면만 카탈로그의 크게 보기 안에서(iframe) 또는 새 창으로 연다.
@@ -16,7 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const t = catalogTrends.find((x) => x.id === id);
   const base = demoProjects.find((p) => p.id === t?.of);
-  return { title: t && base ? `${base.title} ${t.tag}` : "곰파트너", robots: { index: false, follow: false } };
+  if (!t || !base) return { title: "곰파트너", robots: { index: false, follow: false } };
+  // 검색에는 올리지 않지만 주소를 공유했을 때 제목, 설명, 그림이 나오게 기본 메타를 채운다(그림은 공통 이미지)
+  const title = `${base.title} ${t.tag}`;
+  return { ...pageMeta({ title, description: `${title} 화면입니다. ${t.headline}.`, path: `/live/${id}` }), robots: { index: false, follow: false } };
 }
 
 export default async function LivePage({ params }: { params: Promise<{ id: string }> }) {

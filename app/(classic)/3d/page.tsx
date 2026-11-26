@@ -10,7 +10,7 @@ export const metadata: Metadata = pageMeta({
   title: s.metaTitle,
   description: s.metaDescription,
   path,
-  image: { src: "/3d/assets/og.jpg", alt: "곰파트너 3D 웹 제작 마을", width: 1200, height: 630 },
+  alt: "곰파트너 3D 웹 제작. 시스템 선반 3D 견적 화면",
 });
 
 // 11-26 3D 웹 한 판(components/classic/three/ThreeBoard.tsx). 제작, 유지보수, 카탈로그 판과 같은 틀(BoardShell)을 쓴다.

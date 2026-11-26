@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArchiveShell, docH2Base, type Src } from "@/components/classic/archive/ArchiveShell";
 import { insightBySlug, insights, readMinutes } from "@/data/classic/insights";
 import { LdScript } from "@/components/seo/JsonLd";
-import { ORG_ID, breadcrumbLd, pageMeta } from "@/lib/seo";
+import { ORG_ID, breadcrumbLd, ogSrc, pageMeta } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -18,9 +18,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!n) return {};
   return pageMeta({
     title: n.title,
-    description: n.summary,
+    description: n.metaDescription ?? n.summary,
     path: `/insight/${slug}`,
-    image: n.image,
+    image: { src: n.image.src, alt: `${n.title} | 곰파트너 위키 운영 노트` },
     article: true,
   });
 }
@@ -45,7 +45,7 @@ export default async function ClassicInsightDetailPage({ params }: Props) {
           "@type": "Article",
           headline: n.title,
           description: n.summary,
-          image: [`${siteUrl}${n.image.src}`],
+          image: [`${siteUrl}${ogSrc(n.image.src)}`],
           datePublished: `${n.date}T09:00:00+09:00`,
           dateModified: `${n.updated ?? n.date}T09:00:00+09:00`,
           author: { "@id": ORG_ID },

@@ -7,7 +7,7 @@ import { pageMeta } from "@/lib/seo";
 const HREF = "/knowledge/web-award";
 export const metadata: Metadata = pageMeta({
   title: "웹어워드 수상작으로 본 한국 웹 디자인 22년(2004~2025) | 위키",
-  description: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문. 브랜드 프로모션과 플래시 시절에서 모바일웹, 웹표준, 반응형, 소셜, AI 서비스로 심사 축이 옮겨 간 흐름을 수상 기록으로 정리했습니다.",
+  description: "웹어워드코리아 2004~2025 최고대상과 새로 생긴 부문으로 한국 웹 디자인의 흐름을 정리했습니다. 플래시, 모바일웹, 반응형, AI 서비스.",
   path: HREF,
   article: true,
 });

@@ -12,6 +12,7 @@ export const metadata: Metadata = pageMeta({
   title: "상담 신청",
   description: "제작하거나 수정할 홈페이지의 업종, 필요한 기능, 희망 일정을 남겨 주시면 검토 뒤 견적서로 회신합니다.",
   path: "/contact",
+  alt: "곰파트너 상담 신청. 신청서 화면",
 });
 
 export default function ClassicContactPage() {

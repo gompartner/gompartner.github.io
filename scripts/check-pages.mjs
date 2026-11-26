@@ -25,6 +25,14 @@ for (const p of paths) {
   need((body.match(/<main[\s>]/g) || []).length <= 1, "main 중복");
   need(/application\/ld\+json/.test(h) || p.startsWith("/3d/"), "구조화 데이터 없음");
   if (!brandOk(p)) need(!/og:image" content="[^"]*og-image\.png/.test(h), "대표 이미지 없음(node scripts/page-cards.mjs)");
+  // 11-26 공유 미리보기: 그림 파일이 실제로 있고, 1200x630으로 적혀 있고, 주소에 버전 값이 붙어 있을 것(그림을 바꾸면 lib/seo.ts 의 OG_VERSION 을 올린다)
+  const og = (h.match(/<meta property="og:image" content="([^"]*)/)?.[1] ?? "").replace(/&amp;/g, "&");
+  const ogFile = og ? decodeURIComponent(new URL(og, "https://gompartner.co.kr").pathname) : "";
+  need(og && existsSync(`${out}${ogFile}`), `대표 이미지 파일 없음(${og || "og:image 없음"})`);
+  need(/og:image:width" content="1200"/.test(h) && /og:image:height" content="630"/.test(h), "대표 이미지 크기가 1200x630으로 적혀 있지 않음");
+  need(/\?v=\d{8}/.test(og), "대표 이미지 주소에 버전 값(?v=) 없음");
+  need(/og:image:alt" content="[^"]+/.test(h), "대표 이미지 alt 없음");
+  need(/name="twitter:card" content="summary_large_image"/.test(h) && /name="twitter:image" content="[^"]+/.test(h), "twitter 카드 없음");
   if (/^\/(insight|knowledge|tools)\//.test(p)) need(llms.includes(p), "llms.txt에 없음");
 }
 if (errs.length) {

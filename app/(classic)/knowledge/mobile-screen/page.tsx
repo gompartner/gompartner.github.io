@@ -9,7 +9,7 @@ import { pageMeta } from "@/lib/seo";
 const HREF = "/knowledge/mobile-screen";
 export const metadata: Metadata = pageMeta({
   title: "모바일 화면: 한국이 모바일로 먼저 넘어간 길, 한국 일본 미국 2009~2025 | 위키",
-  description: "2012년 전체 접속 중 모바일 비율은 한국 24%, 미국 10%, 일본 8%였습니다. m. 전용 사이트, PC 화면 그대로, 반응형으로 갈린 세 나라의 길을 차트와 실제 사례로 비교합니다.",
+  description: "2012년 모바일 접속 비율은 한국 24%, 미국 10%, 일본 8%였습니다. m. 사이트와 반응형으로 갈린 세 나라를 차트로 비교합니다.",
   path: HREF,
   article: true,
 });

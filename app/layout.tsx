@@ -51,13 +51,13 @@ export const metadata: Metadata = {
     siteName: profile.name,
     title: siteTitle,
     description: siteDescription,
-    images: [{ ...OG_IMAGE, alt: `${profile.name}, 홈페이지 제작과 유지보수` }],
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: [OG_IMAGE.url],
+    images: [{ url: OG_IMAGE.url, alt: OG_IMAGE.alt }],
   },
   verification: {
     other: { "naver-site-verification": ["1c5242ef5ddbce4e807bad7225bb0770a1cb06c1", "184bef35395b609c58d44964bf16993e76c0dd50"] },
