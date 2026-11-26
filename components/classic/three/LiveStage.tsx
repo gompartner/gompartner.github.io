@@ -22,7 +22,7 @@ const STAGE_BG = "#e6ecea";
 type Mode = "auto" | "video" | "still";
 
 /** src는 끼울 주소, href는 전체 화면으로 열 주소. children은 3D 아래에 두는 이름표와 제목, hint는 그 아래 한 줄. poster는 넓은 화면의 첫 그림, preview는 휴대폰의 조작 영상 */
-export function LiveStage({ src, href, title, poster, preview, hint, children }: { src: string; href: string; title: string; poster: string; preview: { src: string; poster: string; w: number; h: number; alt: string }; hint: string; children: ReactNode }) {
+export function LiveStage({ src, href, title, poster, stages, preview, hint, children }: { src: string; href: string; title: string; poster: string; stages?: { min: number; src: string }[]; preview: { src: string; poster: string; w: number; h: number; alt: string }; hint: string; children: ReactNode }) {
   // 서버와 첫 그리기에서는 어떤 기기인지 모른다(null): 그동안은 첫 화면 그림만 보인다
   const [mode, setMode] = useState<Mode | null>(null);
   const [on, setOn] = useState(false);
@@ -92,8 +92,10 @@ export function LiveStage({ src, href, title, poster, preview, hint, children }:
             <MotionShot src={preview.src} poster={preview.poster} alt={preview.alt} w={preview.w} h={preview.h} />
           ) : (
             <picture className="block h-full w-full">
+              {/* 11-27 사용자 "만든다 만 느낌": 넓은 화면은 칸 크기 그대로 찍은 그림(stages)을 칸 폭에 맞춰 골라 꽉 채운다. 양옆에 바탕색 여백이 남지 않게 */}
+              {(stages ?? []).map((g) => <source key={g.min} media={`(min-width: ${g.min}px)`} srcSet={g.src} />)}
               <source media="(min-width: 768px)" srcSet={poster} />
-              <img src={preview.poster} alt="" width={preview.w} height={preview.h} decoding="async" className="h-full w-full object-cover object-center md:object-contain" />
+              <img src={preview.poster} alt="" width={preview.w} height={preview.h} decoding="async" className={`h-full w-full object-cover object-center ${stages ? "" : "md:object-contain"}`} />
             </picture>
           )}
         </div>

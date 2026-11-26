@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
-import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Check, ChevronDown } from "lucide-react";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { Frame } from "@/components/classic/catalog/CatalogDialog";
 import { FaqBlock } from "@/components/classic/FaqBlock";
@@ -51,39 +51,39 @@ const csvLines = ["품목,옵션,단가", "중문,3연동 슬라이딩,720000", 
 
 function Joint({ label }: { label: string }) {
   return (
-    <div aria-hidden className="flex items-center justify-center gap-3 py-1 lg:flex-col lg:py-0">
+    <div aria-hidden className="flex items-center gap-3 py-3 pl-6 md:pl-9 lg:pl-[calc(220px+2.25rem)]">
       <span className="grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-[#0b0d12] text-white">
-        <ArrowDown size={18} className="lg:hidden" />
-        <ArrowRight size={18} className="hidden lg:block" />
+        <ArrowDown size={18} />
       </span>
-      <span className="text-[13px] font-bold text-[#8a94a6] lg:w-14 lg:text-center lg:leading-[1.35]">{label}</span>
+      <span className="text-[14px] font-bold text-[#8a94a6]">{label}</span>
     </div>
   );
 }
 
-function Part({ no, en, ko, children }: { no: string; en: string; ko: string; children: ReactNode }) {
+/** 한 줄: 왼쪽은 큰 번호와 BUILD, RUN, CARE, 오른쪽은 그 단계의 부품 */
+function Row({ no, en, ko, children }: { no: string; en: string; ko: string; children: ReactNode }) {
   return (
-    <div className={`${card} flex min-w-0 flex-col gap-6 p-5 md:p-6`}>
-      <p className="flex items-center gap-2.5 text-[13px] font-bold tracking-[0.16em] text-[#7aa7ff] md:text-[14px]">
-        <span>{no}</span>
-        <span aria-hidden className="h-px w-6 bg-current" />
-        <span>{en}</span>
-        <span className="tracking-[-0.01em] text-[#c9ced6]">{ko}</span>
+    <div className={`${card} grid gap-6 p-6 md:p-9 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-9`}>
+      <p className="flex items-baseline gap-3 lg:flex-col lg:gap-1">
+        <span className="text-[40px] font-[800] leading-none tracking-[-0.05em] text-white md:text-[56px]">{no}</span>
+        <span className="text-[14px] font-bold tracking-[0.16em] text-[#7aa7ff] md:text-[15px]">{en}</span>
+        <span className="text-[15px] font-bold text-[#c9ced6] md:text-[16px]">{ko}</span>
       </p>
       {children}
     </div>
   );
 }
 
-function Piece({ title, body, children }: { title: string; body: string; children: ReactNode }) {
+function Piece({ title, body, children }: { title: string; body: string; children?: ReactNode }) {
   return (
     <div className="min-w-0">
       {children}
-      <h3 className="mt-4 break-keep text-[19px] font-[800] leading-[1.35] tracking-[-0.035em] md:text-[20px]">{title}</h3>
-      <p className="mt-1.5 break-keep text-[15px] leading-[1.65] text-[#aab2bf]">{body}</p>
+      <h3 className={`${children ? "mt-5" : ""} break-keep text-[20px] font-[800] leading-[1.35] tracking-[-0.035em] md:text-[22px]`}>{title}</h3>
+      <p className="mt-2 break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">{body}</p>
     </div>
   );
 }
+
 
 /** 연동 범위. 업무 시스템 연결은 사용 중인 시스템의 API나 웹훅을 확인한 뒤 범위를 정한다(협의) */
 const integrations: [string, string[]][] = [
@@ -91,8 +91,6 @@ const integrations: [string, string[]][] = [
   ["견적 접수", ["곰파트너 거래장부", "메일 알림", "구글 시트"]],
   ["업무 시스템(협의)", ["사용 중인 CRM", "ERP", "자체 관리자 화면", "API와 웹훅 연동"]],
 ];
-
-const shotBox = "relative block aspect-[16/10] overflow-hidden rounded-[14px] border border-white/12 bg-[#0f131b]";
 
 /** 패키지마다 대표 화면 한 장 */
 const planShot: Record<string, { img: string; alt: string }> = {
@@ -132,6 +130,7 @@ export function ThreeBoard() {
           href={room.href}
           title="3D 거실 상담 화면. 거실 크기를 정하고 가구를 놓고 옮기면 합계가 바뀝니다."
           poster={`${V}/room.jpg?v=11272`}
+          stages={[{ min: 1180, src: `${V}/room-stage-1200.jpg` }, { min: 900, src: `${V}/room-stage-1000.jpg` }, { min: 768, src: `${V}/room-stage-800.jpg` }]}
           preview={{ src: `${V}/room-m.mp4?v=11273`, poster: `${V}/room-m.jpg?v=11272`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
           hint="가구를 눌러 고르고 끌어서 옮기면 합계가 같이 바뀝니다. 고른 구성은 견적서로 보낼 수 있습니다."
         >
@@ -146,7 +145,7 @@ export function ThreeBoard() {
         </LiveStage>
       </section>
 
-      {/* 2. 조립: 3D 화면(BUILD)에서 견적서(RUN), 단가 변경(CARE)까지 */}
+      {/* 2. 조립: 3D 화면(BUILD)에서 견적서(RUN), 단가 변경(CARE)까지. 11-27 사용자 "만든다 만 느낌": 좁은 세 칸이 태블릿에서 눌려 넓은 세 줄로 */}
       <section aria-labelledby="t3d-flow" className={sec}>
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
           <h2 id="t3d-flow" className={h2}>
@@ -156,60 +155,67 @@ export function ThreeBoard() {
             3D 컨피규레이터 구축과 견적서 발행, 단가 관리를 하나의 업무 흐름으로 연동합니다. 어디에 붙이고 어떻게 받을지 먼저 설계한 뒤 조립합니다.
           </p>
         </div>
-        <div className="mt-8 grid gap-3 md:mt-10 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.25fr)_auto_minmax(0,0.85fr)] lg:items-stretch lg:gap-4">
-          <Part no="01" en="BUILD" ko="만듭니다">
-            <Piece title="3D 컨피규레이터" body="고객이 문 방식과 치수, 유리를 직접 선택하고 3D로 확인합니다. 운영 중인 홈페이지에 별도 페이지나 삽입 코드로 연동합니다.">
-              <span className={shotBox}>
-                <Image src="/3d/assets/thumb/sm/door.jpg?v=11272" alt="현관 중문 3D 화면. 3연동 슬라이딩 문과 폭, 금액 표시" fill sizes="(min-width: 1024px) 320px, 90vw" className="object-cover object-top" />
-              </span>
-            </Piece>
-            <Piece title="실시간 견적 산출" body="업체 단가표를 옵션별 계산 규칙으로 구성해 선택 즉시 합계를 산출합니다.">
-              <div className="rounded-[14px] border border-white/12 bg-[#0f131b] p-4 text-[14px] tabular-nums">
-                <dl>
-                  {doorLines.map(([k, v]) => (
-                    <div key={k} className="flex items-baseline justify-between gap-3 border-b border-white/10 py-2 first:pt-0">
-                      <dt className="min-w-0 break-keep text-[#c9ced6]">{k}</dt>
-                      <dd className="shrink-0 text-white">{v}</dd>
+        <div className="mt-8 md:mt-10">
+          <Row no="01" en="BUILD" ko="만듭니다">
+            <div className="grid gap-8 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:gap-9">
+              <Piece title="3D 컨피규레이터" body="고객이 문 방식과 치수, 유리를 직접 선택하고 3D로 확인합니다. 운영 중인 홈페이지에 별도 페이지나 삽입 코드로 연동합니다.">
+                <Frame shot={{ src: `${V}/door.jpg?v=11273`, frame: "browser", ratio: "16/10", alt: "현관 중문 3D 화면에서 문 방식과 색을 바꾸는 영상", video: { src: `${V}/door.mp4?v=11273`, w: 960, h: 600 } }} sizes="(min-width: 1024px) 520px, 90vw" />
+              </Piece>
+              <Piece title="실시간 견적 산출" body="업체 단가표를 옵션별 계산 규칙으로 구성해 선택 즉시 합계를 산출합니다.">
+                <div className="rounded-[14px] border border-white/12 bg-[#0f131b] p-5 text-[15px] tabular-nums">
+                  <p className="text-[13px] font-bold tracking-[0.04em] text-[#8a94a6]">현관 중문, 3연동 슬라이딩, 폭 1,200mm</p>
+                  <dl className="mt-3">
+                    {doorLines.map(([k, v]) => (
+                      <div key={k} className="flex items-baseline justify-between gap-4 border-b border-white/10 py-2.5">
+                        <dt className="min-w-0 break-keep text-[#c9ced6]">{k}</dt>
+                        <dd className="shrink-0 whitespace-nowrap text-white">{v}</dd>
+                      </div>
+                    ))}
+                    <div className="flex items-baseline justify-between gap-4 pt-4">
+                      <dt className="whitespace-nowrap font-bold">합계 <span className="text-[13px] font-normal text-[#8a94a6]">부가세 포함</span></dt>
+                      <dd className="shrink-0 whitespace-nowrap text-[22px] font-[800] tracking-[-0.03em]">1,275,000원</dd>
                     </div>
-                  ))}
-                  <div className="flex items-baseline justify-between gap-3 pt-3">
-                    <dt className="font-bold">합계 <span className="text-[13px] font-normal text-[#8a94a6]">부가세 포함</span></dt>
-                    <dd className="shrink-0 text-[20px] font-[800] tracking-[-0.03em]">1,275,000원</dd>
-                  </div>
-                </dl>
-              </div>
-            </Piece>
-          </Part>
+                  </dl>
+                </div>
+              </Piece>
+            </div>
+          </Row>
 
           <Joint label="견적 데이터" />
 
-          <Part no="02" en="RUN" ko="운영합니다">
-            <Piece title="견적서 자동 작성" body="견적 요청 시 품목과 규격, 금액이 입력된 견적서가 거래장부에 자동으로 작성됩니다. 담당자는 검토 후 발행합니다.">
-              <span className={`${shotBox} bg-white`}>
-                <Image src="/images/three/flow-quote.jpg" alt="거래장부 견적서. 현관 중문 3연동 슬라이딩, 폭 1,200mm, 합계 1,275,000원" fill sizes="(min-width: 1024px) 420px, 90vw" className="object-cover object-top" />
-              </span>
-            </Piece>
-            <Piece title="고객 수령 확인" body="발행한 견적서를 링크로 전달하면 고객이 휴대폰에서 수령 확인이나 수정 요청을 남깁니다. 확인 일시는 기록으로 남습니다.">
-              <span className={shotBox}>
-                <Image src="/images/three/flow-recv.jpg" alt="고객 휴대폰의 받는 화면. 견적서 아래 받았어요와 수정 요청 단추" fill sizes="(min-width: 1024px) 420px, 90vw" className="object-cover object-top" />
-              </span>
-            </Piece>
-          </Part>
+          <Row no="02" en="RUN" ko="운영합니다">
+            <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_200px] md:items-start md:gap-9 lg:grid-cols-[minmax(0,1fr)_230px]">
+              <Piece title="견적서 자동 작성" body="견적 요청 시 품목과 규격, 금액이 입력된 견적서가 거래장부에 자동으로 작성됩니다. 담당자는 검토 후 발행합니다.">
+                <span className="block overflow-hidden rounded-[14px] border border-white/12 bg-white">
+                  <Image src="/images/three/flow-quote.jpg" alt="거래장부 견적서. 현관 중문 3연동 슬라이딩, 폭 1,200mm, 합계 1,275,000원" width={1200} height={772} sizes="(min-width: 1024px) 640px, 90vw" className="block h-auto w-full" />
+                </span>
+              </Piece>
+              <Piece title="고객 수령 확인" body="발행한 견적서를 링크로 전달하면 고객이 휴대폰에서 수령 확인이나 수정 요청을 남깁니다. 확인 일시는 기록으로 남습니다.">
+                <div className="mx-auto max-w-[200px] md:max-w-none">
+                  <Frame shot={{ src: "/images/three/flow-recv-m.jpg", frame: "phone", ratio: "390/580", alt: "고객 휴대폰의 받는 화면. 견적서 아래 받았어요와 수정 요청 단추" }} sizes="230px" />
+                </div>
+              </Piece>
+            </div>
+          </Row>
 
           <Joint label="단가 변경" />
 
-          <Part no="03" en="CARE" ko="관리합니다">
-            <Piece title="단가와 옵션 관리" body="단가와 옵션은 코드와 분리된 엑셀(CSV) 파일로 관리합니다. 직접 수정이 어려우면 월 운영(월 10만 원부터)으로 변경을 대행합니다.">
-              <pre className="overflow-x-auto rounded-[14px] border border-white/12 bg-[#0f131b] p-4 font-mono text-[13px] leading-[1.8] text-[#c9ced6]">
-                {csvLines.join("\n")}
-              </pre>
-            </Piece>
-            <p className="mt-auto">
-              <a href="/maintenance" className={pill}>
-                유지보수 보기 <ArrowUpRight size={17} aria-hidden />
-              </a>
-            </p>
-          </Part>
+          <Row no="03" en="CARE" ko="관리합니다">
+            <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:gap-9">
+              <div>
+                <Piece title="단가와 옵션 관리" body="단가와 옵션은 코드와 분리된 엑셀(CSV) 파일로 관리합니다. 직접 수정이 어려우면 월 운영(월 10만 원부터)으로 변경을 대행합니다." />
+                <p className="mt-6">
+                  <a href="/maintenance" className={pill}>
+                    유지보수 보기 <ArrowUpRight size={17} aria-hidden />
+                  </a>
+                </p>
+              </div>
+              <div className="overflow-hidden rounded-[14px] border border-white/12 bg-[#0f131b]">
+                <p className="border-b border-white/10 px-5 py-3 font-mono text-[13px] text-[#8a94a6]">door-prices.csv</p>
+                <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] leading-[1.9] text-[#c9ced6]">{csvLines.join("\n")}</pre>
+              </div>
+            </div>
+          </Row>
         </div>
 
         {/* 연동 범위: 곰파트너 거래장부 외에 쓰고 있는 홈페이지, 접수 채널, 업무 시스템 */}
