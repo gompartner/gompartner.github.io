@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronDown, List } from "lucide-react";
 import { docUpdated, kindOf, relatedOf, topicOf, topics } from "@/data/classic/archive";
 import { ReadTracker } from "@/components/classic/archive/ReadTracker";
+import { TakeoverCheck } from "@/components/classic/archive/TakeoverCheck";
 import { eyebrow, ice, wrap } from "@/components/classic/ui";
 import { LdScript } from "@/components/seo/JsonLd";
 import { ORG_ID, breadcrumbLd, pageCardUrl } from "@/lib/seo";
@@ -267,23 +268,13 @@ export function ArchiveShell({
 export const docH2Base = "anchor-24 break-keep text-[22px] font-[800] leading-[1.4] tracking-[-0.035em] text-white md:text-[25px]";
 export const docH2 = `mt-14 ${docH2Base}`;
 
-/** 인수 시 확인 사항(우리 색깔). 확인할 때 하나씩 지워 가는 체크 칸 모양 */
+/** 인수 시 확인 사항(우리 색깔). 확인하며 하나씩 체크하는 목록(TakeoverCheck) */
 export function TakeoverBox({ sub, items }: { sub: string; items: { b: string; t: string }[] }) {
   return (
     <section id="take" aria-labelledby="take-h" className="anchor-24">
       <h2 id="take-h" className={docH2}>인수 시 확인 사항</h2>
       <p className="mt-2 text-[14.5px] text-[#aab2bf]">{sub}</p>
-      <ul role="list" className="mt-4 border-t border-white/12">
-        {items.map((x) => (
-          <li key={x.b} className="grid grid-cols-[26px_minmax(0,1fr)] gap-1.5 border-b border-white/10 py-3.5">
-            <span aria-hidden className="mt-1 h-[16px] w-[16px] rounded-[3px] border-[1.5px] border-[#8a93a1]" />
-            <div>
-              <p className="text-[16px] font-bold text-white">{x.b}</p>
-              <p className="mt-0.5 text-[15px] leading-[1.65] text-[#aab2bf]">{x.t}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <TakeoverCheck items={items} />
     </section>
   );
 }
