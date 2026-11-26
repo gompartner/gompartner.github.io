@@ -154,7 +154,7 @@ export const works = [
   {
     en: "RUN",
     name: "운영합니다",
-    body: "웹사이트 모니터링 서비스 사이트 지킴이와 거래명세서, 미수금을 관리하는 거래장부를 직접 만들어 운영합니다.",
+    body: "웹사이트 모니터링 서비스 사이트 지킴이와 거래명세서를 링크로 보내고 수령 확인을 받는 거래장부를 직접 만들어 운영합니다.",
     links: [
       { href: "https://jikimi.gompartner.co.kr/", label: "사이트 지킴이" },
       { href: "https://jangbu.gompartner.co.kr/", label: "거래장부" },
