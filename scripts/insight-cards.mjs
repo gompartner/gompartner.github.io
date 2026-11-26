@@ -1,7 +1,7 @@
 // 운영 노트(/insight) 글의 대표 이미지(1200x630 JPG)를 글 제목으로 만든다. 공유 미리보기, 구글 디스커버, 구조화 데이터에만 쓰고 본문에는 넣지 않는다.
 // 사용: node scripts/insight-cards.mjs (없는 것만 만든다) / --all (모두 다시)
 //  CDP=http://127.0.0.1:9333 을 주면 새 크롬을 띄우지 않고 이미 떠 있는 업무용 크롬의 새 탭으로 만든다
-// 11-26 페이지 카드와 같은 틀(scripts/og-card.mjs)로 맞췄다: 어두운 바탕, 꼬리표 "WIKI / 운영 노트", 제목 두 줄까지.
+// 11-26 페이지 카드와 같은 틀(scripts/og-card.mjs)로 맞췄다: 어두운 바탕, 가운데 정렬, 꼬리표 "WIKI / 운영 노트", 제목 세 줄까지.
 // 폰트(Pretendard woff2)를 쓰려고 크롬으로 그린다. 빌드 서버에는 폰트가 없어 만든 JPG를 저장소에 올린다.
 // 그림을 다시 만들어 배포할 때는 lib/seo.ts 의 OG_VERSION 을 올린다.
 import { readFileSync, existsSync, mkdirSync } from "node:fs";

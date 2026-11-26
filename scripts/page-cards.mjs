@@ -1,13 +1,14 @@
 // 페이지의 공유 미리보기 이미지(1200x630 JPG)를 만든다. 그림체와 틀은 scripts/og-card.mjs (11-26 지금 사이트의 어두운 화면에 맞춰 다시 그림).
-// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all] [--only <주소 앞부분>]
+// 사용: node scripts/page-cards.mjs <사이트 주소, 예 http://localhost:3123> [--all] [--features] [--only <주소 앞부분>]
 //  아무것도 안 주면 아직 없는 카드만 만든다. --all 은 모두 다시, --only /knowledge 는 그 주소로 시작하는 페이지만 다시.
+//  --features 는 화면이 들어가는 주요 페이지 카드만 다시(그 페이지의 화면을 고친 뒤).
 //  CDP=http://127.0.0.1:9333 을 주면 새 크롬을 띄우지 않고 이미 떠 있는 업무용 크롬의 새 탭으로 만든다(끝나면 그 탭만 닫는다)
 // 만드는 것
-//  1. 주요 페이지(FEATURES): 왼쪽에 꼬리표와 제목, 오른쪽에 그 페이지의 실제 화면 일부. 메인은 public/og-image.png, 나머지는 public/og/page/<주소>.jpg
+//  1. 주요 페이지(FEATURES): 위쪽 가운데에 꼬리표와 제목, 그 아래에 그 페이지의 실제 화면 일부. 메인은 public/og-image.png, 나머지는 public/og/page/<주소>.jpg
 //  2. 그 밖의 사이트맵 페이지와 점검표(/jaryo): 제목 카드(꼬리표 + 제목). public/og/page/<주소>.jpg. 꼬리표와 제목은 페이지의 위치 표시와 h1에서 읽는다
 //  3. 정적 3D 화면(SCREENS): 그 화면을 1200x630으로 찍은 그림. public/3d/ 아래 og 이미지
 // 운영 노트(/insight) 카드는 scripts/insight-cards.mjs 가 만든다.
-// 그림을 다시 만들어 배포할 때는 lib/seo.ts 의 OG_VERSION 과 public/3d 화면 head 의 ?v= 값을 같이 올린다(공유 서비스가 옛 그림을 기억한다).
+// 그림을 다시 만들어 배포할 때는 lib/seo.ts 의 OG_VERSION 과 public/3d, public/go/jaryo 의 head 에 적힌 ?v= 값을 같이 올린다(공유 서비스가 옛 그림을 기억한다).
 import { existsSync, mkdirSync } from "node:fs";
 import { H, SHOT, W, drawCard, openTab, root } from "./og-card.mjs";
 
@@ -19,18 +20,19 @@ mkdirSync(OUT, { recursive: true });
 const key = (p) => p.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
 
 // 주요 페이지. title 은 페이지 이름(큰 제목이 질문 문장인 판은 카드에 페이지 이름을 쓴다), sub 는 그 아래 한 줄.
-// shot 은 오른쪽에 넣을 화면: vw 폭으로 연 페이지에서 sel 요소의 왼쪽 위부터(center 면 가운데부터) 폭 cw 만큼을 찍는다.
-//  dx, dy 는 시작점을 옮기는 값, up 은 sel 에서 몇 단계 위 요소를 쓸지, wait 는 화면이 다 그려질 때까지 기다리는 시간(ms)
+// shot 은 제목 아래에 넣을 화면(가로로 긴 띠, og-card.mjs 의 SHOT 비율): vw 폭으로 연 페이지에서 sel 요소의 왼쪽 위부터(center 면 가운데부터) 폭 cw 만큼을 찍는다.
+//  dx, dy 는 시작점을 옮기는 값, up 은 sel 에서 몇 단계 위 요소를 쓸지, wait 는 화면이 다 그려질 때까지 기다리는 시간(ms).
+//  sel 없이 from 만 주면 그 주소(정적 3D 화면)를 띠 비율의 창으로 열어 화면 전체를 찍는다(3D가 창 크기에 맞춰 다시 잡힌다)
 const FEATURES = {
-  "/": { file: `${root}public/og-image.png`, title: "Build,\nRun, Care.", ice: "Build,\nRun, Care.", sub: "홈페이지, 앱 제작과 유지보수", shot: { vw: 1440, sel: 'iframe[title^="3D 마을"]', cw: 560, center: true, wait: 9000 } },
-  "/make": { label: "BUILD", accent: "build", title: "홈페이지, 앱 제작", sub: "종류별 화면과 금액, 제작 기간", shot: { vw: 1280, sel: "#mk-panel", cw: 860 } },
-  "/3d": { label: "3D WEB", title: "3D 웹 제작", ice: "3D 웹", sub: "고객이 직접 구성하는 3D 견적 화면", shot: { vw: 1280, sel: 'section[aria-labelledby="t3d-live"]', cw: 760, center: true, wait: 7000 } },
-  "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 860, sel: '[role=tablist][aria-label="상황"]', cw: 844, dx: -16, dy: -16 } },
-  "/pricing": { label: "PRICE", title: "제작, 유지보수 비용", ice: "제작,", sub: "홈페이지 제작 29.9만 원부터", shot: { vw: 860, sel: 'section[aria-labelledby="pr-2"]', cw: 844, dx: -16, dy: -16 } },
-  "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: 'button[aria-label$=" 화면 크게 보기"]', cw: 680, dx: -20, dy: -24 } },
-  "/knowledge": { label: "WIKI", title: "위키", sub: "홈페이지 기획, 제작, 운영 문서", shot: { vw: 1000, sel: "main input[type=search]", up: 2, cw: 992, dx: -20, dy: -20 } },
-  "/story": { label: "ABOUT", title: "회사소개", sub: "만들고, 운영하고, 관리합니다", shot: { vw: 860, sel: "main ul.grid", cw: 844, dx: -16, dy: -66 } },
-  "/contact": { label: "CONTACT", title: "상담 신청", ice: "상담", sub: "검토 후 견적서로 회신합니다", shot: { vw: 1280, sel: 'section[aria-labelledby="contact-form"]', cw: 640 } },
+  "/": { file: `${root}public/og-image.png`, title: "Build, Run, Care.", ice: "Build, Run, Care.", sub: "홈페이지, 앱 제작과 유지보수", shot: { vw: 1440, sel: 'iframe[title^="3D 마을"]', cw: 590, dy: 64, wait: 9000 } },
+  "/make": { label: "BUILD", accent: "build", title: "홈페이지, 앱 제작", sub: "종류별 화면과 금액, 제작 기간", shot: { vw: 1280, sel: "#mk-panel", cw: 892, dx: -16, dy: 196 } },
+  "/3d": { label: "3D WEB", title: "3D 웹 제작", ice: "3D 웹", sub: "고객이 직접 구성하는 3D 견적 화면", shot: { from: "/3d/configurator/", vw: 1140, wait: 7000 } },
+  "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 1280, sel: '[role=tablist][aria-label="상황"]', cw: 1264, dx: -16, dy: -20 } },
+  "/pricing": { label: "PRICE", title: "제작, 유지보수 비용", ice: "제작,", sub: "홈페이지 제작 29.9만 원부터", shot: { vw: 1280, sel: 'section[aria-labelledby="pr-2"]', cw: 1264, dx: -16, dy: -16 } },
+  "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: "main article", cw: 1264, dx: -16, dy: -16 } },
+  "/knowledge": { label: "WIKI", title: "위키", sub: "홈페이지 기획, 제작, 운영 문서", shot: { vw: 1280, sel: "main input[type=search]", up: 2, cw: 1264, dx: -16, dy: -20 } },
+  "/story": { label: "ABOUT", title: "회사소개", sub: "만들고, 운영하고, 관리합니다", shot: { vw: 1280, sel: "main ul.grid", cw: 1264, dx: -16, dy: -60 } },
+  "/contact": { label: "CONTACT", title: "상담 신청", ice: "상담", sub: "검토 후 견적서로 회신합니다", shot: { vw: 1280, sel: 'section[aria-labelledby="contact-form"]', cw: 960, center: true, dy: -20 } },
 };
 
 // 정적 3D 화면: [주소, 저장할 파일]. 섬 화면(/3d/island.html)은 바로 열면 /3d 로 넘어가므로 /3d 카드를 같이 쓴다
@@ -52,7 +54,8 @@ function labelOf(html) {
   return "GOMPARTNER";
 }
 
-const want = (path, file) => (only ? path.startsWith(only) : all || !existsSync(file));
+const featuresOnly = process.argv.includes("--features");
+const want = (path, file) => (featuresOnly ? !!FEATURES[path] : only ? path.startsWith(only) : all || !existsSync(file));
 
 const xml = await get("/sitemap.xml");
 const sitemap = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
@@ -84,29 +87,35 @@ try {
     const file = f.file ?? `${OUT}/${key(path)}.jpg`;
     if (!want(path, file)) continue;
     const s = f.shot;
-    await open(path, s.vw, 1100, s.wait ?? 3000);
-    // 요소를 머리글(위에 붙어 다니는 메뉴) 아래로 오게 스크롤한 뒤, 그 자리에서 화면 좌표로 찍는다
-    const TOP = 120;
-    const box = await page.evaluate(
-      ({ sel, up, dy, top }) => {
-        // 같은 선택자가 휴대폰용, PC용으로 둘 있으면 지금 보이는 것을 고른다
-        let el = [...document.querySelectorAll(sel)].find((e) => e.getBoundingClientRect().width > 0);
-        for (let i = 0; el && i < up; i++) el = el.parentElement;
-        if (!el) return null;
-        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + dy - top, behavior: "instant" });
-        const r = el.getBoundingClientRect();
-        return { x: r.left, y: r.top + dy, w: r.width };
-      },
-      { sel: s.sel, up: s.up ?? 0, dy: s.dy ?? 0, top: TOP },
-    );
-    if (!box) {
-      failed.push(`${path}: 화면에서 ${s.sel} 을 찾지 못했습니다`);
-      continue;
+    let data;
+    if (!s.sel) {
+      await open(s.from, s.vw, Math.round((s.vw * SHOT.h) / SHOT.w), s.wait ?? 3000);
+      data = await page.screenshot({ type: "png" });
+    } else {
+      await open(s.from ?? path, s.vw, 1100, s.wait ?? 3000);
+      // 요소를 머리글(위에 붙어 다니는 메뉴) 아래로 오게 스크롤한 뒤, 그 자리에서 화면 좌표로 찍는다
+      const TOP = 120;
+      const box = await page.evaluate(
+        ({ sel, up, dy, top }) => {
+          // 같은 선택자가 휴대폰용, PC용으로 둘 있으면 지금 보이는 것을 고른다
+          let el = [...document.querySelectorAll(sel)].find((e) => e.getBoundingClientRect().width > 0);
+          for (let i = 0; el && i < up; i++) el = el.parentElement;
+          if (!el) return null;
+          window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + dy - top, behavior: "instant" });
+          const r = el.getBoundingClientRect();
+          return { x: r.left, y: r.top + dy, w: r.width };
+        },
+        { sel: s.sel, up: s.up ?? 0, dy: s.dy ?? 0, top: TOP },
+      );
+      if (!box) {
+        failed.push(`${path}: 화면에서 ${s.sel} 을 찾지 못했습니다`);
+        continue;
+      }
+      await page.waitForTimeout(800);
+      // 카드의 창 안쪽(og-card.mjs 의 SHOT)과 같은 비율로 찍는다
+      const clip = { x: Math.max(0, Math.round(s.center ? box.x + box.w / 2 - s.cw / 2 : box.x + (s.dx ?? 0))), y: Math.round(box.y), width: s.cw, height: Math.round((s.cw * SHOT.h) / SHOT.w) };
+      data = await page.screenshot({ type: "png", clip });
     }
-    await page.waitForTimeout(800);
-    // 카드의 창 안쪽(og-card.mjs 의 SHOT)과 같은 비율로 찍는다
-    const clip = { x: Math.max(0, Math.round(s.center ? box.x + box.w / 2 - s.cw / 2 : box.x + (s.dx ?? 0))), y: Math.round(box.y), width: s.cw, height: Math.round((s.cw * SHOT.h) / SHOT.w) };
-    const data = await page.screenshot({ type: "png", clip });
     await page.setViewportSize({ width: W, height: H });
     const fit = await drawCard(page, { ...f, shot: { data, url: `gompartner.co.kr${path === "/" ? "" : path}` } }, file);
     made++;
