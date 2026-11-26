@@ -1027,11 +1027,24 @@ async function shareLink() {
 $('share-btn').addEventListener('click', shareLink);
 $('sheet-share').addEventListener('click', shareLink);
 // 11-26 사용자 "견적은 자연스럽게 거래장부로 이어지면 좋겠음": 이 구성을 거래장부 견적서 품목 한 줄로 채워 연다
+// 11-27 사용자 "수량이 1임 고정인가?": 구성 전체를 "식 1"로 넘기지 않고 견적 내역 그대로(기본 제품, 치수 추가, 유리, 부속, 시공비) 넘긴다.
+// "자동 닫힘 2개"처럼 개수가 붙은 줄은 수량과 단가로 나눈다. 내역 합이 합계와 다르면 예전처럼 한 줄로
+function quoteItems(name, what, price) {
+  const { lines, total } = computeLines(), { t: ty, dw, dh } = door();
+  const t = (x, n) => String(x || '').replace(/\s+/g, ' ').trim().slice(0, n);
+  const items = lines.filter(l => l.price > 0).map(l => {
+    if (/^기본 제품가/.test(l.name)) return [t(`현관 중문 ${ty.name}`, 40), t(`폭 ${mm(dw)}, 높이 ${mm(dh)}`, 40), '식', 1, l.price];
+    const m = / (\d+)개$/.exec(l.name), n = m ? +m[1] : 1;
+    return [t(m ? l.name.slice(0, m.index) : l.name, 40), t(l.sub, 40), n > 1 ? '개' : '식', n, l.price / n];
+  });
+  const sum = items.reduce((s, r) => s + r[3] * r[4], 0);
+  return items.length && sum === total && items.every(r => Number.isInteger(r[4])) ? items : [[name, what, '식', 1, price]];
+}
 function sendQuote() {
   if (typeof renderInfo === 'function') renderInfo();   // 견적 내역 창을 열지 않고 눌러도 지금 구성 금액으로
   const name = document.title.replace(/ 3D 견적 화면.*$/, '').trim(), what = ($('qt-what').innerHTML || '').replace(/<br\s*\/?>/gi, ', ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim().slice(0, 40).replace(/[,\s]+$/, '');
   const price = Number(($('qt-total').textContent || '').replace(/[^0-9]/g, '')) || 0, incl = /부가세 포함/.test($('sheet').textContent);
-  const j = JSON.stringify({ k: '견적서', i: [[name, what, '식', 1, price]], m: '3D 견적 화면에서 고른 구성입니다.', v: incl ? 'incl' : '' });
+  const j = JSON.stringify({ k: '견적서', i: quoteItems(name, what, price), m: `3D 견적 화면에서 고른 구성입니다. ${($('qt-what').innerHTML || '').replace(/<br\s*\/?>/gi, ', ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim()}`.slice(0, 200), v: incl ? 'incl' : '' });
   const b = btoa(unescape(encodeURIComponent(j))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   window.open(`https://jangbu.gompartner.co.kr/write?from=3d-door&q=${b}`, '_blank', 'noopener');
 }
