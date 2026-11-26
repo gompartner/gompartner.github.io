@@ -33,7 +33,9 @@
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-icon.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!-- 11-26 글꼴을 외부(jsdelivr) 전체판 749KB에서 사이트와 같은 부분 글꼴(약 250KB)로. 카카오톡 안 브라우저 첫 로딩이 늘어지던 원인 -->
+<link rel="preload" href="/3d/assets/fonts/PretendardVariable.subset.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Pretendard;src:local("Pretendard Variable"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2-variations"),url(/3d/assets/fonts/PretendardVariable.subset.woff2) format("woff2");font-weight:45 920;font-style:normal;font-display:swap}</style>
 <style>
   :root {
     --bg: #1c1815;
