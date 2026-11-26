@@ -74,7 +74,7 @@ export const metadata: Metadata = {
 // (a)로 했다: 내 손이 닿지 않는 부품(검색 결과, 자료 미리보기, 차트)까지 한 번에 같은 색이 되고 11-22에 대비를 재 둔 색표다. 머리와 위키 틀만 판 모양으로 다시 썼고,
 // 흰 바탕이어야 하는 것(상담 신청서)은 메인처럼 keep-light 흰 카드에 둔다((c)는 그 카드에만 썼다). 기기 설정은 보지 않는다(기본은 어두운 화면).
 const THEME_CLASS = "gp-dark";
-const themeScript = `try{if(localStorage.getItem('gp-theme')==='light'){var c=document.documentElement.classList;c.remove('gp-dark');c.add('gp-light');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#ffffff')}}catch(e){}`;
+const themeScript = `try{localStorage.removeItem('gp-theme');if(localStorage.getItem('gp-color')==='light'){var c=document.documentElement.classList;c.remove('gp-dark');c.add('gp-light');var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#ffffff')}}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -89,7 +89,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground antialiased">
-        {/* 11-26 화면 색 선택(사용자 "다크모드 화이트모드 선택도 필요"): 기본은 어두운 화면, 머리글에서 밝은 화면을 고르면 gp-theme에 기억한다.
+        {/* 11-26 화면 색 선택(사용자 "다크모드 화이트모드 선택도 필요"): 기본은 어두운 화면, 머리글에서 밝은 화면을 고르면 gp-color에 기억한다. 11-22판 사이트에서 밝은 화면을 고른 사람은 gp-theme에 light가 남아 새 사이트도 흰 화면으로 열리므로, 그 값은 지운다.
             그리기 전에 html의 gp-dark를 gp-light로 바꾼다. 밝은 화면 색은 app/classic-light.css, 바꾸는 버튼은 components/classic/ThemeSwitch.tsx */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {/* 클래식 보기를 골랐으면 웹툰 화면을 그리기 전에 클래식 주소로 옮긴다 */}

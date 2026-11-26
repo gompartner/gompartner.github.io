@@ -69,11 +69,11 @@ const { page, close } = await openTab();
 let made = 0;
 const failed = [];
 try {
-  // 화면 색 선택(gp-theme)이 밝은 화면으로 저장돼 있어도 이 탭은 기본(어두운 화면)으로 연다. 저장된 값은 건드리지 않는다
+  // 화면 색 선택(gp-color)이 밝은 화면으로 저장돼 있어도 이 탭은 기본(어두운 화면)으로 연다. 저장된 값은 건드리지 않는다
   await page.addInitScript(() => {
     const g = Storage.prototype.getItem;
     Storage.prototype.getItem = function (k) {
-      return k === "gp-theme" ? null : g.call(this, k);
+      return k === "gp-color" || k === "gp-theme" ? null : g.call(this, k);
     };
   });
   const open = async (path, vw, vh, wait) => {
