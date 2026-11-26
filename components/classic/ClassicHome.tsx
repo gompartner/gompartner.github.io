@@ -71,7 +71,7 @@ const products = [
   {
     name: "거래장부",
     href: "https://jangbu.gompartner.co.kr/",
-    img: "/images/products/jangbu.jpg",
+    img: "/images/products/jangbu-1126.jpg",
     lead: "거래명세서를 링크로 보내고 거래처에게 받았다는 확인을 받는 업무 도구",
     facts: ["가입 없이 작성과 PDF 저장", "받는 쪽 지문으로 수령 확인", "외상 거래처 미수금과 월 합계"],
     light: false,
