@@ -1,15 +1,18 @@
-// 사이트 문구 점검(11-26 사용자 "가운뎃점 쓰지 말라니 쉼표 남발", "규칙 넣어야"). 빌드 뒤 check-pages.mjs가 부른다.
+// 사이트 문구 점검. 빌드 뒤 check-pages.mjs가 부르고, 오류가 있으면 빌드가 실패해 배포되지 않는다.
+// 규칙 한 줄: 나열 부호(쉼표, 가운뎃점, 겹낫표)는 금지가 아니라 아껴 쓴다. 문제는 남발이다.
+//   (10-14 가운뎃점 지적 뒤 쉼표로 옮겨 남발, 11-26 사용자 "쓰지 말라는 게 아니라 너무 많이 사용해서", "이젠 쉼표잖아, 정리 좀 해")
+//  1. 한 문장에 나열 부호(쉼표와 가운뎃점) 3개 이상이면 오류, 2개는 경고 수만 센다.
+//     세지 않는 것: 숫자 자릿수, 영문과 숫자 기술 목록(GLB, GLTF), "이름표: 짧은 명사 목록", 괄호 안 짧은 목록, 출처 줄, 법 조문 번호, 표어.
+//     참고 문서(위키, 인사이트, 자료실)는 용어 목록처럼 명사 나열이 내용인 곳이 많아 명사 나열은 두고 쉼표로 절을 잇는 문장만 잡는다.
+//  2. 한 쪽에 가운뎃점 5개, 겹낫표 5쌍까지.
+//  3. 장식 기호(엠대시, 화살표, 당구장, 원 숫자, 굽은 따옴표, 이모지)는 쓰지 않는다. 단위 기호(㎡, ℃, %)는 쓴다.
 // 규칙은 채널 공용 점검기(01_Work/03_Resource/글-점검/textcheck.py)와 같다. 배포 서버에서도 돌아야 해서 저장소 안에 따로 둔다.
-//  1. 키보드로 못 누르는 장식 기호(가운뎃점, 엠대시, 화살표, 당구장, 원 숫자, 굽은 따옴표, 이모지). 단위 기호(㎡, ℃, %)는 쓴다.
-//     겹낫표는 막지 않고 한 쪽에 5쌍 넘게 쓰면 잡는다(11-26 사용자 "쓰지 말라는 게 아니라 너무 많이 사용해서").
-//  2. 한 문장에 쉼표 3개 이상이면 오류, 2개는 경고 수만 센다.
-//     세지 않는 쉼표: 숫자 자릿수, 영문과 숫자 기술 목록(GLB, GLTF), 이름표 뒤 짧은 명사 나열("팝업 6가지: 모달, 팝오버, 바텀시트"), 표어.
 // 사용: node scripts/copy-check.mjs [out 폴더]   오류가 있으면 종료 코드 1
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const SYMBOLS = /[·•‧・–—―←-⇿※…①-⓿‘’“”\u{1f300}-\u{1faff}☀-➿⭐⭕]/gu;
+const SYMBOLS = /[•‧・–—―←-⇿※…①-⓿‘’“”\u{1f300}-\u{1faff}☀-➿⭐⭕]/gu;
 const MOTTO = ["만들고, 운영하고, 관리합니다", "만들고, 운영하고, 관리"];
 const VERB_END = /(니다|어요|아요|해요|세요|하고|하며|해서|하면|되고|이고|는지|은지|는데|으며)[.?!]?$/;
 
@@ -75,16 +78,19 @@ export function checkHtml(html, reference = false) {
   let warns = 0;
   const pairs = (body.match(/[「『]/g) || []).length;
   if (pairs > 5) errors.push(`겹낫표 ${pairs}쌍(한 쪽에 5쌍까지)`);
+  const dots = (body.match(/·/g) || []).length;
+  if (dots > 5) errors.push(`가운뎃점 ${dots}개(한 쪽에 5개까지)`);
   const seen = new Set();
-  for (const s of [...sentences(desc), ...sentences(body)]) {
-    if (seen.has(s)) continue;
-    seen.add(s);
-    const sym = s.match(SYMBOLS);
-    if (sym) errors.push(`기호 ${[...new Set(sym)].join(" ")}: ${s.slice(0, 80)}`);
+  for (const raw of [...sentences(desc), ...sentences(body)]) {
+    if (seen.has(raw)) continue;
+    seen.add(raw);
+    const s = raw.replace(/·/g, ","); // 가운뎃점도 나열 부호로 함께 센다
+    const sym = raw.match(SYMBOLS);
+    if (sym) errors.push(`기호 ${[...new Set(sym)].join(" ")}: ${raw.slice(0, 80)}`);
     const c = countedCommas(s);
     if (reference && c >= 3 && isNounList(s) && clauseCommas(s) < 2) { warns++; continue; }
-    if (c >= 3) errors.push(`쉼표 ${c}개: ${s.slice(0, 80)}`);
-    else if (reference && clauseCommas(s) >= 2) errors.push(`쉼표로 이은 절 ${clauseCommas(s)}개: ${s.slice(0, 80)}`);
+    if (c >= 3) errors.push(`나열 부호 ${c}개: ${raw.slice(0, 80)}`);
+    else if (reference && clauseCommas(s) >= 2) errors.push(`쉼표로 이은 절 ${clauseCommas(s)}개: ${raw.slice(0, 80)}`);
     else if (c === 2) warns++;
   }
   return { errors, warns };
@@ -124,6 +130,6 @@ if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1] ?? "")) {
     console.log(b.page);
     for (const e of b.errors) console.log("  " + e);
   }
-  console.log(`문구 점검: ${pages}쪽, 오류 ${n}건(${bad.length}쪽), 쉼표 2개 문장 ${warns}개`);
+  console.log(`문구 점검: ${pages}쪽, 오류 ${n}건(${bad.length}쪽), 나열 부호 2개 문장 ${warns}개`);
   process.exit(n ? 1 : 0);
 }
