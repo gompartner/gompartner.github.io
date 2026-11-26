@@ -228,7 +228,7 @@ export function CatalogBoard({ stories, trends, rest, cats, total }: { stories: 
             <h2 id="ct-year" className="text-[24px] font-[800] tracking-[-0.045em] md:text-[32px]">
               웹 트렌드를 반영한 화면
             </h2>
-            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">2026년, 2027년 웹 디자인 트렌드를 반영해 제작한 병원 홈페이지입니다.</p>
+            <p className="max-w-[440px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:text-[16px]">병원 홈페이지에 3D, 스크롤 인터랙션, 타이포그래피 연출을 적용한 화면입니다.</p>
           </div>
           <div className="mt-5 space-y-4 md:mt-6 md:space-y-5">{byYear.map((s, i) => board(s, i))}</div>
         </section>
