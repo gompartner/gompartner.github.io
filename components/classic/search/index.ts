@@ -36,7 +36,7 @@ export function buildSearchIndex(): SearchItem[] {
     { kind: "서비스", title: "업무 프로그램 제작", desc: "엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다", href: "/make", hay: "업무 프로그램 엑셀 자동화 관리자 주문 취합 결과지 출력 발주서" },
     ...makeExtras.map((m) => ({ kind: "서비스" as const, title: m.title, desc: m.lead, href: "/make", hay: [m.metaDescription, ...m.scope.flatMap((g) => g.items), ...m.forWhom].join(" ") })),
     { kind: "서비스", title: threeMeta.title, desc: threeMeta.lead, href: "/3d", hay: ["3D 쓰리디 견적 컨피규레이터 쇼룸 가구 중문 인테리어 셀프 인테리어", threeMeta.metaDescription, ...threeScope.flatMap((g) => g.items), ...threeForWhom].join(" ") },
-    ...threeFaq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/3d#t3d-faq", hay: threeMeta.title })),
+    ...threeFaq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/knowledge/3d-web#faq", hay: threeMeta.title })),
     { kind: "서비스", title: "홈페이지 유지보수", desc: "유지보수, 유지관리, 성능 개선, 고도화, 업체 변경, 보안 업데이트", href: "/maintenance", hay: "유지보수 관리 수정 바이브코딩" },
     ...maintenanceServices.map((s) => ({
       kind: "서비스" as const,

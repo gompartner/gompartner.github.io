@@ -20,7 +20,6 @@ export const oldClassicPaths: string[] = [
   "notice/design-2",
   "notice/design-4",
   "notice/maintenance-2026-11",
-  "notice/php-promo-2026-11",
   "notice/renewal-2026-10",
   "privacy",
   "privacy/1",

@@ -362,7 +362,7 @@ function rawTopics(): Topic[] {
       { title: "디자인 흐름", items: designDocs.map((d) => ({ label: d.title, href: d.href })) },
     ] },
     { id: "dev", label: "개발", desc: "만드는 도구(CMS)와 서버 언어 버전, 브라우저 호환과 화면 기술(플래시와 jQuery). 페이지 무게와 앱, AI로 만든 서비스", groups: [
-      { title: "문서", items: ["/knowledge/cms", "/knowledge/server-language", "/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight", "/knowledge/php", "/knowledge/app"].map(doc) },
+      { title: "문서", items: [...["/knowledge/cms", "/knowledge/server-language", "/knowledge/browser", "/knowledge/flash-jquery", "/knowledge/page-weight", "/knowledge/php", "/knowledge/app"].map(doc), { label: "3D 홈페이지 제작 안내", href: "/knowledge/3d-web" }] },
       { title: "AI로 만든 서비스 운영", items: series("AI로 만든 서비스 운영") },
     ] },
     { id: "infra", label: "인프라", desc: "도메인과 서버, 호스팅, https와 인증서", groups: [
@@ -427,6 +427,7 @@ export function relatedOf(href: string, limit = 3): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-27", kind: "개발", title: "3D 홈페이지 제작 안내", href: "/knowledge/3d-web" },
   { date: "2026-11-26", kind: "디자인", title: "2026, 2027 웹 디자인 트렌드", href: "/knowledge/design-trends" },
   { date: "2026-11-26", kind: "디자인", title: "웹 디자인 트렌드 용어", href: "/knowledge/terms/trends" },
   { date: "2026-11-22", kind: "디자인", title: "웹어워드 수상작으로 본 한국 웹 디자인 22년", href: "/knowledge/web-award" },

@@ -10,7 +10,7 @@ export const DESCRIPTION_MAX = 80;
 // 11-26 모든 카드를 1200x630 JPG로 맞췄다(카카오톡, 페이스북, X 공통). 그림을 다시 만들면 OG_VERSION 날짜를 올린다:
 // 공유 서비스는 이미지 주소로 그림을 기억해 두기 때문에 주소(?v=)가 바뀌어야 새 그림을 가져간다.
 // 값은 날짜 8자리 + 그날 몇 번째인지 2자리. public/3d 와 public/go/jaryo 의 정적 head 에 적힌 ?v= 도 같은 값으로 맞춘다.
-export const OG_VERSION = "2026112602";
+export const OG_VERSION = "2026112701";
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 /** 사이트 안 이미지 주소에 버전 값을 붙인다(이미 ?가 있거나 바깥 주소면 그대로) */
 export const ogSrc = (src: string) => (src.startsWith("/") && !src.includes("?") ? `${src}?v=${OG_VERSION}` : src);

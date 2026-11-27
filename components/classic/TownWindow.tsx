@@ -51,16 +51,10 @@ export function TownWindow() {
     link.rel = "modulepreload";
     link.href = THREE_URL;
     document.head.appendChild(link);
-    let idle = 0;
-    const coarse = matchMedia("(pointer: coarse)").matches;
-    const timer = window.setTimeout(() => {
-      const go = () => setSrc(built ? BASE : `${BASE}&build=1&wait=1`);
-      if ("requestIdleCallback" in window) idle = window.requestIdleCallback(go, { timeout: 400 });
-      else go();
-    }, built ? 200 : coarse ? 900 : 400);
+    // 11-27 대표 "메인에 3D는 2초 이내": 미리 기다리던 시간(휴대폰 0.9초, PC 0.4초)을 없애고 바로 불러온다
+    const timer = window.setTimeout(() => setSrc(built ? BASE : `${BASE}&build=1&wait=1`), 0);
     return () => {
       window.clearTimeout(timer);
-      if (idle && "cancelIdleCallback" in window) window.cancelIdleCallback(idle);
       link.remove();
     };
   }, [built]);
@@ -73,7 +67,7 @@ export function TownWindow() {
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      timer = window.setTimeout(() => setLines(true), 900);
+      timer = window.setTimeout(() => setLines(true), 250); // 11-27 설계선은 잠깐만(2초 안에 마을이 다 지어지게)
     }, { threshold: 0.5 });
     io.observe(el);
     return () => {

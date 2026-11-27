@@ -60,6 +60,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...["terms", "screens", "data", "notes", "checklists"].map((s) => ({ path: `/knowledge/${s}`, priority: 0.6, files: [`app/(classic)/knowledge/${s}/page.tsx`, "data/classic/archive.ts"] })),
     ...topics().map((t) => ({ path: `/knowledge/${t.id}`, priority: 0.6, files: ["data/classic/archive.ts"] })),
     ...trendDocs.map((d) => ({ path: d.href, priority: 0.6, files: [`app/(classic)${d.href}/page.tsx`, "data/classic/trendData.ts"] })),
+    { path: "/knowledge/3d-web", priority: 0.6, files: ["app/(classic)/knowledge/3d-web/page.tsx", "data/classic/three.ts"] },
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/knowledge/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),
     { path: "/notice", priority: 0.3, files: ["app/(classic)/notice/page.tsx", "data/classic/notices.ts"] },
     // 공지 글은 글에 적힌 날짜가 내용이 바뀐 날이다

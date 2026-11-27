@@ -26,9 +26,9 @@ const key = (p) => p.replace(/^\/|\/$/g, "").replaceAll("/", "--") || "home";
 //  dx, dy 는 시작점을 옮기는 값, up 은 sel 에서 몇 단계 위 요소를 쓸지, wait 는 화면이 다 그려질 때까지 기다리는 시간(ms).
 //  sel 없이 from 만 주면 그 주소(정적 3D 화면)를 띠 비율의 창으로 열어 화면 전체를 찍는다(3D가 창 크기에 맞춰 다시 잡힌다)
 const FEATURES = {
-  "/": { file: `${root}public/og-image.png`, title: "Build, Run, Care.", ice: "Build, Run, Care.", sub: "홈페이지, 앱 제작과 유지보수", shot: { vw: 1440, sel: 'iframe[title^="3D 마을"]', cw: 590, dy: 64, wait: 9000 } },
+  "/": { file: `${root}public/og-image.png`, title: "Build, Run, Care.", ice: "Build, Run, Care.", sub: "홈페이지, 앱 제작과 유지보수", shot: { vw: 1440, sel: 'iframe[title^="3D 시스템"]', cw: 590, dy: 64, wait: 9000 } },
   "/make": { label: "BUILD", accent: "build", title: "홈페이지, 앱 제작", sub: "종류별 화면과 금액, 제작 기간", shot: { vw: 1280, sel: "#mk-panel", cw: 892, dx: -16, dy: 196 } },
-  "/3d": { label: "3D WEB", title: "3D 웹 제작", ice: "3D 웹", sub: "고객이 직접 구성하는 3D 견적 화면", shot: { from: "/3d/sofa/?embed=1", vw: 1140, wait: 7000 } },
+  "/3d": { label: "3D WEB", title: "3D 홈페이지 제작", ice: "3D", sub: "브랜드 3D 홈페이지부터 3D 견적까지", shot: { from: "/3d/sofa/?embed=1", vw: 1140, wait: 7000 } },
   "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 1280, sel: '[role=tablist][aria-label="상황"]', cw: 1264, dx: -16, dy: -20 } },
   "/pricing": { label: "PRICE", title: "제작, 유지보수 비용", ice: "제작,", sub: "홈페이지 제작 29.9만 원부터", shot: { vw: 1280, sel: 'section[aria-labelledby="pr-2"]', cw: 1264, dx: -16, dy: -16 } },
   "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: "main article", cw: 1264, dx: -16, dy: -16 } },

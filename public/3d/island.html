@@ -895,6 +895,7 @@ if (!renderer) { document.body.classList.add('no-gl'); await new Promise(() => {
 const DPR = Math.min(devicePixelRatio, MOBILE ? 2 : 1.5); // 11-24 PC 1.75에서 1.5로(끌 때 프레임이 떨어짐) // 11-03 휴대폰 1.5는 가는 선이 돌릴 때 반짝여 2로
 renderer.setPixelRatio(DPR);
 renderer.shadowMap.enabled = true;
+renderer.localClippingEnabled = true; // 11-27 첫 화면 공사 연출(건물을 바닥부터 잘라 보여 줌)
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.shadowMap.autoUpdate = false; // 11-24 그림자는 두 프레임에 한 번만 다시 그린다
 let shadowTick = 0;
@@ -1016,6 +1017,20 @@ const mat = {
   glass: new THREE.MeshPhysicalMaterial({ color: 0xcfe0e6, roughness: 0.03, metalness: 0, transparent: true, opacity: 0.16, depthWrite: false, envMapIntensity: 1.5 }),
   awning: M(0xffffff, { map: awningTex, roughness: 0.9, side: THREE.DoubleSide }), awning2: M(0xffffff, { map: awningTex2, roughness: 0.9, side: THREE.DoubleSide })
 };
+// 11-27 대표 "계절별로, 자동으로 바뀌게": 방문한 날의 한국 날짜로 계절을 정해 나무와 땅 색, 날리는 것(꽃잎, 낙엽, 눈)을 바꾼다.
+// 12월 1~26일은 광장 퍼걸러 앞에 크리스마스 트리. 미리 보기: 주소 끝에 ?season=spring|summer|autumn|winter, &xmas=1
+const SEASON_Q = new URLSearchParams(location.search);
+const KST = new Date(Date.now() + 9 * 3600e3), K_M = KST.getUTCMonth() + 1, K_D = KST.getUTCDate();
+const SEASON = SEASON_Q.get('season') || (K_M >= 3 && K_M <= 5 ? 'spring' : K_M >= 6 && K_M <= 8 ? 'summer' : K_M >= 9 && K_M <= 11 ? 'autumn' : 'winter');
+const XMAS = SEASON_Q.has('xmas') ? SEASON_Q.get('xmas') !== '0' : (K_M === 12 && K_D <= 26);
+({
+  spring: () => { mat.leaf.color.set(0xf4b9c7); mat.leaf2.color.set(0xeea3b6); mat.leaf3.color.set(0xfad3dc); mat.grass.color.set(0x9dc271); mat.grass2.color.set(0x8fb565); },
+  summer: () => { mat.leaf.color.set(0x5a8f42); mat.leaf2.color.set(0x4a7a3e); mat.leaf3.color.set(0x76a648); mat.grass.color.set(0x86ab5e); mat.grass2.color.set(0x789f54); },
+  autumn: () => { mat.leaf.color.set(0xe08a2c); mat.leaf2.color.set(0xc4462a); mat.leaf3.color.set(0xe8bd3a); mat.grass.color.set(0xa7a56a); mat.grass2.color.set(0x9a985f); },
+  winter: () => { mat.leaf.color.set(0xe6edf1); mat.leaf2.color.set(0xd5dfe5); mat.leaf3.color.set(0xf1f5f7); mat.pine.color.set(0x52775a); mat.grass.color.set(0xe9eef1); mat.grass2.color.set(0xdde5ea); },
+}[SEASON] || (() => {}))();
+// 가을 덩어리 색 두 가지 더(진홍, 연두빛 노랑): 한 나무 안에서도 덩어리마다 다른 색이 섞여 알록달록하게
+const AUTUMN_EXTRA = SEASON === 'autumn' ? [M(0x9e2f28, { flatShading: true }), M(0xb9b23e, { flatShading: true })] : [];
 const signMat = (tex, glow = 0xffffff) => M(0xffffff, { map: tex, emissive: new THREE.Color(glow), emissiveMap: tex, emissiveIntensity: 0, roughness: 0.5 });
 const nightMats = [];
 
@@ -1151,10 +1166,11 @@ function tree(x, z, s = 1, kind = 0) {
   if (kind === 1) {
     for (let i = 0; i < 3; i++) k.add(new THREE.ConeGeometry((0.75 - i * 0.18) * s, 0.8 * s, 7), mat.pine, 0, (0.25 + i * 0.42) * s, 0, i);
   } else {
-    const m = kind === 2 ? mat.maple : [mat.leaf, mat.leaf2, mat.leaf3][(Math.abs(Math.round(x * 3 + z)) % 3)];
+    const pal = [mat.leaf, mat.leaf2, mat.leaf3, ...AUTUMN_EXTRA], h0 = Math.abs(Math.round(x * 3 + z));
+    const m = kind === 2 ? mat.maple : pal[h0 % pal.length], m2 = SEASON === 'autumn' && kind !== 2 ? pal[(h0 + 2) % pal.length] : m, m3 = SEASON === 'autumn' && kind !== 2 ? pal[(h0 + 3) % pal.length] : m;
     k.add(ico1, m, 0, 0.45 * s, 0, 0, 0, 0, 0.62 * s, 0.6 * s, 0.62 * s);
-    k.add(ico1, m, 0.32 * s, 0.25 * s, 0.1 * s, 1, 0, 0, 0.42 * s, 0.4 * s, 0.42 * s);
-    k.add(ico1, m, -0.28 * s, 0.3 * s, -0.12 * s, 2, 0, 0, 0.45 * s, 0.42 * s, 0.45 * s);
+    k.add(ico1, m2, 0.32 * s, 0.25 * s, 0.1 * s, 1, 0, 0, 0.42 * s, 0.4 * s, 0.42 * s);
+    k.add(ico1, m3, -0.28 * s, 0.3 * s, -0.12 * s, 2, 0, 0, 0.45 * s, 0.42 * s, 0.45 * s);
   }
   k.flush(crown);
   world.add(g);
@@ -1539,6 +1555,15 @@ const cwGlass = new THREE.MeshPhysicalMaterial({ color: 0xb9d4e2, roughness: 0.0
   for (let i = 0; i < 8; i++) { const x = -0.95 + i * 0.27, sag = Math.sin((i / 7) * Math.PI) * 0.16; for (const z of [-0.6, -2.6]) k.add(sph, mat.lamp, x, 2.3 - sag, z, 0, 0, 0, 0.04, 0.04, 0.04); }
   // 화단 꽃
   for (let i = 0; i < 6; i++) k.add(sph, [mat.flowerR, mat.flowerY, mat.flowerW][i % 3], -0.9 + i * 0.36, 0.1, -3.2, 0, 0, 0, 0.07, 0.07, 0.07);
+  // 12월 1~26일: 퍼걸러 앞(광장 들머리)에 크리스마스 트리, 장식 전구는 밤에 켜진다. 아래에 선물 상자
+  if (XMAS) {
+    const tx = 0, tz = 0.05;
+    k.cyl(0.09, 0.12, 0.4, mat.trunk, tx, 0.06, tz, 8);
+    [[0.85, 0.85, 0.4], [0.66, 0.78, 1.05], [0.45, 0.7, 1.62]].forEach(([r, h, y]) => k.cyl(0.0, r, h, mat.pine, tx, y, tz, 14));
+    k.add(ico, mat.lampY, tx, 2.42, tz, 0, 0.4, 0, 0.15, 0.15, 0.07);
+    for (let i = 0; i < 30; i++) { const a = i * 2.399, t = (i % 15) / 15, y = 0.55 + t * 1.6, r = 0.8 * (1 - t * 0.78) + 0.03; k.add(sph, [mat.lampR, mat.lampY, mat.lampB][i % 3], tx + Math.cos(a) * r, y, tz + Math.sin(a) * r, 0, 0, 0, 0.055, 0.055, 0.055); }
+    for (const [x, z, w, m] of [[-0.55, 0.5, 0.3, mat.silkRed], [0.5, 0.45, 0.26, mat.silkBlue], [0.12, 0.7, 0.22, mat.flowerY]]) { k.box(w, w * 0.8, w, m, tx + x, 0.06, tz + z); k.box(w + 0.01, w * 0.8 + 0.01, 0.035, mat.white, tx + x, 0.06, tz + z); }
+  }
   // 출입구 쪽 디딤돌
   k.flush(g);
   const st = Kit(); for (let i = 0; i < 5; i++) st.cyl(0.22, 0.22, 0.04, mat.stone, 10.25, 0, 2.6 + i * 0.85, 10); st.flush(world);
@@ -1551,6 +1576,27 @@ const neruScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.42), screenMat
 neruScreen.position.set(0.25, 1.35, -0.25); B.neru.g.add(neruScreen);
 { const k = Kit(); k.box(0.68, 0.48, 0.04, mat.dark, 0.25, 1.11, -0.28); k.box(0.04, 1.1, 0.04, mat.dark, 0.25, 0.1, -0.3); k.box(0.4, 0.03, 0.3, mat.dark, 0.25, 0.1, -0.3); k.flush(B.neru.g); }
 
+// 여름(6~8월): 분수 둘레를 물놀이장으로. 돌 바닥 위에 물을 채우고 튜브를 띄우고, 가장자리에 파라솔과 선베드
+const pool = (() => {
+  if (SEASON !== 'summer') return null;
+  const g = new THREE.Group(); g.position.set(0.4, 0.05, 5.8); world.add(g);
+  const water = new THREE.Mesh(new THREE.RingGeometry(1.5, 2.3, 48), new THREE.MeshStandardMaterial({ color: 0x4fb3e8, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.88 }));
+  water.rotation.x = -Math.PI / 2; water.position.y = 0.06; water.receiveShadow = true; g.add(water);
+  const k = Kit();
+  const rim = M(0xf2ede4);
+  for (let i = 0; i < 48; i++) { const a = i / 48 * Math.PI * 2; k.box(0.32, 0.08, 0.14, rim, Math.cos(a) * 2.36, 0.02, Math.sin(a) * 2.36, -a + Math.PI / 2); }
+  const tube = [M(0xff6b5b), M(0xffd24a), M(0x6fd0a0)];
+  [[0.5, 1.9], [2.3, 1.85], [4.1, 1.8]].forEach(([a, r], i) => k.add(new THREE.TorusGeometry(0.18, 0.07, 10, 20), tube[i], Math.cos(a) * r, 0.1, Math.sin(a) * r, 0, Math.PI / 2, 0));
+  const stripe = [M(0xffffff), M(0xff6b5b), M(0x3f8fd8)];
+  [[0.9, 2.95], [2.6, 3.0], [5.2, 2.95]].forEach(([a, r], i) => {
+    const x = Math.cos(a) * r, z = Math.sin(a) * r;
+    k.cyl(0.025, 0.025, 1.3, mat.metal, x, 0, z, 6);
+    k.add(new THREE.ConeGeometry(0.62, 0.32, 10), stripe[i % 3 === 0 ? 1 : 2], x, 1.42, z);
+    k.box(0.32, 0.06, 0.8, rim, x + Math.cos(a + 0.8) * 0.55, 0.16, z + Math.sin(a + 0.8) * 0.55, -a);
+  });
+  k.flush(g);
+  return { water };
+})();
 // 공원 분수
 const fountain = {};
 {
@@ -2488,7 +2534,21 @@ function simCheck(days = 1) {
   }
   return { bad, samples, minGap: +minGap.toFixed(2) };
 }
+// 계절에 날리는 것: 봄 꽃잎, 가을 낙엽, 겨울 눈(여름은 없음)
+const fall = (() => {
+  const kind = { spring: [0xf7c6d2, 240, 0.17, 0.32], autumn: [0xd9822b, 110, 0.15, 0.5], winter: [0xffffff, 260, 0.09, 0.55] }[SEASON];
+  if (!kind || reduce) return null;
+  const [col, n, size, sp] = kind, pos = new Float32Array(n * 3), seed = [];
+  for (let i = 0; i < n; i++) { pos.set([(Math.random() - 0.5) * 26, Math.random() * 9, (Math.random() - 0.5) * 18], i * 3); seed.push([Math.random() * 6.28, sp * (0.6 + Math.random() * 0.8)]); }
+  const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.6, 'rgba(255,255,255,.8)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 32, 32);
+  if (SEASON !== 'winter') { x.clearRect(0, 0, 32, 32); x.fillStyle = '#fff'; x.beginPath(); x.ellipse(16, 16, 13, 7, -0.6, 0, Math.PI * 2); x.fill(); } // 꽃잎과 잎은 길쭉하게
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ color: col, size, map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, opacity: 0.9 }));
+  world.add(p); return { p, pos, seed, n };
+})();
 function background(dt, time) {
+  if (pool) pool.water.material.color.setHSL(0.56, 0.72, 0.6 + Math.sin(time * 1.6) * 0.03);
+  if (fall) { const a = fall.pos; for (let i = 0; i < fall.n; i++) { const [ph, v] = fall.seed[i]; a[i * 3 + 1] -= v * dt; a[i * 3] += (Math.sin(time * 0.9 + ph) * 0.25 + (SEASON === 'spring' ? 0.55 : 0)) * dt; /* 봄은 바람에 옆으로 흩날린다 */ a[i * 3 + 2] += Math.cos(time * 0.7 + ph) * dt * 0.12; if (a[i * 3 + 1] < 0 || a[i * 3] > 13.5) { a[i * 3 + 1] = 8 + Math.random(); a[i * 3] = (Math.random() - 0.5) * 26 - (SEASON === 'spring' ? 3 : 0); a[i * 3 + 2] = (Math.random() - 0.5) * 18; } } fall.p.geometry.attributes.position.needsUpdate = true; }
   // 행인
   for (const w of walkers) {
     w.x += w.v * w.dir * dt;
@@ -2577,6 +2637,54 @@ function size() {
 }
 let dirty = true;
 const BUILD = new URLSearchParams(location.search).get('build') === '1' && !reduce;
+// 11-27 대표 "지어지는 연출 다시" > "층층이 쌓기": 바닥판이 깔리고, 건물을 층 높이로 나눠 아래층부터 한 층씩 위에서 내려와 얹힌다.
+// 층마다 건물을 하나 더 복제해(형상은 공유) 그 층 높이만 남기고 잘라 낸 뒤 위에서 떨어뜨린다. 다 얹히면 복제를 지우고 원래 건물을 보인다
+const BUILD_DROP = 1.3, FLOOR_T = 0.26, FLOOR_GAP = 0.11, BLD_GAP = 0.17;
+function buildPrep(b) {
+  b.g.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(b.g), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+  const F = Math.max(2, Math.min(5, Math.round(size.y / 0.85))), fh = size.y / F;
+  b.floors = [];
+  for (let k = 0; k < F; k++) {
+    const y0 = box.min.y + k * fh - (k ? 0.002 : 0.05), y1 = box.min.y + (k + 1) * fh + (k === F - 1 ? 0.05 : 0.002);
+    const lo = new THREE.Plane(new THREE.Vector3(0, 1, 0), -y0), hi = new THREE.Plane(new THREE.Vector3(0, -1, 0), y1);
+    const g = b.g.clone(true), mats = new Map();
+    g.traverse(m => {
+      if (!m.isMesh || !m.material || Array.isArray(m.material)) return;
+      let cm = mats.get(m.material); if (!cm) { cm = m.material.clone(); cm.clippingPlanes = [lo, hi]; cm.clipShadows = true; mats.set(m.material, cm); }
+      m.material = cm;
+    });
+    g.visible = false; b.g.parent.add(g);
+    b.floors.push({ g, lo, hi, y0, y1, base: g.position.y, mats: [...mats.values()] });
+  }
+  // 바닥판: 건물 자리에 얇은 판이 먼저 깔린다
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(size.x + 0.16, 0.05, size.z + 0.16), new THREE.MeshStandardMaterial({ color: 0xd9dde3, roughness: 0.9 }));
+  plate.position.set(c.x, box.min.y + 0.02, c.z); plate.receiveShadow = true; plate.scale.set(0.001, 1, 0.001); world.add(plate); b.plate = plate;
+}
+function buildStep(b, id) {
+  if (!b.floors) buildPrep(b);
+  const i = ORDER.filter(k => k !== 'gom').indexOf(id), t0 = 0.05 + Math.max(0, i) * BLD_GAP;
+  b.g.visible = false;
+  // 바닥판 0.12초
+  const pu = clamp((buildClock - t0) / 0.12, 0, 1), pe = 1 - Math.pow(1 - pu, 3);
+  b.plate.scale.set(Math.max(0.001, pe), 1, Math.max(0.001, pe)); b.plate.visible = pu > 0;
+  let done = pu >= 1;
+  b.floors.forEach((f, k) => {
+    const u = clamp((buildClock - t0 - 0.1 - k * FLOOR_GAP) / FLOOR_T, 0, 1);
+    // 떨어지다가 닿는 순간 살짝 튕기고 멈춘다(쿵)
+    const fall = u < 0.78 ? Math.pow(u / 0.78, 2) : 1, bounce = u < 0.78 ? 0 : Math.sin((u - 0.78) / 0.22 * Math.PI) * 0.06;
+    const off = (1 - fall) * BUILD_DROP + bounce;
+    f.g.visible = u > 0; f.g.position.y = f.base + off;
+    f.lo.constant = -(f.y0 + off); f.hi.constant = f.y1 + off;
+    if (u < 1) done = false;
+  });
+  if (done) {
+    b.built = true; b.g.visible = true;
+    b.floors.forEach(f => { f.g.parent && f.g.parent.remove(f.g); f.mats.forEach(m => m.dispose()); });
+    b.plate.parent && b.plate.parent.remove(b.plate); b.plate.geometry.dispose(); b.plate.material.dispose();
+  }
+  dirty = true;
+}
 let buildClock = 0;
 // 11-26 ?wait=1: 3D를 미리 불러 두고, 바깥 화면(메인)이 창이 보일 때 'gp-build'를 보내면 그때 건물을 내린다
 let buildWait = BUILD && new URLSearchParams(location.search).get('wait') === '1';
@@ -2616,19 +2724,10 @@ function loop(now) {
     const want = (hovered === id || selected === id) ? 0.16 : 0;
     b.lift += (want - b.lift) * (reduce ? 1 : 1 - Math.exp(-dt * 10));
     b.g.position.y = b.lift;
-    // 11-25 메인 조립형 첫 화면에서 ?build=1 로 열면 건물이 하늘에서 하나씩 돌며 내려와 자리에 앉는다
-    if (BUILD && !b.built) {
-      if (b.ry0 === undefined) b.ry0 = b.g.rotation.y;
-      // 첫 장면을 그리는 데 걸리는 시간에 연출이 지나가 버리지 않게, 실제로 그린 프레임의 시간(dt는 0.05초로 잘림)만 센다
-      const u = clamp((buildClock - 0.1 - ORDER.indexOf(id) * 0.15) / 0.55, 0, 1); // 11-26 기다리는 시간을 줄이려고 빠르게(다섯 채가 1.3초 안에 앉는다)
-      const c1 = 1.70158, c3 = c1 + 1, e = 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); // 살짝 넘쳤다 돌아오는 감속
-      b.g.visible = u > 0;
-      b.g.position.y = b.lift + (1 - e) * 8;
-      b.g.rotation.y = b.ry0 + (1 - e) * 1.4;
-      b.g.scale.setScalar(0.35 + 0.65 * e);
-      if (u >= 1) { b.built = true; b.g.rotation.y = b.ry0; b.g.scale.setScalar(1); }
-      dirty = true;
-    }
+    // 11-25 메인 조립형 첫 화면에서 ?build=1 로 열 때의 연출.
+    // 11-27 대표 "떨어지는 느낌 말고 지어지는 느낌으로", "메인 밑 3d 다시": 빈 터에 파란 설계선 상자가 먼저 서고,
+    // 건물마다 바닥부터 한 층씩 채워 올라간다(잘라 보이는 높이에 파란 공사선). 다 차면 설계선이 걷힌다
+    if (BUILD && !b.built) buildStep(b, id);
   }
   const sel = selected || hovered;
   outline.enabled = !!sel;
