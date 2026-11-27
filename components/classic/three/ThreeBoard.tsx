@@ -23,12 +23,12 @@ const demo = (id: string) => threeDemos.find((d) => d.href === `/3d/${id}/`)!;
 
 /** 영상으로 보여 주는 화면(맨 위에서 직접 만지는 거실 상담 화면은 여기서 뺀다). head는 영상에서 실제로 하는 일. wide는 넓은 화면에서 두 칸을 차지하는 카드 */
 // 11-27 사용자 "소파 아래 넣어 줘야지 사라짐": 맨 위를 거실로 바꾸며 빠졌던 모듈 소파를 첫 카드로
+// 11-27 대표 "정말 최선 한 개 하고 트렌드도 홈페이지로": 견적 화면은 맨 위 거실 하나로 대표하고, 이 칸은 서로 다른 종류만 둔다.
+// 소파, 선반, 중문 견적 화면은 지우지 않고 맨 아래 "제품별 견적 화면" 카드에 작은 그림 링크로 묶었다
 const screens: { id: string; head: string; wide?: boolean; phone?: boolean }[] = [
-  { id: "sofa", head: "모듈을 붙이고 원단을 바꾸면 금액이 바뀝니다" },
-  { id: "configurator", head: "칸과 부속을 붙이면 금액이 바뀝니다" },
-  { id: "door", head: "설치 전에 문 방식과 색을 정합니다" },
   { id: "space", head: "시공 전과 후를 3D로 비교합니다" },
 ];
+const products = ["sofa", "configurator", "door"];
 
 /** 도입이 필요한 경우(threeForWhom)마다 화면이 하는 일. 구현 범위(threeScope)에 있는 기능으로만 답한다 */
 const answers = [
@@ -241,13 +241,30 @@ export function ThreeBoard() {
         </div>
       </section>
 
-      {/* 3. 업종별 화면: 조작하는 영상과 체험하기 */}
+      {/* 3. 3D로 만드는 화면: 3D 홈페이지, 공간, 제품별 견적 */}
       <section aria-labelledby="t3d-screens" className={sec}>
         <h2 id="t3d-screens" className={h2}>
-          업종별 3D 화면
+          3D로 만드는 화면
         </h2>
         <div className="mt-8 md:mt-10">
-          <Reel count={screens.length} label="업종별 3D 화면">
+          <Reel count={screens.length + 2} label="3D로 만드는 화면">
+            <li className={`${card} flex w-[86%] shrink-0 snap-center flex-col gap-5 p-4 md:w-auto md:p-6`}>
+              <Frame shot={{ src: "/images/three/trend.jpg?v=11274", frame: "browser", ratio: "16/10", alt: "곰파트너 3D 홈페이지. 선으로 그린 API와 데이터베이스 구성도와 System 제목" }} sizes="(min-width: 768px) 600px, 86vw" />
+              <div className="flex grow flex-col px-1 pb-1 md:px-0 md:pb-0">
+                <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[14px] font-bold md:text-[15px]">
+                  <span className="text-[#7aa7ff]">3D 홈페이지</span>
+                  <span aria-hidden className="h-3 w-px bg-white/25" />
+                  <span className="text-[#c9ced6]">브랜드 첫 화면</span>
+                </p>
+                <h3 className={`mt-2 ${h3}`}>내리는 대로 3D가 다시 짜입니다</h3>
+                <p className="mt-2 break-keep text-[15px] leading-[1.65] text-[#aab2bf] md:text-[16px]">선으로 그린 3D가 마우스를 따라 돌고, 아래로 내리면 흩어졌다가 다음 장면으로 다시 짜이는 홈페이지입니다.</p>
+                <p className="mt-auto pt-5">
+                  <a href="/trend" aria-label="3D 홈페이지 체험하기" className={pill}>
+                    체험하기 <ArrowUpRight size={17} aria-hidden />
+                  </a>
+                </p>
+              </div>
+            </li>
             {screens.map((s) => {
               const d = demo(s.id);
               const name = `${d.category} ${d.title}`;
@@ -278,6 +295,30 @@ export function ThreeBoard() {
                 </li>
               );
             })}
+            <li className={`${card} flex w-[86%] shrink-0 snap-center flex-col gap-5 p-4 md:col-span-2 md:w-auto md:p-6`}>
+              <div className="px-1 md:px-0">
+                <p className="text-[14px] font-bold text-[#7aa7ff] md:text-[15px]">제품별 견적 화면</p>
+                <h3 className={`mt-2 ${h3}`}>제품 하나만 골라 견적을 받는 화면도 만듭니다</h3>
+              </div>
+              <ul className="grid gap-3 sm:grid-cols-3" role="list">
+                {products.map((id) => {
+                  const d = demo(id);
+                  return (
+                    <li key={id}>
+                      <a href={d.href} className="group block overflow-hidden rounded-[14px] border border-white/12 bg-[#0f131b] hover:border-white/40">
+                        <span className="relative block aspect-[16/10]">
+                          <Image src={`${V}/${id}.jpg?v=11273`} alt={`${d.title} 3D 견적 화면`} fill sizes="(min-width: 640px) 33vw, 86vw" className="object-cover object-top" />
+                        </span>
+                        <span className="flex items-center justify-between gap-2 px-4 py-3 text-[15px] font-bold text-white">
+                          {d.title}
+                          <ArrowUpRight size={16} aria-hidden className="text-white/50 group-hover:text-white" />
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
           </Reel>
         </div>
       </section>

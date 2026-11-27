@@ -25,6 +25,10 @@ a { color: inherit; text-decoration: none; }
 .wrap { max-width: 1440px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 56px); }
 :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
+#labels { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#labels span { position: absolute; left: 0; top: 0; opacity: 0; display: inline-flex; align-items: center; gap: 6px; margin: -9px 0 0 6px; font: 600 12px/1 "SFMono-Regular", Menlo, Consolas, monospace; letter-spacing: .02em; color: #cfdcff; white-space: nowrap; transition: opacity .2s linear; }
+#labels span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #9fbaff; box-shadow: 0 0 8px #9fbaff; }
+@media (max-width: 760px) { #labels span { font-size: 10px; gap: 4px; } }
 #lines { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; touch-action: pan-y; }
 
 header { position: fixed; inset: 0 0 auto; z-index: 10; mix-blend-mode: difference; }
@@ -68,6 +72,8 @@ main { position: relative; z-index: 1; }
 .copy li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; font-weight: 600; }
 .copy li span { color: var(--mute); font-weight: 500; }
 .btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; min-height: 52px; padding: 0 26px; border-radius: 999px; background: #fff; color: #000; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.copy p.sm { margin-top: 26px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--mute); }
+.copy p.sm + .btns { margin-top: 12px; }
 .btn.ghost { background: none; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
 .btn:hover { transform: translateY(-1px); }
 .btns { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -103,6 +109,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 </head>
 <body>
 <canvas id="lines" aria-hidden="true"></canvas>
+<div id="labels" aria-hidden="true"></div>
 
 <header>
   <div class="wrap">
@@ -111,7 +118,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <a href="#build" target="_self">Build</a>
       <a href="#run" target="_self">Run</a>
       <a href="#care" target="_self">Care</a>
-      <a class="go" href="https://gompartner.co.kr/#apply">Contact</a>
+      <a class="go" href="https://gompartner.co.kr/contact">Contact</a>
     </nav>
   </div>
 </header>
@@ -121,68 +128,79 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     <div class="wrap" style="width:100%">
       <h1 id="h-hero" aria-label="Build, Run, Care."><span><i>Build,</i></span><span><i>Run,</i></span><span><i>Care.</i></span></h1>
       <div class="sub">
-        <p>만들고, 운영하고, 관리합니다.</p>
+        <p>홈페이지와 업무 시스템을 만들고 운영합니다.</p>
         <small aria-hidden="true">SCROLL</small>
       </div>
     </div>
   </section>
 
-  <section class="scene" id="build" data-shape="1" aria-labelledby="h-3d">
+  <!-- 11-27 대표 "장면 구성과 설명 보편적이지 않아", "카피라이터가 좀 이상했음": 개발 에이전시 사이트가 흔히 쓰는 서비스 순서(Web & App, System, AI, Cloud & DevOps, Maintenance).
+       설명은 해 드리는 일 한 문장만. 기술 이름(REST API, RAG, On-Premise, MSA 등)은 그림의 이름표로만. 마지막 금액 줄은 뺐다(대표 "급 저렴") -->
+  <section class="scene" id="build" data-shape="1" aria-labelledby="h-web">
     <div class="wrap" style="width:100%">
       <div class="copy">
         <p class="kick"><span>01</span><i></i><span>BUILD</span></p>
-        <h2 id="h-3d">3D 견적 화면</h2>
-        <p>가구나 중문을 고객이 3D로 직접 구성하고 견적까지 받는 화면을 만듭니다. 고른 구성은 품목과 금액이 채워진 견적서로 이어집니다.</p>
-        <ul>
-          <li>공간 3D 뷰어<span>180만 원부터</span></li>
-          <li>제품 3D 컨피규레이터<span>450만 원부터</span></li>
-        </ul>
-        <div class="btns"><a class="btn" href="https://gompartner.co.kr/3d">3D 견적 보기</a></div>
+        <h2 id="h-web">Web &amp; App</h2>
+        <p>반응형 웹과 모바일 앱을 기획부터 개발까지 맡습니다.</p>
       </div>
     </div>
   </section>
 
-  <section class="scene" id="run" data-shape="2" aria-labelledby="h-jb">
+  <section class="scene" data-shape="2" aria-labelledby="h-sys">
     <div class="wrap" style="width:100%">
       <div class="copy">
-        <p class="kick"><span>02</span><i></i><span>RUN</span></p>
-        <h2 id="h-jb">거래장부</h2>
-        <p>거래명세서를 링크로 보내고 거래처에게 받았다는 확인을 받는 업무 도구입니다. 직접 만들어 운영하고 있습니다.</p>
-        <ul>
-          <li>가입 없이 작성과 PDF 저장</li>
-          <li>받는 쪽 지문으로 수령 확인</li>
-          <li>외상 거래처 미수금과 월 합계</li>
-        </ul>
-        <div class="btns"><a class="btn" href="https://jangbu.gompartner.co.kr/">거래장부 열기</a></div>
+        <p class="kick"><span>02</span><i></i><span>BUILD</span></p>
+        <h2 id="h-sys">System</h2>
+        <p>업무에 맞는 시스템을 API와 데이터베이스부터 설계하고 구축합니다.</p>
       </div>
     </div>
   </section>
 
-  <section class="scene" data-shape="3" aria-labelledby="h-jk">
+  <section class="scene" data-shape="3" aria-labelledby="h-ai">
     <div class="wrap" style="width:100%">
       <div class="copy">
-        <p class="kick"><span>02</span><i></i><span>RUN</span></p>
-        <h2 id="h-jk">사이트 지킴이</h2>
-        <p>웹사이트가 멈추거나 인증서와 도메인이 만료되기 전에 알려 주는 모니터링 서비스입니다.</p>
-        <ul>
-          <li>10분 주기 가용성 점검</li>
-          <li>SSL 인증서와 도메인 만료 단계별 알림</li>
-          <li>사이트 3개까지 무료</li>
-        </ul>
-        <div class="btns"><a class="btn" href="https://jikimi.gompartner.co.kr/">지킴이 열기</a></div>
+        <p class="kick"><span>03</span><i></i><span>BUILD</span></p>
+        <h2 id="h-ai">AI</h2>
+        <p>상담과 문서 작성 같은 반복 업무에 AI를 연결합니다.</p>
       </div>
     </div>
   </section>
 
-  <section class="scene end" id="care" data-shape="4" aria-labelledby="h-care">
+  <section class="scene" id="run" data-shape="4" aria-labelledby="h-ops">
     <div class="wrap" style="width:100%">
       <div class="copy">
-        <p class="kick"><span>03</span><i></i><span>CARE</span></p>
-        <h2 id="h-care">만든 사람이<br>끝까지 관리합니다</h2>
-        <p>다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡고, 건별 10,000원부터입니다.</p>
+        <p class="kick"><span>04</span><i></i><span>RUN</span></p>
+        <h2 id="h-ops">Cloud &amp; DevOps</h2>
+        <p>클라우드와 사내 서버 어디든 배포하고, 배포 과정을 자동화해 안정적으로 운영합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="care" data-shape="5" aria-labelledby="h-mnt">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>05</span><i></i><span>CARE</span></p>
+        <h2 id="h-mnt">Maintenance</h2>
+        <p>오픈 이후에도 모니터링과 유지보수를 맡고, 필요한 기능은 고도화합니다.</p>
+        <p class="sm">직접 만들어 운영하는 서비스</p>
         <div class="btns">
-          <a class="btn" href="https://gompartner.co.kr/#apply">무료 견적 받기</a>
-          <a class="btn ghost" href="https://gompartner.co.kr/maintenance">유지보수 보기</a>
+          <a class="btn ghost" href="https://jikimi.gompartner.co.kr/">사이트 지킴이</a>
+          <a class="btn ghost" href="https://jangbu.gompartner.co.kr/">거래장부</a>
+          <a class="btn ghost" href="https://gompartner.co.kr/3d">3D 견적</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene end" id="end" data-shape="6" aria-labelledby="h-care">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>CONTACT</span></p>
+        <h2 id="h-care">프로젝트 문의</h2>
+        <p>만들고 싶은 서비스를 알려 주시면 범위와 비용을 정리해 견적서로 드립니다.</p>
+        <div class="btns">
+          <a class="btn" href="https://gompartner.co.kr/contact">무료 견적 받기</a>
+          <a class="btn ghost" href="https://gompartner.co.kr/works">작업 사례 보기</a>
         </div>
       </div>
     </div>
@@ -213,7 +231,10 @@ camera.position.set(0, 0.2, 9);
 /* ---------- 선 도형: [x1,y1,z1,x2,y2,z2] 목록 ---------- */
 const L = [];
 const seg = (o, a, b) => o.push([a[0], a[1], a[2], b[0], b[1], b[2]]);
+// 11-27 대표 "트렌드 그림이 아직 애매": 철사 도식은 뒤쪽 모서리까지 비쳐 낙서처럼 보였다. 상자와 원통은 면도 기록해 어두운 면으로 채운다(뒤 선이 가려지고 면마다 빛이 달라 입체로 읽힘)
+let SOLID = null;
 function box(o, x1, y1, z1, x2, y2, z2) {
+  if (SOLID && Math.abs(x2 - x1) > 0.02 && Math.abs(y2 - y1) > 0.02 && Math.abs(z2 - z1) > 0.02) SOLID.push(['b', x1, y1, z1, x2, y2, z2]);
   const p = [[x1,y1,z1],[x2,y1,z1],[x2,y2,z1],[x1,y2,z1],[x1,y1,z2],[x2,y1,z2],[x2,y2,z2],[x1,y2,z2]];
   [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a,b]) => seg(o, p[a], p[b]));
 }
@@ -336,8 +357,165 @@ function town() {
   return o;
 }
 
+// 11-27 대표 "처음부터 나오는 게 중문이 맞아? 마을이랑": 첫 장면은 곰파트너 마을, 3D 견적 장면은 대표 견적 화면인 거실(소파, 벽 선반, 현관 중문)
+function room() {
+  const o = [], G = -0.95, W = 4.4, D = 3.2, H = 2.3, x0 = -W / 2, z0 = -D / 2;
+    const fl = (x1, z1, x2, z2, y) => { seg(o,[x1,y,z1],[x2,y,z1]); seg(o,[x2,y,z1],[x2,y,z2]); seg(o,[x2,y,z2],[x1,y,z2]); seg(o,[x1,y,z2],[x1,y,z1]); };
+  fl(x0, z0, x0 + W, z0 + D, G);                                         // 바닥
+  for (let x = x0 + 0.55; x < x0 + W; x += 0.55) seg(o, [x, G, z0], [x, G, z0 + D]); // 마루 줄눈
+  seg(o, [x0, G, z0], [x0, G + H, z0]); seg(o, [x0 + W, G, z0], [x0 + W, G + H, z0]); seg(o, [x0, G + H, z0], [x0 + W, G + H, z0]); // 뒷벽
+  seg(o, [x0, G, z0 + D], [x0, G + H, z0 + D]); seg(o, [x0, G + H, z0], [x0, G + H, z0 + D]);   // 왼벽
+  // 뒷벽 창
+  [[x0 + 2.4, x0 + 4.1]].forEach(([a, b]) => { seg(o,[a,G+0.9,z0],[b,G+0.9,z0]); seg(o,[b,G+0.9,z0],[b,G+2.0,z0]); seg(o,[b,G+2.0,z0],[a,G+2.0,z0]); seg(o,[a,G+2.0,z0],[a,G+0.9,z0]); seg(o,[(a+b)/2,G+0.9,z0],[(a+b)/2,G+2.0,z0]); });
+  // 소파: 1인 모듈 셋과 카우치(뒷벽 앞)
+  const sz = z0 + 0.3, sd = 0.9;
+  for (let i = 0; i < 3; i++) { const x = x0 + 0.5 + i * 0.75; box(o, x, G + 0.1, sz, x + 0.75, G + 0.42, sz + sd); box(o, x, G + 0.42, sz, x + 0.75, G + 0.85, sz + 0.2); }
+  const cx = x0 + 0.5 + 3 * 0.75; box(o, cx, G + 0.1, sz, cx + 0.85, G + 0.42, sz + sd + 0.7); box(o, cx, G + 0.42, sz, cx + 0.85, G + 0.85, sz + 0.2);
+  box(o, x0 + 0.35, G + 0.1, sz, x0 + 0.5, G + 0.62, sz + sd); box(o, cx + 0.85, G + 0.1, sz, cx + 1.0, G + 0.62, sz + sd + 0.7);
+  // 러그와 탁자
+  fl(x0 + 0.9, sz + sd + 0.25, x0 + 3.2, sz + sd + 1.45, G + 0.005);
+  box(o, x0 + 1.5, G, sz + sd + 0.55, x0 + 2.5, G + 0.35, sz + sd + 1.1);
+  // 왼벽 시스템 선반: 기둥 3개, 선반 4단, 서랍
+  const sx = x0 + 0.02, sw = 0.35;
+  for (let k = 0; k < 3; k++) { const z = z0 + 0.9 + k * 0.6; seg(o, [sx, G, z], [sx, G + 2.0, z]); seg(o, [sx + sw, G, z], [sx + sw, G + 2.0, z]); }
+  for (const y of [0.05, 0.6, 1.15, 1.7, 2.0]) fl(sx, z0 + 0.9, sx + sw, z0 + 2.1, G + y);
+  box(o, sx + 0.02, G + 0.08, z0 + 0.95, sx + sw - 0.02, G + 0.55, z0 + 1.45); seg(o, [sx + sw - 0.02, G + 0.32, z0 + 1.15], [sx + sw - 0.02, G + 0.32, z0 + 1.25]);
+  // 오른쪽 앞: 현관 3연동 중문(틀과 문짝 셋)
+  const dx = x0 + W, dz1 = z0 + D - 1.4, dz2 = z0 + D - 0.1;
+  box(o, dx - 0.12, G, dz1, dx, G + 2.15, dz2);
+  for (let i = 0; i < 3; i++) { const a = dz1 + 0.05 + i * (dz2 - dz1 - 0.1) / 3, b = a + (dz2 - dz1 - 0.1) / 3; const xx = dx - 0.1 + i * 0.025; seg(o,[xx,G+0.05,a],[xx,G+2.05,a]); seg(o,[xx,G+2.05,a],[xx,G+2.05,b]); seg(o,[xx,G+2.05,b],[xx,G+0.05,b]); for (let g = 1; g < 3; g++) { const z = a + (b - a) * g / 3; seg(o, [xx, G + 0.1, z], [xx, G + 2.0, z]); } }
+  // 화분
+  box(o, x0 + 3.9, G, z0 + 0.4, x0 + 4.2, G + 0.35, z0 + 0.7); [[0,0.9],[0.15,0.75],[-0.15,0.7]].forEach(([d,h]) => seg(o, [x0 + 4.05, G + 0.35, z0 + 0.55], [x0 + 4.05 + d, G + 0.35 + h, z0 + 0.55 + d * 0.5]));
+  return o;
+}
+// 11-27 대표 흐름: 화면 > API 연결 > 데이터베이스 저장 > 온프레미스 > MSA 나누고 합치고 > 운영(모니터)
+function ringY(o, cx, cy, cz, r, n = 20, ry = 1) { const pts = []; for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2; pts.push([cx + r * Math.cos(a), cy, cz + r * ry * Math.sin(a)]); } poly(o, pts); }
+function ringZ(o, cx, cy, cz, r, n = 10) { const pts = []; for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2; pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a), cz]); } poly(o, pts); }
+function cyl(o, cx, cz, r, y1, y2, rings = 2) { if (SOLID) SOLID.push(['c', cx, cz, r, y1, y2]); for (let i = 0; i < rings; i++) ringY(o, cx, y1 + (y2 - y1) * i / (rings - 1), cz, r); for (let k = 0; k < 4; k++) { const a = k / 4 * Math.PI * 2 + 0.4; seg(o, [cx + r * Math.cos(a), y1, cz + r * Math.sin(a)], [cx + r * Math.cos(a), y2, cz + r * Math.sin(a)]); } }
+function browser(o, x1, y1, x2, y2, z, d = 0.08, full = true) {
+  box(o, x1, y1, z - d, x2, y2, z);
+  const t = y2 - (y2 - y1) * 0.11; seg(o, [x1, t, z + 0.001], [x2, t, z + 0.001]);
+  for (let i = 0; i < 3; i++) ringZ(o, x1 + 0.09 + i * 0.09, (t + y2) / 2, z + 0.002, 0.025, 8);
+  rect(o, x1 + (x2 - x1) * 0.3, t + (y2 - t) * 0.25, x2 - (x2 - x1) * 0.12, y2 - (y2 - t) * 0.25, z + 0.002);
+  if (!full) return;
+  const w = x2 - x1, h = t - y1, X = f => x1 + w * f, Y = f => y1 + h * f, Z = z + 0.003;
+  rect(o, X(0.05), Y(0.86), X(0.22), Y(0.93), Z); for (let i = 0; i < 4; i++) rect(o, X(0.55 + i * 0.1), Y(0.88), X(0.62 + i * 0.1), Y(0.91), Z);
+  rect(o, X(0.05), Y(0.62), X(0.48), Y(0.72), Z); rect(o, X(0.05), Y(0.52), X(0.36), Y(0.58), Z); rect(o, X(0.05), Y(0.38), X(0.18), Y(0.46), Z);
+  rect(o, X(0.55), Y(0.36), X(0.95), Y(0.78), Z); seg(o, [X(0.55), Y(0.36), Z], [X(0.95), Y(0.78), Z]); seg(o, [X(0.55), Y(0.78), Z], [X(0.95), Y(0.36), Z]);
+  for (let i = 0; i < 3; i++) { const a = 0.05 + i * 0.31; rect(o, X(a), Y(0.06), X(a + 0.28), Y(0.3), Z); seg(o, [X(a + 0.03), Y(0.12), Z], [X(a + 0.2), Y(0.12), Z]); }
+}
+function phone(o, x1, y1, x2, y2, z, full = true) {
+  box(o, x1, y1, z - 0.06, x2, y2, z);
+  const w = x2 - x1, h = y2 - y1, X = f => x1 + w * f, Y = f => y1 + h * f, Z = z + 0.003;
+  rect(o, X(0.08), Y(0.05), X(0.92), Y(0.93), Z); seg(o, [X(0.4), Y(0.965), Z], [X(0.6), Y(0.965), Z]);
+  if (!full) return;
+  rect(o, X(0.14), Y(0.8), X(0.5), Y(0.86), Z); rect(o, X(0.14), Y(0.5), X(0.86), Y(0.74), Z); seg(o, [X(0.14), Y(0.5), Z], [X(0.86), Y(0.74), Z]);
+  rect(o, X(0.14), Y(0.4), X(0.7), Y(0.45), Z); rect(o, X(0.14), Y(0.12), X(0.86), Y(0.22), Z);
+}
+function screenShape() { const o = []; browser(o, -2.0, -1.05, 1.0, 1.0, 0); phone(o, 1.35, -1.1, 2.05, 0.3, 0.45); seg(o, [-2.4, -1.25, 0.3], [2.4, -1.25, 0.3]); return o; }
+const API_BOX = [-0.42, -0.42, -0.25, 0.42, 0.12, 0.25];
+const API_PATHS = [[[-1.15, 0.55, 0], [-0.2, 0.12, 0]], [[1.05, 0.55, 0.2], [0.2, 0.12, 0]], [[0, -0.42, 0], [0, -1.05, 0]], [[0.42, -0.15, 0], [1.6, -0.15, 0]], [[-0.42, -0.15, 0], [-1.6, -0.15, 0]]];
+function apiShape() {
+  const o = []; browser(o, -2.0, 0.55, -0.3, 1.55, 0, 0.06, false); phone(o, 0.8, 0.55, 1.3, 1.5, 0.2, false);
+  box(o, ...API_BOX);
+  const z = 0.251; poly(o, [[-0.2, -0.05, z], [-0.3, -0.15, z], [-0.2, -0.25, z]]); poly(o, [[0.2, -0.05, z], [0.3, -0.15, z], [0.2, -0.25, z]]); seg(o, [0.07, 0.0, z], [-0.07, -0.3, z]);
+  API_PATHS.forEach(([a, b]) => seg(o, a, b));
+  box(o, 1.6, -0.4, -0.2, 2.1, 0.1, 0.2); ringZ(o, 1.85, -0.15, 0.201, 0.12);
+  box(o, -2.1, -0.4, -0.2, -1.6, 0.1, 0.2); rect(o, -1.95, -0.25, -1.75, -0.05, 0.201);
+  cyl(o, 0, 0, 0.45, -1.45, -1.05, 2);
+  return o;
+}
+function dbShape() {
+  const o = []; box(o, -0.35, 1.0, -0.2, 0.35, 1.4, 0.2);
+  for (const x of [-0.2, 0, 0.2]) seg(o, [x, 1.0, 0], [x, 0.55, 0]);
+  cyl(o, 0, 0, 0.95, -1.3, 0.5, 6);
+  cyl(o, 2.0, 0.3, 0.42, -1.3, -0.5, 3);
+  for (let i = 0; i < 6; i++) { const x = 0.95 + i * 0.1; seg(o, [x, -0.9, 0.15], [x + 0.06, -0.9, 0.17]); }
+  seg(o, [-2.2, -1.3, 0.9], [2.6, -1.3, 0.9]);
+  return o;
+}
+function aiShape() {
+  // 채팅 화면 > AI Agent > LLM, RAG(벡터 DB), 도구(API)
+  const o = [];
+  box(o, -2.4, -0.35, -0.05, -1.05, 1.25, 0.05); seg(o, [-2.4, 1.05, 0.051], [-1.05, 1.05, 0.051]);
+  [[-2.3, 0.75, -1.6, 0.92], [-1.85, 0.45, -1.15, 0.62], [-2.3, 0.15, -1.45, 0.32]].forEach(([x1, y1, x2, y2]) => rect(o, x1, y1, x2, y2, 0.052));
+  rect(o, -2.3, -0.25, -1.15, -0.1, 0.052);
+  box(o, -0.4, 0.05, -0.3, 0.4, 0.85, 0.3); ringZ(o, 0, 0.45, 0.301, 0.2, 12); seg(o, [0, 0.3, 0.302], [0, 0.6, 0.302]); seg(o, [-0.15, 0.45, 0.302], [0.15, 0.45, 0.302]);
+  ringZ(o, 1.6, 1.25, 0.25, 0.42, 6); ringZ(o, 1.6, 1.25, -0.25, 0.42, 6); for (let i = 0; i < 6; i++) { const t = i / 6 * Math.PI * 2; seg(o, [1.6 + 0.42 * Math.cos(t), 1.25 + 0.42 * Math.sin(t), 0.25], [1.6 + 0.42 * Math.cos(t), 1.25 + 0.42 * Math.sin(t), -0.25]); }
+  cyl(o, 1.6, 0, 0.45, -1.15, -0.35, 3); for (let i = 0; i < 5; i++) { const x = 1.35 + i * 0.12; seg(o, [x, -0.6, 0.46], [x, -0.75 - (i % 2) * 0.1, 0.46]); }
+  box(o, -0.35, -1.35, -0.2, 0.35, -0.85, 0.2); poly(o, [[-0.12, -1.02, 0.201], [-0.2, -1.1, 0.201], [-0.12, -1.18, 0.201]]); poly(o, [[0.12, -1.02, 0.201], [0.2, -1.1, 0.201], [0.12, -1.18, 0.201]]);
+  AI_PATHS.forEach(([a, b]) => seg(o, a, b));
+  return o;
+}
+const AI_PATHS = [[[-1.05, 0.45, 0], [-0.4, 0.45, 0]], [[0.4, 0.65, 0], [1.2, 1.15, 0]], [[0.4, 0.25, 0], [1.15, -0.5, 0]], [[0, 0.05, 0], [0, -0.85, 0]]];
+const CI_X = [-2.1, -0.75, 0.6, 1.95];
+function cicdShape() {
+  // Git > Build > Test > Deploy 파이프라인과 컨테이너 묶음
+  const o = [], y1 = -0.55, y2 = 0.1;
+  CI_X.forEach((x, i) => { box(o, x - 0.42, y1, -0.25, x + 0.42, y2, 0.25); if (i < 3) { seg(o, [x + 0.42, (y1 + y2) / 2, 0], [CI_X[i + 1] - 0.42, (y1 + y2) / 2, 0]); poly(o, [[CI_X[i + 1] - 0.55, (y1 + y2) / 2 + 0.08, 0], [CI_X[i + 1] - 0.42, (y1 + y2) / 2, 0], [CI_X[i + 1] - 0.55, (y1 + y2) / 2 - 0.08, 0]]); } });
+  const z = 0.251, gx = CI_X[0]; seg(o, [gx - 0.15, -0.42, z], [gx - 0.15, -0.02, z]); poly(o, [[gx - 0.15, -0.3, z], [gx + 0.12, -0.15, z], [gx + 0.12, -0.02, z]]); ringZ(o, gx - 0.15, -0.42, z, 0.04, 6); ringZ(o, gx + 0.12, -0.02, z, 0.04, 6);
+  const bx = CI_X[1]; for (let i = 0; i < 3; i++) rect(o, bx - 0.25 + i * 0.18, -0.4, bx - 0.12 + i * 0.18, -0.05, z);
+  const tx = CI_X[2]; poly(o, [[tx - 0.18, -0.25, z], [tx - 0.05, -0.38, z], [tx + 0.2, -0.08, z]]);
+  const dx = CI_X[3]; poly(o, [[dx - 0.15, -0.42, z], [dx + 0.15, -0.42, z]]); seg(o, [dx, -0.42, z], [dx, -0.05, z]); poly(o, [[dx - 0.12, -0.17, z], [dx, -0.05, z], [dx + 0.12, -0.17, z]]);
+  for (let k = 0; k < 3; k++) { const yy = 0.55 + k * 0.32; box(o, dx - 0.5, yy, -0.3, dx + 0.5, yy + 0.24, 0.3); for (let v = 0; v < 4; v++) seg(o, [dx - 0.35 + v * 0.22, yy + 0.04, 0.301], [dx - 0.35 + v * 0.22, yy + 0.2, 0.301]); }
+  seg(o, [dx, y2, 0], [dx, 0.55, 0]);
+  seg(o, [-2.7, y1 - 0.25, 0.4], [2.6, y1 - 0.25, 0.4]);
+  return o;
+}
+function onpremShape() {
+  // Deploy: 왼쪽 온프레미스 랙, 오른쪽 클라우드와 인스턴스, 가운데 옮기는 점선 화살표
+  const o = [], x0 = -2.2, x1 = -1.15;
+  box(o, x0, -1.3, -0.45, x1, 1.2, 0.45);
+  for (let u = 0; u < 8; u++) { const y = -1.2 + u * 0.3; rect(o, x0 + 0.06, y, x1 - 0.06, y + 0.24, 0.451); rect(o, x0 + 0.12, y + 0.09, x0 + 0.18, y + 0.15, 0.452); for (let v = 0; v < 4; v++) seg(o, [x1 - 0.45 + v * 0.08, y + 0.06, 0.452], [x1 - 0.45 + v * 0.08, y + 0.18, 0.452]); }
+  // 구름: 왼쪽 반원, 위 봉우리 둘, 오른쪽 반원, 평평한 바닥(한 줄로 이어 그린다)
+  const cl = [], cx = 1.25, cy = 0.35, arc = (x, y, r, a0, a1, n = 12) => { for (let i = 0; i <= n; i++) { const t = a0 + (a1 - a0) * i / n; cl.push([x + r * Math.cos(t), y + r * Math.sin(t), 0]); } };
+  arc(cx - 0.75, cy - 0.2, 0.37, Math.PI * 1.5, Math.PI * 0.5); arc(cx - 0.3, cy + 0.12, 0.42, Math.PI, 0); arc(cx + 0.35, cy + 0.2, 0.4, Math.PI, 0); arc(cx + 0.75, cy - 0.2, 0.37, Math.PI * 0.5, -Math.PI * 0.5);
+  cl.push([cx - 0.75, cy - 0.57, 0]); poly(o, cl);
+  for (let i = 0; i < 3; i++) { const bx = cx - 0.62 + i * 0.45; box(o, bx, cy - 0.35, -0.12, bx + 0.32, cy + 0.0, 0.12); }
+  for (let i = 0; i < 7; i++) { const xa = -1.0 + i * 0.14; seg(o, [xa, 0.0, 0], [xa + 0.08, 0.0, 0]); }
+  poly(o, [[-0.1, 0.12, 0], [0.04, 0.0, 0], [-0.1, -0.12, 0]]);
+  for (let i = 0; i < 3; i++) { const ex = 0.55 + i * 0.7; ringZ(o, ex, -0.95, 0, 0.16, 12); seg(o, [ex - 0.16, -0.95, 0], [ex + 0.16, -0.95, 0]); ringZ(o, ex, -0.95, 0.001, 0.07, 8); seg(o, [ex, -0.79, 0], [cx - 0.7 + i * 0.7, cy - 0.57, 0]); }
+  seg(o, [-2.6, -1.3, 0.5], [2.6, -1.3, 0.5]);
+  return o;
+}
+function msaShape() {
+  // 정면에서 읽히는 허브와 바퀴살: 가운데 API Gateway, 둘레에 마이크로서비스 6개(각자 작은 DB)
+  const o = [];
+  box(o, -0.36, -0.36, -0.2, 0.36, 0.36, 0.2); ringZ(o, 0, 0, 0.201, 0.16, 12);
+  MSA_POS.forEach(([x, y, z]) => {
+    box(o, x - 0.26, y - 0.26, z - 0.15, x + 0.26, y + 0.26, z + 0.15);
+    rect(o, x - 0.16, y - 0.04, x + 0.16, y + 0.12, z + 0.151); seg(o, [x - 0.16, y - 0.12, z + 0.151], [x + 0.08, y - 0.12, z + 0.151]);
+    const d = Math.hypot(x, y), ux = x / d, uy = y / d; seg(o, [ux * 0.42, uy * 0.42, 0], [x - ux * 0.3, y - uy * 0.3, z]);
+    cyl(o, x + 0.42, z, 0.1, y - 0.26, y - 0.06, 2);
+  });
+  ringZ(o, 0, 0, -0.25, 2.55, 40);
+  return o;
+}
+// 11-27 대표 "뭔가 어설퍼": 도형에 이름이 없어 클립아트 같았다. 장면마다 영문 이름표와 데이터 흐름 경로를 둔다
+const MSA_POS = Array.from({ length: 6 }, (_, i) => { const a = i / 6 * Math.PI * 2 + Math.PI / 2; return [1.85 * Math.cos(a), 1.5 * Math.sin(a), 0]; });
+const MSA_NAMES = ['orders', 'users', 'payments', 'alerts', 'search', 'files'];
+const MNT_SVC = [0, 1, 2, 3].map(i => { const a = i / 4 * Math.PI * 2 + Math.PI / 4; return [2.65 + 0.72 * Math.cos(a), 0.25 + 0.72 * Math.sin(a)]; });
+const SCENE = [
+  { labels: [], paths: [] },
+  { labels: [['Web', -2.0, 1.12, 0], ['App', 1.35, 0.42, 0.45]], paths: [] },
+  { labels: [['Web', -2.0, 1.68, 0], ['App', 0.8, 1.62, 0.2], ['REST API', -0.42, 0.24, 0], ['Payment', 1.6, 0.22, 0], ['OAuth', -2.1, 0.22, 0], ['Database', 0.5, -1.25, 0]], paths: API_PATHS },
+  { labels: [['Chat', -2.4, 1.38, 0], ['AI Agent', 0.42, 0.95, 0], ['LLM', 2.05, 1.5, 0], ['RAG / Vector DB', 2.1, -0.3, 0], ['Tools / API', -1.55, -1.1, 0]], paths: AI_PATHS.concat(AI_PATHS.map(([a, b]) => [b, a])) },
+  { labels: [['On-Premise', -2.2, 1.35, 0], ['CI/CD', -0.75, 0.32, 0, 'c'], ['Cloud', 1.6, 1.05, 0], ['Edge', 2.15, -0.72, 0]], paths: [[[-1.0, 0.0, 0], [0.04, 0.0, 0]], [[-1.0, 0.0, 0], [0.04, 0.0, 0]]].concat([0, 1, 2].map(i => [[0.55 + i * 0.7, -0.22, 0], [0.55 + i * 0.7, -0.79, 0]])) },
+  { labels: [['Monitoring', -2.4, 1.32, 0.06], ['Alert', 0.55, 0.72, 0.32], ['MSA', 2.65, 1.15, 0, 'c']], paths: MNT_SVC.map(([x, y]) => [[2.65, 0.25, 0], [x, y, 0]]).concat(MNT_SVC.map(([x, y]) => [[x, y, 0], [2.65, 0.25, 0]])) },
+];
+
+function maintShape() {
+  const n0 = SOLID ? SOLID.length : 0, segs = monitor().map(q => [q[0] - 0.9, q[1], q[2], q[3] - 0.9, q[4], q[5]]);
+  if (SOLID) for (let i = n0; i < SOLID.length; i++) { const it = SOLID[i]; if (it[0] === 'b') { it[1] -= 0.9; it[4] -= 0.9; } else it[1] -= 0.9; }
+  const hx = 2.65, hy = 0.25, o = segs;
+  box(o, hx - 0.2, hy - 0.2, -0.12, hx + 0.2, hy + 0.2, 0.12);
+  MNT_SVC.forEach(([x, y]) => { box(o, x - 0.15, y - 0.15, -0.1, x + 0.15, y + 0.15, 0.1); seg(o, [hx, hy, 0], [x, y, 0]); });
+  return o;
+}
+
 /* ---------- 같은 개수의 짧은 선으로 나눠 모양끼리 옮겨 갈 수 있게 ---------- */
 const N = 2400;
+const NORM = [];
 function resample(segs) {
   const lens = segs.map(s => Math.hypot(s[3]-s[0], s[4]-s[1], s[5]-s[2]));
   const total = lens.reduce((a, b) => a + b, 0);
@@ -352,6 +530,7 @@ function resample(segs) {
   out.forEach(q => { for (let a = 0; a < 6; a++) { const c = a % 3; mn[c] = Math.min(mn[c], q[a]); mx[c] = Math.max(mx[c], q[a]); } });
   const ctr = [0, 1, 2].map(c => (mn[c] + mx[c]) / 2), k = 3.3 / Math.max(mx[0] - mn[0], mx[1] - mn[1]);
   out.forEach(q => { for (let a = 0; a < 6; a++) q[a] = (q[a] - ctr[a % 3]) * k; });
+  NORM.push({ ctr, k });
   // 옮겨 갈 때 엉키지 않게 위치 순서로 정렬
   out.sort((p, q) => (p[0] + p[3] + (p[1] + p[4]) * 0.35) - (q[0] + q[3] + (q[1] + q[4]) * 0.35));
   return Float32Array.from(out.flat());
@@ -366,7 +545,10 @@ function stars() {
   }
   return a;
 }
-const SHAPES = [resample(door()), resample(town()), resample(paper()), resample(monitor()), stars()];
+const SOLIDS = [];
+const take = f => { SOLID = []; const segs = f(); SOLIDS.push(SOLID); SOLID = null; return resample(segs); };
+const starsN = () => { NORM.push({ ctr: [0, 0, 0], k: 1 }); SOLIDS.push([]); return stars(); };
+const SHAPES = [starsN(), take(screenShape), take(apiShape), take(aiShape), take(onpremShape), take(maintShape), starsN()];
 // 흩어질 때 쓰는 방향(선마다 하나)
 const SCATTER = new Float32Array(N * 3);
 for (let i = 0; i < N; i++) { const t = rnd() * Math.PI * 2, u = rnd() * 2 - 1, s = Math.sqrt(1 - u * u), r = 0.5 + rnd() * 1.6; SCATTER.set([r * s * Math.cos(t), r * u, r * s * Math.sin(t)], i * 3); }
@@ -378,7 +560,58 @@ const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, op
 const lines = new THREE.LineSegments(geo, mat);
 const glowMat = new THREE.LineBasicMaterial({ color: 0x9fbaff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, fog: true });
 const glow = new THREE.LineSegments(geo, glowMat); glow.scale.setScalar(1.006);
-const group = new THREE.Group(); group.add(lines, glow); scene.add(group);
+scene.add(new THREE.HemisphereLight(0xb8c8ff, 0x020308, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(-4, 6, 5); scene.add(sun);
+const solidMats = [], solidGroups = SOLIDS.map((list, i) => {
+  const g = new THREE.Group(), { ctr, k } = NORM[i];
+  const m = new THREE.MeshLambertMaterial({ color: 0x2a3554, emissive: 0x06080f, transparent: true, opacity: 0, depthWrite: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  solidMats.push(m);
+  list.forEach(it => {
+    let mesh;
+    if (it[0] === 'b') { const [, x1, y1, z1, x2, y2, z2] = it; mesh = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(x2 - x1) * k, Math.abs(y2 - y1) * k, Math.abs(z2 - z1) * k), m); mesh.position.set(((x1 + x2) / 2 - ctr[0]) * k, ((y1 + y2) / 2 - ctr[1]) * k, ((z1 + z2) / 2 - ctr[2]) * k); }
+    else { const [, cx, cz, r, y1, y2] = it; mesh = new THREE.Mesh(new THREE.CylinderGeometry(r * k, r * k, Math.abs(y2 - y1) * k, 24), m); mesh.position.set((cx - ctr[0]) * k, ((y1 + y2) / 2 - ctr[1]) * k, (cz - ctr[2]) * k); }
+    mesh.renderOrder = -1; g.add(mesh);
+  });
+  g.visible = false; return g;
+});
+const group = new THREE.Group(); group.add(lines, glow, ...solidGroups); scene.add(group);
+// 11-27 API 장면: 선을 따라 오가는 데이터 점(짧은 빛 선). API 도형과 같은 정규화를 쓴다
+const PK = 16, pkPos = new Float32Array(PK * 6), pkGeo = new THREE.BufferGeometry();
+pkGeo.setAttribute('position', new THREE.BufferAttribute(pkPos, 3));
+const pkMat = new THREE.LineBasicMaterial({ color: 0xbfd2ff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const packets = new THREE.LineSegments(pkGeo, pkMat); group.add(packets);
+function movePackets(now, p) {
+  const si = Math.round(p), w = reduce ? 0 : Math.max(0, 1 - Math.abs(p - si) * 2.4), paths = (SCENE[si] || {}).paths || [];
+  pkMat.opacity = paths.length ? w : 0; if (!paths.length || w < 0.02) return;
+  const { ctr, k } = NORM[si], tf = v => v.map((c, i) => (c - ctr[i]) * k);
+  for (let i = 0; i < PK; i++) {
+    const [a0, b0] = paths[i % paths.length], a = tf(a0), b = tf(b0), back = i >= paths.length && paths.length < 7;
+    let t = ((now / 1000) * 0.45 + i * 0.37) % 1; if (back) t = 1 - t;
+    const t2 = Math.min(1, t + 0.07);
+    for (let c = 0; c < 3; c++) { pkPos[i * 6 + c] = a[c] + (b[c] - a[c]) * t; pkPos[i * 6 + 3 + c] = a[c] + (b[c] - a[c]) * t2; }
+  }
+  pkGeo.attributes.position.needsUpdate = true;
+}
+
+const labelBox = document.getElementById('labels');
+const labelEls = SCENE.map(sc => sc.labels.map(([t]) => { const e = document.createElement('span'); e.textContent = t; labelBox.appendChild(e); return e; }));
+const lv = new THREE.Vector3();
+function moveLabels(p) {
+  const si = Math.round(p), w = Math.max(0, 1 - Math.abs(p - si) * 3.2);
+  group.updateMatrixWorld();
+  SCENE.forEach((sc, i) => {
+    const show = i === si && w > 0.05 && NORM[i];
+    sc.labels.forEach(([, x, y, z, al], j) => {
+      const e = labelEls[i][j];
+      if (!show) { e.style.opacity = 0; return; }
+      const { ctr, k } = NORM[i];
+      lv.set((x - ctr[0]) * k, (y - ctr[1]) * k, (z - ctr[2]) * k).applyMatrix4(group.matrixWorld).project(camera);
+      e.style.opacity = w;
+      const px = (lv.x + 1) / 2 * innerWidth, flip = !al && px > innerWidth - 120;
+      e.style.transform = `translate(${px.toFixed(1)}px, ${((1 - lv.y) / 2 * innerHeight).toFixed(1)}px)` + (al === 'c' ? ' translateX(calc(-50% - 6px))' : flip ? ' translateX(calc(-100% - 14px))' : '');
+    });
+  });
+}
 
 /* ---------- 내리기에 따라 모양 바꾸기, 손을 따라 돌기 ---------- */
 const scenes = [...document.querySelectorAll('[data-shape]')];
@@ -406,6 +639,8 @@ function place(p) {
   geo.attributes.position.needsUpdate = true;
   geo.computeBoundingSphere();
   mat.opacity = 0.9 - spread * 0.35;
+  const si = Math.round(p), sw = Math.max(0, 1 - Math.abs(p - si) * 3);
+  solidGroups.forEach((g, i) => { const on = i === si && sw > 0.02; g.visible = on; if (on) solidMats[i].opacity = sw; });
 }
 const aim = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
 addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { aim.y = (e.clientX / innerWidth - 0.5) * 0.9; aim.x = (e.clientY / innerHeight - 0.5) * 0.35; } }, { passive: true });
@@ -429,13 +664,15 @@ function loop(now) {
   requestAnimationFrame(loop);
   const p = progress();
   place(p);
+  movePackets(now, p);
+  moveLabels(p);
   const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
   cur.x += (aim.x - cur.x) * 0.06; cur.y += (aim.y - cur.y) * 0.06;
   const spin = reduce ? 0 : now / 1000 * 0.12;
   group.rotation.set(cur.x + 0.12, cur.y + Math.sin(spin) * 0.35 - 0.25, 0);
   // 넓은 화면: 첫 화면은 오른쪽, 장면 글이 왼쪽이라 그림은 오른쪽. 휴대폰: 위 가운데
-  if (narrow) { group.position.set(0, 1.25, 0); group.scale.setScalar(0.66); }
-  else { group.position.set(2.0, 0.15, 0); group.scale.setScalar(1); }
+  if (narrow) { group.position.set(0, 1.25, 0); group.scale.setScalar(0.6); }
+  else { group.position.set(1.95, 0.1, 0); group.scale.setScalar(1.12); }
   renderer.render(scene, camera);
 }
 requestAnimationFrame(loop);
