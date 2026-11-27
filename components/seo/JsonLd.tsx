@@ -43,6 +43,7 @@ export function SiteJsonLd() {
         name: profile.name,
         legalName: profile.name,
         alternateName: [profile.nameEn, "gompartner"],
+        slogan: "Build, Run, Care.",
         url: `${siteUrl}/`,
         logo: `${siteUrl}/apple-icon.png`,
         image: `${siteUrl}/apple-icon.png`,

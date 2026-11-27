@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build, Run, Care | 곰파트너</title>
+<meta name="robots" content="noindex, follow">
+<base target="_top">
+<link rel="canonical" href="https://gompartner.co.kr/">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!--
+  11-27 사용자 "최초로 했던 걸로 하고 불러오기": 아임웹(gompartner.imweb.me)이 코드 위젯의 스크립트를 지워서, 이 원본을 곰파트너 서버(/trend)에 두고 아임웹에서는 액자(iframe)로 불러온다. 링크는 바깥 창(_top)으로 연다.
+  11-27 사용자 "트렌드형 하나 만들어서 아임웹 하자, 폰트는 A안 좋았는데, 뒤 이미지는 타운 말고 선으로 이펙트 있는 3D 인터랙티브".
+  - 글꼴: 11-26 A안(Pretendard 800, 화면 가득, 글자 사이 좁게, 검정 바탕)
+  - 뒤 그림: 우리가 실제로 만든 물건(현관 중문, 모듈 소파, 거래명세서 두 벌, 지킴이 화면과 휴대폰 알림)을 면 없이 선으로만.
+    마우스와 손가락을 따라 돌고, 내리면 선이 흩어졌다가 다음 물건으로 다시 짜인다. 3D 마을과 조각 조립은 본 사이트 표식이라 쓰지 않는다.
+  - 문구와 금액은 본 사이트(gompartner.co.kr) 그대로. 판은 검색에서 빼고 원본은 본 사이트(canonical).
+-->
+<style>
+:root { --bg: #000; --fg: #fff; --mute: #8f8f8f; --line: rgba(255,255,255,.16); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color: var(--fg); font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", sans-serif; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; font-feature-settings: "calt" 0; }
+body { background: var(--bg); overflow-x: hidden; word-break: keep-all; }
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 56px); }
+:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+#lines { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; touch-action: pan-y; }
+
+header { position: fixed; inset: 0 0 auto; z-index: 10; mix-blend-mode: difference; }
+header .wrap { display: flex; justify-content: space-between; align-items: center; height: 68px; }
+header .logo { font-size: 18px; font-weight: 800; letter-spacing: -0.04em; }
+header nav { display: flex; gap: clamp(14px, 2.6vw, 36px); font-size: 14px; font-weight: 600; }
+header nav a { min-height: 44px; display: inline-flex; align-items: center; }
+header nav a:hover { opacity: .6; }
+
+main { position: relative; z-index: 1; }
+.scene { min-height: 100svh; display: flex; align-items: flex-end; padding: 120px 0 clamp(32px, 7vh, 80px); pointer-events: none; }
+.scene a, .scene .btn { pointer-events: auto; }
+
+/* 첫 화면 */
+.hero h1 { font-size: clamp(68px, 14.2vw, 228px); font-weight: 800; line-height: .84; letter-spacing: -0.065em; }
+.hero h1 span { display: block; overflow: hidden; padding-bottom: .04em; }
+.hero h1 span i { display: block; font-style: normal; transform: translateY(105%); animation: up 1s cubic-bezier(.2,.8,.2,1) forwards; }
+.hero h1 span:nth-child(2) i { animation-delay: .09s; }
+.hero h1 span:nth-child(3) i { animation-delay: .18s; }
+.hero .sub { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: clamp(20px, 3vh, 36px); }
+.hero .sub p { font-size: clamp(18px, 1.8vw, 26px); font-weight: 700; letter-spacing: -0.03em; }
+.hero .sub small { font-size: 13px; color: var(--mute); letter-spacing: .14em; }
+@keyframes up { to { transform: none; } }
+
+/* 장면 글 */
+.copy { max-width: 620px; }
+.kick { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; letter-spacing: .18em; color: var(--mute); }
+.kick i { width: 32px; height: 1px; background: currentColor; }
+.copy h2 { margin-top: 18px; font-size: clamp(44px, 7.4vw, 120px); font-weight: 800; line-height: .92; letter-spacing: -0.06em; }
+.copy p { margin-top: 22px; font-size: clamp(16px, 1.35vw, 19px); line-height: 1.7; color: #cfcfcf; max-width: 520px; }
+.copy ul { list-style: none; margin-top: 22px; border-top: 1px solid var(--line); }
+.copy li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+.copy li span { color: var(--mute); font-weight: 500; }
+.btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; min-height: 52px; padding: 0 26px; border-radius: 999px; background: #fff; color: #000; font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+.btn.ghost { background: none; color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.45); }
+.btn:hover { transform: translateY(-1px); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btns .btn { margin-top: 0; }
+.copy .btns { margin-top: 28px; }
+
+/* 마지막: 문의 */
+.end { align-items: center; }
+.end .copy { max-width: none; }
+.end h2 { font-size: clamp(56px, 11vw, 180px); }
+footer { position: relative; z-index: 1; border-top: 1px solid var(--line); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-top: 24px; padding-bottom: 32px; font-size: 13px; color: var(--mute); }
+
+/* 휴대폰: 선 그림은 위, 글은 아래. 글 뒤를 어둡게 받쳐 읽히게 */
+@media (max-width: 760px) {
+  header nav a:not(.go) { display: none; }
+  .scene { padding-top: 52svh; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.78) 62%, #000 100%); }
+  .hero { background: none; padding-top: 120px; }
+  .copy li { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1 span i { animation: none; transform: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="lines" aria-hidden="true"></canvas>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="https://gompartner.co.kr/">곰파트너</a>
+    <nav aria-label="주 메뉴">
+      <a href="#build" target="_self">Build</a>
+      <a href="#run" target="_self">Run</a>
+      <a href="#care" target="_self">Care</a>
+      <a class="go" href="https://gompartner.co.kr/#apply">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="scene hero" data-shape="0" aria-labelledby="h-hero">
+    <div class="wrap" style="width:100%">
+      <h1 id="h-hero" aria-label="Build, Run, Care."><span><i>Build,</i></span><span><i>Run,</i></span><span><i>Care.</i></span></h1>
+      <div class="sub">
+        <p>만들고, 운영하고, 관리합니다.</p>
+        <small aria-hidden="true">SCROLL</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="build" data-shape="1" aria-labelledby="h-3d">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>01</span><i></i><span>BUILD</span></p>
+        <h2 id="h-3d">3D 견적 화면</h2>
+        <p>가구나 중문을 고객이 3D로 직접 구성하고 견적까지 받는 화면을 만듭니다. 고른 구성은 품목과 금액이 채워진 견적서로 이어집니다.</p>
+        <ul>
+          <li>공간 3D 뷰어<span>180만 원부터</span></li>
+          <li>제품 3D 컨피규레이터<span>450만 원부터</span></li>
+        </ul>
+        <div class="btns"><a class="btn" href="https://gompartner.co.kr/3d">3D 견적 보기</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="run" data-shape="2" aria-labelledby="h-jb">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>02</span><i></i><span>RUN</span></p>
+        <h2 id="h-jb">거래장부</h2>
+        <p>거래명세서를 링크로 보내고 거래처에게 받았다는 확인을 받는 업무 도구입니다. 직접 만들어 운영하고 있습니다.</p>
+        <ul>
+          <li>가입 없이 작성과 PDF 저장</li>
+          <li>받는 쪽 지문으로 수령 확인</li>
+          <li>외상 거래처 미수금과 월 합계</li>
+        </ul>
+        <div class="btns"><a class="btn" href="https://jangbu.gompartner.co.kr/">거래장부 열기</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" data-shape="3" aria-labelledby="h-jk">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>02</span><i></i><span>RUN</span></p>
+        <h2 id="h-jk">사이트 지킴이</h2>
+        <p>웹사이트가 멈추거나 인증서와 도메인이 만료되기 전에 알려 주는 모니터링 서비스입니다.</p>
+        <ul>
+          <li>10분 주기 가용성 점검</li>
+          <li>SSL 인증서와 도메인 만료 단계별 알림</li>
+          <li>사이트 3개까지 무료</li>
+        </ul>
+        <div class="btns"><a class="btn" href="https://jikimi.gompartner.co.kr/">지킴이 열기</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene end" id="care" data-shape="4" aria-labelledby="h-care">
+    <div class="wrap" style="width:100%">
+      <div class="copy">
+        <p class="kick"><span>03</span><i></i><span>CARE</span></p>
+        <h2 id="h-care">만든 사람이<br>끝까지 관리합니다</h2>
+        <p>다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡고, 건별 10,000원부터입니다.</p>
+        <div class="btns">
+          <a class="btn" href="https://gompartner.co.kr/#apply">무료 견적 받기</a>
+          <a class="btn ghost" href="https://gompartner.co.kr/maintenance">유지보수 보기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>곰파트너, 사업자등록번호 725-40-01614</span>
+    <span>Copyright 2026 곰파트너. 원본 사이트 gompartner.co.kr</span>
+  </div>
+</footer>
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+
+const canvas = document.getElementById('lines');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.setClearColor(0x000000, 1);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x000000, 6.5, 13);
+const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+camera.position.set(0, 0.2, 9);
+
+/* ---------- 선 도형: [x1,y1,z1,x2,y2,z2] 목록 ---------- */
+const L = [];
+const seg = (o, a, b) => o.push([a[0], a[1], a[2], b[0], b[1], b[2]]);
+function box(o, x1, y1, z1, x2, y2, z2) {
+  const p = [[x1,y1,z1],[x2,y1,z1],[x2,y2,z1],[x1,y2,z1],[x1,y1,z2],[x2,y1,z2],[x2,y2,z2],[x1,y2,z2]];
+  [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(([a,b]) => seg(o, p[a], p[b]));
+}
+function rect(o, x1, y1, x2, y2, z) { seg(o,[x1,y1,z],[x2,y1,z]); seg(o,[x2,y1,z],[x2,y2,z]); seg(o,[x2,y2,z],[x1,y2,z]); seg(o,[x1,y2,z],[x1,y1,z]); }
+function poly(o, pts) { for (let i = 0; i < pts.length - 1; i++) seg(o, pts[i], pts[i+1]); }
+
+// 1. 현관 중문: 3연동 슬라이딩, 바깥 틀, 문짝 세 장(앞뒤로 조금씩), 세로 간살, 롱바 손잡이
+function door() {
+  const o = [], W = 1.7, H = 2.8, y0 = -H / 2;
+  box(o, -W/2-0.06, y0, -0.12, W/2+0.06, y0+H+0.06, 0.12);         // 바깥 틀
+  box(o, -W/2, y0+H-0.12, -0.1, W/2, y0+H, 0.1);                    // 위 레일
+  for (let i = 0; i < 3; i++) {
+    const pw = W / 3 + 0.04, x1 = -W/2 + i * (W/3) - 0.02, z = -0.06 + i * 0.06;
+    box(o, x1, y0+0.02, z-0.015, x1+pw, y0+H-0.14, z+0.015);
+    rect(o, x1+0.05, y0+0.08, x1+pw-0.05, y0+H-0.2, z+0.016);       // 유리 테두리
+    for (let k = 1; k <= 3; k++) { const gx = x1 + 0.05 + (pw - 0.1) * k / 4; seg(o, [gx, y0+0.08, z+0.017], [gx, y0+H-0.2, z+0.017]); }
+  }
+  box(o, W/2-0.2, y0+0.7, 0.07, W/2-0.17, y0+1.9, 0.1);              // 손잡이
+  rect(o, -W/2-0.5, y0, W/2+0.5, y0, 0); seg(o, [-W/2-0.5, y0, -0.5], [W/2+0.5, y0, -0.5]); // 바닥선
+  return o;
+}
+// 2. 모듈 소파: 1인 모듈 셋과 카우치, 등받이, 팔걸이, 다리
+function sofa() {
+  const o = [], y0 = -0.75, D = 0.95, seatH = 0.42, mw = 0.78;
+  const x0 = -1.75;
+  for (let i = 0; i < 3; i++) {
+    const x = x0 + i * mw;
+    box(o, x, y0+0.12, -D/2, x+mw, y0+seatH, D/2);                   // 좌석 틀
+    box(o, x+0.02, y0+seatH, -D/2+0.18, x+mw-0.02, y0+seatH+0.14, D/2-0.02); // 방석
+    box(o, x, y0+seatH, -D/2, x+mw, y0+0.95, -D/2+0.2);               // 등받이
+    rect(o, x+0.06, y0+0.03, x+0.1, y0+0.12, D/2-0.08);
+  }
+  const cx = x0 + 3 * mw;                                             // 카우치
+  box(o, cx, y0+0.12, -D/2, cx+0.95, y0+seatH, D/2+0.75);
+  box(o, cx+0.02, y0+seatH, -D/2+0.18, cx+0.93, y0+seatH+0.14, D/2+0.73);
+  box(o, cx, y0+seatH, -D/2, cx+0.95, y0+0.95, -D/2+0.2);
+  box(o, x0-0.18, y0+0.12, -D/2, x0, y0+0.7, D/2);                    // 팔걸이
+  box(o, cx+0.95, y0+0.12, -D/2, cx+1.13, y0+0.7, D/2+0.75);
+  rect(o, -2.4, y0, 2.4, y0, 0);
+  return o;
+}
+// 3. 거래명세서 두 벌(공급자 보관용, 공급받는자 보관용): 제목 칸, 공급자와 받는자 칸, 품목 표
+function paper() {
+  const o = [];
+  const sheet = (ox, oy, z) => {
+    const W = 1.75, H = 2.45, x1 = ox - W/2, y2 = oy + H/2, y1 = oy - H/2, x2 = ox + W/2;
+    rect(o, x1, y1, x2, y2, z);
+    rect(o, ox-0.42, y2-0.34, ox+0.42, y2-0.14, z);                   // 제목 칸
+    rect(o, x1+0.1, y2-0.95, ox-0.04, y2-0.48, z);                    // 공급받는자
+    rect(o, ox+0.04, y2-0.95, x2-0.1, y2-0.48, z);                    // 공급자
+    for (let r = 1; r < 4; r++) seg(o, [ox+0.04, y2-0.48-r*0.1175, z], [x2-0.1, y2-0.48-r*0.1175, z]);
+    seg(o, [x1+0.1, y2-1.1, z], [x2-0.1, y2-1.1, z]);                 // 합계 줄
+    const ty = y2 - 1.22, rows = 7, rh = 0.13;
+    for (let r = 0; r <= rows; r++) seg(o, [x1+0.1, ty-r*rh, z], [x2-0.1, ty-r*rh, z]);
+    [0, 0.12, 0.62, 0.82, 1.05, 1.32, 1.55].forEach(c => seg(o, [x1+0.1+c, ty, z], [x1+0.1+c, ty-rows*rh, z]));
+    seg(o, [x2-0.1, ty, z], [x2-0.1, ty-rows*rh, z]);
+    rect(o, x2-0.62, y1+0.14, x2-0.1, y1+0.32, z);                    // 인수자 칸
+  };
+  sheet(0.35, 0.15, -0.35);
+  sheet(-0.2, -0.1, 0.25);
+  return o;
+}
+// 4. 사이트 지킴이: 모니터의 점검 그래프와 상태 칸, 옆 휴대폰의 만료 알림
+function monitor() {
+  const o = [], W = 2.9, H = 1.75, y1 = -0.55, x1 = -W/2 - 0.35;
+  box(o, x1, y1, -0.05, x1+W, y1+H, 0.05);
+  rect(o, x1+0.08, y1+0.08, x1+W-0.08, y1+H-0.08, 0.051);
+  box(o, x1+W/2-0.08, y1-0.45, -0.04, x1+W/2+0.08, y1, 0.04);
+  box(o, x1+W/2-0.5, y1-0.5, -0.3, x1+W/2+0.5, y1-0.45, 0.3);
+  const gx1 = x1 + 0.25, gx2 = x1 + W - 0.95, gy = y1 + 0.35, pts = [];
+  for (let i = 0; i <= 28; i++) { const x = gx1 + (gx2 - gx1) * i / 28; const v = i === 17 ? 0.75 : 0.18 + 0.12 * Math.abs(Math.sin(i * 1.7)); pts.push([x, gy + v, 0.052]); }
+  poly(o, pts);
+  seg(o, [gx1, gy, 0.052], [gx2, gy, 0.052]);
+  for (let r = 0; r < 4; r++) { const yy = y1 + H - 0.32 - r * 0.28; rect(o, x1+W-0.8, yy-0.16, x1+W-0.2, yy, 0.052); rect(o, x1+W-0.75, yy-0.11, x1+W-0.69, yy-0.05, 0.053); }
+  const px = 1.45, py = -0.75, pw = 0.68, ph = 1.38;                  // 휴대폰
+  box(o, px, py, 0.25, px+pw, py+ph, 0.31);
+  rect(o, px+0.05, py+0.09, px+pw-0.05, py+ph-0.09, 0.311);
+  for (let r = 0; r < 3; r++) rect(o, px+0.09, py+ph-0.34-r*0.27, px+pw-0.09, py+ph-0.14-r*0.27, 0.312);
+  return o;
+}
+
+/* ---------- 같은 개수의 짧은 선으로 나눠 모양끼리 옮겨 갈 수 있게 ---------- */
+const N = 2400;
+function resample(segs) {
+  const lens = segs.map(s => Math.hypot(s[3]-s[0], s[4]-s[1], s[5]-s[2]));
+  const total = lens.reduce((a, b) => a + b, 0);
+  let counts = lens.map(l => Math.max(1, Math.round(l / total * N)));
+  let sum = counts.reduce((a, b) => a + b, 0);
+  while (sum > N) { const i = counts.indexOf(Math.max(...counts)); counts[i]--; sum--; }
+  while (sum < N) { const r = lens.map((l, k) => l / counts[k]); counts[r.indexOf(Math.max(...r))]++; sum++; }
+  const out = [];
+  segs.forEach((s, i) => { const c = counts[i]; for (let k = 0; k < c; k++) { const a = k / c, b = (k + 1) / c; out.push([s[0]+(s[3]-s[0])*a, s[1]+(s[4]-s[1])*a, s[2]+(s[5]-s[2])*a, s[0]+(s[3]-s[0])*b, s[1]+(s[4]-s[1])*b, s[2]+(s[5]-s[2])*b]); } });
+  // 물건마다 크기가 달라(소파는 넓고 중문은 높다) 가운데로 옮기고 가장 긴 쪽을 같은 길이로 맞춘다
+  const mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+  out.forEach(q => { for (let a = 0; a < 6; a++) { const c = a % 3; mn[c] = Math.min(mn[c], q[a]); mx[c] = Math.max(mx[c], q[a]); } });
+  const ctr = [0, 1, 2].map(c => (mn[c] + mx[c]) / 2), k = 3.3 / Math.max(mx[0] - mn[0], mx[1] - mn[1]);
+  out.forEach(q => { for (let a = 0; a < 6; a++) q[a] = (q[a] - ctr[a % 3]) * k; });
+  // 옮겨 갈 때 엉키지 않게 위치 순서로 정렬
+  out.sort((p, q) => (p[0] + p[3] + (p[1] + p[4]) * 0.35) - (q[0] + q[3] + (q[1] + q[4]) * 0.35));
+  return Float32Array.from(out.flat());
+}
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function stars() {
+  const a = new Float32Array(N * 6);
+  for (let i = 0; i < N; i++) {
+    const r = 3 + rnd() * 4, t = rnd() * Math.PI * 2, u = rnd() * 2 - 1, s = Math.sqrt(1 - u * u);
+    const x = r * s * Math.cos(t), y = r * u * 0.7, z = r * s * Math.sin(t) - 1.5, d = 0.02 + rnd() * 0.05;
+    a.set([x, y, z, x + d, y + d * 0.4, z], i * 6);
+  }
+  return a;
+}
+const SHAPES = [resample(door()), resample(sofa()), resample(paper()), resample(monitor()), stars()];
+// 흩어질 때 쓰는 방향(선마다 하나)
+const SCATTER = new Float32Array(N * 3);
+for (let i = 0; i < N; i++) { const t = rnd() * Math.PI * 2, u = rnd() * 2 - 1, s = Math.sqrt(1 - u * u), r = 0.5 + rnd() * 1.6; SCATTER.set([r * s * Math.cos(t), r * u, r * s * Math.sin(t)], i * 3); }
+
+const pos = new Float32Array(N * 6);
+const geo = new THREE.BufferGeometry();
+geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, fog: true });
+const lines = new THREE.LineSegments(geo, mat);
+const glowMat = new THREE.LineBasicMaterial({ color: 0x9fbaff, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false, fog: true });
+const glow = new THREE.LineSegments(geo, glowMat); glow.scale.setScalar(1.006);
+const group = new THREE.Group(); group.add(lines, glow); scene.add(group);
+
+/* ---------- 내리기에 따라 모양 바꾸기, 손을 따라 돌기 ---------- */
+const scenes = [...document.querySelectorAll('[data-shape]')];
+let narrow = false, view = 0;
+const smooth = t => t * t * (3 - 2 * t);
+function progress() {
+  // 장면 k의 가운데가 화면 가운데에 올 때 모양 k가 다 짜인다
+  const mid = innerHeight / 2;
+  for (let k = 0; k < scenes.length - 1; k++) {
+    const a = scenes[k].getBoundingClientRect(), b = scenes[k + 1].getBoundingClientRect();
+    const ca = a.top + a.height / 2, cb = b.top + b.height / 2;
+    if (cb >= mid) return ca >= mid ? k : k + (ca - mid) / (ca - cb);
+  }
+  return scenes.length - 1;
+}
+function place(p) {
+  const k = Math.min(SHAPES.length - 2, Math.floor(p)), t = Math.min(1, Math.max(0, p - k));
+  const e = smooth(Math.min(1, Math.max(0, (t - 0.12) / 0.76)));
+  const A = SHAPES[k], B = SHAPES[k + 1], spread = Math.pow(Math.sin(Math.PI * e), 1.4);
+  for (let i = 0; i < N; i++) {
+    const sx = SCATTER[i*3] * spread, sy = SCATTER[i*3+1] * spread, sz = SCATTER[i*3+2] * spread, j = i * 6;
+    pos[j]   = A[j]   + (B[j]   - A[j])   * e + sx; pos[j+1] = A[j+1] + (B[j+1] - A[j+1]) * e + sy; pos[j+2] = A[j+2] + (B[j+2] - A[j+2]) * e + sz;
+    pos[j+3] = A[j+3] + (B[j+3] - A[j+3]) * e + sx; pos[j+4] = A[j+4] + (B[j+4] - A[j+4]) * e + sy; pos[j+5] = A[j+5] + (B[j+5] - A[j+5]) * e + sz;
+  }
+  geo.attributes.position.needsUpdate = true;
+  geo.computeBoundingSphere();
+  mat.opacity = 0.9 - spread * 0.35;
+}
+const aim = { x: 0, y: 0 }, cur = { x: 0, y: 0 };
+addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { aim.y = (e.clientX / innerWidth - 0.5) * 0.9; aim.x = (e.clientY / innerHeight - 0.5) * 0.35; } }, { passive: true });
+// 휴대폰은 끌어서 옆으로 돌린다(세로로 내리는 것은 그대로 화면 내리기)
+let drag = null;
+canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y0: aim.y }; });
+addEventListener('pointermove', e => { if (drag && e.pointerType !== 'mouse') aim.y = drag.y0 + (e.clientX - drag.x) / innerWidth * 2.4; }, { passive: true });
+addEventListener('pointerup', () => { drag = null; });
+addEventListener('pointercancel', () => { drag = null; });
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  narrow = w < 760;
+}
+addEventListener('resize', resize); resize();
+
+let t0 = performance.now();
+function loop(now) {
+  requestAnimationFrame(loop);
+  const p = progress();
+  place(p);
+  const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
+  cur.x += (aim.x - cur.x) * 0.06; cur.y += (aim.y - cur.y) * 0.06;
+  const spin = reduce ? 0 : now / 1000 * 0.12;
+  group.rotation.set(cur.x + 0.12, cur.y + Math.sin(spin) * 0.35 - 0.25, 0);
+  // 넓은 화면: 첫 화면은 오른쪽, 장면 글이 왼쪽이라 그림은 오른쪽. 휴대폰: 위 가운데
+  if (narrow) { group.position.set(0, 1.25, 0); group.scale.setScalar(0.66); }
+  else { group.position.set(2.0, 0.15, 0); group.scale.setScalar(1); }
+  renderer.render(scene, camera);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

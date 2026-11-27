@@ -160,6 +160,8 @@ export function HeroBuild() {
               </svg>
             </div>
             <h1 id="c-hero" className="gp-fade order-3 mt-7 break-keep text-[22px] font-[700] leading-[1.5] tracking-[-0.03em] md:text-[28px]" style={at(1.5)}>
+              {/* 11-27 사용자 "build run care 검색했을 때 우리 사이트가 노출되게": 큰 영어 글자는 조각 그림(aria-hidden)이라 문서에 글자가 없었다. 같은 문구를 제목에 읽히는 글자로 둔다 */}
+              <span className="sr-only">Build, Run, Care. </span>
               {ko}
             </h1>
             <span aria-hidden className="gp-line order-3 mt-5 hidden h-px w-16 bg-[#7aa7ff] lg:block" style={at(1.6)} />

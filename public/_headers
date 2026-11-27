@@ -21,3 +21,10 @@
 
 /models/*
   Cache-Control: public, max-age=86400
+
+# 11-27 사용자 "최초로 했던 걸로 하고 불러오기": 트렌드형 원본(/trend)만 곰파트너 아임웹 판 두 곳에서 액자(iframe)로 불러올 수 있게.
+# 다른 주소는 위 /* 그대로(우리 사이트 밖에서 끼우기 금지)
+/trend/*
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  Content-Security-Policy: frame-ancestors 'self' https://gompartner.imweb.me https://gompartner-trend.imweb.me; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
