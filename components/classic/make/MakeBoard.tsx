@@ -18,7 +18,7 @@ export function MakeBoard({ children }: { children?: ReactNode }) {
   const [on, setOn] = useState(0);
   const k = kinds[on];
   return (
-    <BoardShell no="01" en="BUILD" kw="홈페이지 제작" ice="무엇을" title=" 만들까요" lead="종류를 고르면 만든 화면과 금액, 기간이 바로 나옵니다.">
+    <BoardShell no="01" en="BUILD" kw="홈페이지 제작" ice="무엇을" title=" 만들까요" lead="종류를 선택하면 제작 사례와 금액, 기간을 바로 확인할 수 있습니다.">
           <div className="mt-10 grid gap-6 md:mt-14 lg:grid-cols-[300px_1fr] lg:gap-10">
             {/* 종류 고르기: 넓은 화면은 세로 목록, 좁은 화면은 옆으로 넘기는 줄 */}
             <div role="tablist" aria-label="제작 종류" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] lg:mx-0 lg:block lg:space-y-1 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">

@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { asm } from "@/components/classic/assembleState";
-import { SLICES, clear, pieceCss, pieces, rnd } from "@/components/classic/assembleParts";
+import { clear, pieceCss, pieces, rnd, slices } from "@/components/classic/assembleParts";
 import { cssMin } from "@/lib/cssMin";
 
 // 메인 첫 화면 아래 칸의 조립. 사용자와 여러 번 고치며 정한 것:
 //  - 조립의 단위는 카드 한 장이 아니라 그 안의 작은 부품이다(11-26 "작은 부품 컴포넌트가 조립되는 느낌, 지금은 도장 찍는 느낌").
-//    카드 바탕이 비스듬한 판 세 조각으로 맞물리고, 번호, 제목, 설명, 금액, 화살표, 무늬가 제각각 방향에서 다가와 제자리에 끼워진다.
+//    카드 바탕이 비스듬한 판 조각(카드마다 2~4개, 자르는 자리와 방향이 다름)으로 맞물리고, 번호, 제목, 설명, 금액, 화살표, 무늬가 제각각 방향에서 다가와 제자리에 끼워진다.
 //  - 11-26 조립은 시간이 아니라 스크롤에 맞춰 진행한다. 부품이 화면 아래 끝에서 가운데까지 올라오는 동안 조각이 모이고, 가운데에 닿으면 다 맞물려 한 번 밝아진다.
 //    지나온 경위: 조립이 끝날 때까지 스크롤을 붙잡았다가("잘 안 되는 듯, 자연스럽게 냅두자") 뺐고, 시간에 맞춰 조립하니
 //    빨리 내리면 "속도가 못 따라감", 빠르게 줄이니 "연출이 그냥 스쳐 지나감". 스크롤한 만큼 진행하면 빨리 내려도 늦게 내려도 눈앞에서 조립된다.
@@ -63,11 +63,12 @@ export function Assemble({ children }: { children: ReactNode }) {
         const prevPos = el.style.position;
         if (getComputedStyle(el).position === "static") el.style.position = "relative";
         face.style.backgroundColor = "transparent";
-        const plates = SLICES.map((clip, i) => {
+        // 카드마다 조각 수와 자르는 자리, 방향이 다르다(assembleParts의 slices)
+        const plates = slices().map((sl, i) => {
           const p = document.createElement("span");
           p.className = "asm-plate asm-scrub";
           p.setAttribute("aria-hidden", "true");
-          p.style.cssText = `background:${bg};border-radius:${cs.borderRadius};clip-path:${clip};--px:${[-90, 0, 90][i] + Math.round(rnd(-20, 20))}px;--py:${[40, -70, 50][i] + Math.round(rnd(-15, 15))}px;--pr:${[-7, 4, 8][i]}deg;--ps:1;--s:${(i * 0.05).toFixed(2)};--w:0.45`;
+          p.style.cssText = `background:${bg};border-radius:${cs.borderRadius};clip-path:${sl.clip};--px:${sl.px}px;--py:${sl.py}px;--pr:${sl.pr}deg;--ps:1;--s:${(i * 0.05).toFixed(2)};--w:0.45`;
           el.insertBefore(p, el.firstChild);
           return p;
         });

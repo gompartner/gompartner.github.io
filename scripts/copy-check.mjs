@@ -13,7 +13,18 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const SYMBOLS = /[•‧・–—―←-⇿※…①-⓿‘’“”\u{1f300}-\u{1faff}☀-➿⭐⭕]/gu;
-const MOTTO = ["만들고, 운영하고, 관리합니다", "만들고, 운영하고, 관리"];
+const MOTTO = ["만들고, 운영하고, 관리해 드립니다", "만들고, 운영하고, 관리합니다", "만들고, 운영하고, 관리"];
+// 4. 업계에서 쓰지 않는 구어체 말(11-28 대표 "엽니다 표현 안 쓴다", "매번 지적하는데 토큰 낭비"). 판매 페이지에서 나오면 오류.
+//    말을 더하려면 여기 한 줄만 늘린다. [잡을 말, 대신 쓸 말]
+const WORDS = [
+  [/엽니다|열립니다|열어 보기/, "오픈합니다, 이동합니다, 바로가기"],
+  [/잇는|잇습니다|이어 줍니다/, "연결하는, 연결합니다"],
+  [/손봐|손봅니다|살려 둡니다/, "점검하고 보완해, 복구합니다"],
+  [/키워 갑니다|고칠 곳을 찾/, "고도화합니다, 개선 사항을 도출"],
+  [/고르면[^.]{0,30}나옵니다/, "선택하면 ~를 확인할 수 있습니다"],
+  [/맡깁니다|^맡기기$/, "맡기실 수 있습니다, 견적 요청하기"],
+  [/^앗,|지웠어요/, "페이지를 찾을 수 없습니다"],
+];
 const VERB_END = /(니다|어요|아요|해요|세요|하고|하며|해서|하면|되고|이고|는지|은지|는데|으며)[.?!]?$/;
 
 const decode = (s) => s.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'");
@@ -87,6 +98,7 @@ export function checkHtml(html, reference = false) {
     const s = raw.replace(/·/g, ","); // 가운뎃점도 나열 부호로 함께 센다
     const sym = raw.match(SYMBOLS);
     if (sym) errors.push(`기호 ${[...new Set(sym)].join(" ")}: ${raw.slice(0, 80)}`);
+    if (!reference) for (const [re, alt] of WORDS) if (re.test(raw)) errors.push(`어휘 "${raw.match(re)[0]}" 대신 ${alt}: ${raw.slice(0, 80)}`);
     const c = countedCommas(s);
     if (reference && c >= 3 && isNounList(s) && clauseCommas(s) < 2) { warns++; continue; }
     if (c >= 3) errors.push(`나열 부호 ${c}개: ${raw.slice(0, 80)}`);

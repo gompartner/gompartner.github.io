@@ -35,7 +35,7 @@ const label = "block text-[16px] font-bold";
 const opt = "font-normal text-[#5b6370]";
 const err = "mt-1.5 text-[15px] text-[#d63d4a]";
 
-/** compact: 메인 랜딩 첫 화면용(11-25). 이메일과 마케팅 동의 칸을 빼고 이름, 휴대폰, 주소, 문의 내용만 받는다 */
+/** compact: 메인 랜딩 첫 화면용(11-25). 이름, 휴대폰, 주소, 문의 내용만 받는다. 11-28 대표 "메인에는 왜 마케팅 수신동의 없지": 마케팅 동의는 메인에도 두고, 체크하면 안내 받을 이메일 칸을 펼친다(처리방침상 안내는 이메일로만) */
 export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -78,6 +78,7 @@ export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
     if (!name.trim()) e.name = "이름을 입력해 주세요.";
     if (!PHONE_RE.test(phone.trim())) e.phone = "휴대폰 번호를 확인해 주세요.";
     if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "이메일 주소를 확인해 주세요.";
+    else if (compact && marketing && !email.trim()) e.email = "안내 받을 이메일을 적어 주세요.";
     if (!agree) e.agree = "개인정보 수집 및 이용에 동의해 주세요.";
     setErrors(e);
     const keys = Object.keys(e);
@@ -271,14 +272,22 @@ export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
         </details>
         {errors.agree && <p id="cc-agree-err" className={err}>{errors.agree}</p>}
 
-        {!compact && (
         <>
         <div className="mt-6 flex items-start gap-3">
-          <input id="cc-marketing" type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" />
+          <input id="cc-marketing" type="checkbox" checked={marketing} onChange={(e) => { setMarketing(e.target.checked); if (compact && !e.target.checked) setEmail(""); }} className="mt-1 h-5 w-5 shrink-0 accent-[#256ef4]" />
           <label htmlFor="cc-marketing" className="text-[16px] font-bold leading-[1.6]">
             마케팅 정보 수신에 동의합니다. <span className={opt}>(선택)</span>
           </label>
         </div>
+        {compact && marketing && (
+          <div className="mt-4">
+            <label htmlFor="cc-email" className={label}>
+              안내 받을 이메일
+            </label>
+            <input id="cc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" placeholder="name@example.com" className={field} aria-invalid={!!errors.email} aria-describedby={errors.email ? "cc-email-err" : undefined} />
+            {errors.email && <p id="cc-email-err" className={err}>{errors.email}</p>}
+          </div>
+        )}
         <details className="group mt-3 rounded-md border border-[#e6e9ee] bg-[#f6f7f9] px-4 py-3 text-[15px] leading-[1.6] text-[#5b6370]">
           <summary className="flex cursor-pointer list-none items-center gap-1 font-bold text-[#3d4450] [&::-webkit-details-marker]:hidden">
             자세히 보기
@@ -292,7 +301,6 @@ export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
           </ul>
         </details>
         </>
-        )}
       </div>
 
       {status.kind === "error" && (
@@ -306,7 +314,7 @@ export function ContactForm({ compact = false }: { compact?: boolean } = {}) {
         disabled={status.kind === "sending"}
         className="flex h-14 w-full items-center justify-center rounded-md bg-[#256ef4] text-[18px] font-bold text-white transition-colors hover:bg-[#0b50d0] disabled:opacity-60 motion-reduce:transition-none md:w-[240px]"
       >
-        {status.kind === "sending" ? "접수 중" : "맡기기"}
+        {status.kind === "sending" ? "접수 중" : "견적 요청하기"}
       </button>
     </form>
   );

@@ -15,7 +15,7 @@ setTimeout(go,1500)})()`;
     <>
       <script dangerouslySetInnerHTML={{ __html: js }} />
       <p style={{ padding: 24, fontFamily: "sans-serif" }}>
-        <a href={COMPANY_PROFILE_URL}>회사소개서를 엽니다</a>
+        <a href={COMPANY_PROFILE_URL}>회사소개서로 이동합니다</a>
       </p>
     </>
   );

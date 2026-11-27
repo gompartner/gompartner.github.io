@@ -5,7 +5,7 @@ import { NavLink } from "@/components/classic/NavLink";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
-import { appPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
+import { appPlans, manwon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
 import { NewTabMark } from "@/components/classic/NewTab";
 import { cssMin } from "@/lib/cssMin";
@@ -33,17 +33,16 @@ html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none;
 @media (max-width: 767px) { html:has(.gp-home) footer { padding-bottom: 0; } }
 @keyframes gp-flow { to { stroke-dashoffset: -32; } }
 .gp-flow { animation: gp-flow 1.1s linear infinite; }
-@keyframes gp-flow-y { to { background-position: 0 24px; } }
-.gp-flow-y { background-image: linear-gradient(to bottom, rgba(255,255,255,.7) 50%, transparent 50%); background-size: 2px 12px; animation: gp-flow-y 0.9s linear infinite; }
-@media (prefers-reduced-motion: reduce) { .gp-flow, .gp-flow-y { animation: none; } .gp-flow-dot { display: none; } }
+@media (prefers-reduced-motion: reduce) { .gp-flow { animation: none; } .gp-flow-dot { display: none; } }
 `;
 
 type Tone = "blue" | "white" | "yellow" | "line";
+// 11-28 대표 문구: 제작은 급한 당일 오픈, 시스템은 개선점 도출과 단계 오픈, 앱은 사내용부터 스토어까지 기술 검토, 유지보수는 매월 분석과 함께 개선
 const services: { no: string; name: string; body: string; price: string; href: string; tone: Tone; span: string }[] = [
-  { no: "01", name: "웹사이트 제작", body: `소개 홈페이지 ${plans[0].days}일, 랜딩페이지 ${landingPlans[0].days}일이면 엽니다`, price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
-  { no: "02", name: "업무 시스템 개발", body: "엑셀 업무를 웹 관리자 화면으로 옮깁니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
-  { no: "03", name: "앱 개발", body: "웹앱부터 스토어 출시 앱까지 만듭니다", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
-  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고칩니다", price: "건별 30,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
+  { no: "01", name: "웹사이트 제작", body: "미완성 사이트도 급하면 당일 오픈합니다", price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
+  { no: "02", name: "업무 시스템 개발", body: "개선 사항을 도출해 단계적으로 오픈합니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
+  { no: "03", name: "앱 개발", body: "기술 검토 후 사내용부터 스토어 앱까지 개발합니다", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
+  { no: "04", name: "유지보수와 고도화", body: "매월 분석해 개선점을 찾고 함께 고도화합니다", price: "건별 30,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
   blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white", arrow: "bg-white text-[#256ef4]" },
@@ -55,9 +54,9 @@ const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string 
 // 업체 자랑 대신 고객이 겪는 상황에서 시작한다(11-25 밤 사용자 "돈 안 내고 싶겠다"). 11-27 대표 "글이 너무 많다": 상황 제목만 두고 본문은 뺐다(값은 유지보수, 제작 페이지에)
 const reasons = [
   { name: "만든 업체와 연락이 안 될 때", c: "#7aa7ff" },
-  { name: "글자 하나 고치는 데 며칠씩 걸릴 때", c: "#ffd84d" },
-  { name: "얼마가 들지 몰라 미루고 있을 때", c: "#ffffff" },
-  { name: "엑셀과 카카오톡으로 버티고 있을 때", c: "#7aa7ff" },
+  { name: "문구 하나 수정에 며칠씩 걸릴 때", c: "#ffd84d" },
+  { name: "비용을 몰라 미루고 있을 때", c: "#ffffff" },
+  { name: "문의 받고 답하고 정리하는 일을 사람이 다 할 때", c: "#7aa7ff" },
 ];
 
 // 직접 기획하고 만들어 운영하는 서비스. 문구는 각 서비스 사이트의 소개 문장에서 가져온다
@@ -66,7 +65,7 @@ const products = [
     name: "사이트 지킴이",
     href: "https://jikimi.gompartner.co.kr/",
     img: "/images/products/jikimi.jpg",
-    lead: "웹사이트가 멈추거나 인증서, 도메인이 만료되기 전에 알려 주는 모니터링 서비스",
+    lead: "웹사이트 장애와 SSL 인증서, 도메인 만료를 미리 알려 주는 모니터링 서비스",
     facts: ["10분 주기 가용성 점검", "SSL 인증서와 도메인 만료 단계별 알림", "사이트 3개까지 무료"],
     light: true,
   },
@@ -74,8 +73,8 @@ const products = [
     name: "거래장부",
     href: "https://jangbu.gompartner.co.kr/",
     img: "/images/products/jangbu-1126.jpg",
-    lead: "거래명세서를 링크로 보내고 거래처에게 받았다는 확인을 받는 업무 도구",
-    facts: ["가입 없이 작성과 PDF 저장", "받는 쪽 지문으로 수령 확인", "외상 거래처 미수금과 월 합계"],
+    lead: "거래명세서를 링크로 발송하고 거래처의 수령 확인을 받는 업무 도구",
+    facts: ["가입 없이 작성과 PDF 저장", "거래처 지문 인증으로 수령 확인", "외상 거래처 미수금과 월 합계"],
     light: false,
   },
 ];
@@ -166,7 +165,7 @@ function Motif({ tone }: { tone: Tone }) {
 function Services() {
   return (
     <section id="services" aria-labelledby="c-services" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
-      <Head no="01" en="BUILD" title="만듭니다" id="c-services" />
+      <Head no="01" en="BUILD" title="만들어 드립니다" id="c-services" />
       <ul className="mt-10 grid gap-3 md:mt-14 md:grid-cols-6 md:gap-4" role="list">
         {services.map((s) => {
           const t = tones[s.tone];
@@ -197,7 +196,7 @@ function Why() {
     <section id="care" aria-labelledby="c-why" className="scroll-mt-20 border-y border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-12 py-20 md:py-32 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16`}>
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <Head no="03" en="CARE" title="관리합니다" id="c-why" />
+          <Head no="03" en="CARE" title="관리해 드립니다" id="c-why" />
           <p data-part="text" className="mt-6 max-w-[420px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
             이럴 때 맡기세요.
           </p>
@@ -222,19 +221,20 @@ function Why() {
 function Products() {
   return (
     <section id="products" aria-labelledby="c-products" className={`${wrap} scroll-mt-20 py-20 md:py-32`}>
-      <Head no="02" en="RUN" title="운영합니다" id="c-products" />
-      <p data-part="text" className="mt-6 max-w-[560px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-        직접 만들어 지금도 운영하고 있는 서비스입니다.
+      <Head no="02" en="RUN" title="운영해 드립니다" id="c-products" />
+      <p data-part="text" className="mt-4 max-w-[560px] break-keep text-[15px] leading-[1.7] text-[#aab2bf] md:mt-6 md:text-[17px]">
+        직접 개발해 운영 중인 서비스입니다.
       </p>
-      <ul className="mt-10 grid gap-4 md:mt-14 lg:grid-cols-2" role="list">
+      <ul className="mt-8 grid gap-3 md:mt-14 md:gap-4 lg:grid-cols-2" role="list">
         {products.map((p) => (
           <li key={p.name} data-part className={`flex flex-col overflow-hidden rounded-[28px] ${p.light ? "bg-[#e6eeff] text-[#0b0d12]" : "border border-[#7aa7ff]/45 bg-[#121722] text-white"}`}>
-            <div className="p-7 md:p-9">
-              <h3 className="text-[28px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{p.name}</h3>
-              <p className={`mt-3 max-w-[460px] break-keep text-[16px] leading-[1.65] md:text-[17px] ${p.light ? "text-[#3d4450]" : "text-[#aab2bf]"}`}>{p.lead}</p>
-              <ul className="mt-6 space-y-2.5" role="list">
+            {/* 11-28 대표 "모바일에서 줄여줘": 휴대폰은 글자, 여백, 화면 그림을 줄인다 */}
+            <div className="p-6 md:p-9">
+              <h3 className="text-[24px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[38px]">{p.name}</h3>
+              <p className={`mt-2 max-w-[460px] break-keep text-[15px] leading-[1.6] md:mt-3 md:text-[17px] ${p.light ? "text-[#3d4450]" : "text-[#aab2bf]"}`}>{p.lead}</p>
+              <ul className="mt-4 space-y-1.5 md:mt-6 md:space-y-2.5" role="list">
                 {p.facts.map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-[16px] font-bold md:text-[17px]">
+                  <li key={f} className="flex items-center gap-2.5 text-[15px] font-bold md:text-[17px]">
                     <span aria-hidden className={`grid h-5 w-5 shrink-0 place-items-center rounded-full ${p.light ? "bg-[#256ef4] text-white" : "bg-[#7aa7ff]/20 text-[#7aa7ff]"}`}>
                       <Check size={13} strokeWidth={3} />
                     </span>
@@ -242,12 +242,12 @@ function Products() {
                   </li>
                 ))}
               </ul>
-              <a href={p.href} target="_blank" rel="noopener noreferrer" className={`mt-7 inline-flex min-h-11 items-center gap-1 text-[16px] font-bold underline-offset-4 hover:underline ${p.light ? "text-[#0b50d0]" : "text-[#7aa7ff]"}`}>
-                {p.name} 열기 <NewTabMark size={16} />
+              <a href={p.href} target="_blank" rel="noopener noreferrer" className={`mt-3 inline-flex min-h-11 items-center gap-1 text-[15px] font-bold md:mt-7 md:text-[16px] underline-offset-4 hover:underline ${p.light ? "text-[#0b50d0]" : "text-[#7aa7ff]"}`}>
+                {p.name} 바로가기 <NewTabMark size={16} />
               </a>
             </div>
-            <div className="mt-auto px-7 md:px-9">
-              <span className="relative block aspect-[3/2] overflow-hidden rounded-t-[16px] border border-b-0 border-black/10 bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
+            <div className="mt-auto px-6 md:px-9">
+              <span className="relative block aspect-[16/8] overflow-hidden md:aspect-[3/2] rounded-t-[16px] border border-b-0 border-black/10 bg-white shadow-[0_-8px_30px_rgba(0,0,0,.18)]">
                 <Image src={p.img} alt={`${p.name} 화면`} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover object-top" />
               </span>
             </div>
@@ -263,7 +263,7 @@ function Process() {
     <section id="process" aria-labelledby="c-process" className="scroll-mt-20 bg-[#1f5fe0] text-white">
       <div className={`${wrap} py-20 md:py-32`}>
         <Head no="04" en="PROCESS" title="진행 방식" id="c-process" onBlue />
-        <div className="relative mt-12 md:mt-20">
+        <div className="relative mt-8 md:mt-20">
           {/* 원 다섯 개를 지나 흐르는 선과 그 위를 달리는 점(넓은 화면) */}
           <svg aria-hidden viewBox="0 0 1000 200" preserveAspectRatio="none" className="absolute inset-x-0 top-0 hidden h-[200px] w-full md:block" fill="none">
             <path className="gp-flow" d={flowPath} stroke="#fff" strokeOpacity=".7" strokeWidth="2" strokeDasharray="8 8" vectorEffect="non-scaling-stroke" />
@@ -271,19 +271,21 @@ function Process() {
               <animateMotion dur="7s" repeatCount="indefinite" path={flowPath} />
             </circle>
           </svg>
-          {/* 좁은 화면은 세로로 흐르는 선 */}
-          <span aria-hidden className="gp-flow-y absolute bottom-10 left-[43px] top-2 w-0.5 md:hidden" />
-          <ol className="relative grid gap-9 md:grid-cols-5 md:gap-4" role="list">
+          {/* 좁은 화면도 PC처럼 지그재그(11-28 대표). 작은 원 다섯 개, 짝수 단계는 28px 내리고 원 가운데(위 26px, 아래 54px)를 흐르는 점선으로 잇는다 */}
+          <svg aria-hidden viewBox="0 0 500 80" preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-[80px] w-full md:hidden" fill="none">
+            <path className="gp-flow" d="M50 26 L150 54 L250 26 L350 54 L450 26" stroke="#fff" strokeOpacity=".7" strokeWidth="2" strokeDasharray="6 6" vectorEffect="non-scaling-stroke" />
+          </svg>
+          <ol className="relative grid grid-cols-5 gap-1 md:gap-4" role="list">
             {steps.map((s, i) => (
-              <li key={s.name} data-part="text" className={`flex items-start gap-5 md:flex-col md:items-center md:gap-0 md:text-center ${i % 2 ? "md:pt-[60px]" : ""}`}>
-                <span className="grid h-[88px] w-[88px] shrink-0 place-items-center rounded-full bg-white text-[#1f5fe0] shadow-[0_10px_30px_rgba(8,26,74,.35)] md:h-[140px] md:w-[140px]">
+              <li key={s.name} data-part="text" className={`flex flex-col items-center text-center ${i % 2 ? "pt-7 md:pt-[60px]" : ""}`}>
+                <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-white text-[#1f5fe0] shadow-[0_6px_18px_rgba(8,26,74,.35)] md:h-[140px] md:w-[140px] md:shadow-[0_10px_30px_rgba(8,26,74,.35)]">
                   <span>
-                    <span className="block text-center text-[11px] font-bold tracking-[0.14em] md:text-[13px]">STEP</span>
-                    <span className="block text-center text-[36px] font-[800] leading-none tabular-nums md:text-[56px]">{i + 1}</span>
+                    <span className="hidden text-center text-[13px] font-bold tracking-[0.14em] md:block">STEP</span>
+                    <span className="block text-center text-[22px] font-[800] leading-none tabular-nums md:text-[56px]">{i + 1}</span>
                   </span>
                 </span>
-                <span className="block pt-2 md:mt-6 md:pt-0">
-                  <span className="block text-[21px] font-[800] tracking-[-0.03em] md:text-[23px]">{s.name}</span>
+                <span className="mt-3 block md:mt-6">
+                  <span className="block text-[16px] font-[800] tracking-[-0.03em] md:text-[23px]">{s.name}</span>
                 </span>
               </li>
             ))}
@@ -301,7 +303,7 @@ function Apply() {
         <div>
           <Head no="05" en="CONTACT" title="무료 견적 받기" id="c-apply" />
           <p data-part="text" className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-            만들거나 고칠 것을 한 줄만 남겨 주세요. 범위와 금액, 일정을 정리해 바로 답합니다.
+            원하시는 것을 한 줄만 남겨 주세요. 범위와 금액, 일정을 정리해 회신합니다.
           </p>
           <ul data-part="text" className="mt-9 space-y-3" role="list">
             <li>

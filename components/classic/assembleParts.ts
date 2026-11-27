@@ -14,8 +14,37 @@ export const pieceCss = `
 
 export const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 export const MAX = 14;
-// 카드 바탕을 나누는 비스듬한 판 세 조각
-export const SLICES = ["polygon(0% 0%, 40% 0%, 28% 100%, 0% 100%)", "polygon(40% 0%, 74% 0%, 62% 100%, 28% 100%)", "polygon(74% 0%, 100% 0%, 100% 100%, 62% 100%)"];
+// 카드 바탕을 나누는 판 조각. 11-28 대표 "처음 입장했을 때 슬래시된 조각 패턴이 같다": 예전에는 모든 카드가 같은 세 조각(같은 자리, 같은 기울기)이었다.
+// 이제 카드마다 조각 수(2~4), 자르는 방향(세로 7, 가로 3), 자르는 자리와 기울기 방향을 새로 정한다. 조각은 자기 자리 쪽 바깥에서 날아온다.
+export type Slice = { clip: string; px: number; py: number; pr: number };
+export function slices(): Slice[] {
+  const n = 2 + Math.floor(Math.random() * 3);
+  const across = Math.random() < 0.7; // true: 세로로 자른다(조각이 좌우로), false: 가로로 자른다(조각이 위아래로)
+  // 자르는 선 n-1개: 고른 간격에 조금씩 흔들고, 선마다 기울기 방향을 따로 정한다(간격 25% 이상, 흔들림 4%, 기울기 12% 이하라 선끼리 겹치지 않는다)
+  const a = [0], b = [0];
+  for (let k = 1; k < n; k++) {
+    const base = (k / n) * 100 + rnd(-4, 4);
+    const tilt = rnd(5, 12) * (Math.random() < 0.5 ? -1 : 1);
+    a.push(base + tilt / 2);
+    b.push(base - tilt / 2);
+  }
+  a.push(100);
+  b.push(100);
+  const f = (v: number) => `${v.toFixed(1)}%`;
+  return Array.from({ length: n }, (_, i) => {
+    const mid = (a[i] + a[i + 1] + b[i] + b[i + 1]) / 4;
+    const out = ((mid - 50) / 50) * rnd(70, 110);
+    const clip = across
+      ? `polygon(${f(a[i])} 0%, ${f(a[i + 1])} 0%, ${f(b[i + 1])} 100%, ${f(b[i])} 100%)`
+      : `polygon(0% ${f(a[i])}, 0% ${f(a[i + 1])}, 100% ${f(b[i + 1])}, 100% ${f(b[i])})`;
+    return {
+      clip,
+      px: Math.round(across ? out : rnd(-40, 40)),
+      py: Math.round(across ? rnd(-60, 50) : out * 0.7),
+      pr: +rnd(-8, 8).toFixed(1),
+    };
+  });
+}
 export const clear = (c: string) => c === "transparent" || c === "rgba(0, 0, 0, 0)";
 
 /** 조립할 작은 요소를 고른다: 글자를 직접 품었거나, 작거나(원, 버튼, 아이콘), 안에 블록 요소가 없으면 그 자체가 부품. 아니면 안으로 더 들어간다 */

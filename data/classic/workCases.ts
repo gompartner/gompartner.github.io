@@ -18,6 +18,10 @@ export interface WorkCase {
   pc: string;
   m: string;
   alt: string;
+  /** 11-28 대표 "3d 페이지에서는 랜딩이 움직이는데 work에서는 정적": 있으면 PC 그림 자리에서 이 영상이 돈다(/3d와 같은 녹화) */
+  video?: { src: string; w: number; h: number };
+  /** 휴대폰 화면 자리에서 도는 영상(390x844) */
+  videoM?: string;
 }
 
 export const workCases: WorkCase[] = [
@@ -34,6 +38,23 @@ export const workCases: WorkCase[] = [
     pc: "/images/works/site-pc.jpg",
     m: "/images/works/site-m.jpg",
     alt: "곰파트너 사이트 첫 화면. Build, Run, Care 제목과 3D 마을",
+  },
+  {
+    // 11-28 대표 "work에 trend 빠짐, 2번 위치에": 곰파트너 주소에서 운영 중인 트렌드형 3D 홈페이지. 대표 "트렌드형은 뭐야, 랜딩 아니었어", "첫 페이지가 나와야지": 이름은 랜딩페이지, 그림은 첫 화면(PC 1600, 휴대폰 520 폭으로 배포본 /trend 첫 화면을 찍음)
+    id: "landing",
+    kind: "랜딩페이지",
+    name: "곰파트너 랜딩페이지",
+    line: "화면을 내리면 서비스마다 장면이 선으로 그려지는 랜딩페이지입니다.",
+    href: "/trend",
+    host: "gompartner.co.kr/trend",
+    problem: "서비스를 글과 사진으로만 나열하면 어느 제작사 홈페이지나 비슷해 보입니다.",
+    made: "화면을 내리면 서비스마다 3D 장면이 선으로 그려지고 다음 장면으로 이어집니다.",
+    now: "곰파트너 주소에서 운영 중이며 PC와 휴대폰에서 같은 장면을 봅니다.",
+    pc: "/images/works/landing-pc.jpg",
+    video: { src: "/videos/3d/trend.mp4?v=11283", w: 960, h: 600 },
+    videoM: "/videos/3d/trend-m.mp4?v=11283",
+    m: "/images/works/landing-m.jpg",
+    alt: "곰파트너 랜딩페이지 첫 화면. Build, Run, Care 제목과 흐르는 빛줄기",
   },
   {
     id: "jangbu",
@@ -65,9 +86,9 @@ export const workCases: WorkCase[] = [
   },
   {
     id: "3d",
-    kind: "3D 홈페이지",
+    kind: "3D 견적",
     name: "3D 거실 상담 화면",
-    line: "손님이 거실에 가구를 놓아 보며 금액을 확인하는 상담 화면입니다.",
+    line: "고객이 거실에 가구를 배치해 보며 금액을 확인하는 상담 화면입니다.",
     href: "/3d/room/",
     host: "gompartner.co.kr/3d/room",
     problem: "인테리어와 가구 상담은 손님이 자기 집에 들어갈지 몰라 같은 질문을 반복하고, 실측을 다녀와도 계약으로 이어지지 않는 일이 잦습니다.",

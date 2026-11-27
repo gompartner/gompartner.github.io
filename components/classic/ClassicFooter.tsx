@@ -33,7 +33,6 @@ const groups = [
     title: "곰파트너",
     items: [
       { href: "/story", label: "회사소개" },
-      { href: "/notice", label: "공지사항" },
       { href: "/contact", label: "상담 신청" },
       { href: "/knowledge", label: "위키" },
     ],

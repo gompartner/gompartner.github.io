@@ -2,21 +2,23 @@
 // 11-27 사이트 변천사(단계 여덟 장)를 내렸다. 날짜와 숫자는 변경 기록(git log)에서 확인한 것만 쓴다(변경 950회: git rev-list --count HEAD, 11-26 기준 954).
 // 11-27 대표 "글이 너무 많다": 지금의 페이지 세 장과 결론 칸을 내리고, 하는 일은 한 줄씩, 일하는 방식은 제목 세 줄만 보인다
 
-export const storyLead = "홈페이지와 앱을 만들고, 운영하고, 관리합니다. 이 사이트부터 그렇게 운영합니다.";
+// 11-28 대표 "만듭니다는 내가 하는 거고 만들어 드립니다 아님? 고객이 들어오면 뭐라고 생각할지": 하는 일은 고객에게 해 드리는 말로
+// 11-28 대표 "고객 입장에서, 최대한 고객의 의견을 반영한다는 뉘앙스로 사고 싶게": 제목도 "매일 바꿉니다"에서 고객 요청에 맞춘다는 말로
+export const storyLead = "요청은 하나도 빼지 않고 정해진 수정 횟수 안에 묶어 반영합니다.";
 
 // 하는 일. 메인 첫 문장(Build, Run, Care)과 같은 순서
 export const works = [
-  { en: "BUILD", name: "만듭니다", body: "홈페이지부터 앱과 3D 웹까지 제작합니다.", links: [{ href: "/make", label: "제작" }] },
+  { en: "BUILD", name: "만들어 드립니다", body: "홈페이지부터 앱과 3D 웹까지 제작합니다.", links: [{ href: "/make", label: "제작" }] },
   {
     en: "RUN",
-    name: "운영합니다",
-    body: "사이트 지킴이와 거래장부를 직접 만들어 운영합니다.",
+    name: "운영해 드립니다",
+    body: "오픈 뒤 장애와 만료 관리를 맡아 드립니다.",
     links: [
       { href: "https://jikimi.gompartner.co.kr/", label: "사이트 지킴이" },
       { href: "https://jangbu.gompartner.co.kr/", label: "거래장부" },
     ],
   },
-  { en: "CARE", name: "관리합니다", body: "수정 한 건부터 유지보수 업체 변경까지 맡습니다.", links: [{ href: "/maintenance", label: "유지보수" }] },
+  { en: "CARE", name: "관리해 드립니다", body: "수정 한 건부터 유지보수 업체 변경까지 맡아 드립니다.", links: [{ href: "/maintenance", label: "유지보수" }] },
 ];
 
 // 일하는 방식. 어느 제작사나 하는 일(반응형, 소스 제공, 계약서, 하자보수)은 적지 않는다

@@ -120,14 +120,14 @@ export function TownWindow() {
           <iframe
             ref={frame}
             src={src}
-            title="3D 마을. 건물 이름표를 누르면 해당 상품 화면을 엽니다."
+            title="3D 마을. 건물 이름표를 누르면 해당 서비스 화면으로 이동합니다."
             className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"}`}
           />
         )}
       </div>
       <p className="gp-fade flex min-h-11 items-center gap-2 border-t border-white/10 px-4 pb-7 pt-2.5 text-[13px] leading-[1.5] text-[#aab2bf] md:text-[14px]" style={at(1.3)}>
         <i aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${ready ? "bg-[#28c840]" : "bg-[#7aa7ff]"}`} />
-        {ready ? "건물 이름표를 누르면 그 상품 화면이 열립니다. 끌면 마을이 돌아갑니다." : "3D 마을을 조립하고 있습니다."}
+        {ready ? "건물 이름표를 누르면 해당 서비스 화면으로 이동합니다. 화면을 끌면 마을이 회전합니다." : "3D 마을을 조립하고 있습니다."}
       </p>
     </div>
   );

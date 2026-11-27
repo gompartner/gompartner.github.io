@@ -4,7 +4,6 @@ import type { CatalogItem } from "@/components/classic/catalog/CatalogDialog";
 import { threeFaq, threeForWhom, threeMeta, threeScope } from "@/data/classic/three";
 import { faq } from "@/data/classic/faq";
 import { maintenanceFaq, maintenanceServices } from "@/data/classic/maintenance";
-import { notices } from "@/data/classic/notices";
 import { insights } from "@/data/classic/insights";
 import { makeExtras } from "@/data/classic/makeExtra";
 import { termGroups } from "@/data/classic/glossary";
@@ -12,7 +11,7 @@ import { designDocs, shortTitle, takeover, techDocs, termHref } from "@/data/cla
 import { datasets } from "@/data/classic/trendData";
 
 // 통합검색 색인. 서버에서 만들어 검색 페이지(클라이언트)에 넘긴다(11-01).
-export type SearchKind = "바로가기" | "서비스" | "작업 사례" | "위키" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문" | "공지사항";
+export type SearchKind = "바로가기" | "서비스" | "작업 사례" | "위키" | "운영 노트" | "네이버 블로그" | "티스토리" | "유튜브" | "무료 도구" | "용어" | "자주 묻는 질문";
 export interface SearchItem {
   kind: SearchKind;
   title: string;
@@ -33,7 +32,7 @@ export function buildSearchIndex(): SearchItem[] {
   const services: SearchItem[] = [
     { kind: "서비스", title: "홈페이지 제작", desc: "병원, 매장, 전문직, 기업, 학원 홈페이지를 업종에 맞게 만듭니다", href: "/make", hay: "홈페이지 제작 반응형 패키지 소개 문의 예약 맞춤 기능 검색엔진 등록 원본 소스" },
     { kind: "서비스", title: "랜딩페이지 제작", desc: "광고로 들어온 고객의 상담, 예약 신청을 바로 받는 홍보용 페이지를 만듭니다", href: "/make", hay: "랜딩 랜딩페이지 광고 신청 접수 구글 시트 문자 알림톡 이벤트 홍보" },
-    { kind: "서비스", title: "업무 프로그램 제작", desc: "엑셀로 하던 주문 취합, 관리, 출력 업무를 웹 프로그램으로 만듭니다", href: "/make", hay: "업무 프로그램 엑셀 자동화 관리자 주문 취합 결과지 출력 발주서" },
+    { kind: "서비스", title: "업무 프로그램 제작", desc: "엑셀로 관리하던 주문 취합과 출력 업무를 웹 프로그램으로 전환합니다", href: "/make", hay: "업무 프로그램 엑셀 자동화 관리자 주문 취합 결과지 출력 발주서" },
     ...makeExtras.map((m) => ({ kind: "서비스" as const, title: m.title, desc: m.lead, href: "/make", hay: [m.metaDescription, ...m.scope.flatMap((g) => g.items), ...m.forWhom].join(" ") })),
     { kind: "서비스", title: threeMeta.title, desc: threeMeta.lead, href: "/3d", hay: ["3D 쓰리디 견적 컨피규레이터 쇼룸 가구 중문 인테리어 셀프 인테리어", threeMeta.metaDescription, ...threeScope.flatMap((g) => g.items), ...threeForWhom].join(" ") },
     ...threeFaq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/knowledge/3d-web#faq", hay: threeMeta.title })),
@@ -63,7 +62,6 @@ export function buildSearchIndex(): SearchItem[] {
     ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: f.tag === "care" ? "/maintenance" : "/make", hay: "" })),
     ...maintenanceServices.flatMap((s) => (maintenanceFaq[s.id] ?? []).map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/maintenance", hay: s.h1 }))),
   ];
-  const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
   const posts: SearchItem[] = insights.map((n) => ({
     kind: "운영 노트",
     sub: n.series,
@@ -85,13 +83,12 @@ export function buildSearchIndex(): SearchItem[] {
   ];
   // 11-26 페이지 이름으로 찾을 수 있게(검수: "비용", "회사소개", "거래장부"로 검색하면 그 페이지가 안 나왔다)
   const pages: SearchItem[] = [
-    { kind: "바로가기", title: "제작", desc: "홈페이지와 랜딩페이지 등 만들 종류를 고르면 금액과 기간이 나옵니다", href: "/make", hay: "Build 빌드 만들기 제작 종류 금액 기간 비용 가격 요금 얼마" },
-    { kind: "바로가기", title: "유지보수", desc: "지금 상황을 고르면 해 드리는 일과 금액이 나옵니다", href: "/maintenance", hay: "Care 케어 관리 유지관리 수정 업체 변경" },
-    { kind: "바로가기", title: "작업 사례", desc: "곰파트너가 만들어 운영하는 홈페이지와 업무 시스템, 3D 견적 화면", href: "/works", hay: "Works 포트폴리오 사례 실적 만든 화면 카탈로그" },
+    { kind: "바로가기", title: "제작", desc: "홈페이지와 랜딩페이지 등 제작 종류를 선택하면 금액과 기간을 확인할 수 있습니다", href: "/make", hay: "Build 빌드 만들기 제작 종류 금액 기간 비용 가격 요금 얼마" },
+    { kind: "바로가기", title: "유지보수", desc: "상황을 선택하면 작업 내용과 금액을 확인할 수 있습니다", href: "/maintenance", hay: "Care 케어 관리 유지관리 수정 업체 변경" },
+    { kind: "바로가기", title: "작업 사례", desc: "곰파트너가 직접 개발해 운영하는 홈페이지와 업무 시스템, 3D 견적 화면", href: "/works", hay: "Works 포트폴리오 사례 실적 만든 화면 카탈로그" },
     { kind: "바로가기", title: "위키", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수 문서", href: "/knowledge", hay: "Wiki 문서 자료 용어 지식" },
     { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 일하는 방식", href: "/story", hay: "About 소개 곰파트너 회사" },
-    { kind: "바로가기", title: "공지사항", desc: "서비스와 사이트 변경 안내", href: "/notice", hay: "공지 안내 소식 알림" },
-    { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/contact", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
+    { kind: "바로가기", title: "문의", desc: "무료 견적 신청서와 전화, 이메일 연락처", href: "/contact", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
     { kind: "바로가기", title: "개인정보처리방침", desc: "상담에서 처리하는 개인정보의 항목, 목적, 보유 기간", href: "/privacy", hay: "개인정보 처리방침 약관 보호" },
     { kind: "바로가기", title: "사이트 지킴이", desc: "운영 중인 서비스. 웹사이트가 멈추거나 인증서가 끝나기 전에 알려 줍니다", href: "https://jikimi.gompartner.co.kr/", hay: "Run 운영 서비스 모니터링 점검 지킴이 알림" },
     { kind: "바로가기", title: "거래장부", desc: "운영 중인 서비스. 거래명세서와 미수금을 관리합니다", href: "https://jangbu.gompartner.co.kr/", hay: "Run 운영 서비스 명세서 미수 장부 납품 도매" },
@@ -99,7 +96,7 @@ export function buildSearchIndex(): SearchItem[] {
   ];
   const byHref = (h: string) => (h.startsWith("/make") ? "제작" : h.startsWith("/maintenance") ? "유지보수" : h.startsWith("/3d") ? "3D 웹" : "일반");
   for (const i of [...services, ...faqs]) i.sub = byHref(i.href);
-  return [...pages, ...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs, ...news];
+  return [...pages, ...services, ...catalogs, ...archive, ...kiosk3d, ...posts, ...terms, ...faqs];
 }
 
 /** 카탈로그 검색용(카탈로그 목록 페이지) */

@@ -42,8 +42,8 @@ export default function NotFound() {
                 <p aria-hidden className="select-none text-[120px] font-[800] leading-[0.8] tracking-[-0.07em] bg-[linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04))] bg-clip-text text-transparent md:text-[220px]">
                   404
                 </p>
-                <h1 className="mt-8 break-keep text-[30px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[44px]">앗, 이 페이지는 지웠어요</h1>
-                <p className="mt-4 max-w-[480px] break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">사이트를 새로 정리하면서 예전 페이지를 내렸습니다. 아래 메뉴에서 찾으시는 내용으로 이동해 주세요.</p>
+                <h1 className="mt-8 break-keep text-[30px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[44px]">페이지를 찾을 수 없습니다</h1>
+                <p className="mt-4 max-w-[480px] break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">사이트 개편으로 이전 페이지가 삭제되었습니다. 아래 메뉴에서 원하시는 내용을 찾아 주세요.</p>
               </div>
               <nav aria-label="주요 메뉴">
                 <ul className="border-t border-white/15" role="list">

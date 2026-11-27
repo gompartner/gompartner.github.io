@@ -8,7 +8,7 @@ import { NEW_TAB, NewTabMark, isOutside } from "@/components/classic/NewTab";
 import { useState } from "react";
 import { CatalogDialog, type CatalogItem } from "@/components/classic/catalog/CatalogDialog";
 
-export const ORDER: SearchKind[] = ["바로가기", "서비스", "작업 사례", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문", "공지사항"];
+export const ORDER: SearchKind[] = ["바로가기", "서비스", "작업 사례", "위키", "운영 노트", "네이버 블로그", "티스토리", "유튜브", "무료 도구", "용어", "자주 묻는 질문"];
 
 /** 검색 결과 묶음. 종류별로 나눠 보여 준다 */
 export function SearchResults({ items, grouped = true }: { items: SearchItem[]; grouped?: boolean }) {

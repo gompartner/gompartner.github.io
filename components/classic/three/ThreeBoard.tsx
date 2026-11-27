@@ -54,7 +54,7 @@ export function ThreeBoard() {
       {/* 1. 3D 홈페이지: 스크롤하면 선으로 그린 3D가 흩어졌다가 다음 장면으로 바뀌는 브랜드 첫 화면. 11-27 대표가 "내리는 대로 장면이 다시 짜입니다"를 짚어 업계 말(스크롤)로 고침 */}
       <Stage id="t3d-brand" kind="3D 홈페이지" name="브랜드 첫 화면" head="스크롤에 맞춰 3D 장면이 바뀝니다" href="/trend">
         <Tilt className="mt-10 md:mt-14">
-          <Frame shot={{ src: `${V}/trend.jpg?v=11275`, frame: "browser", ratio: "16/10", alt: "3D 홈페이지를 내리며 웹과 앱, 시스템, AI, 클라우드 장면이 선으로 바뀌는 영상", video: { src: `${V}/trend.mp4?v=11275`, w: 960, h: 600 } }} sizes="(min-width: 1280px) 1200px, 92vw" />
+          <Frame shot={{ src: `${V}/trend.jpg?v=11275`, frame: "browser", ratio: "16/10", alt: "3D 홈페이지를 내리며 웹과 앱, 시스템, AI, 클라우드 장면이 선으로 바뀌는 영상", video: { src: `${V}/trend.mp4?v=11283`, w: 960, h: 600 } }} sizes="(min-width: 1280px) 1200px, 92vw" />
         </Tilt>
       </Stage>
 
@@ -75,7 +75,7 @@ export function ThreeBoard() {
           poster={`${V}/room.jpg?v=11272`}
           stages={[{ min: 1180, src: `${V}/room-stage-1200.jpg` }, { min: 900, src: `${V}/room-stage-1000.jpg` }, { min: 768, src: `${V}/room-stage-800.jpg` }]}
           preview={{ src: `${V}/room-m.mp4?v=11273`, poster: `${V}/room-m.jpg?v=11272`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
-          hint="가구를 눌러 고르고 끌어서 옮기면 합계가 같이 바뀝니다."
+          hint="가구를 선택해 끌어 옮기면 합계 금액이 함께 바뀝니다."
         >
           <p className={tag}>
             <span className="text-[#7aa7ff]">3D 견적</span>
@@ -83,7 +83,7 @@ export function ThreeBoard() {
             <span className="text-[#c9ced6]">{room.title}</span>
           </p>
           <h2 id="t3d-live" className={`mt-2 ${big}`}>
-            놓아 보고 바로 견적을 받습니다
+            배치해 보고 바로 견적을 받습니다
           </h2>
         </LiveStage>
         </Tilt>

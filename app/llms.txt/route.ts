@@ -97,7 +97,6 @@ ${faq.map((f) => `- ${plain(f.q)} ${plain(f.a)}`).join("\n")}
 
 ## Optional
 
-- [공지사항](${url("/notice")})
 - [개인정보처리방침](${url("/privacy")})
 `;
 

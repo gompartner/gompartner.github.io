@@ -22,7 +22,7 @@ const tones = [
 
 export function StoryBoard() {
   return (
-    <BoardShell no="06" en="ABOUT" ice="곰파트너는 " title="매일 바꿉니다" lead={storyLead}>
+    <BoardShell no="06" en="ABOUT" ice="말씀하신 대로 " title="끝까지 맞춰 드립니다" lead={storyLead}>
       {/* 하는 일: 메인 첫 문장과 같은 순서, 같은 색 판 */}
       <ul className="mt-10 grid gap-4 md:mt-14 md:grid-cols-3" role="list">
         {works.map((w, i) => (
@@ -62,7 +62,7 @@ export function StoryBoard() {
         </ul>
       </section>
 
-      <BoardClose text="팔고 싶은 상품이 무엇인지 한 줄만 남겨 주세요." />
+      <BoardClose text="원하시는 것을 한 줄만 남겨 주세요." />
     </BoardShell>
   );
 }

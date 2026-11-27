@@ -2,7 +2,6 @@ import { termGroups } from "@/data/classic/glossary";
 import { termHref, topics, trendDocs } from "@/data/classic/archive";
 import { execFileSync } from "node:child_process";
 import type { MetadataRoute } from "next";
-import { notices } from "@/data/classic/notices";
 import { insights } from "@/data/classic/insights";
 import { siteUrl } from "@/lib/site";
 
@@ -61,9 +60,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/knowledge/3d-web", priority: 0.6, files: ["app/(classic)/knowledge/3d-web/page.tsx", "data/classic/three.ts"] },
     { path: "/knowledge/choose-builder", priority: 0.6, files: ["app/(classic)/knowledge/choose-builder/page.tsx"] },
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/knowledge/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),
-    { path: "/notice", priority: 0.3, files: ["app/(classic)/notice/page.tsx", "data/classic/notices.ts"] },
-    // 공지 글은 글에 적힌 날짜가 내용이 바뀐 날이다
-    ...notices.map((n) => ({ path: `/notice/${n.id}`, priority: 0.3, date: new Date(`${n.date}T00:00:00+09:00`) })),
 
     { path: "/privacy", priority: 0.2, files: ["app/(classic)/privacy/page.tsx", "data/classic/privacyPolicy.ts"] },
   ];

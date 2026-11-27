@@ -32,7 +32,7 @@ const FEATURES = {
   "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 1280, sel: '[role=tablist][aria-label="상황"]', cw: 1264, dx: -16, dy: -20 } },
   "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: "main article", cw: 1264, dx: -16, dy: -16 } },
   "/knowledge": { label: "WIKI", title: "위키", sub: "홈페이지 기획, 제작, 운영 문서", shot: { vw: 1280, sel: "main input[type=search]", up: 2, cw: 1264, dx: -16, dy: -20 } },
-  "/story": { label: "ABOUT", title: "회사소개", sub: "만들고, 운영하고, 관리합니다", shot: { vw: 1280, sel: "main ul.grid", cw: 1264, dx: -16, dy: -60 } },
+  "/story": { label: "ABOUT", title: "회사소개", sub: "만들고, 운영하고, 관리해 드립니다", shot: { vw: 1280, sel: "main ul.grid", cw: 1264, dx: -16, dy: -60 } },
   "/contact": { label: "CONTACT", title: "상담 신청", ice: "상담", sub: "검토 후 견적서로 회신합니다", shot: { vw: 1280, sel: 'section[aria-labelledby="contact-form"]', cw: 960, center: true, dy: -20 } },
 };
 
