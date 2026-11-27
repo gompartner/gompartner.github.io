@@ -48,6 +48,15 @@ main { position: relative; z-index: 1; }
 .hero .sub p { font-size: clamp(18px, 1.8vw, 26px); font-weight: 700; letter-spacing: -0.03em; }
 .hero .sub small { font-size: 13px; color: var(--mute); letter-spacing: .14em; }
 @keyframes up { to { transform: none; } }
+/* 11-27 대표 "글자에 은은한 반짝거림": 큰 제목 위로 흰빛과 옅은 푸른빛이 천천히 지나간다 */
+@keyframes shine { 0%, 10% { background-position: -10% 0; } 55%, 100% { background-position: 110% 0; } }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero h1 span i, .copy h2 { background: linear-gradient(105deg, #d8d8d8 0 40%, #fff 46%, #e3ebff 50%, #fff 54%, #d8d8d8 60% 100%); background-size: 260% 100%; background-position: -10% 0; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+  .hero h1 span i { animation: up 1s cubic-bezier(.2,.8,.2,1) forwards, shine 6s ease-in-out 1.2s infinite; }
+  .hero h1 span:nth-child(2) i { animation-delay: .09s, 1.35s; } .hero h1 span:nth-child(3) i { animation-delay: .18s, 1.5s; }
+  .copy h2 { animation: shine 8s ease-in-out infinite; }
+  #run h2 { animation-delay: 1.5s; } #care h2 { animation-delay: .8s; }
+}
 
 /* 장면 글 */
 .copy { max-width: 620px; }
@@ -75,12 +84,20 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 /* 휴대폰: 선 그림은 위, 글은 아래. 글 뒤를 어둡게 받쳐 읽히게 */
 @media (max-width: 760px) {
   header nav a:not(.go) { display: none; }
+  /* 11-27 대표 "글씨 크게 가능? 모바일에서" */
+  .hero h1 { font-size: 23vw; }
+  .hero .sub p { font-size: 21px; }
+  .copy h2 { font-size: 15vw; }
+  .end h2 { font-size: 13.5vw; }
+  .copy p { font-size: 17px; }
+  .copy li { font-size: 16px; }
+  .kick { font-size: 14px; }
   .scene { padding-top: 52svh; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.78) 62%, #000 100%); }
   .hero { background: none; padding-top: 120px; }
-  .copy li { font-size: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero h1 span i { animation: none; transform: none; }
+  .copy h2 { animation: none; }
 }
 </style>
 </head>
@@ -278,6 +295,47 @@ function monitor() {
   return o;
 }
 
+// 11-27 대표 "3D가 지금 타운으로 보여야"(채널 정리 세션이 아임웹 판에 만든 마을 선 그림): 3D 견적 장면은 소파 대신 마을
+function town() {
+  const o = [], G = -0.9;
+  box(o, -2.6, G-0.18, -1.7, 2.6, G, 1.7);                              // 땅판
+  const flat = (x1, z1, x2, z2, y) => { seg(o,[x1,y,z1],[x2,y,z1]); seg(o,[x2,y,z1],[x2,y,z2]); seg(o,[x2,y,z2],[x1,y,z2]); seg(o,[x1,y,z2],[x1,y,z1]); };
+  flat(-2.6, -0.25, 2.6, 0.25, G+0.001);                                // 도로
+  for (let x = -2.3; x < 2.4; x += 0.5) seg(o, [x, G+0.002, 0], [x+0.22, G+0.002, 0]); // 중앙선
+  for (let k = 0; k < 5; k++) { const z = -0.2 + k * 0.1; seg(o, [-0.9, G+0.002, z], [-0.65, G+0.002, z]); } // 횡단보도
+  // 가구 쇼룸: 넓은 유리창과 차양
+  box(o, -2.3, G, -1.5, -1.0, G+0.85, -0.55);
+  rect(o, -2.2, G+0.08, -1.1, G+0.6, -0.55); seg(o, [-1.65, G+0.08, -0.55], [-1.65, G+0.6, -0.55]);
+  poly(o, [[-2.3, G+0.72, -0.55], [-2.3, G+0.62, -0.35], [-1.0, G+0.62, -0.35], [-1.0, G+0.72, -0.55]]);
+  for (let x = -2.2; x <= -1.1; x += 0.22) seg(o, [x, G+0.72, -0.55], [x, G+0.62, -0.35]);
+  // 사무실: 2층, 층마다 창 줄, 옥상 난간
+  box(o, -0.55, G, -1.5, 0.65, G+1.45, -0.55);
+  for (const y of [0.15, 0.6, 1.02]) { rect(o, -0.45, G+y, 0.55, G+y+0.32, -0.55); for (let x = -0.2; x < 0.55; x += 0.25) seg(o, [x, G+y, -0.55], [x, G+y+0.32, -0.55]); }
+  rect(o, -0.45, G+1.45, 0.55, G+1.45, -0.6); box(o, 0.15, G+1.45, -1.3, 0.5, G+1.62, -0.95);
+  // 인테리어 집: 큰 창, 경사 지붕
+  box(o, 1.1, G, -1.5, 2.3, G+0.95, -0.6);
+  rect(o, 1.2, G+0.15, 1.75, G+0.75, -0.6); rect(o, 1.9, G, 2.15, G+0.6, -0.6);
+  poly(o, [[1.05, G+0.95, -0.55], [1.7, G+1.3, -0.55], [2.35, G+0.95, -0.55]]); poly(o, [[1.05, G+0.95, -1.55], [1.7, G+1.3, -1.55], [2.35, G+0.95, -1.55]]);
+  seg(o, [1.7, G+1.3, -0.55], [1.7, G+1.3, -1.55]);
+  // 한옥 마당: 담장과 기와지붕
+  flat(-2.4, 0.55, -1.0, 1.5, G+0.18); for (const [x,z] of [[-2.4,0.55],[-1.0,0.55],[-1.0,1.5],[-2.4,1.5]]) seg(o, [x, G, z], [x, G+0.18, z]);
+  box(o, -2.35, G, 1.05, -1.6, G+0.45, 1.45);
+  poly(o, [[-2.5, G+0.45, 0.95], [-1.97, G+0.75, 1.25], [-1.45, G+0.45, 0.95]]); poly(o, [[-2.5, G+0.45, 1.55], [-1.97, G+0.75, 1.25], [-1.45, G+0.45, 1.55]]);
+  seg(o, [-2.5, G+0.45, 0.95], [-2.5, G+0.45, 1.55]); seg(o, [-1.45, G+0.45, 0.95], [-1.45, G+0.45, 1.55]);
+  // 분수: 두 겹 원
+  const ring = (cx, cz, r, y) => { const pts = []; for (let i = 0; i <= 16; i++) { const a = i / 16 * Math.PI * 2; pts.push([cx + r * Math.cos(a), y, cz + r * Math.sin(a)]); } poly(o, pts); };
+  ring(0.2, 1.0, 0.42, G+0.12); ring(0.2, 1.0, 0.42, G); ring(0.2, 1.0, 0.18, G+0.3);
+  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + 0.4; seg(o, [0.2 + 0.42*Math.cos(a), G, 1.0 + 0.42*Math.sin(a)], [0.2 + 0.42*Math.cos(a), G+0.12, 1.0 + 0.42*Math.sin(a)]); }
+  seg(o, [0.2, G+0.12, 1.0], [0.2, G+0.3, 1.0]);
+  // 나무: 줄기와 사각뿔
+  const tree = (x, z, h) => { seg(o, [x, G, z], [x, G+0.15, z]); const t = [x, G+0.15+h, z], s = 0.16; const b = [[x-s,G+0.15,z-s],[x+s,G+0.15,z-s],[x+s,G+0.15,z+s],[x-s,G+0.15,z+s]]; for (let i = 0; i < 4; i++) { seg(o, b[i], b[(i+1)%4]); seg(o, b[i], t); } };
+  [[-0.75,-0.9,0.45],[0.9,-1.0,0.5],[2.45,-0.4,0.4],[0.95,0.75,0.42],[1.3,1.35,0.5],[-0.6,1.3,0.45],[2.2,0.8,0.38]].forEach(([x,z,h]) => tree(x, z, h));
+  // 쉼터 지붕과 버스
+  box(o, 1.6, G, 0.55, 2.4, G+0.5, 1.15); rect(o, 1.6, G+0.5, 2.4, G+0.5, 0.85);
+  box(o, 0.8, G+0.02, -0.2, 1.75, G+0.38, -0.02); for (let x = 0.9; x < 1.7; x += 0.17) rect(o, x, G+0.2, x+0.12, G+0.32, -0.021);
+  return o;
+}
+
 /* ---------- 같은 개수의 짧은 선으로 나눠 모양끼리 옮겨 갈 수 있게 ---------- */
 const N = 2400;
 function resample(segs) {
@@ -308,7 +366,7 @@ function stars() {
   }
   return a;
 }
-const SHAPES = [resample(door()), resample(sofa()), resample(paper()), resample(monitor()), stars()];
+const SHAPES = [resample(door()), resample(town()), resample(paper()), resample(monitor()), stars()];
 // 흩어질 때 쓰는 방향(선마다 하나)
 const SCATTER = new Float32Array(N * 3);
 for (let i = 0; i < N; i++) { const t = rnd() * Math.PI * 2, u = rnd() * 2 - 1, s = Math.sqrt(1 - u * u), r = 0.5 + rnd() * 1.6; SCATTER.set([r * s * Math.cos(t), r * u, r * s * Math.sin(t)], i * 3); }
