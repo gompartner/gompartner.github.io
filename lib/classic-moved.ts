@@ -103,6 +103,8 @@ export const oldClassicPaths: string[] = [
 export function newPathFor(rest: string): string {
   if (rest === "") return "/";
   if (rest.startsWith("privacy/")) return "/privacy";
+  // 11-27 자주 묻는 질문 페이지(/faq)를 내려 제작(/make)으로 넘긴다
+  if (rest === "faq") return "/make";
   if (rest === "landing" || rest.startsWith("landing/")) return "/landing-page" + rest.slice("landing".length);
   return "/" + rest;
 }

@@ -5,7 +5,7 @@ import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { workCases, type WorkCase } from "@/data/classic/workCases";
 
 // 11-26 작업 판(/works). 가상 브랜드 카탈로그(CatalogBoard) 자리에 직접 만들어 운영하는 작업 네 개를 크게 둔다.
-// 작업마다 PC 화면 위에 휴대폰 화면을 겹쳐 놓고, 아래에 문제와 만든 것, 지금 쓰는 모습을 적는다.
+// 작업마다 PC 화면 위에 휴대폰 화면을 겹쳐 놓고, 아래에 이름과 한 줄, 열어 보기를 둔다(11-27 대표 "글이 너무 많다": 문제, 만든 것, 지금 칸은 뺐다).
 
 function Open({ c, className, children }: { c: WorkCase; className: string; children: React.ReactNode }) {
   return c.href.startsWith("/") ? (
@@ -14,9 +14,6 @@ function Open({ c, className, children }: { c: WorkCase; className: string; chil
     <a href={c.href} target="_blank" rel="noopener" className={className}>{children}</a>
   );
 }
-
-const dt = "text-[13px] font-bold tracking-[0.02em] text-[#7aa7ff]";
-const dd = "mt-2 break-keep text-[16px] leading-[1.7] text-[#c9ced6] md:text-[17px]";
 
 export function WorksBoard() {
   return (
@@ -43,23 +40,19 @@ export function WorksBoard() {
               </span>
             </Open>
 
-            <div className="mt-10 grid gap-8 md:mt-12 md:grid-cols-12 md:gap-10">
-              <div className="md:col-span-4">
+            <div className="mt-10 flex flex-col gap-6 md:mt-12 md:flex-row md:items-end md:justify-between md:gap-10">
+              <div className="min-w-0">
                 <p className="text-[14px] font-bold text-[#8a94a6]">
                   <span className="tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                   <span aria-hidden className="mx-2 text-white/25">|</span>
                   {c.kind}
                 </p>
                 <h2 className="mt-3 break-keep text-[34px] font-[800] leading-[1.15] tracking-[-0.05em] md:text-[48px]">{c.name}</h2>
-                <Open c={c} className="mt-6 inline-flex min-h-[48px] items-center gap-2 rounded-full px-5 text-[15px] font-bold shadow-[inset_0_0_0_1.5px_rgba(255,255,255,.7)] hover:bg-white hover:text-[#0b0d12]">
-                  열어 보기 <ArrowUpRight size={17} aria-hidden />
-                </Open>
+                <p className="mt-3 break-keep text-[16px] leading-[1.7] text-[#c9ced6] md:text-[18px]">{c.line}</p>
               </div>
-              <dl className="grid gap-7 md:col-span-8 md:grid-cols-3 md:gap-8">
-                <div><dt className={dt}>문제</dt><dd className={dd}>{c.problem}</dd></div>
-                <div><dt className={dt}>만든 것</dt><dd className={dd}>{c.made}</dd></div>
-                <div><dt className={dt}>지금</dt><dd className={dd}>{c.now}</dd></div>
-              </dl>
+              <Open c={c} className="inline-flex w-fit shrink-0 min-h-[48px] items-center gap-2 rounded-full px-5 text-[15px] font-bold shadow-[inset_0_0_0_1.5px_rgba(255,255,255,.7)] hover:bg-white hover:text-[#0b0d12]">
+                열어 보기 <ArrowUpRight size={17} aria-hidden />
+              </Open>
             </div>
           </li>
         ))}

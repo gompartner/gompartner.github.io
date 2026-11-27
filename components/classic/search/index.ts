@@ -60,7 +60,7 @@ export function buildSearchIndex(): SearchItem[] {
   // 11-26 데모, 샘플 주소를 내려 화면은 카탈로그 한 판(/works)으로만 잇는다
   const kiosk3d: SearchItem[] = [];
   const faqs: SearchItem[] = [
-    ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/faq", hay: "" })),
+    ...faq.map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: f.tag === "care" ? "/maintenance" : "/make", hay: "" })),
     ...maintenanceServices.flatMap((s) => (maintenanceFaq[s.id] ?? []).map((f) => ({ kind: "자주 묻는 질문" as const, title: f.q, desc: f.a, href: "/maintenance", hay: s.h1 }))),
   ];
   const news: SearchItem[] = notices.map((n) => ({ kind: "공지사항", title: n.title, desc: n.summary, href: `/notice/${n.id}`, hay: n.sections.flatMap((x) => [x.h, ...(x.p ?? []), ...(x.list ?? [])]).join(" ") }));
@@ -90,7 +90,6 @@ export function buildSearchIndex(): SearchItem[] {
     { kind: "바로가기", title: "작업 사례", desc: "곰파트너가 만들어 운영하는 홈페이지와 업무 시스템, 3D 견적 화면", href: "/works", hay: "Works 포트폴리오 사례 실적 만든 화면 카탈로그" },
     { kind: "바로가기", title: "위키", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수 문서", href: "/knowledge", hay: "Wiki 문서 자료 용어 지식" },
     { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 일하는 방식", href: "/story", hay: "About 소개 곰파트너 회사" },
-    { kind: "바로가기", title: "자주 묻는 질문", desc: "제작, 비용, 일정, 유지보수에 대해 자주 받는 질문", href: "/faq", hay: "FAQ 질문 답변 궁금" },
     { kind: "바로가기", title: "공지사항", desc: "서비스와 사이트 변경 안내", href: "/notice", hay: "공지 안내 소식 알림" },
     { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/contact", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
     { kind: "바로가기", title: "개인정보처리방침", desc: "상담에서 처리하는 개인정보의 항목, 목적, 보유 기간", href: "/privacy", hay: "개인정보 처리방침 약관 보호" },

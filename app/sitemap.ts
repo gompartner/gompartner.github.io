@@ -49,7 +49,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
 
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
-    { path: "/faq", priority: 0.7, files: ["app/(classic)/faq/page.tsx", "data/classic/faq.ts"] },
     { path: "/contact", priority: 0.7, files: ["app/(classic)/contact/page.tsx"] },
 
 
@@ -60,6 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...topics().map((t) => ({ path: `/knowledge/${t.id}`, priority: 0.6, files: ["data/classic/archive.ts"] })),
     ...trendDocs.map((d) => ({ path: d.href, priority: 0.6, files: [`app/(classic)${d.href}/page.tsx`, "data/classic/trendData.ts"] })),
     { path: "/knowledge/3d-web", priority: 0.6, files: ["app/(classic)/knowledge/3d-web/page.tsx", "data/classic/three.ts"] },
+    { path: "/knowledge/choose-builder", priority: 0.6, files: ["app/(classic)/knowledge/choose-builder/page.tsx"] },
     ...termGroups.map((g) => ({ path: termHref(g), priority: 0.6, files: ["app/(classic)/knowledge/terms/[slug]/page.tsx", "data/classic/glossary.ts", "data/classic/archive.ts"] })),
     { path: "/notice", priority: 0.3, files: ["app/(classic)/notice/page.tsx", "data/classic/notices.ts"] },
     // 공지 글은 글에 적힌 날짜가 내용이 바뀐 날이다

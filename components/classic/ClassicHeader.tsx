@@ -30,7 +30,6 @@ const BOARDS = [
 // 햄버거 메뉴에만 더 나오는 것
 const MORE: { href: string; label: string; ko: string; big?: boolean }[] = [
   { href: "/story", label: "About", ko: "회사소개" },
-  { href: "/faq", label: "FAQ", ko: "자주 묻는 질문" },
 ];
 
 // 아래 스타일 설명(11-26 점검: 스타일 문자열 안의 주석은 공개 파일에 그대로 실려서 밖으로 뺐다)

@@ -7,6 +7,8 @@ export interface WorkCase {
   id: string;
   kind: string;
   name: string;
+  /** 11-27 작업 판에 보이는 한 줄(문제, 만든 것, 지금은 검색 색인에만 쓴다) */
+  line: string;
   href: string;
   /** 주소 표시용 */
   host: string;
@@ -23,6 +25,7 @@ export const workCases: WorkCase[] = [
     id: "site",
     kind: "홈페이지",
     name: "곰파트너 사이트",
+    line: "종류나 상황을 고르면 금액과 기간이 바로 나오는 회사 홈페이지입니다.",
     href: "/",
     host: "gompartner.co.kr",
     problem: "제작 비용을 알려면 상담부터 해야 하는 구조였습니다. 고객은 금액과 기간을 먼저 보고 싶어 합니다.",
@@ -36,6 +39,7 @@ export const workCases: WorkCase[] = [
     id: "jangbu",
     kind: "업무 시스템",
     name: "거래장부",
+    line: "거래명세서를 링크로 보내고 수령 확인을 받는 업무 도구입니다.",
     href: "https://jangbu.gompartner.co.kr/",
     host: "jangbu.gompartner.co.kr",
     problem: "거래명세서를 사진이나 메신저로 보내면 거래처가 받았는지 남지 않습니다. 외상 미수금은 장부에 따로 옮겨 적어야 합니다.",
@@ -49,6 +53,7 @@ export const workCases: WorkCase[] = [
     id: "jikimi",
     kind: "운영 도구",
     name: "사이트 지킴이",
+    line: "사이트 중단과 인증서 만료를 미리 알려 주는 모니터링 서비스입니다.",
     href: "https://jikimi.gompartner.co.kr/",
     host: "jikimi.gompartner.co.kr",
     problem: "사이트가 멈추거나 SSL 인증서가 만료돼도 방문자가 알려 주기 전까지 모르는 경우가 많습니다.",
@@ -62,6 +67,7 @@ export const workCases: WorkCase[] = [
     id: "3d",
     kind: "3D 홈페이지",
     name: "3D 거실 상담 화면",
+    line: "손님이 거실에 가구를 놓아 보며 금액을 확인하는 상담 화면입니다.",
     href: "/3d/room/",
     host: "gompartner.co.kr/3d/room",
     problem: "인테리어와 가구 상담은 손님이 자기 집에 들어갈지 몰라 같은 질문을 반복하고, 실측을 다녀와도 계약으로 이어지지 않는 일이 잦습니다.",

@@ -353,7 +353,7 @@ function rawTopics(): Topic[] {
   return [
     { id: "plan", label: "기획", desc: "만들기 전에 정할 것. 업체 고르기와 견적 질문, 유지비와 웹 변천사", groups: [
       { title: "웹 변천사", items: ["/knowledge/history", "/knowledge/company-homepage", "/knowledge/public-homepage", "/knowledge/personal-homepage", "/knowledge/ai-and-homepage"].map(doc) },
-      { title: "업체와 견적", items: [...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }] },
+      { title: "업체와 견적", items: [{ label: "홈페이지 제작 업체 고르는 법", href: "/knowledge/choose-builder" }, ...series("업체 선정"), { label: "홈페이지 견적 질문지(PDF)", href: "/jaryo/estimate" }] },
     ] },
     { id: "design", label: "디자인", desc: "화면 부품의 이름과 디자인 용어, 페이지 종류별 화면과 시안, 기기에 따라 바뀐 화면", groups: [
       { title: "화면 부품 용어", items: cats.map((c) => ({ label: c, count: parts.filter((g) => g.cat === c).length, children: parts.filter((g) => g.cat === c).map((g) => ({ label: shortTitle(g), href: termHref(g) })) })) },
@@ -427,6 +427,7 @@ export function relatedOf(href: string, limit = 3): TreeNode[] {
 
 /** 최근 수정된 문서. 인사이트는 글 날짜에서 자동으로, 나머지는 더한 날 직접 적는다(지어내지 않기) */
 export const manualLog: { date: string; kind: string; title: string; href: string }[] = [
+  { date: "2026-11-27", kind: "기획", title: "홈페이지 제작 업체 고르는 법", href: "/knowledge/choose-builder" },
   { date: "2026-11-27", kind: "개발", title: "3D 홈페이지 제작 안내", href: "/knowledge/3d-web" },
   { date: "2026-11-26", kind: "디자인", title: "2026, 2027 웹 디자인 트렌드", href: "/knowledge/design-trends" },
   { date: "2026-11-26", kind: "디자인", title: "웹 디자인 트렌드 용어", href: "/knowledge/terms/trends" },

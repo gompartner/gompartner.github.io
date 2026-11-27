@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { Suspense } from "react";
-import { ArrowUpRight, Check, Mail, Phone, Plus } from "lucide-react";
+import { ArrowUpRight, Check, Mail, Phone } from "lucide-react";
 import { NavLink } from "@/components/classic/NavLink";
 import { ContactForm } from "@/components/classic/contact/ContactForm";
 import { HeroBuild } from "@/components/classic/HeroBuild";
 import { Assemble } from "@/components/classic/Assemble";
-import { appPlans, manwon, plans } from "@/data/classic/pricing";
+import { appPlans, landingPlans, manwon, plans } from "@/data/classic/pricing";
 import { profile } from "@/data/classic/profile";
 import { NewTabMark } from "@/components/classic/NewTab";
 import { cssMin } from "@/lib/cssMin";
@@ -14,7 +14,7 @@ import { cssMin } from "@/lib/cssMin";
 // 첫 화면(HeroBuild)은 글자, 선, 둥근 부품과 3D 마을이 조립되고, 그 아래 칸은 부품이 제각각 날아와 맞물린다(Assemble).
 // 11-25 밤 다시 짬: 흰 바탕용 칸에 색만 뒤집어 덧칠하던 것을 버리고 어두운 바탕 기준으로 처음부터.
 //  - 첫 문장 "Build, Run, Care." 순서대로: 만듭니다(색이 다른 큰 판 4장) > 운영합니다(사이트 지킴이, 거래장부) > 돌봅니다(이럴 때 맡기세요, 큰 숫자 줄)
-//    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 자주 묻는 질문 > 프로젝트 문의(흰 신청서)
+//    > 진행 방식(파란 바탕, 흐르는 선 위의 원 5개) > 프로젝트 문의(흰 신청서). 11-27 자주 묻는 질문 칸은 뺐다(대표 "글이 너무 많다")
 //  - 색: 바탕 #0b0d12, 파랑 #256ef4, 하늘 #7aa7ff, 흰색, 포인트 노랑 #ffd84d
 // 비교용이던 한국형, 일본형, 미국형 첫 화면과 ?v= 장치는 지웠다. 신청은 이 페이지 맨 아래 신청서에서 끝낸다.
 // 11-25 밤 사용자 결정: 샘플(카탈로그) 포트폴리오는 실적이 아니라 메인에서 내리고, 직접 만들어 운영하는 사이트 지킴이와 거래장부를 보여 준다.
@@ -40,10 +40,10 @@ html:has(.gp-home) [aria-label="전화와 카카오톡 상담"] { display: none;
 
 type Tone = "blue" | "white" | "yellow" | "line";
 const services: { no: string; name: string; body: string; price: string; href: string; tone: Tone; span: string }[] = [
-  { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
-  { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산과 재고, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
-  { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지 만듭니다", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
-  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 30,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
+  { no: "01", name: "웹사이트 제작", body: `소개 홈페이지 ${plans[0].days}일, 랜딩페이지 ${landingPlans[0].days}일이면 엽니다`, price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
+  { no: "02", name: "업무 시스템 개발", body: "엑셀 업무를 웹 관리자 화면으로 옮깁니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
+  { no: "03", name: "앱 개발", body: "웹앱부터 스토어 출시 앱까지 만듭니다", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
+  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고칩니다", price: "건별 30,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
   blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white", arrow: "bg-white text-[#256ef4]" },
@@ -52,12 +52,12 @@ const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string 
   line: { box: "border border-[#7aa7ff]/45 bg-[#121722] text-white hover:border-[#7aa7ff]", sub: "text-[#aab2bf]", no: "text-[#7aa7ff]", arrow: "bg-white text-[#0b0d12]" },
 };
 
-// 업체 자랑 대신 고객이 겪는 상황에서 시작한다(11-25 밤 사용자 "돈 안 내고 싶겠다"). 제목은 고객의 상황, 본문은 그때 해 주는 일. 숫자는 비용, 유지보수 페이지의 값
+// 업체 자랑 대신 고객이 겪는 상황에서 시작한다(11-25 밤 사용자 "돈 안 내고 싶겠다"). 11-27 대표 "글이 너무 많다": 상황 제목만 두고 본문은 뺐다(값은 유지보수, 제작 페이지에)
 const reasons = [
-  { name: "만든 업체와 연락이 안 될 때", body: "사이트를 넘겨받아 바로 고칩니다. 아임웹이나 워드프레스 등 어떤 도구로 만든 사이트든 맡습니다.", c: "#7aa7ff" },
-  { name: "글자 하나 고치는 데 며칠씩 걸릴 때", body: "카카오톡으로 말씀하시면 바로 답하고 건별 30,000원부터 고칩니다. 월 계약은 필요 없습니다.", c: "#ffd84d" },
-  { name: "얼마가 들지 몰라 미루고 있을 때", body: `소개 홈페이지 ${manwon(plans[0].price)}, ${plans[0].days}일. 가격과 기간을 먼저 공개하고 견적은 무료로 드립니다.`, c: "#ffffff" },
-  { name: "엑셀과 카카오톡으로 버티고 있을 때", body: "정산과 재고, 견적 업무를 화면 하나로 옮깁니다. 거래명세서를 링크로 보내고 수령 확인을 받는 거래장부를 직접 만들어 운영하고 있습니다.", c: "#7aa7ff" },
+  { name: "만든 업체와 연락이 안 될 때", c: "#7aa7ff" },
+  { name: "글자 하나 고치는 데 며칠씩 걸릴 때", c: "#ffd84d" },
+  { name: "얼마가 들지 몰라 미루고 있을 때", c: "#ffffff" },
+  { name: "엑셀과 카카오톡으로 버티고 있을 때", c: "#7aa7ff" },
 ];
 
 // 직접 기획하고 만들어 운영하는 서비스. 문구는 각 서비스 사이트의 소개 문장에서 가져온다
@@ -80,22 +80,11 @@ const products = [
   },
 ];
 
-const steps = [
-  { name: "상담", body: "필요한 기능과 예산을 듣고 범위를 제안합니다." },
-  { name: "견적", body: "범위와 일정, 비용을 견적서 한 장으로 확정합니다." },
-  { name: "제작", body: "만드는 화면을 단계마다 보여 드리고 확인을 받습니다." },
-  { name: "오픈", body: "도메인 연결과 검색 등록까지 마치고 엽니다." },
-  { name: "운영", body: "오픈한 뒤의 수정과 관리를 이어서 맡습니다." },
-];
+// 11-27 단계 이름만(설명은 뺐다)
+const steps = [{ name: "상담" }, { name: "견적" }, { name: "제작" }, { name: "오픈" }, { name: "운영" }];
 // 원 다섯 개의 가운데를 지나는 물결 선(가로 1000 기준, 원 가운데 x는 100, 300, 500, 700, 900)
 const flowPath = "M100 70 C 200 70, 200 130, 300 130 S 400 70, 500 70 S 600 130, 700 130 S 800 70, 900 70";
 
-const faqs = [
-  { q: "얼마나 걸리나요?", a: "소개 홈페이지는 6일, 랜딩페이지는 4일이면 엽니다. 문의와 예약 홈페이지는 9일, 설치형 웹앱은 10일입니다. 업무 시스템은 요구사항을 확인한 뒤 견적서에 일정을 적어 드립니다." },
-  { q: "금액은 언제 정해지나요?", a: "계약 전에 확정합니다. 범위와 금액, 일정을 견적서로 드리고 동의하시면 바로 시작합니다." },
-  { q: "만든 뒤 수정은 어떻게 하나요?", a: "건별 30,000원부터 요청하실 수 있고 수정이 잦으면 월 유지관리(월 60만 원부터, 1년 계약)로 묶을 수 있습니다. 오픈 후 1개월 동안 생긴 하자는 무상으로 고칩니다." },
-  { q: "지금 쓰는 사이트를 그대로 두고 고칠 수 있나요?", a: "네. 새로 만들지 않고 지금 사이트에서 필요한 부분만 고칩니다. 다른 업체가 만든 사이트도 넘겨받아 수정합니다." },
-];
 
 export function ClassicHome() {
   return (
@@ -109,7 +98,6 @@ export function ClassicHome() {
           <Products />
           <Why />
           <Process />
-          <Faq />
           <Apply />
         </Assemble>
       </div>
@@ -222,7 +210,6 @@ function Why() {
               </span>
               <div>
                 <h3 className="break-keep text-[22px] font-[800] leading-[1.3] tracking-[-0.04em] md:text-[29px]">{r.name}</h3>
-                <p className="mt-3 break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">{r.body}</p>
               </div>
             </li>
           ))}
@@ -297,7 +284,6 @@ function Process() {
                 </span>
                 <span className="block pt-2 md:mt-6 md:pt-0">
                   <span className="block text-[21px] font-[800] tracking-[-0.03em] md:text-[23px]">{s.name}</span>
-                  <span className="mt-2 block break-keep text-[16px] leading-[1.65] text-white md:px-1">{s.body}</span>
                 </span>
               </li>
             ))}
@@ -308,38 +294,12 @@ function Process() {
   );
 }
 
-function Faq() {
-  return (
-    <section id="faq" aria-labelledby="c-faq" className={`${wrap} grid scroll-mt-20 gap-10 py-20 md:py-32 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16`}>
-      <div>
-        <Head no="05" en="FAQ" title="자주 묻는 질문" id="c-faq" />
-        <p data-part="text" className="mt-6 max-w-[380px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
-          더 궁금한 점은 견적 문의에 함께 적어 주세요. 견적과 같이 답변드립니다.
-        </p>
-      </div>
-      <div className="space-y-3">
-        {faqs.map((f) => (
-          <details key={f.q} data-part className="group rounded-[20px] border border-white/12 bg-[#121722] px-5 open:border-[#7aa7ff]/50 md:px-7">
-            <summary className="flex min-h-[68px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-[17px] font-[800] tracking-[-0.02em] md:text-[20px] [&::-webkit-details-marker]:hidden">
-              {f.q}
-              <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white group-open:rotate-45 group-open:bg-[#256ef4] motion-safe:transition-transform">
-                <Plus size={18} strokeWidth={2.5} />
-              </span>
-            </summary>
-            <p className="break-keep pb-6 text-[16px] leading-[1.7] text-[#c9ced6] md:text-[17px]">{f.a}</p>
-          </details>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function Apply() {
   return (
     <section id="apply" aria-labelledby="c-apply" className="scroll-mt-20 border-t border-white/10 bg-[#0f131b]">
       <div className={`${wrap} grid gap-10 py-20 md:py-32 lg:grid-cols-[1fr_560px] lg:gap-16`}>
         <div>
-          <Head no="06" en="CONTACT" title="무료 견적 받기" id="c-apply" />
+          <Head no="05" en="CONTACT" title="무료 견적 받기" id="c-apply" />
           <p data-part="text" className="mt-6 max-w-[480px] break-keep text-[17px] leading-[1.7] text-[#aab2bf]">
             만들거나 고칠 것을 한 줄만 남겨 주세요. 범위와 금액, 일정을 정리해 바로 답합니다.
           </p>
