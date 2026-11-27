@@ -6,7 +6,7 @@ import { manwon, planCommon, plans } from "@/data/classic/pricing";
 
 // 11-26 제작 판 아래 안내(구글 "홈페이지 제작", "홈페이지 제작 업체" 검색과 AI 개요용). 3D 판의 h2 순서를 따른다:
 // 무엇을 만드는지, 종류별 패키지와 기간, 제작 방식 비교, 업체 고를 때 확인할 것, 자주 묻는 질문.
-// 금액과 기간은 비용 데이터(data/classic/pricing, three)에서 읽는다. 호스팅과 구독료 범위는 runningCostNote(국내 업체 공개 요금 조사)와 같은 값만 쓴다.
+// 금액과 기간은 비용 데이터(data/classic/pricing)에서 읽는다. 호스팅과 구독료 범위는 runningCostNote(국내 업체 공개 요금 조사)와 같은 값만 쓴다.
 
 /** 종류마다 한 줄. 탭의 한 줄(line)은 짧은 표어라 여기서는 무엇을 만드는지 사실로 적는다 */
 const what: Record<string, string> = {
@@ -14,7 +14,6 @@ const what: Record<string, string> = {
   landing: "광고로 들어온 방문자의 신청을 받는 한 페이지입니다. 접수 내역은 메일과 구글 시트로 받습니다.",
   program: "엑셀로 하던 정산과 재고, 접수 업무를 웹 화면으로 옮깁니다.",
   app: "휴대폰 홈 화면에 설치하는 웹앱과 앱스토어, 플레이스토어 출시 앱을 만듭니다.",
-  "3d": "고객이 제품과 공간을 3D로 구성하고 견적까지 접수하는 화면입니다.",
 };
 
 const [basic, , premium] = plans;

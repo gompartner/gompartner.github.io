@@ -8,7 +8,7 @@ import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-// 색인 대상은 첫 화면과 app/(classic) 페이지뿐이다. 옛 /classic 주소(이동 페이지), 데모(/demo), 크몽 연결용 /landing 은 넣지 않는다.
+// 색인 대상은 첫 화면과 app/(classic) 페이지뿐이다. 옛 /classic 주소(이동 페이지), 데모(/demo)는 넣지 않는다.
 // priority는 검색어 페이지(제작, 유지보수) 먼저, 공지와 개인정보는 낮게(11-01 점검).
 // lastmod는 빌드 시각이 아니라 원본 파일의 마지막 커밋일이다. git이 없거나 기록이 없으면 생략한다.
 
@@ -39,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const maintenanceData = "data/classic/maintenance.ts";
   const entries: Entry[] = [
     { path: "/", priority: 1.0, files: ["app/(home)/page.tsx", "components/classic/ClassicHome.tsx", "data/seo.ts"] },
-    // 11-26 안쪽 한 판: 제작, 유지보수, 비용, 카탈로그
+    // 11-26 안쪽 한 판: 제작, 유지보수, 카탈로그(11-27 비용 페이지는 내림)
     { path: "/make", priority: 0.9, files: ["app/(classic)/make/page.tsx", "components/classic/make/MakeBoard.tsx", "data/classic/pricing.ts"] },
     { path: "/works", priority: 0.7, files: ["app/(classic)/works/page.tsx", "components/classic/works/WorksBoard.tsx", "data/classic/workCases.ts"] },
 
@@ -48,7 +48,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...["room", "sofa", "configurator", "space", "door"].map((d) => ({ path: `/3d/${d}/`, priority: 0.6, files: [`public/3d/${d}/index.html`] })),
     { path: "/maintenance", priority: 0.9, files: ["app/(classic)/maintenance/page.tsx", maintenanceData] },
 
-    { path: "/pricing", priority: 0.8, files: ["app/(classic)/pricing/page.tsx", "data/classic/pricing.ts"] },
     { path: "/story", priority: 0.7, files: ["app/(classic)/story/page.tsx", "data/classic/about.ts"] },
     { path: "/faq", priority: 0.7, files: ["app/(classic)/faq/page.tsx", "data/classic/faq.ts"] },
     { path: "/contact", priority: 0.7, files: ["app/(classic)/contact/page.tsx"] },

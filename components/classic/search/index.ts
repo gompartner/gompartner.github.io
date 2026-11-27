@@ -85,12 +85,11 @@ export function buildSearchIndex(): SearchItem[] {
   ];
   // 11-26 페이지 이름으로 찾을 수 있게(검수: "비용", "회사소개", "거래장부"로 검색하면 그 페이지가 안 나왔다)
   const pages: SearchItem[] = [
-    { kind: "바로가기", title: "제작", desc: "홈페이지, 랜딩페이지, 업무 시스템, 앱, 3D 웹 가운데 무엇을 만들지 고릅니다", href: "/make", hay: "Build 빌드 만들기 제작 종류 금액 기간" },
+    { kind: "바로가기", title: "제작", desc: "홈페이지와 랜딩페이지 등 만들 종류를 고르면 금액과 기간이 나옵니다", href: "/make", hay: "Build 빌드 만들기 제작 종류 금액 기간 비용 가격 요금 얼마" },
     { kind: "바로가기", title: "유지보수", desc: "지금 상황을 고르면 해 드리는 일과 금액이 나옵니다", href: "/maintenance", hay: "Care 케어 관리 유지관리 수정 업체 변경" },
-    { kind: "바로가기", title: "비용", desc: "종류와 구성을 고르면 합계와 기간이 나옵니다", href: "/pricing", hay: "Price 가격 견적 금액 요금 얼마 계산" },
     { kind: "바로가기", title: "작업 사례", desc: "곰파트너가 만들어 운영하는 홈페이지와 업무 시스템, 3D 견적 화면", href: "/works", hay: "Works 포트폴리오 사례 실적 만든 화면 카탈로그" },
     { kind: "바로가기", title: "위키", desc: "기획, 디자인, 개발, 인프라, 보안, 검색, 운영과 유지보수 문서", href: "/knowledge", hay: "Wiki 문서 자료 용어 지식" },
-    { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 사이트 변천사", href: "/story", hay: "About 소개 연혁 변천사 곰파트너 회사" },
+    { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 일하는 방식", href: "/story", hay: "About 소개 곰파트너 회사" },
     { kind: "바로가기", title: "자주 묻는 질문", desc: "제작, 비용, 일정, 유지보수에 대해 자주 받는 질문", href: "/faq", hay: "FAQ 질문 답변 궁금" },
     { kind: "바로가기", title: "공지사항", desc: "서비스와 사이트 변경 안내", href: "/notice", hay: "공지 안내 소식 알림" },
     { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/contact", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },

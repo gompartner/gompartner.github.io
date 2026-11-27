@@ -2,8 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { BoardClose, BoardShell } from "@/components/classic/board/ui";
 import { NEW_TAB, NewTabMark } from "@/components/classic/NewTab";
 import { manwon } from "@/data/classic/pricing";
@@ -12,7 +11,7 @@ import { kinds } from "@/components/classic/make/kinds";
 // 11-26 제작 한 판(사용자 "제작 한 판, 유지보수 한 판, 비용 한 판, 카탈로그 한 판", "각자 유닛으로 만들어 일원화가 안 됨").
 // 방향 셋을 놓고 골랐다: (1) 기존 긴 문서 페이지 6개를 색만 어둡게 (2) 한 화면에서 종류를 고르면 구성, 금액, 기간이 바뀌는 판 (3) 메인에 전부 넣기.
 // (1)은 여전히 따로 노는 긴 문서, (3)은 메인이 길어져서 (2)로 했다. 메인과 같은 바탕, 같은 글자, 같은 색 판.
-// 금액과 구성은 비용 데이터(data/classic/pricing, three)를 그대로 읽는다. 자세한 조건은 각 상세 페이지로 잇는다.
+// 금액과 구성은 비용 데이터(data/classic/pricing)를 그대로 읽는다. 자세한 조건은 각 상세 페이지로 잇는다.
 
 /** children: 판 아래 안내 칸(app/(classic)/make/page.tsx 가 MakeGuide를 넣는다. 서버에서 그려 검색에 그대로 읽힌다) */
 export function MakeBoard({ children }: { children?: ReactNode }) {
@@ -53,11 +52,6 @@ export function MakeBoard({ children }: { children?: ReactNode }) {
                     </p>
                     <h2 className="mt-2 break-keep text-[26px] font-[800] leading-[1.25] tracking-[-0.045em] md:text-[36px]">{k.line}</h2>
                   </div>
-                  {k.id === "3d" && (
-                    <Link href={k.href} className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-white/25 px-4 text-[15px] font-bold text-white hover:border-white">
-                      자세한 구성 <ArrowUpRight size={16} aria-hidden />
-                    </Link>
-                  )}
                 </div>
                 <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2" role="list">
                   {k.who.map((w) => (

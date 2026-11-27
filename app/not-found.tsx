@@ -21,7 +21,6 @@ const pages = [
   { href: "/make", label: "제작", en: "BUILD" },
   { href: "/3d", label: "3D 웹", en: "3D WEB" },
   { href: "/maintenance", label: "유지보수", en: "CARE" },
-  { href: "/pricing", label: "비용", en: "PRICE" },
   { href: "/works", label: "작업 사례", en: "WORKS" },
   { href: "/knowledge", label: "위키", en: "WIKI" },
   { href: "/contact", label: "상담 신청", en: "CONTACT" },

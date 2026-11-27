@@ -30,7 +30,6 @@ const FEATURES = {
   "/make": { label: "BUILD", accent: "build", title: "홈페이지, 앱 제작", sub: "종류별 화면과 금액, 제작 기간", shot: { vw: 1280, sel: "#mk-panel", cw: 892, dx: -16, dy: 196 } },
   "/3d": { label: "3D WEB", title: "3D 홈페이지 제작", ice: "3D", sub: "브랜드 3D 홈페이지부터 3D 견적까지", shot: { from: "/3d/sofa/?embed=1", vw: 1140, wait: 7000 } },
   "/maintenance": { label: "CARE", accent: "care", title: "홈페이지 유지보수", sub: "수정, 업체 변경, 월 유지관리", shot: { vw: 1280, sel: '[role=tablist][aria-label="상황"]', cw: 1264, dx: -16, dy: -20 } },
-  "/pricing": { label: "PRICE", title: "제작, 유지보수 비용", ice: "제작,", sub: "홈페이지 제작 29.9만 원부터", shot: { vw: 1280, sel: 'section[aria-labelledby="pr-2"]', cw: 1264, dx: -16, dy: -16 } },
   "/works": { label: "CATALOG", title: "업종별 화면 카탈로그", sub: "홈페이지, 랜딩페이지, 앱, 키오스크, 3D 웹", shot: { vw: 1280, sel: "main article", cw: 1264, dx: -16, dy: -16 } },
   "/knowledge": { label: "WIKI", title: "위키", sub: "홈페이지 기획, 제작, 운영 문서", shot: { vw: 1280, sel: "main input[type=search]", up: 2, cw: 1264, dx: -16, dy: -20 } },
   "/story": { label: "ABOUT", title: "회사소개", sub: "만들고, 운영하고, 관리합니다", shot: { vw: 1280, sel: "main ul.grid", cw: 1264, dx: -16, dy: -60 } },

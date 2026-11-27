@@ -45,8 +45,8 @@ const guides = {
 };
 
 // 공지사항 게시판은 살아 있다(4e2a5e5 복구). 공지 아래(app/(classic)/notice)에는 파일을 만들지 않는다
-// 11-12 /pricing 은 비용 페이지로 다시 씀. 옛 /classic/pricing 만 그쪽으로 넘긴다
-const map = { "/classic/pricing": "/pricing" };
+// 11-12 /pricing 은 비용 페이지로 다시 씀. 11-27 비용 페이지를 내려 옛 /classic/pricing 은 제작(/make)으로 넘긴다
+const map = { "/classic/pricing": "/make" };
 for (const [k, v] of Object.entries(tools)) {
   // 11-04 자료실(/tools)을 되살려 옛 /classic/tools 주소만 새 주소로 넘긴다
   map[k ? `/classic/tools/${k}` : "/classic/tools"] = k ? `/tools/${k}` : "/tools";

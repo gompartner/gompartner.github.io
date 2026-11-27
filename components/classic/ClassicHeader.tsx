@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { cssMin } from "@/lib/cssMin";
 
 // 사이트 머리글. 11-26 다시 씀: 메인과 안쪽 판이 모두 같은 어두운 띠 하나를 쓴다.
-//  - 넓은 화면: 어느 페이지에서나 같은 메뉴(Build, Care, Price, Catalog, Wiki, Contact). 오른쪽에 통합검색과 화면 색(다크, 화이트) 버튼
+//  - 넓은 화면: 어느 페이지에서나 같은 메뉴(Build, 3D Web, Care, Works, Wiki, Contact. 11-27 Price는 비용 페이지와 함께 내림). 오른쪽에 통합검색과 화면 색(다크, 화이트) 버튼
 //  - 좁은 화면: 통합검색과 햄버거 버튼. 햄버거를 누르면 화면을 덮는 메뉴가 열린다(11-26 사용자 "모바일 상단에 햄버거 메뉴로, 통합검색, 다크모드 화이트모드 선택")
 // 견적 버튼은 두지 않는다(11-25 사용자 "있어도 안 누르는 거면"). 문의는 Contact와 메인 맨 아래 신청서로.
 
@@ -20,7 +20,6 @@ const BOARDS = [
   // 11-26 사용자 "상단 메뉴에 3D 웹이 없어": 소개 페이지를 새로 만들었는데 가는 길이 바닥글과 제작 판 안에만 있었다
   { href: "/3d", label: "3D Web", ko: "3D 웹", big: true },
   { href: "/maintenance", label: "Care", ko: "유지보수" },
-  { href: "/pricing", label: "Price", ko: "비용" },
   { href: "/works", label: "Works", ko: "작업 사례", big: true },
   { href: "/knowledge", label: "Wiki", ko: "위키" },
   // 11-27 사용자 "상단 메뉴에서 CONTACT 누르면 별도 페이지로": 메인 아래 신청서 대신 상담 신청 페이지(/contact)

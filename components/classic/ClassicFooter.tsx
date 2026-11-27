@@ -18,7 +18,6 @@ const groups = [
     items: [
       { href: "/make", label: "제작" },
       { href: "/maintenance", label: "유지보수" },
-      { href: "/pricing", label: "비용" },
       { href: "/works", label: "작업 사례" },
       { href: "/3d", label: "3D 웹" },
     ],
