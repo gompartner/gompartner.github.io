@@ -127,7 +127,17 @@ export function ClassicHeader() {
       <style>{cssMin(css)}</style>
       <div className="border-b border-white/10">
         <nav aria-label="주 메뉴" className="mx-auto flex h-16 w-full max-w-[1248px] items-center justify-between gap-2 px-4 md:h-[76px] md:gap-4 md:px-6">
-          <Link href="/" className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white">
+          {/* 11-27 사용자 "메인에서 로고 누르면 위로 올라가게, 아니면 홈으로": 메인에서는 맨 위로(주소의 #구역도 지움), 다른 페이지에서는 메인으로 */}
+          <Link
+            href="/"
+            onClick={(e) => {
+              if (pathname !== "/") return;
+              e.preventDefault();
+              if (location.hash) history.replaceState(null, "", "/");
+              window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+            }}
+            className="flex shrink-0 items-center gap-2.5 text-[21px] font-[800] tracking-[-0.04em] text-white"
+          >
             <Image src="/images/bear-avatar.webp" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             <span>곰파트너</span>
           </Link>
