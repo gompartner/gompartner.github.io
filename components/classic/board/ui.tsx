@@ -104,7 +104,7 @@ export function BoardShell({ no, en, ice, title, lead, kw, children }: { no: str
 }
 
 /** 판 맨 아래 한 줄과 문의로 가는 링크 하나 */
-export function BoardClose({ text, href = "/#apply", label = "Contact" }: { text: string; href?: string; label?: string }) {
+export function BoardClose({ text, href = "/contact", label = "Contact" }: { text: string; href?: string; label?: string }) {
   return (
     <div className="mt-16 flex flex-col gap-5 border-t border-white/12 pt-10 md:mt-24 md:flex-row md:items-center md:justify-between">
       <p className="break-keep text-[22px] font-[800] leading-[1.35] tracking-[-0.04em] md:text-[30px]">{text}</p>

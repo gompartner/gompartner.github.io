@@ -93,7 +93,7 @@ export function buildSearchIndex(): SearchItem[] {
     { kind: "바로가기", title: "회사소개", desc: "곰파트너가 하는 일과 사이트 변천사", href: "/story", hay: "About 소개 연혁 변천사 곰파트너 회사" },
     { kind: "바로가기", title: "자주 묻는 질문", desc: "제작, 비용, 일정, 유지보수에 대해 자주 받는 질문", href: "/faq", hay: "FAQ 질문 답변 궁금" },
     { kind: "바로가기", title: "공지사항", desc: "서비스와 사이트 변경 안내", href: "/notice", hay: "공지 안내 소식 알림" },
-    { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/#apply", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
+    { kind: "바로가기", title: "문의", desc: "무료 견적 신청서. 전화와 이메일도 함께 있습니다", href: "/contact", hay: "Contact 상담 신청 견적 연락처 전화 이메일 문의하기" },
     { kind: "바로가기", title: "개인정보처리방침", desc: "상담에서 처리하는 개인정보의 항목, 목적, 보유 기간", href: "/privacy", hay: "개인정보 처리방침 약관 보호" },
     { kind: "바로가기", title: "사이트 지킴이", desc: "운영 중인 서비스. 웹사이트가 멈추거나 인증서가 끝나기 전에 알려 줍니다", href: "https://jikimi.gompartner.co.kr/", hay: "Run 운영 서비스 모니터링 점검 지킴이 알림" },
     { kind: "바로가기", title: "거래장부", desc: "운영 중인 서비스. 거래명세서와 미수금을 관리합니다", href: "https://jangbu.gompartner.co.kr/", hay: "Run 운영 서비스 명세서 미수 장부 납품 도매" },

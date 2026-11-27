@@ -23,7 +23,8 @@ const BOARDS = [
   { href: "/pricing", label: "Price", ko: "비용" },
   { href: "/works", label: "Works", ko: "작업 사례", big: true },
   { href: "/knowledge", label: "Wiki", ko: "위키" },
-  { href: "/#apply", label: "Contact", ko: "문의" },
+  // 11-27 사용자 "상단 메뉴에서 CONTACT 누르면 별도 페이지로": 메인 아래 신청서 대신 상담 신청 페이지(/contact)
+  { href: "/contact", label: "Contact", ko: "문의" },
 ];
 // 11-26 big: 미리받기(prefetch)가 큰 페이지(/3d 약 89KB, /works 약 57KB, 압축 전). 화면에 보이기만 해도 받지 않고 손을 올렸을 때 받는다.
 // 카카오톡 안 브라우저에서 메인 첫 로딩이 안 되고 두 번째부터 열린다는 제보로, 첫 방문에 받는 양을 줄였다

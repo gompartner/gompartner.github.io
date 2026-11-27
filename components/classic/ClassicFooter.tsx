@@ -36,6 +36,7 @@ const groups = [
       { href: "/story", label: "회사소개" },
       { href: "/notice", label: "공지사항" },
       { href: "/faq", label: "자주 묻는 질문" },
+      { href: "/contact", label: "상담 신청" },
       { href: "/knowledge", label: "위키" },
     ],
   },

@@ -3,12 +3,11 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { ClassicShell } from "@/components/classic/ClassicShell";
 import { wrap } from "@/components/classic/board/ui";
-import { NotFoundFeedback } from "@/components/classic/NotFoundFeedback";
 
 // 없는 주소로 들어왔을 때.
 // 11-27 사용자 "그만 넘겨, 페이지 찾을 수 없다만 표시해도 되잖아", "404도 다시 만들어줘": 옛 주소 넘김을 모두 빼서 옛 주소는 이 화면으로 온다.
 // 예전 화면은 밝은 바탕에 파란 단추(11-01 클래식 틀)라 지금 사이트(검정 바탕, 판)와 따로 놀았다. 판과 같은 바탕, 격자, 글자로 다시 만들었다.
-// 11-27 사용자 "404는 앗 기존 지웠어요라고 하고 불편사항 받도록, 별점이랑": 제목을 바꾸고 별점과 한 줄 의견을 받는다(NotFoundFeedback).
+// 11-27 사용자 "404는 앗 기존 지웠어요라고": 제목을 바꿈. 별점과 의견 받기는 넣었다가 사용자 "별점 의견 빼고"로 뺐다.
 // 메뉴는 머리글과 같은 순서. 파란 면과 파란 단추는 쓰지 않는다(11-26 색 규칙).
 export const metadata: Metadata = {
   title: "페이지를 찾을 수 없습니다",
@@ -25,7 +24,7 @@ const pages = [
   { href: "/pricing", label: "비용", en: "PRICE" },
   { href: "/works", label: "작업 사례", en: "WORKS" },
   { href: "/knowledge", label: "위키", en: "WIKI" },
-  { href: "/#apply", label: "문의", en: "CONTACT" },
+  { href: "/contact", label: "상담 신청", en: "CONTACT" },
 ];
 
 export default function NotFound() {
@@ -39,14 +38,13 @@ export default function NotFound() {
               <span aria-hidden className="h-px w-10 bg-current" />
               <span>NOT FOUND</span>
             </p>
-            <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16">
+            <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
               <div>
                 <p aria-hidden className="select-none text-[120px] font-[800] leading-[0.8] tracking-[-0.07em] bg-[linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04))] bg-clip-text text-transparent md:text-[220px]">
                   404
                 </p>
                 <h1 className="mt-8 break-keep text-[30px] font-[800] leading-[1.2] tracking-[-0.045em] md:text-[44px]">앗, 이 페이지는 지웠어요</h1>
-                <p className="mt-4 max-w-[480px] break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">사이트를 새로 정리하면서 예전 페이지를 내렸습니다. 찾으시던 내용이 있었다면 남겨 주세요. 다시 만들거나 맞는 곳으로 안내하겠습니다.</p>
-                <NotFoundFeedback />
+                <p className="mt-4 max-w-[480px] break-keep text-[16px] leading-[1.7] text-[#aab2bf] md:text-[17px]">사이트를 새로 정리하면서 예전 페이지를 내렸습니다. 아래 메뉴에서 찾으시는 내용으로 이동해 주세요.</p>
               </div>
               <nav aria-label="주요 메뉴">
                 <ul className="border-t border-white/15" role="list">
