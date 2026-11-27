@@ -51,8 +51,8 @@ export function ThreeBoard() {
   const space = demo("space");
   return (
     <BoardShell no="01" en="3D WEB" kw="3D 홈페이지 제작" ice="3D로 만드는 " title="홈페이지" lead={`${threeMeta.lead}.`}>
-      {/* 1. 3D 홈페이지: 내리면 선으로 그린 3D가 흩어졌다가 다음 장면으로 다시 짜이는 브랜드 첫 화면 */}
-      <Stage id="t3d-brand" kind="3D 홈페이지" name="브랜드 첫 화면" head="내리는 대로 장면이 다시 짜입니다" href="/trend">
+      {/* 1. 3D 홈페이지: 스크롤하면 선으로 그린 3D가 흩어졌다가 다음 장면으로 바뀌는 브랜드 첫 화면. 11-27 대표가 "내리는 대로 장면이 다시 짜입니다"를 짚어 업계 말(스크롤)로 고침 */}
+      <Stage id="t3d-brand" kind="3D 홈페이지" name="브랜드 첫 화면" head="스크롤에 맞춰 3D 장면이 바뀝니다" href="/trend">
         <Tilt className="mt-10 md:mt-14">
           <Frame shot={{ src: `${V}/trend.jpg?v=11275`, frame: "browser", ratio: "16/10", alt: "3D 홈페이지를 내리며 웹과 앱, 시스템, AI, 클라우드 장면이 선으로 바뀌는 영상", video: { src: `${V}/trend.mp4?v=11275`, w: 960, h: 600 } }} sizes="(min-width: 1280px) 1200px, 92vw" />
         </Tilt>

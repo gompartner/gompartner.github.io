@@ -12,11 +12,11 @@ import { maintenanceServices, maintenanceSteps } from "@/data/classic/maintenanc
 const svc = (id: string) => maintenanceServices.find((s) => s.id === id)!;
 const cases: { q: string; id: string; a: string; price: string; note: string; c: string }[] = [
   { q: "사이트가 열리지 않아요", id: "fix", a: "다른 요청보다 먼저 봅니다. 원인을 찾는 동안 백업본으로 먼저 살려 둡니다.", price: "원인 확인 후 견적", note: "금액을 먼저 알려 드리고, 동의하시면 작업합니다", c: "#ff8a70" },
-  { q: "글자나 사진을 바꾸고 싶어요", id: "fix", a: "문구, 가격, 사진, 공지를 요청하신 그대로 고칩니다. 월 계약 없이 한 건씩 맡깁니다.", price: "건별 10,000원부터", note: "2영업일 안에 반영합니다", c: "#ffd84d" },
+  { q: "글자나 사진을 바꾸고 싶어요", id: "fix", a: "문구, 가격, 사진, 공지를 요청하신 그대로 고칩니다. 월 계약 없이 한 건씩 맡깁니다.", price: "건별 30,000원부터", note: "2영업일 안에 반영합니다", c: "#ffd84d" },
   { q: "만든 업체와 연락이 안 돼요", id: "takeover", a: "사이트와 계정을 넘겨받아 지금 상태를 점검하고, 이어서 고치고 운영합니다.", price: "점검 후 견적", note: "도메인, 호스팅 만료일부터 확인합니다", c: "#7aa7ff" },
   { q: "사이트가 느려졌어요", id: "perf", a: "어디서 느려지는지 재서 원인을 찾고, 고칠 곳과 효과를 보고서로 드린 뒤 개선합니다.", price: "진단 후 견적", note: "진단 결과를 먼저 드립니다", c: "#ffffff" },
   { q: "AI 도구로 만든 걸 오픈하고 싶어요", id: "ai-site", a: "직접 만드신 서비스를 받아 보안, 결제, 서버를 손봐 실제로 운영할 수 있게 만듭니다.", price: "범위 확인 후 견적", note: "지금 쓰는 도구에서 계속 고칠 수 있게 둡니다", c: "#7aa7ff" },
-  { q: "매달 맡아 줄 곳이 필요해요", id: "monthly", a: "월 1회 정기 점검과 수정 요청을 월 단위로 맡습니다. 만료일과 백업도 함께 챙깁니다.", price: "규모 기준 견적", note: "월 방문자 수, 회원 수, 사이트 수로 정합니다", c: "#ffd84d" },
+  { q: "매달 맡아 줄 곳이 필요해요", id: "monthly", a: "월 1회 정기 점검과 수정 요청을 월 단위로 맡습니다. 만료일과 백업도 함께 챙깁니다.", price: "월 60만 원부터", note: "1년 단위로 계약합니다", c: "#ffd84d" },
 ];
 
 /** children: 판 아래 안내 칸(app/(classic)/maintenance/page.tsx 가 CareGuide를 넣는다) */

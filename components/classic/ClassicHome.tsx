@@ -43,7 +43,7 @@ const services: { no: string; name: string; body: string; price: string; href: s
   { no: "01", name: "웹사이트 제작", body: "소개 홈페이지 6일, 문의와 예약 홈페이지 9일, 광고용 랜딩페이지 4일", price: `${manwon(plans[0].price)}부터`, href: "/make", tone: "blue", span: "md:col-span-4" },
   { no: "02", name: "업무 시스템 개발", body: "엑셀로 하던 정산과 재고, 견적 업무를 웹 관리자 화면 하나로 옮깁니다", price: "요구사항 확인 후 견적", href: "/make", tone: "white", span: "md:col-span-2" },
   { no: "03", name: "앱 개발", body: "홈 화면에 설치하는 웹앱부터 스토어 출시 앱까지 만듭니다", price: `${manwon(appPlans[0].price)}부터`, href: "/make", tone: "yellow", span: "md:col-span-2" },
-  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 10,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
+  { no: "04", name: "유지보수와 고도화", body: "다른 업체가 만든 사이트도 이어받아 고치고 운영합니다. 수정 한 건부터 맡습니다", price: "건별 30,000원부터", href: "/maintenance", tone: "line", span: "md:col-span-4" },
 ];
 const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string }> = {
   blue: { box: "bg-[#256ef4] text-white hover:bg-[#1f63e6]", sub: "text-white", no: "text-white", arrow: "bg-white text-[#256ef4]" },
@@ -55,7 +55,7 @@ const tones: Record<Tone, { box: string; sub: string; no: string; arrow: string 
 // 업체 자랑 대신 고객이 겪는 상황에서 시작한다(11-25 밤 사용자 "돈 안 내고 싶겠다"). 제목은 고객의 상황, 본문은 그때 해 주는 일. 숫자는 비용, 유지보수 페이지의 값
 const reasons = [
   { name: "만든 업체와 연락이 안 될 때", body: "사이트를 넘겨받아 바로 고칩니다. 아임웹이나 워드프레스 등 어떤 도구로 만든 사이트든 맡습니다.", c: "#7aa7ff" },
-  { name: "글자 하나 고치는 데 며칠씩 걸릴 때", body: "카카오톡으로 말씀하시면 바로 답하고 건별 10,000원부터 고칩니다. 월 계약은 필요 없습니다.", c: "#ffd84d" },
+  { name: "글자 하나 고치는 데 며칠씩 걸릴 때", body: "카카오톡으로 말씀하시면 바로 답하고 건별 30,000원부터 고칩니다. 월 계약은 필요 없습니다.", c: "#ffd84d" },
   { name: "얼마가 들지 몰라 미루고 있을 때", body: `소개 홈페이지 ${manwon(plans[0].price)}, ${plans[0].days}일. 가격과 기간을 먼저 공개하고 견적은 무료로 드립니다.`, c: "#ffffff" },
   { name: "엑셀과 카카오톡으로 버티고 있을 때", body: "정산과 재고, 견적 업무를 화면 하나로 옮깁니다. 거래명세서를 링크로 보내고 수령 확인을 받는 거래장부를 직접 만들어 운영하고 있습니다.", c: "#7aa7ff" },
 ];
@@ -93,7 +93,7 @@ const flowPath = "M100 70 C 200 70, 200 130, 300 130 S 400 70, 500 70 S 600 130,
 const faqs = [
   { q: "얼마나 걸리나요?", a: "소개 홈페이지는 6일, 랜딩페이지는 4일이면 엽니다. 문의와 예약 홈페이지는 9일, 설치형 웹앱은 10일입니다. 업무 시스템은 요구사항을 확인한 뒤 견적서에 일정을 적어 드립니다." },
   { q: "금액은 언제 정해지나요?", a: "계약 전에 확정합니다. 범위와 금액, 일정을 견적서로 드리고 동의하시면 바로 시작합니다." },
-  { q: "만든 뒤 수정은 어떻게 하나요?", a: "건별 10,000원부터 요청하실 수 있고 수정이 잦으면 월 유지관리로 묶을 수 있습니다. 오픈 후 1개월 동안 생긴 하자는 무상으로 고칩니다." },
+  { q: "만든 뒤 수정은 어떻게 하나요?", a: "건별 30,000원부터 요청하실 수 있고 수정이 잦으면 월 유지관리(월 60만 원부터, 1년 계약)로 묶을 수 있습니다. 오픈 후 1개월 동안 생긴 하자는 무상으로 고칩니다." },
   { q: "지금 쓰는 사이트를 그대로 두고 고칠 수 있나요?", a: "네. 새로 만들지 않고 지금 사이트에서 필요한 부분만 고칩니다. 다른 업체가 만든 사이트도 넘겨받아 수정합니다." },
 ];
 

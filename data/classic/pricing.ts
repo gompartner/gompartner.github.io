@@ -28,7 +28,7 @@ export const plans: Plan[] = [
     id: "basic",
     name: "소개 홈페이지",
     title: "소개 홈페이지",
-    price: 299_000,
+    price: 990_000,
     days: 6,
     revisions: 2,
     summary: "매장과 병원 등 사업장 소개 중심",
@@ -38,7 +38,7 @@ export const plans: Plan[] = [
     id: "standard",
     name: "문의와 예약 홈페이지",
     title: "문의와 예약 홈페이지",
-    price: 490_000,
+    price: 1_990_000,
     days: 9,
     revisions: 3,
     summary: "문의와 예약 접수, 게시물 직접 관리",
@@ -48,7 +48,7 @@ export const plans: Plan[] = [
     id: "premium",
     name: "맞춤 기능 홈페이지",
     title: "맞춤 기능 홈페이지",
-    price: 990_000,
+    price: 3_900_000,
     days: 12,
     revisions: 4,
     summary: "예약과 주문 등 업종 맞춤 기능 개발",
@@ -61,7 +61,7 @@ export const landingPlans: Plan[] = [
     id: "landing-basic",
     name: "신청 접수",
     title: "신청 접수",
-    price: 99_000,
+    price: 390_000,
     days: 4,
     revisions: 2,
     summary: "신청 접수와 즉시 알림",
@@ -71,7 +71,7 @@ export const landingPlans: Plan[] = [
     id: "landing-standard",
     name: "상담 관리",
     title: "상담 관리",
-    price: 149_000,
+    price: 590_000,
     days: 5,
     revisions: 2,
     summary: "상담 진행 상태 관리",
@@ -81,7 +81,7 @@ export const landingPlans: Plan[] = [
     id: "landing-premium",
     name: "광고 성과 정리",
     title: "광고 성과 정리",
-    price: 249_000,
+    price: 890_000,
     days: 7,
     revisions: 3,
     summary: "광고 채널별 성과 집계",
@@ -296,5 +296,6 @@ export function estimateFor(projectId: string): Estimate | null {
   return { plan, lines, list, discount, total: list - discount, days: Math.ceil(days) };
 }
 
+// 11-27 대표 "너무 저렴해" > "가격 올려": 소개 29.9만>99만, 문의와 예약 49만>199만, 맞춤 기능 99만>390만, 랜딩 9.9만/14.9만/24.9만>39만/59만/89만, 건별 수정 1만>3만, 인수 점검은 무료 유지. 앱, 키오스크는 그대로
 export const manwon = (n: number) => `${(n / 10_000).toLocaleString("ko-KR", { maximumFractionDigits: 1 })}만 원`;
 export const formatWon = (n: number) => `${n.toLocaleString("ko-KR")}원`;

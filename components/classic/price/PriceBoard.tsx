@@ -164,8 +164,8 @@ export function PriceBoard() {
             <dl className="mt-3 space-y-2 text-[15px]">
               {[
                 ["업무 시스템", "요구사항 확인 후 견적"],
-                ["수정 한 건", "10,000원부터"],
-                ["월 유지관리", "규모 기준 견적"],
+                ["수정 한 건", "30,000원부터"],
+                ["월 유지관리", "월 60만 원부터(1년 계약)"],
               ].map(([a, b]) => (
                 <div key={a} className="flex justify-between gap-3">
                   <dt className="text-[#c9ced6]">{a}</dt>
