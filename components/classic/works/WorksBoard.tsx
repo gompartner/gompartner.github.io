@@ -25,7 +25,7 @@ export function WorksBoard() {
         {workCases.map((c, i) => (
           <li key={c.id} id={c.id} className="scroll-mt-24">
             <Open c={c} className="group relative block pb-[12%] md:pb-[6%]">
-              <span className="block overflow-hidden rounded-[10px] bg-[#151922] shadow-[0_0_0_1px_rgba(255,255,255,.08)] md:w-[86%]">
+              <span className={`block overflow-hidden rounded-[10px] bg-[#151922] shadow-[0_0_0_1px_rgba(255,255,255,.08)] md:w-[86%]${c.phoneLeft ? " md:ml-auto" : ""}`}>
                 <span className="flex h-8 items-center gap-1.5 border-b border-white/8 px-3 md:h-9">
                   <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-white/20" />
                   <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-white/20" />
@@ -42,7 +42,7 @@ export function WorksBoard() {
                   )}
                 </span>
               </span>
-              <span className="absolute bottom-0 right-0 block w-[30%] overflow-hidden rounded-[18px] border-[5px] border-[#232833] bg-[#151922] shadow-[0_30px_60px_-20px_rgba(0,0,0,.8)] md:w-[19%] md:rounded-[26px] md:border-[7px]">
+              <span className={`absolute bottom-0 ${c.phoneLeft ? "left-0" : "right-0"} block w-[30%] overflow-hidden rounded-[18px] border-[5px] border-[#232833] bg-[#151922] shadow-[0_30px_60px_-20px_rgba(0,0,0,.8)] md:w-[19%] md:rounded-[26px] md:border-[7px]`}>
                 <span className="relative block aspect-[390/844]">
                   {c.videoM ? (
                     <span className="absolute inset-0" aria-hidden>

@@ -22,6 +22,8 @@ export interface WorkCase {
   video?: { src: string; w: number; h: number };
   /** 휴대폰 화면 자리에서 도는 영상(390x844) */
   videoM?: string;
+  /** 11-28 사용자 "수묵은 모바일을 왼쪽에": 그림이 오른쪽에 있는 작업은 휴대폰을 왼쪽에 겹친다 */
+  phoneLeft?: boolean;
 }
 
 export const workCases: WorkCase[] = [
@@ -71,6 +73,7 @@ export const workCases: WorkCase[] = [
     video: { src: "/videos/3d/sumuk.mp4", w: 960, h: 600 },
     videoM: "/videos/3d/sumuk-m.mp4",
     m: "/images/works/sumuk-m.jpg",
+    phoneLeft: true,
     alt: "수묵화 홈페이지 첫 화면. 제작이라는 붓글씨와 한옥 처마, 소나무가 그려진 수묵화",
   },
   {
