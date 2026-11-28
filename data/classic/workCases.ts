@@ -57,6 +57,23 @@ export const workCases: WorkCase[] = [
     alt: "곰파트너 랜딩페이지 첫 화면. Build, Run, Care 제목과 흐르는 빛줄기",
   },
   {
+    // 11-28 사용자 "work에 올릴꺼야? 랜딩?" 응: 수묵화 그림을 획으로 나눠 다시 긋는 랜딩페이지(gompartner.co.kr/k-sumuk). 그림은 이 맥에서 만든 수묵화
+    id: "sumuk",
+    kind: "랜딩페이지",
+    name: "수묵화 홈페이지",
+    line: "그림 위를 문지르면 그 자리에 붓 획이 그어지는 수묵화 랜딩페이지입니다.",
+    href: "/k-sumuk/",
+    host: "gompartner.co.kr/k-sumuk",
+    problem: "제작, 운영, 관리라는 말은 어느 제작사나 씁니다. 글로 적으면 차이가 보이지 않습니다.",
+    made: "세 가지 일을 한옥 처마, 강가 마을, 달밤 돌담 세 장의 수묵화로 담았습니다. 그림을 획 단위로 나눠 큰 획부터 다시 긋고, 화면을 내리면 그림 속으로 들어가 다음 장면이 그려집니다.",
+    now: "곰파트너 주소에서 운영 중입니다. 휴대폰은 손가락, PC는 마우스가 붓이 되어 닿는 자리의 획이 먼저 그어집니다.",
+    pc: "/images/works/sumuk-pc.jpg",
+    video: { src: "/videos/3d/sumuk.mp4", w: 960, h: 600 },
+    videoM: "/videos/3d/sumuk-m.mp4",
+    m: "/images/works/sumuk-m.jpg",
+    alt: "수묵화 홈페이지 첫 화면. 제작이라는 붓글씨와 한옥 처마, 소나무가 그려진 수묵화",
+  },
+  {
     id: "jangbu",
     kind: "업무 시스템",
     name: "거래장부",
