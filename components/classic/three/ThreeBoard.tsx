@@ -74,7 +74,7 @@ export function ThreeBoard() {
           title="3D 거실 상담 화면. 거실 크기를 정하고 가구를 놓고 옮기면 합계가 바뀝니다."
           poster={`${V}/room.jpg?v=11272`}
           stages={[{ min: 1180, src: `${V}/room-stage-1200.jpg` }, { min: 900, src: `${V}/room-stage-1000.jpg` }, { min: 768, src: `${V}/room-stage-800.jpg` }]}
-          preview={{ src: `${V}/room-m.mp4?v=11273`, poster: `${V}/room-m.jpg?v=11272`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
+          preview={{ src: `${V}/room-m.mp4?v=11273`, poster: `${V}/room-m.jpg?v=11272`, still: `${V}/room-stage-m.jpg?v=11286`, w: 390, h: 844, alt: "휴대폰에서 거실을 돌려 보고 소파 모듈을 붙이고 선반과 바닥을 바꾸는 화면" }}
           hint="가구를 선택해 끌어 옮기면 합계 금액이 함께 바뀝니다."
         >
           <p className={tag}>
